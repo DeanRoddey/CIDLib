@@ -74,7 +74,7 @@ TTest_MemBufMove::eRunTest(TTextStringOutStream&   strmOut
     // Test move semantics stuff
     THeapBuf mbufOld(64, 128);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 64; c4Index++)
-        mbufOld[c4Index] = tCIDLib::TCard1(c4Index);
+        mbufOld.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
     THeapBuf mbufCopy(tCIDLib::ForceMove(mbufOld));
 
     // The new guy should have the data now
@@ -165,9 +165,9 @@ TTest_MemBufExp::eRunTest(  TTextStringOutStream&   strmOut
         //
         THeapBuf mbufTest(10, 15);
         for (tCIDLib::TCard1 c1Val = 0; c1Val < 5; c1Val++)
-            mbufTest[c1Val] = c1Val;
+            mbufTest.PutCard1(c1Val, c1Val);
         for (tCIDLib::TCard1 c1Val = 5; c1Val < 10; c1Val++)
-            mbufTest[c1Val] = c1Val + 5;
+            mbufTest.PutCard1(c1Val + 5, c1Val);
 
         //
         //  Make 5 bytes available at offset 5 and insert 5 through 9. Ths should
@@ -175,7 +175,7 @@ TTest_MemBufExp::eRunTest(  TTextStringOutStream&   strmOut
         //
         mbufTest.MakeSpace(5, 5, 10);
         for (tCIDLib::TCard1 c1Val = 5; c1Val < 10; c1Val++)
-            mbufTest[c1Val] = c1Val;
+            mbufTest.PutCard1(c1Val, c1Val);
 
         for (tCIDLib::TCard1 c1Val = 0; c1Val < 15; c1Val++)
         {
@@ -213,13 +213,13 @@ TTest_MemBufExp::eRunTest(  TTextStringOutStream&   strmOut
         //  0, 1, 2, 10, 11, 3, 4
         //
         THeapBuf mbufTest(7, 7);
-        mbufTest[0] = 0;
-        mbufTest[1] = 1;
-        mbufTest[2] = 2;
-        mbufTest[3] = 10;
-        mbufTest[4] = 11;
-        mbufTest[5] = 3;
-        mbufTest[6] = 4;
+        mbufTest.PutCard1(0, 0);
+        mbufTest.PutCard1(1, 1);
+        mbufTest.PutCard1(2, 2);
+        mbufTest.PutCard1(10, 3);
+        mbufTest.PutCard1(11, 4);
+        mbufTest.PutCard1(3, 5);
+        mbufTest.PutCard1(4, 6);
 
         // Remove the 10/11 bytes to leave a contiguous buffer
         mbufTest.RemoveSpace(3, 2, 7);

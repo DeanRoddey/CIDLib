@@ -64,6 +64,9 @@ TGraphMemDev::TGraphMemDev( const   TGraphDrawDev&  gdevCompatible
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     //
@@ -85,6 +88,9 @@ TGraphMemDev::TGraphMemDev( const   TGraphDrawDev&  gdevCompatible
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     // Store the handle
@@ -111,6 +117,9 @@ TGraphMemDev::TGraphMemDev( const   TGraphDrawDev&  gdevCompatible
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     //
@@ -132,6 +141,9 @@ TGraphMemDev::TGraphMemDev( const   TGraphDrawDev&  gdevCompatible
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     // Store the handle
@@ -159,6 +171,9 @@ TGraphMemDev::TGraphMemDev( const   TSize&                  szMax
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     //
@@ -180,6 +195,9 @@ TGraphMemDev::TGraphMemDev( const   TSize&                  szMax
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
 
     // Store the handle

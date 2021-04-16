@@ -37,12 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDSChan& facCIDSChan()
 {
-    static TFacCIDSChan* pfacCIDSChan = nullptr;
-    if (!pfacCIDSChan)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDSChan)
-            pfacCIDSChan = new TFacCIDSChan;
-    }
-    return *pfacCIDSChan;
+    static TFacCIDSChan* pfacThis = new TFacCIDSChan();
+    return *pfacThis;
 }

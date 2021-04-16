@@ -31,10 +31,15 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <Mmdeviceapi.h>
 #include    <Mmsystem.h>
 #include    <Endpointvolume.h>
 #include    <dsound.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------
@@ -49,46 +54,49 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Audio
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  amapTable
-    //      A table to map multimedia errors into our errors. It uses the
-    //      standard error mapping record defined by CIDKernel.
-    //
-    //      <TBD> When is this to be used? Its not used now!
-    //
-    //  c4MajVer
-    //  c4MinVer
-    //      The maj/min version of the driver that is controlling this device.
-    //
-    //  i4DevId
-    //      The id of the chosen audio device, if there is one. If not, then
-    //      bAudioSupport is set to false and this value is -1.
-    // -----------------------------------------------------------------------
-    const tCIDKernel_::TErrMap   amapTable[] =
+    namespace
     {
-            { MMSYSERR_ERROR        , kKrnlErrs::errcGen_GenFailure }
-        ,   { MMSYSERR_BADDEVICEID  , kKrnlErrs::errcGen_InvalidDeviceId }
-        ,   { MMSYSERR_NOTENABLED   , kKrnlErrs::errcGen_NotReady }
-        ,   { MMSYSERR_ALLOCATED    , kKrnlErrs::errcGen_AlreadyAllocated }
-        ,   { MMSYSERR_INVALHANDLE  , kKrnlErrs::errcData_InvalidHandle }
-        ,   { MMSYSERR_NODRIVER     , kKrnlErrs::errcDev_NoDriverLoaded }
-        ,   { MMSYSERR_NOMEM        , kKrnlErrs::errcMem_AllocError }
-        ,   { MMSYSERR_NOTSUPPORTED , kKrnlErrs::errcGen_NotSupported }
-        ,   { MMSYSERR_INVALFLAG    , kKrnlErrs::errcData_InvalidFlag }
-        ,   { MMSYSERR_INVALPARAM   , kKrnlErrs::errcData_InvalidParameter }
-        ,   { MMSYSERR_HANDLEBUSY   , kKrnlErrs::errcGen_Busy }
-        ,   { MMSYSERR_INVALIDALIAS , kKrnlErrs::errcData_InvalidAlias }
-        ,   { MMSYSERR_KEYNOTFOUND  , kKrnlErrs::errcGen_NotFound }
-        ,   { MMSYSERR_READERROR    , kKrnlErrs::errcGen_ReadFault }
-        ,   { MMSYSERR_WRITEERROR   , kKrnlErrs::errcGen_WriteFault }
-        ,   { MMSYSERR_DELETEERROR  , kKrnlErrs::errcGen_DeleteError }
-        ,   { MMSYSERR_VALNOTFOUND  , kKrnlErrs::errcGen_NotFound }
-        ,   { MMSYSERR_NODRIVERCB   , kKrnlErrs::errcGen_NotSupported }
-    };
-    tCIDLib::TCard4         c4Formats;
-    const tCIDLib::TCard4   c4XlatEntries = tCIDLib::c4ArrayElems(amapTable);
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  amapTable
+        //      A table to map multimedia errors into our errors. It uses the
+        //      standard error mapping record defined by CIDKernel.
+        //
+        //      <TBD> When is this to be used? Its not used now!
+        //
+        //  c4MajVer
+        //  c4MinVer
+        //      The maj/min version of the driver that is controlling this device.
+        //
+        //  i4DevId
+        //      The id of the chosen audio device, if there is one. If not, then
+        //      bAudioSupport is set to false and this value is -1.
+        // -----------------------------------------------------------------------
+        const tCIDKernel_::TErrMap   amapTable[] =
+        {
+                { MMSYSERR_ERROR        , kKrnlErrs::errcGen_GenFailure }
+            ,   { MMSYSERR_BADDEVICEID  , kKrnlErrs::errcGen_InvalidDeviceId }
+            ,   { MMSYSERR_NOTENABLED   , kKrnlErrs::errcGen_NotReady }
+            ,   { MMSYSERR_ALLOCATED    , kKrnlErrs::errcGen_AlreadyAllocated }
+            ,   { MMSYSERR_INVALHANDLE  , kKrnlErrs::errcData_InvalidHandle }
+            ,   { MMSYSERR_NODRIVER     , kKrnlErrs::errcDev_NoDriverLoaded }
+            ,   { MMSYSERR_NOMEM        , kKrnlErrs::errcMem_AllocError }
+            ,   { MMSYSERR_NOTSUPPORTED , kKrnlErrs::errcGen_NotSupported }
+            ,   { MMSYSERR_INVALFLAG    , kKrnlErrs::errcData_InvalidFlag }
+            ,   { MMSYSERR_INVALPARAM   , kKrnlErrs::errcData_InvalidParameter }
+            ,   { MMSYSERR_HANDLEBUSY   , kKrnlErrs::errcGen_Busy }
+            ,   { MMSYSERR_INVALIDALIAS , kKrnlErrs::errcData_InvalidAlias }
+            ,   { MMSYSERR_KEYNOTFOUND  , kKrnlErrs::errcGen_NotFound }
+            ,   { MMSYSERR_READERROR    , kKrnlErrs::errcGen_ReadFault }
+            ,   { MMSYSERR_WRITEERROR   , kKrnlErrs::errcGen_WriteFault }
+            ,   { MMSYSERR_DELETEERROR  , kKrnlErrs::errcGen_DeleteError }
+            ,   { MMSYSERR_VALNOTFOUND  , kKrnlErrs::errcGen_NotFound }
+            ,   { MMSYSERR_NODRIVERCB   , kKrnlErrs::errcGen_NotSupported }
+        };
+        tCIDLib::TCard4         c4Formats;
+        const tCIDLib::TCard4   c4XlatEntries = tCIDLib::c4ArrayElems(amapTable);
+    }
 }
 
 
@@ -133,9 +141,10 @@ bEnumAudioDevs(GUID* pGUID, TCHAR* pszDesc, TCHAR* pszDevName, VOID* pContext)
         return TRUE;
 
     // Format the GUID to a string
-    const tCIDLib::TCard4 c4BufSz = 127;
+    constexpr tCIDLib::TCard4 c4BufSz = 127;
     tCIDLib::TCh achBuf[c4BufSz + 1];
-    ::StringFromGUID2(*pGUID, achBuf, c4BufSz);
+    if (!::StringFromGUID2(*pGUID, achBuf, c4BufSz))
+        return FALSE;
 
     if (pInfo->pchToFill[0] != kCIDLib::chNull)
         TRawStr::CatStr(pInfo->pchToFill, L"\n", pInfo->c4MaxChars);
@@ -163,7 +172,7 @@ static HRESULT hresGetDefAudioEndPointVol(IAudioEndpointVolume*& pToSet)
     IMMDeviceEnumerator* pEnumerator = NULL;
     hRes = ::CoCreateInstance
     (
-        CLSID_MMDevEnum, NULL, CLSCTX_ALL, IID_IMMDevEnum, (void**)&pEnumerator
+        CLSID_MMDevEnum, NULL, CLSCTX_ALL, IID_IMMDevEnum, tCIDLib::pToVoidPP(&pEnumerator)
     );
 
     if (FAILED(hRes))
@@ -186,7 +195,7 @@ static HRESULT hresGetDefAudioEndPointVol(IAudioEndpointVolume*& pToSet)
     // Use that (sigh...) to activate an end point volume object
     hRes = pMMDev->Activate
     (
-        __uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (void**)&pToSet
+        __uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, tCIDLib::pToVoidPP(&pToSet)
     );
     if (FAILED(hRes))
     {
@@ -241,7 +250,7 @@ tCIDLib::TBoolean TKrnlAudio::bMuteSystemAudio(const tCIDLib::TBoolean bMute)
 
     BOOL SysMute(bMute ? TRUE : FALSE);
     hRes = pAudioEPV->SetMute(SysMute, NULL);
-    if (hRes)
+    if (hRes != S_OK)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcAudio_SetSysMute, hRes);
         return kCIDLib::False;
@@ -335,7 +344,7 @@ tCIDLib::TBoolean TKrnlAudio::bQuerySystemVolume(tCIDLib::TCard4& c4ToFill)
     // Get the scalar volume 0 to 1.0, and scale to our cardinal percent
     float fPerVol;
     hRes = pAudioEPV->GetMasterVolumeLevelScalar(&fPerVol);
-    if (hRes)
+    if (hRes != S_OK)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcAudio_QuerySysVolume, hRes);
         return kCIDLib::False;

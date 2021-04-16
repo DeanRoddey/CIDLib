@@ -46,50 +46,53 @@ RTTIDecls(TFacCIDCtrls, TGUIFacility)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  This is used to fault in the special text file when/if it is required.
-    // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bSpecialTextLoaded = kCIDLib::False;
-
-
-    // -----------------------------------------------------------------------
-    //  These are used in the window enumeration callback, so that we can pass
-    //  info through.
-    // -----------------------------------------------------------------------
-    struct TFindWndText
+    namespace
     {
-                tCIDLib::TBoolean       bStartsWith;
-        const   tCIDLib::TCh*           pszText;
-        const   tCIDLib::TCh*           pszClass;
-                tCIDLib::TCard4         c4TextLen;
-                tCIDCtrls::TWndHandle   hwndFound;
-                tCIDLib::TProcessId     pidTarget;
-                tCIDLib::TCh*           pchTmpBuf;
-                tCIDLib::TCard4         c4TmpBufSz;
-    };
+        // -----------------------------------------------------------------------
+        //  This is used to fault in the special text file when/if it is required.
+        // -----------------------------------------------------------------------
+        TAtomicFlag atomInitDone;
 
-    struct TFindWndOwnedPopup
-    {
-        tCIDCtrls::TWndHandle   hwndFound;
-        tCIDCtrls::TWndHandle   hwndRootOwner;
-        tCIDLib::TBoolean       bModalOnly;
-    };
 
-    struct TFindWndFiltered
-    {
-                tCIDCtrls::TWndHandle   hwndFound;
-                tCIDLib::TProcessId     pidTarget;
-                tCIDLib::TBoolean       bOwned;
-                tCIDCtrls::TWndHandle   hwndOwner;
-        const   tCIDLib::TCh*           pszClass;
-                tCIDLib::TCard4         c4DontWantStyles;
-                tCIDLib::TCard4         c4WantStyles;
-                tCIDLib::TCard4         c4DontWantExStyles;
-                tCIDLib::TCard4         c4WantExStyles;
+        // -----------------------------------------------------------------------
+        //  These are used in the window enumeration callback, so that we can pass
+        //  info through.
+        // -----------------------------------------------------------------------
+        struct TFindWndText
+        {
+                    tCIDLib::TBoolean       bStartsWith;
+            const   tCIDLib::TCh*           pszText;
+            const   tCIDLib::TCh*           pszClass;
+                    tCIDLib::TCard4         c4TextLen;
+                    tCIDCtrls::TWndHandle   hwndFound;
+                    tCIDLib::TProcessId     pidTarget;
+                    tCIDLib::TCh*           pchTmpBuf;
+                    tCIDLib::TCard4         c4TmpBufSz;
+        };
 
-                tCIDLib::TCard4         c4FoundStyles;
-                tCIDLib::TCard4         c4FoundExStyles;
-    };
+        struct TFindWndOwnedPopup
+        {
+            tCIDCtrls::TWndHandle   hwndFound;
+            tCIDCtrls::TWndHandle   hwndRootOwner;
+            tCIDLib::TBoolean       bModalOnly;
+        };
+
+        struct TFindWndFiltered
+        {
+                    tCIDCtrls::TWndHandle   hwndFound;
+                    tCIDLib::TProcessId     pidTarget;
+                    tCIDLib::TBoolean       bOwned;
+                    tCIDCtrls::TWndHandle   hwndOwner;
+            const   tCIDLib::TCh*           pszClass;
+                    tCIDLib::TCard4         c4DontWantStyles;
+                    tCIDLib::TCard4         c4WantStyles;
+                    tCIDLib::TCard4         c4DontWantExStyles;
+                    tCIDLib::TCard4         c4WantExStyles;
+
+                    tCIDLib::TCard4         c4FoundStyles;
+                    tCIDLib::TCard4         c4FoundExStyles;
+        };
+    }
 }
 
 
@@ -146,21 +149,9 @@ QueryMonitorArea(HMONITOR hMon, TArea& areaToFill, const tCIDLib::TBoolean bAvai
     if (::GetMonitorInfo(hMon, &MonInfo))
     {
         if (bAvailOnly)
-        {
-            areaToFill.FromRectl
-            (
-                *reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcWork)
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
-        }
-         else
-        {
-            areaToFill.FromRectl
-            (
-                *reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcMonitor)
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
-        }
+            areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcWork));
+        else
+            areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&MonInfo.rcMonitor));
     }
      else
     {
@@ -692,7 +683,7 @@ TFacCIDCtrls::TFacCIDCtrls() :
     TGUIFacility
     (
         L"CIDCtrls"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -1028,7 +1019,7 @@ TFacCIDCtrls::bOpenFileDlg( const   TWindow&                wndOwner
             ITEMIDLIST* pItemList = ::SHSimpleIDListFromPath(strInitPath.pszBuffer());
             if (pItemList)
             {
-                IShellItem* pShellItem = 0;
+                IShellItem* pShellItem = nullptr;
                 hRes = ::SHCreateShellItem
                 (
                     NULL, NULL, pItemList, &pShellItem
@@ -1387,10 +1378,10 @@ tCIDLib::TBoolean
 TFacCIDCtrls::bLoadSpecialText(const tCIDLib::TMsgId midToLoad, TString& strToFill)
 {
     // If we've not loaded the special text yet, then do that
-    if (!CIDCtrls_ThisFacility::bSpecialTextLoaded)
+    if (!CIDCtrls_ThisFacility::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDCtrls_ThisFacility::bSpecialTextLoaded)
+        if (!CIDCtrls_ThisFacility::atomInitDone)
         {
             TKrnlModule::bLoadMessages
             (
@@ -1398,7 +1389,7 @@ TFacCIDCtrls::bLoadSpecialText(const tCIDLib::TMsgId midToLoad, TString& strToFi
                 , L"CIDCommonText"
                 , m_pmiSpecialMsgs
             );
-            CIDCtrls_ThisFacility::bSpecialTextLoaded = kCIDLib::True;
+            CIDCtrls_ThisFacility::atomInitDone.Set();
         }
     }
 
@@ -1491,7 +1482,7 @@ tCIDLib::TVoid TFacCIDCtrls::ConfinePointer(const TArea& areaOnScreen)
 {
     // Set the cursor confinement to the confine area
     tCIDLib::THostRectl rectlConfine;
-    areaOnScreen.ToRectl(rectlConfine, tCIDLib::ERectlTypes::NonInclusive);
+    areaOnScreen.ToRectl(rectlConfine);
     ::ClipCursor((RECT*)&rectlConfine);
 }
 
@@ -1605,10 +1596,10 @@ TFacCIDCtrls::hwndChildFromText(const   tCIDCtrls::TWndHandle   hwndParent
     const tCIDLib::TCard4 c4BufSz = 1024;
     tCIDLib::TCh achBuf[c4BufSz + 1];
 
-    tCIDCtrls::TWndHandle hwndRet;
+    tCIDCtrls::TWndHandle hwndRet = kCIDCtrls::hwndInvalid;
     if (bDirectChild)
     {
-        tCIDCtrls::TWndHandle hwndRet = ::GetWindow(hwndParent, GW_CHILD);
+        hwndRet = ::GetWindow(hwndParent, GW_CHILD);
         while (hwndRet)
         {
             // See if this window has the expected text
@@ -2618,7 +2609,7 @@ TFacCIDCtrls::SetMonitorPowerState(         TWindow&                wndCaller
         SetForeground(wndCaller.hwndThis(), kCIDLib::True);
 
         INPUT aInputEvs[1];
-        TRawMem::SetMemBuf(aInputEvs, tCIDLib::TCard1(0), sizeof(INPUT));
+        TRawMem::SetMemBuf(aInputEvs, kCIDLib::c1MinCard, sizeof(INPUT));
 
         // Move down/right one pixel, sleep a bit, then more back again
         aInputEvs[0].type = INPUT_MOUSE;
@@ -3038,6 +3029,12 @@ tCIDLib::TVoid TFacCIDCtrls::ValidatePrevWindowPos(TPoint& pntToVal)
     }
 }
 
+
+// Get a window's id
+tCIDCtrls::TWndId TFacCIDCtrls::widFromHandle(const tCIDCtrls::TWndHandle hwndSrc)
+{
+    return ::GetWindowLong(hwndSrc, GWL_ID);
+}
 
 
 // ---------------------------------------------------------------------------

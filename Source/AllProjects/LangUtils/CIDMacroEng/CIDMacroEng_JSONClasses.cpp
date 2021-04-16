@@ -48,15 +48,18 @@ RTTIDecls(TMEngJSONParserInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strJSONAnchor(L"JSONAnchor");
-    const TString   strJSONAnchorClassPath(L"MEng.System.Runtime.JSONAnchor");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strJSONAnchor(L"JSONAnchor");
+        const TString   strJSONAnchorClassPath(L"MEng.System.Runtime.JSONAnchor");
 
-    const TString   strJSONParser(L"JSONParser");
-    const TString   strJSONParserClassPath(L"MEng.System.Runtime.JSONParser");
+        const TString   strJSONParser(L"JSONParser");
+        const TString   strJSONParserClassPath(L"MEng.System.Runtime.JSONParser");
+    }
 }
 
 
@@ -334,7 +337,7 @@ TMEngJSONAnchorInfo::TMEngJSONAnchorInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -627,35 +630,37 @@ TMEngJSONParserInfo::TMEngJSONParserInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2EnumId_ValTypes(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_FindArray(kMacroEng::c2BadId)
-    , m_c2MethId_FindBoolValue(kMacroEng::c2BadId)
-    , m_c2MethId_FindCardValue(kMacroEng::c2BadId)
-    , m_c2MethId_FindFloatValue(kMacroEng::c2BadId)
-    , m_c2MethId_FindIntValue(kMacroEng::c2BadId)
-    , m_c2MethId_FindChild(kMacroEng::c2BadId)
-    , m_c2MethId_FindObject(kMacroEng::c2BadId)
-    , m_c2MethId_FindValue(kMacroEng::c2BadId)
-    , m_c2MethId_FindType(kMacroEng::c2BadId)
-    , m_c2MethId_GetChildAt(kMacroEng::c2BadId)
-    , m_c2MethId_GetChildCount(kMacroEng::c2BadId)
-    , m_c2MethId_GetFirstChild(kMacroEng::c2BadId)
-    , m_c2MethId_GetLastChild(kMacroEng::c2BadId)
-    , m_c2MethId_GetName(kMacroEng::c2BadId)
-    , m_c2MethId_GetNameAt(kMacroEng::c2BadId)
-    , m_c2MethId_GetRootAnchor(kMacroEng::c2BadId)
-    , m_c2MethId_GetType(kMacroEng::c2BadId)
-    , m_c2MethId_GetTypeAt(kMacroEng::c2BadId)
-    , m_c2MethId_GetValue(kMacroEng::c2BadId)
-    , m_c2MethId_GetValueAt(kMacroEng::c2BadId)
-    , m_c2MethId_NextPrevChild(kMacroEng::c2BadId)
-    , m_c2MethId_ParseResponse(kMacroEng::c2BadId)
-    , m_c2MethId_ParseResponse2(kMacroEng::c2BadId)
-    , m_c2TypeId_Anchor(kMacroEng::c2BadId)
-    , m_c2TypeId_TextInStream(kMacroEng::c2BadId)
-    , m_c2TypeId_TextOutStream(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_ValTypes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CheckValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindArray(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindBoolValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindCardValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindFloatValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindIntValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindChild(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindObject(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindType(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetChildAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetChildCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFirstChild(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLastChild(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNameAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetRootAnchor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetType(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetTypeAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetValueAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_NextPrevChild(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseResponse(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseResponse2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PrintToStream(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Anchor(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_TextInStream(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_TextOutStream(kCIDMacroEng::c2BadId)
     , m_c4ErrBadAnchor(kCIDLib::c4MaxCard)
     , m_c4ErrBadIndex(kCIDLib::c4MaxCard)
     , m_c4ErrChildNotFound(kCIDLib::c4MaxCard)
@@ -665,6 +670,7 @@ TMEngJSONParserInfo::TMEngJSONParserInfo(TCIDMacroEngine& meOwner) :
     , m_c4ErrNotAnArray(kCIDLib::c4MaxCard)
     , m_c4ErrNotAnObject(kCIDLib::c4MaxCard)
     , m_c4ErrNotASimpleVal(kCIDLib::c4MaxCard)
+    , m_c4ErrPrintErr(kCIDLib::c4MaxCard)
     , m_c4ErrParseFailed(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
     , m_pmeciValTypes(0)
@@ -1354,58 +1360,74 @@ TMEngJSONParserInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         if (!pjprsnFnd && meOwner.bStackValAt(c4FirstInd + 2))
             ThrowAnErr(meOwner, m_c4ErrNameNotFound, strToFind);
 
-        //
-        //  Either we found it, or they don't want to throw in which case we will
-        //  return the default value they provided. First, check that it's a
-        //  valid value type for what the caller wants.
-        //
-        try
+        tCIDLib::TBoolean bGoodVal = kCIDLib::False;
+        if (pjprsnFnd && (pjprsnFnd->eType() != tCIDNet::EJSONVTypes::Null))
+        {
+            try
+            {
+                if (c2MethId == m_c2MethId_FindBoolValue)
+                {
+                    TMEngBooleanVal& mecvRet = meOwner.mecvStackAtAs<TMEngBooleanVal>(c4FirstInd - 1);
+                    if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::False)
+                    {
+                        mecvRet.bValue(kCIDLib::False);
+                        bGoodVal = kCIDLib::True;
+                    }
+                     else if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::True)
+                    {
+                        mecvRet.bValue(kCIDLib::True);
+                        bGoodVal = kCIDLib::True;
+                    }
+                }
+                 else if (c2MethId == m_c2MethId_FindCardValue)
+                {
+                    TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
+                    mecvRet.c4Value(pjprsnCont->c4FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+                 else if (c2MethId == m_c2MethId_FindFloatValue)
+                {
+                    TMEngFloat8Val& mecvRet = meOwner.mecvStackAtAs<TMEngFloat8Val>(c4FirstInd - 1);
+                    mecvRet.f8Value(pjprsnCont->f8FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+                 else if (c2MethId == m_c2MethId_FindIntValue)
+                {
+                    TMEngInt4Val& mecvRet = meOwner.mecvStackAtAs<TMEngInt4Val>(c4FirstInd - 1);
+                    mecvRet.i4Value(pjprsnCont->i4FindVal(strToFind));
+                    bGoodVal = kCIDLib::True;
+                }
+            }
+
+            catch(TError& errToCatch)
+            {
+                errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                ThrowAnErr(meOwner, m_c4ErrGetValAs, errToCatch);
+            }
+        }
+
+        if (!bGoodVal)
         {
             if (c2MethId == m_c2MethId_FindBoolValue)
             {
                 TMEngBooleanVal& mecvRet = meOwner.mecvStackAtAs<TMEngBooleanVal>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                {
-                    if (pjprsnFnd->eType() == tCIDNet::EJSONVTypes::False)
-                        mecvRet.bValue(kCIDLib::False);
-                    else
-                        mecvRet.bValue(kCIDLib::True);
-                }
-                 else
-                {
-                    mecvRet.bValue(meOwner.bStackValAt(c4FirstInd + 3));
-                }
+                mecvRet.bValue(meOwner.bStackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindCardValue)
             {
                 TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.c4Value(pjprsnCont->c4FindVal(strToFind));
-                else
-                    mecvRet.c4Value(meOwner.c4StackValAt(c4FirstInd + 3));
+                mecvRet.c4Value(meOwner.c4StackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindFloatValue)
             {
                 TMEngFloat8Val& mecvRet = meOwner.mecvStackAtAs<TMEngFloat8Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.f8Value(pjprsnCont->f8FindVal(strToFind));
-                else
-                    mecvRet.f8Value(meOwner.f8StackValAt(c4FirstInd + 3));
+                mecvRet.f8Value(meOwner.f8StackValAt(c4FirstInd + 3));
             }
              else if (c2MethId == m_c2MethId_FindIntValue)
             {
                 TMEngInt4Val& mecvRet = meOwner.mecvStackAtAs<TMEngInt4Val>(c4FirstInd - 1);
-                if (pjprsnFnd)
-                    mecvRet.i4Value(pjprsnCont->i4FindVal(strToFind));
-                else
-                    mecvRet.i4Value(meOwner.i4StackValAt(c4FirstInd + 3));
+                mecvRet.i4Value(meOwner.i4StackValAt(c4FirstInd + 3));
             }
-        }
-
-        catch(TError& errToCatch)
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            ThrowAnErr(meOwner, m_c4ErrGetValAs, errToCatch);
         }
     }
      else if (c2MethId == m_c2MethId_FindChild)
@@ -1855,7 +1877,7 @@ TMEngJSONParserInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 &meOwner.mecvStackAtAs<TMEngMemBufVal>(c4FirstInd).mbufValue()
                 , meOwner.c4StackValAt(c4FirstInd + 1)
                 , tCIDLib::EAdoptOpts::NoAdopt
-                , facCIDEncode().ptcvtMakeNew(meOwner.strStackValAt(c4FirstInd + 2))
+                , facCIDEncode().ptcvtMake(meOwner.strStackValAt(c4FirstInd + 2))
             );
             mecvActual.Parse(strmSrc);
         }

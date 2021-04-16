@@ -43,8 +43,10 @@
 RTTIDecls(TTest_String1,TTestFWTest)
 RTTIDecls(TTest_String2,TTestFWTest)
 RTTIDecls(TTest_String3,TTestFWTest)
-RTTIDecls(TTest_StringMove,TTestFWTest)
 RTTIDecls(TTest_StringCat,TTestFWTest)
+RTTIDecls(TTest_StringMove,TTestFWTest)
+RTTIDecls(TTest_StringTokens,TTestFWTest)
+RTTIDecls(TTest_StringTokenRep,TTestFWTest)
 
 
 // A macro to repeatedly test certain fundamental things
@@ -846,59 +848,6 @@ TTest_String3::eRunTest(TTextStringOutStream&   strmOut
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_StringMove
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TTest_StringMove: Constructor and Destructor
-// ---------------------------------------------------------------------------
-TTest_StringMove::TTest_StringMove() :
-
-    TTestFWTest
-    (
-        L"String Move", L"Tests string move semantics", 2
-    )
-{
-}
-
-TTest_StringMove::~TTest_StringMove()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTest_StringMove: Public, inherited methods
-// ---------------------------------------------------------------------------
-tTestFWLib::ETestRes
-TTest_StringMove::eRunTest(TTextStringOutStream&   strmOut
-                        , tCIDLib::TBoolean&    bWarning)
-{
-    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
-
-    const tCIDLib::TCh* const pszTestStr1 = L"This is a test";
-
-    TString strStart(pszTestStr1);
-    TString strCopy(tCIDLib::ForceMove(strStart));
-
-    if (strCopy != pszTestStr1)
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"String move cotr didn't set the new object\n";
-    }
-
-    if (strStart == pszTestStr1)
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"String move cotr didn't clear the old object\n";
-    }
-
-    return eRes;
-}
-
-
-
-// ---------------------------------------------------------------------------
 //  CLASS: TTest_StringCat
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -1049,4 +998,481 @@ TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
 
     return eRes;
 }
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringMove
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_StringMove: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_StringMove::TTest_StringMove() :
+
+    TTestFWTest
+    (
+        L"String Move", L"Tests string move semantics", 2
+    )
+{
+}
+
+TTest_StringMove::~TTest_StringMove()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_StringMove: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_StringMove::eRunTest(TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    const tCIDLib::TCh* const pszTestStr1 = L"This is a test";
+
+    TString strStart(pszTestStr1);
+    TString strCopy(tCIDLib::ForceMove(strStart));
+
+    if (strCopy != pszTestStr1)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"String move cotr didn't set the new object\n";
+    }
+
+    if (strStart == pszTestStr1)
+    {
+        eRes = tTestFWLib::ETestRes::Failed;
+        strmOut << TFWCurLn << L"String move cotr didn't clear the old object\n";
+    }
+
+    return eRes;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringTokens
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_StringTokens: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_StringTokens::TTest_StringTokens() :
+
+    TTestFWTest
+    (
+        L"String Tokens", L"Tests string token manipulation", 2
+    )
+{
+}
+
+TTest_StringTokens::~TTest_StringTokens()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_StringTokens: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_StringTokens::eRunTest(TTextStringOutStream&  strmOut
+                            , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    //
+    //  Set up a token string that has no special cases and let's just make sure we
+    //  get what we are supposed to.
+    //
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(1) %(2) - %(3,5) : %(4,-3,_)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit1 }
+          , { TString::ETokenFind::TextRun, L" " }
+          , { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit2 }
+          , { TString::ETokenFind::TextRun, L" - " }
+          , { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit3, 5 }
+          , { TString::ETokenFind::TextRun, L" : " }
+          , { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit4, 3, tCIDLib::EHJustify::Left, L'_' }
+          , { TString::ETokenFind::End, nullptr }
+        };
+		if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Basic test"))
+			eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Another basic one just with some different scenarios
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(3,5,A)%(4,-3,B)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit3, 5, tCIDLib::EHJustify::Right, L'A' }
+          , { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit4, 3, tCIDLib::EHJustify::Left, L'B' }
+          , { TString::ETokenFind::End, nullptr }
+        };
+		if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Basic test 2"))
+			eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // On that does precision
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(3,5.2,0)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit3, 5, tCIDLib::EHJustify::Right, L'0', 2 }
+          , { TString::ETokenFind::End, nullptr }
+        };
+		if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Precision test"))
+			eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // This one has escaped tokens
+    {
+        const tCIDLib::TCh* const pszFmt = L"%%(2)%%(3)%%%%";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"%(2)" }
+            , { TString::ETokenFind::TextRun, L"%(3)" }
+            , { TString::ETokenFind::TextRun, L"%" }
+            , { TString::ETokenFind::TextRun, L"%" }
+            , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Escaped tokens"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // This one is just text
+    {
+        const tCIDLib::TCh* const pszFmt = L"This is just some text";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"This is just some text" }
+            , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Just text"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Just a ampersand
+    {
+        const tCIDLib::TCh* const pszFmt = L"@";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"@" }
+            , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Just an amp"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // A token at the very end
+    {
+        const tCIDLib::TCh* const pszFmt = L"Trailing token %(1)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"Trailing token " }
+            , { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit1 }
+            , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Trailing token"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // An unterminated token
+    {
+        const tCIDLib::TCh* const pszFmt = L"Unterminated %(1";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"Unterminated " }
+            , { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Unterminated token"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Space in token 1
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(1 )";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Space in token 1"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Space in token 2
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(1, 1)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Space in token 2"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Space in token 3
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(1,1,  )";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Space in token 3"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Missing token character
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(,2)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Missing token char"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Text with a amp in it, which will cause two returns
+    {
+        const tCIDLib::TCh* const pszFmt = L"Some text % with an amp";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::TextRun, L"Some text " }
+            , { TString::ETokenFind::TextRun, L"% with an amp" }
+            , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Text with amp in it"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Leading zero in width
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(2,01)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Bad width (leading zero)"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // We will accept a zero, though it's the default
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(2,0)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::Token, nullptr, kCIDLib::chDigit2 }
+          , { TString::ETokenFind::End, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Explicit zero width failed"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+
+    // Bad width (hex digit)
+    {
+        const tCIDLib::TCh* const pszFmt = L"%(2,A)";
+        const TTestRes aRes[] =
+        {
+            { TString::ETokenFind::BadFormat, nullptr }
+        };
+        if (!bRunOneTest(strmOut, pszFmt, aRes, tCIDLib::c4ArrayElems(aRes), L"Bad width (hex digit)"))
+        	eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_StringTokens: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+
+//
+//  Runs a single test pass, confirming that the passed format string returns the
+//  indicated series of results.
+//
+tCIDLib::TBoolean
+TTest_StringTokens::bRunOneTest(        TTextStringOutStream&   strmOut
+                                , const tCIDLib::TCh* const     pszFormat
+                                , const TTestRes* const         apRes
+                                , const tCIDLib::TCard4         c4ResCount
+                                , const tCIDLib::TCh* const     pszTestName)
+{
+    TString::ETokenFind eFindRes;
+    const tCIDLib::TCh* pszEnd;
+    tCIDLib::TCh chToken;
+    tCIDLib::EHJustify eJustify;
+    tCIDLib::TCh chFill;
+    tCIDLib::TCard4 c4Precision;
+    tCIDLib::TCard4 c4Width;
+
+	// We'll test that the start/end are within the format
+	const tCIDLib::TCh* pszEndFmt = pszFormat + TRawStr::c4StrLen(pszFormat);
+
+    const tCIDLib::TCh* pszStart = pszFormat;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ResCount; c4Index++)
+    {
+        const TTestRes& resCur = apRes[c4Index];
+
+        eFindRes = TString::eFindToken
+        (
+            pszStart, chToken, eJustify, c4Width, chFill, c4Precision, pszEnd
+        );
+        if (eFindRes != resCur.eFindRes)
+            return kCIDLib::False;
+
+        if (eFindRes == TString::ETokenFind::Token)
+        {
+            // Check the token stuff
+            if ((chToken != resCur.chToken)
+            ||  (eJustify != resCur.eJustify)
+            ||  (c4Width != resCur.c4Width)
+            ||  (c4Precision != resCur.c4Precision)
+            ||  (chFill != resCur.chFill))
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" with bad token results.\n";
+                return kCIDLib::False;
+            }
+        }
+         else if (eFindRes == TString::ETokenFind::TextRun)
+        {
+            // Compare the expected text
+            const tCIDLib::TCard4 c4Len = pszEnd - pszStart;
+            if (!c4Len)
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" with zero text run length.\n";
+                return kCIDLib::False;
+            }
+
+            if (!TRawStr::bCompareStrN(pszStart, resCur.pszText, c4Len))
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" with wrong run text.\n";
+                return kCIDLib::False;
+            }
+        }
+
+        //
+        //  Make sure the start/end are valid if one of the good statuses. And if
+        //  it's a failure or end status, make sure it's the last one since it makes
+        //  no sense to continue.
+        //
+        if ((eFindRes == TString::ETokenFind::Token)
+        ||  (eFindRes == TString::ETokenFind::TextRun))
+        {
+            if ((pszStart < pszFormat) || (pszStart > pszEndFmt))
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" with start pointer not within format.\n";
+                return kCIDLib::False;
+            }
+
+            if ((pszEnd < pszFormat) || (pszEnd > pszEndFmt))
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" with end pointer not within format.\n";
+                return kCIDLib::False;
+            }
+
+            // Move us up to the next one
+            pszStart = pszEnd;
+        }
+         else if ((eFindRes == TString::ETokenFind::BadFormat)
+              ||  (eFindRes == TString::ETokenFind::End))
+        {
+            if (c4Index + 1 != c4ResCount)
+            {
+                strmOut << TFWCurLn << L"Test " << pszTestName
+                        << L" failed' on step " << c4Index
+                        << L" failure or end step must be last in the series.\n";
+                return kCIDLib::False;
+            }
+        }
+    }
+    return kCIDLib::True;
+}
+
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringTokenRep
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_StringTokenRep: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_StringTokenRep::TTest_StringTokenRep() :
+
+    TTestFWTest
+    (
+        L"String Token Replacement", L"Tests string token replacement", 2
+    )
+{
+}
+
+TTest_StringTokenRep::~TTest_StringTokenRep()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_StringTokenRep: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_StringTokenRep::eRunTest( TTextStringOutStream&   strmOut
+                                , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    TString strTest;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"%(1)", 1UL, L"1", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"%(1,0.3)", 15.3124, L"15.312", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"%(1,-5, )", 1UL, L"1    ", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"%(1)", TPoint(4, 5), L"4,5", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"$%(1,6.2,_)", 10.502, L"$_10.50", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    if (!bTestOne(strmOut, TFWCurLn, L"$%(1)\r\n", TString(L"Test"), L"$Test\r\n", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    // The parameter will get ignored and we should get an empty string
+    if (!bTestOne(strmOut, TFWCurLn, L"", TString(L"Test"), L"", strTest))
+        eRes = tTestFWLib::ETestRes::Failed;
+
+    // We should just get the format text. We have to do this one manually
+    strTest.Format(L"Testing");
+    if (strTest != L"Testing")
+    {
+        strmOut << TFWCurLn << L"Result should have been just format text\n\n";
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
+
 

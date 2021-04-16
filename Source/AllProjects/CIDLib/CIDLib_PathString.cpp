@@ -136,6 +136,18 @@ TPathStr::AddLevels(const   TString& strNewLevel1
     AddLevel(strNewLevel3);
 }
 
+tCIDLib::TVoid
+TPathStr::AddLevels(const   TString& strNewLevel1
+                    , const TString& strNewLevel2
+                    , const TString& strNewLevel3
+                    , const TString& strNewLevel4)
+{
+    AddLevel(strNewLevel1);
+    AddLevel(strNewLevel2);
+    AddLevel(strNewLevel3);
+    AddLevel(strNewLevel4);
+}
+
 
 // Add our current contents to the end of the passed base path
 tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)
@@ -208,8 +220,8 @@ tCIDLib::TVoid TPathStr::AppendExt(const TString& strExt)
 
 tCIDLib::TBoolean TPathStr::bExtractExt(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Extension))
@@ -232,8 +244,8 @@ tCIDLib::TBoolean TPathStr::bExtractExt(TString& strBuf)
 
 tCIDLib::TBoolean TPathStr::bExtractNameExt(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Name))
@@ -253,8 +265,8 @@ tCIDLib::TBoolean TPathStr::bExtractNameExt(TString& strBuf)
 
 tCIDLib::TBoolean TPathStr::bExtractPath(TString& strBuf)
 {
-    tCIDLib::TCard4     c4End;
-    tCIDLib::TCard4     c4Start;
+    tCIDLib::TCard4     c4End = 0;
+    tCIDLib::TCard4     c4Start = 0;
     const tCIDLib::TCh* pszBuf = pszBuffer();
 
     if (!TKrnlPathStr::bFindPart(pszBuf, c4Start, c4End, tCIDLib::EPathParts::Path))

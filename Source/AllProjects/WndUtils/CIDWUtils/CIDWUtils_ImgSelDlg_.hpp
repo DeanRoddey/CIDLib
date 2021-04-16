@@ -45,6 +45,7 @@ class TImgSelDlg : public TDlgBox
         TImgSelDlg();
 
         TImgSelDlg(const TImgSelDlg&) = delete;
+        TImgSelDlg(TImgSelDlg&&) = delete;
 
         ~TImgSelDlg();
 
@@ -53,6 +54,7 @@ class TImgSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TImgSelDlg& operator=(const TImgSelDlg&) = delete;
+        TImgSelDlg& operator=(TImgSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -63,7 +65,7 @@ class TImgSelDlg : public TDlgBox
             const   TWindow&                wndOwner
             , const TRefVector<TCIDImage>&  colImgs
             , const TString&                strTitle
-            ,       tCIDLib::TCard4&        c4SelIndex
+            , COP   tCIDLib::TCard4&        c4SelIndex
         );
 
 

@@ -45,69 +45,72 @@ AdvRTTIDecls(TUTF8Converter,TUTFConverter)
 
 namespace CIDLib_UTFConverter
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  ac1FirstByteMark
-    //      A mask to mask onto the first byte of an encoded UTF-8 sequence.
-    //      Its indexed by the number of bytes required to encode it.
-    //
-    //  ac1UTFBytes
-    //      This is an array of values that are indexed by the first encoded
-    //      char of a UTF-8 encoded char, resulting in the number of bytes it
-    //      uses to encode the UTF-16 char.
-    //
-    //  ac4UTFOffsets
-    //      This array is indexed by the count of bytes required to encode
-    //      the value. Its provides an amount to offset the decoded UTF-16
-    //      value by.
-    //
-    //  eDefEncoding
-    //      The default encoding of a TCh value for this host workstation.
-    //      Byte knowing this value, we can optimize when the source and
-    //      target encodings are the same. And its used in the default ctor,
-    //      to create a converter with those characteristics.
-    //
-    //  apszEncodings
-    //      Strings that represent the descriptions of the EEncodings type.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1 ac1FirstByteMark[7] =
+    namespace
     {
-        0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
-    };
-    const tCIDLib::TCard4 ac4UTFOffsets[6] =
-    {
-        0, 0x3080, 0xE2080, 0x3C82080, 0xFA082080, 0x82082080
-    };
-    const tCIDLib::TCard1 ac1UTFBytes[256] =
-    {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-        ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-        ,   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
-        ,   3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
-    };
-    const tCIDLib::TCh* const apszEncodingVals[] =
-    {
-        L"US-ASCII"
-        , L"UTF-8"
-        , L"UTF-16LE"
-        , L"UTF-16BE"
-    };
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  ac1FirstByteMark
+        //      A mask to mask onto the first byte of an encoded UTF-8 sequence.
+        //      Its indexed by the number of bytes required to encode it.
+        //
+        //  ac1UTFBytes
+        //      This is an array of values that are indexed by the first encoded
+        //      char of a UTF-8 encoded char, resulting in the number of bytes it
+        //      uses to encode the UTF-16 char.
+        //
+        //  ac4UTFOffsets
+        //      This array is indexed by the count of bytes required to encode
+        //      the value. Its provides an amount to offset the decoded UTF-16
+        //      value by.
+        //
+        //  eDefEncoding
+        //      The default encoding of a TCh value for this host workstation.
+        //      Byte knowing this value, we can optimize when the source and
+        //      target encodings are the same. And its used in the default ctor,
+        //      to create a converter with those characteristics.
+        //
+        //  apszEncodings
+        //      Strings that represent the descriptions of the EEncodings type.
+        // -----------------------------------------------------------------------
+        constexpr const tCIDLib::TCard1 ac1FirstByteMark[7] =
+        {
+            0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
+        };
+        constexpr const tCIDLib::TCard4 ac4UTFOffsets[6] =
+        {
+            0, 0x3080, 0xE2080, 0x3C82080, 0xFA082080, 0x82082080
+        };
+        constexpr const tCIDLib::TCard1 ac1UTFBytes[256] =
+        {
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+            ,   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+            ,   2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+            ,   3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
+        };
+        constexpr const tCIDLib::TCh* const apszEncodingVals[] =
+        {
+            L"US-ASCII"
+            , L"UTF-8"
+            , L"UTF-16LE"
+            , L"UTF-16BE"
+        };
 
-    TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
-    apszEncodings(apszEncodingVals);
+        TEArray<const tCIDLib::TCh*, TUTFConverter::EEncodings, TUTFConverter::EEncodings::Count>
+        apszEncodings(apszEncodingVals);
+    }
 }
 
 
@@ -120,32 +123,6 @@ TUTFConverter::TUTFConverter(const EEncodings eEncoding) :
     TTextConverter(CIDLib_UTFConverter::apszEncodings[eEncoding])
     , m_eEncoding(eEncoding)
 {
-}
-
-TUTFConverter::TUTFConverter(const TUTFConverter& tcvtSrc) :
-
-    TTextConverter(tcvtSrc)
-    , m_eEncoding(tcvtSrc.m_eEncoding)
-{
-}
-
-TUTFConverter::~TUTFConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUTFConverter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUTFConverter& TUTFConverter::operator=(const TUTFConverter& tcvtSrc)
-{
-    if (this == &tcvtSrc)
-        return *this;
-
-    TParent::operator=(tcvtSrc);
-    m_eEncoding = tcvtSrc.m_eEncoding;
-
-    return *this;
 }
 
 
@@ -197,7 +174,7 @@ TUTFConverter::c4BlockFrom( const   tCIDLib::TCard1* const  pc1Src
                             ,       tCIDLib::TBoolean&      bStop)
 {
     const tCIDLib::TCh          chRep = chRepChar();
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs    eAct = eErrorAction();
 
     //
     //  Do the required work according to the specific encoding. Initialize
@@ -223,13 +200,13 @@ TUTFConverter::c4BlockFrom( const   tCIDLib::TCard1* const  pc1Src
                 if (!pc1Src[c4OutChars] || (pc1Src[c4OutChars] > 0x7F))
                 {
                     // It's a bad char
-                    if ((eAct == tCIDLib::ETCvtActions::StopThenThrow) && c4OutChars)
+                    if ((eAct == tCIDLib::ETCvtActs::StopThenThrow) && c4OutChars)
                     {
                         bStop = kCIDLib::True;
                         break;
                     }
 
-                    if (eAct == tCIDLib::ETCvtActions::Replace)
+                    if (eAct == tCIDLib::ETCvtActs::Replace)
                     {
                         pszToFill[c4OutChars] = chRep;
                     }
@@ -316,14 +293,14 @@ TUTFConverter::c4BlockFrom( const   tCIDLib::TCard1* const  pc1Src
                  else if (c4Val > 0x10FFFF)
                 {
                     // Its a bad char. We don't move up the source pointer here
-                    if ((eAct == tCIDLib::ETCvtActions::StopThenThrow)
+                    if ((eAct == tCIDLib::ETCvtActs::StopThenThrow)
                     &&  (pc1SrcPtr != pc1Src))
                     {
                         bStop = kCIDLib::True;
                         break;
                     }
 
-                    if (eAct == tCIDLib::ETCvtActions::Replace)
+                    if (eAct == tCIDLib::ETCvtActs::Replace)
                     {
                         // We are recoverings, so eat the src bytes
                         pc1SrcPtr += c4EncBytes + 1;
@@ -494,7 +471,7 @@ TUTFConverter::c4BlockTo(const  tCIDLib::TCh* const     pszSrc
                 const tCIDLib::TCh chCur = pszSrc[c4Chars];
                 if (chCur > 0x7F)
                 {
-                    if ((eErrorAction() == tCIDLib::ETCvtActions::StopThenThrow)
+                    if ((eErrorAction() == tCIDLib::ETCvtActs::StopThenThrow)
                     &&  c4Chars)
                     {
                         bStop = kCIDLib::True;
@@ -561,7 +538,7 @@ TUTFConverter::c4BlockTo(const  tCIDLib::TCh* const     pszSrc
                 }
 
                 // Figure out how many bytes we need
-                tCIDLib::TCard4 c4EncBytes;
+                tCIDLib::TCard4 c4EncBytes = 0;
                 if (c4Val < 0x80)
                     c4EncBytes = 1;
                 else if (c4Val < 0x800)
@@ -576,7 +553,7 @@ TUTFConverter::c4BlockTo(const  tCIDLib::TCh* const     pszSrc
                     c4EncBytes = 6;
                 else
                 {
-                    if ((eErrorAction() == tCIDLib::ETCvtActions::StopThenThrow)
+                    if ((eErrorAction() == tCIDLib::ETCvtActs::StopThenThrow)
                     &&  (pc1OutPtr != pc1ToFill))
                     {
                         break;
@@ -735,159 +712,5 @@ TUTFConverter::c4BlockTo(const  tCIDLib::TCh* const     pszSrc
 
     c4OutBytes = c4Bytes;
     return c4Chars;
-}
-
-
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TUSASCIIConverter
-//  PREFIX: tcvt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TUSASCIIConverter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUSASCIIConverter::TUSASCIIConverter() :
-
-    TUTFConverter(TUTFConverter::EEncodings::USASCII)
-{
-}
-
-TUSASCIIConverter::TUSASCIIConverter(const TUSASCIIConverter& tcvtSrc) :
-
-    TUTFConverter(tcvtSrc)
-{
-}
-
-TUSASCIIConverter::~TUSASCIIConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUSASCIIConverter: Public operators
-// ---------------------------------------------------------------------------
-TUSASCIIConverter&
-TUSASCIIConverter::operator=(const TUSASCIIConverter& tcvtSrc)
-{
-    if (this != &tcvtSrc)
-        TParent::operator=(tcvtSrc);
-    return *this;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TUTF16LEConverter
-//  PREFIX: tcvt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TUTF16LEConverter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUTF16LEConverter::TUTF16LEConverter() :
-
-    TUTFConverter(TUTFConverter::EEncodings::UTF16_LE)
-{
-}
-
-TUTF16LEConverter::TUTF16LEConverter(const TUTF16LEConverter& tcvtSrc) :
-
-    TUTFConverter(tcvtSrc)
-{
-}
-
-TUTF16LEConverter::~TUTF16LEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUTF16LEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUTF16LEConverter&
-TUTF16LEConverter::operator=(const TUTF16LEConverter& tcvtSrc)
-{
-    if (this != &tcvtSrc)
-        TParent::operator=(tcvtSrc);
-    return *this;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TUTF16BEConverter
-//  PREFIX: tcvt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TUTF16BEConverter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUTF16BEConverter::TUTF16BEConverter() :
-
-    TUTFConverter(TUTFConverter::EEncodings::UTF16_BE)
-{
-}
-
-TUTF16BEConverter::TUTF16BEConverter(const TUTF16BEConverter& tcvtSrc) :
-
-    TUTFConverter(tcvtSrc)
-{
-}
-
-TUTF16BEConverter::~TUTF16BEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUTF16BEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUTF16BEConverter&
-TUTF16BEConverter::operator=(const TUTF16BEConverter& tcvtSrc)
-{
-    if (this != &tcvtSrc)
-        TParent::operator=(tcvtSrc);
-    return *this;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TUTF8Converter
-//  PREFIX: tcvt
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TUTF8Converter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUTF8Converter::TUTF8Converter() :
-
-    TUTFConverter(TUTFConverter::EEncodings::UTF8)
-{
-}
-
-TUTF8Converter::TUTF8Converter(const TUTF8Converter& tcvtSrc) :
-
-    TUTFConverter(tcvtSrc)
-{
-}
-
-TUTF8Converter::~TUTF8Converter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUTF8Converter: Public operators
-// ---------------------------------------------------------------------------
-TUTF8Converter&
-TUTF8Converter::operator=(const TUTF8Converter& tcvtSrc)
-{
-    if (this != &tcvtSrc)
-        TParent::operator=(tcvtSrc);
-    return *this;
 }
 

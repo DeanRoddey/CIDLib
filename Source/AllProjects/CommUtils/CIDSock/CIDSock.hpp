@@ -57,12 +57,6 @@
 namespace kCIDSock
 {
     // -----------------------------------------------------------------------
-    //  Object Pipe constants
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4ObjPipeMV = 0xFEEDBEEF;
-
-
-    // -----------------------------------------------------------------------
     //  Statistics cache paths for any stats we maintain at this level
     // -----------------------------------------------------------------------
     const tCIDLib::TCh* const   pszStat_Scope_Net       = L"/Stats/Net/";
@@ -112,10 +106,13 @@ extern template class TVector<TIPAddress>;
 //  Some magic macros for some enums of ours that have to be defined down in the
 //  kernel.
 // ---------------------------------------------------------------------------
-EnumBinStreamMacros(tCIDSock::EAddrTypes)
-EnumBinStreamMacros(tCIDSock::ESockProtos)
+namespace tCIDSock
+{
+    EnumBinStreamMacros(tCIDSock::EAddrTypes)
+    EnumBinStreamMacros(tCIDSock::ESockProtos)
 
-StdEnumTricks(tCIDSock::ESockProtos)
+    StdEnumTricks(tCIDSock::ESockProtos)
 
-BmpEnumTricks(tCIDSock::EMSelFlags)
-BmpEnumTricks(tCIDSock::ESockEvs)
+    BmpEnumTricks(tCIDSock::EMSelFlags)
+    BmpEnumTricks(tCIDSock::ESockEvs)
+}

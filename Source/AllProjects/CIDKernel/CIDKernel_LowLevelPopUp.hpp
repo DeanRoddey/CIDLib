@@ -47,7 +47,7 @@ namespace TKrnlPopup
         , const tCIDLib::TErrCode       errcKrnlId
         , const tCIDLib::TOSErrCode     errcHostId
         , const tCIDLib::TCh* const     pszMsg
-        , const tCIDLib::TCh* const     pszMsg2 = 0
+        , const tCIDLib::TCh* const     pszMsg2 = nullptr
     );
 }
 

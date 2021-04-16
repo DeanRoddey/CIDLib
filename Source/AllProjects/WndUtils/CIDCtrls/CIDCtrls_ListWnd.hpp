@@ -128,6 +128,7 @@ class CIDCTRLSEXP TListWnd : public TStdCtrlWnd
         TListWnd() = delete;
 
         TListWnd(const TListWnd&) = delete;
+        TListWnd(TListWnd&&) = delete;
 
         ~TListWnd();
 
@@ -136,6 +137,7 @@ class CIDCTRLSEXP TListWnd : public TStdCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         TListWnd& operator=(const TListWnd&) = delete;
+        TListWnd& operator=(TListWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -210,7 +212,7 @@ class CIDCTRLSEXP TListWnd : public TStdCtrlWnd
         //  handlers. Each derived types has to provide its own notification id or they
         //  would conflict, so the derived class provides us with one to use.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const        pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TListChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)
@@ -220,13 +222,13 @@ class CIDCTRLSEXP TListWnd : public TStdCtrlWnd
             // Add a request object to us (the source button)
             AddNotifyRequest
             (
-                new TNotifyRequestFor<T, TListChangeInfo>(pTarget, m_nidChangeIdToUse)
+                new TNotifyRequestFor<T, TListChangeInfo>(pTarget, TNotificationId(m_nidChangeIdToUse))
             );
 
             // Add a handler object to the target
             TNotHandlerBase* pnothNew = new TNotifyHandlerFor<T, TListChangeInfo>
             (
-                pTarget, m_nidChangeIdToUse, pfnTarget
+                pTarget, TNotificationId(m_nidChangeIdToUse), pfnTarget
             );
             pTarget->AddNotifyHandler(pnothNew, eEnd);
             return pnothNew;

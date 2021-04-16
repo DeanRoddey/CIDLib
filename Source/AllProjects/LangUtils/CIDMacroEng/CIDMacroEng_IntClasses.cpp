@@ -50,17 +50,20 @@ RTTIDecls(TMEngInt4Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_IntClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strInt1(L"Int1");
-    const TString   strInt2(L"Int2");
-    const TString   strInt4(L"Int4");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strInt1(L"Int1");
+        const TString   strInt2(L"Int2");
+        const TString   strInt4(L"Int4");
 
-    const TString   strInt1ClassPath(L"MEng.Int1");
-    const TString   strInt2ClassPath(L"MEng.Int2");
-    const TString   strInt4ClassPath(L"MEng.Int4");
+        const TString   strInt1ClassPath(L"MEng.Int1");
+        const TString   strInt2ClassPath(L"MEng.Int2");
+        const TString   strInt4ClassPath(L"MEng.Int4");
+    }
 }
 
 
@@ -170,30 +173,30 @@ TMEngInt1Info::TMEngInt1Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_AbsValue(kMacroEng::c2BadId)
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetNegated(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2MethId_AbsValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNegated(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -235,7 +238,7 @@ TMEngInt1Info::eCastFrom(       TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TInt1 i1New;
+    tCIDLib::TInt1 i1New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -916,30 +919,30 @@ TMEngInt2Info::TMEngInt2Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_AbsValue(kMacroEng::c2BadId)
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetNegated(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2MethId_AbsValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNegated(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -981,7 +984,7 @@ TMEngInt2Info::eCastFrom(       TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TInt2 i2New;
+    tCIDLib::TInt2 i2New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -1660,30 +1663,30 @@ TMEngInt4Info::TMEngInt4Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_AbsValue(kMacroEng::c2BadId)
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetNegated(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2MethId_AbsValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNegated(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -1725,7 +1728,7 @@ TMEngInt4Info::eCastFrom(       TCIDMacroEngine&    meOwner
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TInt4 i4New;
+    tCIDLib::TInt4 i4New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :

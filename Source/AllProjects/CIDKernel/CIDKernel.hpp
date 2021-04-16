@@ -40,21 +40,26 @@
 
 
 // ---------------------------------------------------------------------------
-//  Subinclude the really fundamental headers that must be before everything.
+//  Sub-include the really fundamental headers that must be before everything.
+//  Some of these are per-platform.
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_PlatformDefines.hpp"
 #include    "CIDKernel_PlatformIncludes.hpp"
-#include    "CIDKernel_DevMacros.hpp"
 #include    "CIDKernel_PlatformTypes.hpp"
+
+#include    "CIDKernel_DevMacros.hpp"
 #include    "CIDKernel_Type.hpp"
+
+#include    "CIDKernel_PlatformConstants.hpp"
+
 #include    "CIDKernel_Constant.hpp"
 #include    "CIDKernel_Version.hpp"
-#include    "CIDKernel_PlatformConstants.hpp"
 #include    "CIDKernel_BaseInlines.hpp"
 #include    "CIDKernel_MemCheck.hpp"
 #include    "CIDKernel_Unicode.hpp"
 #include    "CIDKernel_Error.hpp"
 #include    "CIDKernel_Handles.hpp"
+#include    "CIDKernel_String.hpp"
 #include    "CIDKernel_Module.hpp"
 #include    "CIDKernel_ConCharSet.hpp"
 
@@ -62,48 +67,49 @@
 // ---------------------------------------------------------------------------
 //  Do the standard enum tricks for our enums that can handle it.
 // ---------------------------------------------------------------------------
-#if !defined(CIDKRNL_NOCLASSES)
-StdEnumTricks(tCIDLib::EAdoptOpts)
-StdEnumTricks(tCIDLib::EAngleTypes)
-StdEnumTricks(tCIDLib::EAudioCues)
-StdEnumTricks(tCIDLib::EAutoModes)
-StdEnumTricks(tCIDLib::ECPUTypes)
-StdEnumTricks(tCIDLib::ECreateActs)
-StdEnumTricks(tCIDLib::EDelModes)
-StdEnumTricks(tCIDLib::EDirs)
-StdEnumTricks(tCIDLib::EVolHWTypes)
-StdEnumTricks(tCIDLib::EEndianModes)
-StdEnumTricks(tCIDLib::EEnds)
-StdEnumTricks(tCIDLib::EErrClasses)
-StdEnumTricks(tCIDLib::EEventStates)
-StdEnumTricks(tCIDLib::EForceOpts)
-StdEnumTricks(tCIDLib::EHJustify)
-StdEnumTricks(tCIDLib::EInitTerm)
-StdEnumTricks(tCIDLib::ELanguages)
-StdEnumTricks(tCIDLib::ELockStates)
-StdEnumTricks(tCIDLib::ELogMapModes)
-StdEnumTricks(tCIDLib::EModTypes)
-StdEnumTricks(tCIDLib::EMonths)
-StdEnumTricks(tCIDLib::ENamedRscTypes)
-StdEnumTricks(tCIDLib::EPrioClasses)
-StdEnumTricks(tCIDLib::EPrioLevels)
-StdEnumTricks(tCIDLib::EQPrios)
-StdEnumTricks(tCIDLib::ERangeStates)
-StdEnumTricks(tCIDLib::ERecoverable)
-StdEnumTricks(tCIDLib::ERectlTypes)
-StdEnumTricks(tCIDLib::ESeverities)
-StdEnumTricks(tCIDLib::EShareStates)
-StdEnumTricks(tCIDLib::ESortDirs)
-StdEnumTricks(tCIDLib::ESpecialPaths)
-StdEnumTricks(tCIDLib::EStartEnd)
-StdEnumTricks(tCIDLib::ESysExcepts)
-StdEnumTricks(tCIDLib::ESymmetries)
-StdEnumTricks(tCIDLib::ETriStates)
-StdEnumTricks(tCIDLib::EVJustify)
-StdEnumTricks(tCIDLib::EVisible)
-StdEnumTricks(tCIDLib::EWeekDays)
-#endif
-
+namespace tCIDLib
+{
+    #if !defined(CIDKRNL_NOCLASSES)
+    StdEnumTricks(tCIDLib::EAdoptOpts)
+    StdEnumTricks(tCIDLib::EAngleTypes)
+    StdEnumTricks(tCIDLib::EAudioCues)
+    StdEnumTricks(tCIDLib::EAutoModes)
+    StdEnumTricks(tCIDLib::ECreateActs)
+    StdEnumTricks(tCIDLib::EDelModes)
+    StdEnumTricks(tCIDLib::EDirs)
+    StdEnumTricks(tCIDLib::EVolHWTypes)
+    StdEnumTricks(tCIDLib::EEndianModes)
+    StdEnumTricks(tCIDLib::EEnds)
+    StdEnumTricks(tCIDLib::EErrClasses)
+    StdEnumTricks(tCIDLib::EEventStates)
+    StdEnumTricks(tCIDLib::EForceOpts)
+    StdEnumTricks(tCIDLib::EHJustify)
+    StdEnumTricks(tCIDLib::EInitTerm)
+    StdEnumTricks(tCIDLib::ELanguages)
+    StdEnumTricks(tCIDLib::ELockStates)
+    StdEnumTricks(tCIDLib::ELogMapModes)
+    StdEnumTricks(tCIDLib::EModTypes)
+    StdEnumTricks(tCIDLib::EMonths)
+    StdEnumTricks(tCIDLib::ENamedRscTypes)
+    StdEnumTricks(tCIDLib::EPrioClasses)
+    StdEnumTricks(tCIDLib::EPrioLevels)
+    StdEnumTricks(tCIDLib::EQPrios)
+    StdEnumTricks(tCIDLib::ERangeStates)
+    StdEnumTricks(tCIDLib::ERecoverable)
+    StdEnumTricks(tCIDLib::ERectlTypes)
+    StdEnumTricks(tCIDLib::ESeverities)
+    StdEnumTricks(tCIDLib::EShareStates)
+    StdEnumTricks(tCIDLib::ESortDirs)
+    StdEnumTricks(tCIDLib::ESpecialPaths)
+    StdEnumTricks(tCIDLib::EStartEnd)
+    StdEnumTricks(tCIDLib::ESysExcepts)
+    StdEnumTricks(tCIDLib::ESymmetries)
+    StdEnumTricks(tCIDLib::ETriStates)
+    StdEnumTricks(tCIDLib::EVJustify)
+    StdEnumTricks(tCIDLib::EVisible)
+    StdEnumTricks(tCIDLib::EWeekDays)
+    #endif
+}
 
 
 // ---------------------------------------------------------------------------
@@ -153,6 +159,7 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         TCIDKrnlModule();
 
         TCIDKrnlModule(const TCIDKrnlModule&) = delete;
+        TCIDKrnlModule(TCIDKrnlModule&&) = delete;
 
         ~TCIDKrnlModule();
 
@@ -161,6 +168,7 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         //  Public operators
         // -------------------------------------------------------------------
         TCIDKrnlModule& operator=(const TCIDKrnlModule&) = delete;
+        TCIDKrnlModule& operator=(TCIDKrnlModule&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -234,11 +242,6 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         );
 
         tCIDLib::TBoolean bInitTermFileSys
-        (
-            const   tCIDLib::EInitTerm      eState
-        );
-
-        tCIDLib::TBoolean bInitTermPerThread
         (
             const   tCIDLib::EInitTerm      eState
         );
@@ -344,24 +347,32 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_ErrorIds.hpp"
 #include    "CIDKernel_LList.hpp"
-#include    "CIDKernel_BaseLock.hpp"
 #include    "CIDKernel_RawBits.hpp"
-#include    "CIDKernel_String.hpp"
 #include    "CIDKernel_KVPair.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  And some common types
+// ---------------------------------------------------------------------------
+namespace tCIDKernel
+{
+    // For things like external process environment/parameter lists
+    using TStrList  = TKrnlLList<TKrnlString>;
+}
 
 #include    "CIDKernel_Audio.hpp"
 #include    "CIDKernel_RawMemory.hpp"
+#include    "CIDKernel_Atomic.hpp"
 #include    "CIDKernel_RawString.hpp"
 #include    "CIDKernel_FlagJanitors.hpp"
 #include    "CIDKernel_Environment.hpp"
-#include    "CIDKernel_Process.hpp"
 #include    "CIDKernel_ResourceName.hpp"
 #include    "CIDKernel_CriticalSection.hpp"
 #include    "CIDKernel_SharedMemBuf.hpp"
 #include    "CIDKernel_Event.hpp"
 #include    "CIDKernel_Mutex.hpp"
-#include    "CIDKernel_Semaphore.hpp"
 #include    "CIDKernel_ExternalProcess.hpp"
+#include    "CIDKernel_Process.hpp"
 #include    "CIDKernel_CommPort.hpp"
 #include    "CIDKernel_FileSystem.hpp"
 #include    "CIDKernel_File.hpp"
@@ -371,7 +382,6 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 #include    "CIDKernel_LowLevelPopUp.hpp"
 #include    "CIDKernel_MathLib.hpp"
 #include    "CIDKernel_PathString.hpp"
-#include    "CIDKernel_PerThreadData.hpp"
 #include    "CIDKernel_SafeCounter.hpp"
 #include    "CIDKernel_Signals.hpp"
 #include    "CIDKernel_SystemInfo.hpp"
@@ -383,7 +393,6 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
 #include    "CIDKernel_IP.hpp"
 #include    "CIDKernel_Socket.hpp"
 #include    "CIDKernel_SockPinger.hpp"
-#include    "CIDKernel_MediaChanger.hpp"
 #include    "CIDKernel_TaskScheduler.hpp"
 
 

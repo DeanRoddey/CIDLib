@@ -177,7 +177,9 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
                         , const tCIDLib::EExtProcFlags  eFlag
                         , const tCIDLib::EExtProcShows  eShow)
 {
-    return bStart(pszPath, pszInitPath, 0, 0, 0, 0, eFlag, eShow);
+    tCIDKernel::TStrList klistParms;
+    tCIDKernel::TStrList klistEnv;
+    return bStart(pszPath, pszInitPath, klistParms, klistEnv, eFlag, eShow);
 }
 
 

@@ -81,8 +81,11 @@ class CIDLIBEXP TObject
         // -------------------------------------------------------------------
         //  Hidden Constructors and operators
         // -------------------------------------------------------------------
-        TObject();
-        TObject(const TObject&);
+        TObject() = default;
+        TObject(const TObject&) = default;
+        TObject(TObject&&) = default;
+        TObject& operator=(const TObject&) = default;
+        TObject& operator=(TObject&&) = default;
 };
 
 #pragma CIDLIB_POPPACK

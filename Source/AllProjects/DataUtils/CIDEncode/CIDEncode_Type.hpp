@@ -44,8 +44,11 @@ namespace tCIDEncode
     // -----------------------------------------------------------------------
     //  A counted pointer around a base text converter. This is used to return
     //  newly gen'ed up converters in a by value sort of way. They can also
-    //  just have a pointer returned.
+    //  just have a Raw pointer returned.
+    //
+    //  We also define a unique pointer as well, since some folks will be using
+    //  those.
     // -----------------------------------------------------------------------
     using TTCvtPtr = TCntPtr<TTextConverter>;
+    using TTCvtUPtr = TUniquePtr<TTextConverter>;
 }
-

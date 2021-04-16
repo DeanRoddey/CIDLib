@@ -48,10 +48,13 @@ RTTIDecls(TChunkedTextOutStream,TTextOutStream)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ChunkedMemStream
 {
-    //
-    //  The size of our memory chunks. We grow by 1MB chunks.
-    //
-    const tCIDLib::TCard4 c4ChunkSz = 0x100000;
+    namespace
+    {
+        //
+        //  The size of our memory chunks. We grow by 1MB chunks.
+        //
+        const tCIDLib::TCard4 c4ChunkSz = 0x100000;
+    }
 }
 
 
@@ -212,7 +215,7 @@ TChunkedMemStreamImplInfo::~TChunkedMemStreamImplInfo()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -894,7 +897,7 @@ TChunkedInStreamImpl::~TChunkedInStreamImpl()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -1035,7 +1038,7 @@ TChunkedOutStreamImpl::~TChunkedOutStreamImpl()
         if (facCIDLib().bTestLog(errToCatch, tCIDLib::ELogFlags::BinStreams))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }

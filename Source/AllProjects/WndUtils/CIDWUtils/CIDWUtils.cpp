@@ -42,13 +42,7 @@
 //
 TFacCIDWUtils& facCIDWUtils()
 {
-    static TFacCIDWUtils* pfacCIDWUtils = nullptr;
-    if (!pfacCIDWUtils)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDWUtils)
-            pfacCIDWUtils = new TFacCIDWUtils;
-    }
-    return *pfacCIDWUtils;
+    static TFacCIDWUtils* pfacThis = new TFacCIDWUtils();
+    return *pfacThis;
 }
 

@@ -57,28 +57,13 @@ template class CIDXMLEXP TVector<TXMLTreeParser::TErrInfo>;
 template class TSimplePoolJan<TString>;
 
 
-// ---------------------------------------------------------------------------
-//  Provide RTTI Decl macros for all our classes that don't have a Cpp file
-//  for us.
-// ---------------------------------------------------------------------------
-RTTIDecls(TAttrDefCursor,TObject)
-RTTIDecls(TXMLContentModel,TObject)
-RTTIDecls(TXMLElemDecl,TObject)
-
-
 
 // ---------------------------------------------------------------------------
 //  Global functions
 // ---------------------------------------------------------------------------
 TFacCIDXML& facCIDXML()
 {
-    static TFacCIDXML* pfacCIDXML = nullptr;
-    if (!pfacCIDXML)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDXML)
-            pfacCIDXML = new TFacCIDXML;
-    }
-    return *pfacCIDXML;
+    static TFacCIDXML* pfacThis = new TFacCIDXML();
+    return *pfacThis;
 }
 

@@ -72,16 +72,11 @@ TXMLNameIDPool<TElem>::TXMLNameIDPool(TKeyExtract pfnKeyExtract) :
     , m_c4IdIndex(0)
     , m_c4IterBucket(c4Modulus)
     , m_c4SeqId(1)
-    , m_pIter(0)
+    , m_pIter(nullptr)
     , m_pfnKeyExtract(pfnKeyExtract)
 {
     // Init the bucket pointers
-    TRawMem::SetMemBuf
-    (
-        m_aBuckets
-        , tCIDLib::TCard1(0)
-        , sizeof(TBucketElem*) * c4Modulus
-    );
+    TRawMem::SetMemBuf(m_aBuckets, kCIDLib::c1MinCard, sizeof(TBucketElem*) * c4Modulus);
 
     //
     //  Do the initial allocation for the id array. We don't have to init it
@@ -141,7 +136,7 @@ template <class TElem> tCIDLib::TBoolean TXMLNameIDPool<TElem>::bNext()
         }
     }
     m_c4IterBucket = 0;
-    m_pIter = 0;
+    m_pIter = nullptr;
     return kCIDLib::False;
 }
 
@@ -152,7 +147,7 @@ template <class TElem> tCIDLib::TBoolean TXMLNameIDPool<TElem>::bResetIter()
     //  Reset our iterator node pointer by searching for the first node in
     //  the list that we can find. If we don't find one, then return false.
     //
-    m_pIter = 0;
+    m_pIter = nullptr;
     for (m_c4IterBucket = 0; m_c4IterBucket < c4Modulus; m_c4IterBucket++)
     {
         if (m_aBuckets[m_c4IterBucket])
@@ -186,6 +181,9 @@ tCIDLib::TCard4 TXMLNameIDPool<TElem>::c4AddNew(TElem* const pobjToAdd)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return 0;
     }
     #endif
 
@@ -220,7 +218,7 @@ template <class TElem>
 TElem* TXMLNameIDPool<TElem>::pobjById(const tCIDLib::TCard4 c4Id)
 {
     if (c4Id >= m_c4IdIndex)
-        return 0;
+        return nullptr;
 
     return m_apobjById[c4Id];
 }
@@ -245,6 +243,9 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return nullptr;
     }
     #endif
 
@@ -253,7 +254,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
     //  gonna match and can return now.
     //
     if (!m_aBuckets[hshKey])
-        return 0;
+        return nullptr;
 
     // We have to search the list and compare the names to find the actual one
     TBucketElem* pCur = m_aBuckets[hshKey];
@@ -268,7 +269,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const TString& strName)
     }
 
     // Never found it
-    return 0;
+    return nullptr;
 }
 
 template <class TElem>
@@ -290,6 +291,9 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
             , TCardinal(hshKey)
             , TCardinal(c4Modulus)
         );
+
+        // Won't happen, but makes analyzer happy
+        return nullptr;
     }
     #endif
 
@@ -298,7 +302,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
     //  gonna match and can return now.
     //
     if (!m_aBuckets[hshKey])
-        return 0;
+        return nullptr;
 
     // We have to search the list and compare the names to find the actual one
     TBucketElem* pCur = m_aBuckets[hshKey];
@@ -313,7 +317,7 @@ TElem* TXMLNameIDPool<TElem>::pobjByName(const tCIDLib::TCh* const pszName)
     }
 
     // Never found it
-    return 0;
+    return nullptr;
 }
 
 
@@ -359,7 +363,7 @@ template <class TElem> tCIDLib::TVoid TXMLNameIDPool<TElem>::RemoveAll()
         if (m_aBuckets[c4Index])
         {
             TBucketElem* pCur = m_aBuckets[c4Index];
-            TBucketElem* pNext = 0;
+            TBucketElem* pNext = nullptr;
             while (pCur)
             {
                 // Save the next node before we delete this one
@@ -371,13 +375,13 @@ template <class TElem> tCIDLib::TVoid TXMLNameIDPool<TElem>::RemoveAll()
                 // And now make the saved next the current
                 pCur = pNext;
             }
-            m_aBuckets[c4Index] = 0;
+            m_aBuckets[c4Index] = nullptr;
         }
     }
 
     // Invalidate the internal iterator
     m_c4IterBucket = c4Modulus;
-    m_pIter = 0;
+    m_pIter = nullptr;
 
     // Bump the sequence id to invalidate cursors
     m_c4SeqId++;
@@ -426,18 +430,18 @@ TXMLNameIDPoolCursor(const TXMLNameIDPool<TElem>* const pxnipToIter) :
 
     m_c4IterBucket(TXMLNameIDPool<TElem>::c4Modulus)
     , m_c4SeqId(0)
-    , m_pIter(0)
+    , m_pIter(nullptr)
     , m_pxnipIter(pxnipToIter)
 {
 }
 
 template <class TElem> TXMLNameIDPoolCursor<TElem>::
-TXMLNameIDPoolCursor(const TXMLNameIDPoolCursor& xnipcToCopy) :
+TXMLNameIDPoolCursor(const TXMLNameIDPoolCursor& xnipcSrc) :
 
-    m_c4IterBucket(xnipcToCopy.m_c4IterBucket)
-    , m_c4SeqId(xnipcToCopy.m_c4SeqId)
-    , m_pIter(xnipcToCopy.m_pIter)
-    , m_pxnipIter(xnipcToCopy.m_pxnipIter)
+    m_c4IterBucket(xnipcSrc.m_c4IterBucket)
+    , m_c4SeqId(xnipcSrc.m_c4SeqId)
+    , m_pIter(xnipcSrc.m_pIter)
+    , m_pxnipIter(xnipcSrc.m_pxnipIter)
 {
 }
 
@@ -482,7 +486,7 @@ template <class TElem> tCIDLib::TBoolean TXMLNameIDPoolCursor<TElem>::bNext()
             return kCIDLib::True;
         }
     }
-    m_pIter = 0;
+    m_pIter = nullptr;
     return kCIDLib::False;
 }
 
@@ -503,7 +507,7 @@ template <class TElem> tCIDLib::TBoolean TXMLNameIDPoolCursor<TElem>::bReset()
             return kCIDLib::True;
         }
     }
-    m_pIter = 0;
+    m_pIter = nullptr;
     return kCIDLib::False;
 }
 
@@ -539,17 +543,15 @@ template <class TElem> const TElem& TXMLNameIDPoolCursor<TElem>::objCur() const
 
 
 template <class TElem> TXMLNameIDPoolCursor<TElem>&
-TXMLNameIDPoolCursor<TElem>::operator=(const TXMLNameIDPoolCursor<TElem>& xnipcToAssign)
+TXMLNameIDPoolCursor<TElem>::operator=(const TXMLNameIDPoolCursor<TElem>& xnipcSrc)
 {
-    if (this == &xnipcToAssign)
-        return *this;
-
-    m_c4IterBucket  = xnipcToAssign.m_c4IterBucket;
-    m_c4SeqId       = xnipcToAssign.m_c4SeqId;
-    m_pIter         = xnipcToAssign.m_pIter;
-    m_pxnipIter     = xnipcToAssign.m_pxnipIter;
-
+    if (this != &xnipcSrc)
+    {
+        m_c4IterBucket  = xnipcSrc.m_c4IterBucket;
+        m_c4SeqId       = xnipcSrc.m_c4SeqId;
+        m_pIter         = xnipcSrc.m_pIter;
+        m_pxnipIter     = xnipcSrc.m_pxnipIter;
+    }
     return *this;
 }
-
 

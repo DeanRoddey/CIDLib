@@ -47,13 +47,16 @@ RTTIDecls(TSrcEditor, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDWUtils_SrcEditor
 {
-    //
-    //  The Scintilla marker ids we use. Order is important, since they overlay
-    //  each other based on lower ids.
-    //
-    const tCIDLib::TCard4   c4Marker_BreakPoint     = 0;
-    const tCIDLib::TCard4   c4Marker_BreakPointD    = 1;
-    const tCIDLib::TCard4   c4Marker_CurLine        = 2;
+    namespace
+    {
+        //
+        //  The Scintilla marker ids we use. Order is important, since they overlay
+        //  each other based on lower ids.
+        //
+        constexpr tCIDLib::TCard4   c4Marker_BreakPoint     = 0;
+        constexpr tCIDLib::TCard4   c4Marker_BreakPointD    = 1;
+        constexpr tCIDLib::TCard4   c4Marker_CurLine        = 2;
+    }
 };
 
 
@@ -549,14 +552,14 @@ TSrcEditor::CreateSrcEditor(const   TWindow&                wndParent
                             , const   TString&              strPath)
 {
     // Load the implementation DLL if not already done
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
-    if (!bLoaded)
+    static TAtomicFlag atomLoaded;
+    if (!atomLoaded)
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!atomLoaded)
         {
             ::LoadLibrary(L"SciLexer.dll");
-            bLoaded = kCIDLib::True;
+            atomLoaded.Set();
         }
     }
 
@@ -697,7 +700,7 @@ TSrcEditor::LoadText(const TString& strPath, const TString& strToSet)
     //  It expects a null terminated string, so do that. The transcoding doesn't
     //  transcode anything but the actual text.
     //
-    mbufText[c4Bytes++] = 0;
+    mbufText.PutCard1(0, c4Bytes++);
     ::SendMessage
     (
         hwndSafe(), SCI_SETTEXT, 0, tCIDCtrls::TLParam(mbufText.pc1Data())
@@ -723,7 +726,7 @@ TSrcEditor::LoadText(const TString& strPath, TTextInStream& strmSrc)
     //  buffer based text outstream. We read lines from the source and write
     //  them to the target. We also expand tabs during this process.
     //
-    TTextMBufOutStream strmOut(32 * 1024, 256 * 1024, new TUTF8Converter);
+    TTextMBufOutStream strmOut(32 * 1024, kCIDLib::c4Sz_32M, new TUTF8Converter);
     strmOut.eNewLineType(tCIDLib::ENewLineTypes::LF);
 
     TString strCurLine;
@@ -745,7 +748,7 @@ TSrcEditor::LoadText(const TString& strPath, TTextInStream& strmSrc)
     THeapBuf mbufData(c4Bytes, c4Bytes + 1);
     mbufData.CopyIn(strmOut.mbufData(), c4Bytes);
 
-    mbufData[c4Bytes++] = 0;
+    mbufData.PutCard1(0, c4Bytes++);
     ::SendMessage
     (
         hwndSafe(), SCI_SETTEXT, 0, tCIDCtrls::TLParam(mbufData.pc1Data())
@@ -1043,7 +1046,7 @@ TSrcEditor::SetSearchFlag(  const   tCIDWUtils::EFindOpts   eOpt
     }
      else
     {
-        tCIDCtrls::TWParam wNewFlag;
+        tCIDCtrls::TWParam wNewFlag = 0;
         switch(eOpt)
         {
             case tCIDWUtils::EFindOpts::Case :

@@ -20,7 +20,12 @@
 //  the host environment variables. All of it is static and it should be
 //  treaded like a namespace, but it is implemented as a class  because there
 //  is a need to share data between the platform dependent and independent
-//  implementation files. The constructors are hidden to insure this.
+//  implementation files. The constructors are hidden to insure this, and the
+//  destructor is deleted for the same reason.
+//
+//  We also create a little janitor class that will clean up an array of pointers
+//  to raw strings, since that's a format required in various places to pass
+//  parameter or environment info to system APIs.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -45,6 +50,86 @@ class   TKrnlHashMap;
 
 
 // ---------------------------------------------------------------------------
+//   CLASS: TStrArrayJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class KRNLEXPORT TStrArrayJan
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TStrArrayJan() = delete;
+
+        TStrArrayJan(const TStrArrayJan&) = delete;
+        TStrArrayJan(TStrArrayJan&&) = delete;
+
+        TStrArrayJan(       tCIDLib::TCh**      apszEnv
+                    , const tCIDLib::TCard4     c4Count
+                    , const tCIDLib::TBoolean   bFreeArray) :
+
+            m_bFreeArray(bFreeArray)
+            , m_apszEnv(apszEnv)
+            , m_c4Count(c4Count)
+        {
+        }
+
+        ~TStrArrayJan()
+        {
+            if (m_apszEnv)
+            {
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
+                    delete [] m_apszEnv[c4Index];
+            }
+
+            if (m_bFreeArray)
+                delete [] m_apszEnv;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStrArrayJan& operator=(const TStrArrayJan&) = delete;
+        TStrArrayJan& operator=(TStrArrayJan&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid Orphan()
+        {
+            m_apszEnv = nullptr;
+        }
+
+        tCIDLib::TCh** apszEnv()
+        {
+            return m_apszEnv;
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_bFreeArray
+        //      The array itself may or may not be dynamically allocated. The
+        //      creator tells whether or not we should delete it.
+        //
+        //  m_c4Count
+        //      The size of the array, i.e. the number of strings to delete.
+        //
+        //  m_pszEnv
+        //      The environment data to clean up if we still have it on dtor.
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bFreeArray;
+        tCIDLib::TCard4     m_c4Count;
+        tCIDLib::TCh**      m_apszEnv;
+};
+
+
+
+// ---------------------------------------------------------------------------
 //   CLASS: TKrnlEnvironment
 //  PREFIX: kenv
 // ---------------------------------------------------------------------------
@@ -59,30 +144,32 @@ class KRNLEXPORT TKrnlEnvironment
             public :
                 TElem() :
 
-                    pszKey(nullptr)
-                    , pszValue(nullptr)
+                    m_pszKey(nullptr)
+                    , m_pszValue(nullptr)
                 {
                 }
 
                 TElem(const TElem&) = delete;
+                TElem(TElem&&) = delete;
 
                 ~TElem()
                 {
-                    delete [] pszKey;
-                    delete [] pszValue;
+                    delete [] m_pszKey;
+                    delete [] m_pszValue;
                 }
 
                 TElem& operator=(const TElem&) = delete;
+                TElem& operator=(TElem&&) = delete;
 
                 tCIDLib::TVoid Set( const   tCIDLib::TCh* const pszTheKey
                                     , const tCIDLib::TCh* const pszTheValue)
                 {
-                    pszKey = TRawStr::pszReplicate(pszTheKey);
-                    pszValue = TRawStr::pszReplicate(pszTheValue);
+                    m_pszKey = TRawStr::pszReplicate(pszTheKey);
+                    m_pszValue = TRawStr::pszReplicate(pszTheValue);
                 }
 
-                tCIDLib::TCh*   pszKey;
-                tCIDLib::TCh*   pszValue;
+                tCIDLib::TCh*   m_pszKey;
+                tCIDLib::TCh*   m_pszValue;
         };
 
 
@@ -123,26 +210,29 @@ class KRNLEXPORT TKrnlEnvironment
         static tCIDLib::TBoolean bFind
         (
             const   tCIDLib::TCh* const     pszKey
+            ,       TKrnlString&            kstrToFill
+        );
+
+        static tCIDLib::TBoolean bFind
+        (
+            const   tCIDLib::TCh* const     pszKey
             ,       tCIDLib::TCh* const     pszToFill
             , const tCIDLib::TCard4         c4MaxChars
         );
 
         static tCIDLib::TBoolean bFindExePath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bFindLibPath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bFindTempPath
         (
-                    tCIDLib::TCh* const     pszToFill
-            , const tCIDLib::TCard4         c4MaxChars
+                    TKrnlString&            kstrToFill
         );
 
         static tCIDLib::TBoolean bKeyExists
@@ -178,12 +268,15 @@ class KRNLEXPORT TKrnlEnvironment
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TKrnlEnvironment(const TKrnlEnvironment&) = delete;
+        TKrnlEnvironment(TKrnlEnvironment&&) = delete;
+        ~TKrnlEnvironment() = delete;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlEnvironment& operator=(const TKrnlEnvironment&) = delete;
+        TKrnlEnvironment& operator=(TKrnlEnvironment&&) = delete;
 
 
     protected :

@@ -49,6 +49,7 @@ class CIDWUTILSEXP TColoredList : public TMultiColListBox
         TColoredList();
 
         TColoredList(const TColoredList&) = delete;
+        TColoredList(TColoredList&&) = delete;
 
         ~TColoredList();
 
@@ -57,6 +58,7 @@ class CIDWUTILSEXP TColoredList : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         TColoredList& operator=(const TColoredList&) = delete;
+        TColoredList& operator=(TColoredList&&) = delete;
 
 
         // -------------------------------------------------------------------

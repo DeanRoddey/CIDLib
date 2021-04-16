@@ -35,6 +35,87 @@
 // ---------------------------------------------------------------------------
 //  TKrnlPathStr methods
 // ---------------------------------------------------------------------------
+
+//
+//  This could be portable, but some OSes may have build in helpers for this that
+//  could do useful checks and such.
+//
+tCIDLib::TBoolean
+TKrnlPathStr::bAddLevel(        tCIDLib::TCh* const     pszToFill
+                        , const tCIDLib::TCh* const     pszToAdd
+                        , const tCIDLib::TCard4         c4MaxChars)
+{
+    if (!pszToFill)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
+    // If nothing to add, we are done, and makes below simpler
+    if (!pszToAdd || (*pszToAdd == kCIDLib::chNull))
+        return kCIDLib::True;
+
+    const tCIDLib::TCard4 c4TarLen = TRawStr::c4StrLen(pszToFill);
+    tCIDLib::TCh* pszTar = pszToFill + c4TarLen;
+    tCIDLib::TCh* pszTarEnd  = pszToFill + c4MaxChars;
+    const tCIDLib::TCh* pszSrc = pszToAdd;
+
+    // If the value to add starts with a separator, move forward
+    if (*pszSrc == kCIDLib::chPathSep)
+        pszSrc++;
+
+    // See if the target ends with a slash, if not add one
+    if (c4TarLen && (*(pszTar - 1) != kCIDLib::chPathSep))
+        *pszTar++ = kCIDLib::chPathSep;
+
+    // Now append the bit to add as long as we have space
+    while ((pszTar < pszTarEnd) && *pszSrc)
+        *pszTar++ = *pszSrc++;
+
+    // If we didnt' get all of the src, then an error
+    if (*pszSrc)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InsufficientBuffer);
+        return kCIDLib::False;
+    }
+
+    *pszTar = kCIDLib::chNull;
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlPathStr::bAddTrailingSep(          tCIDLib::TCh* const     pszToFill
+                                , const tCIDLib::TCard4         c4MaxChars)
+{
+    if (!pszToFill)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
+    const tCIDLib::TCard4 c4TarLen = TRawStr::c4StrLen(pszToFill);
+
+    // We only do this if there's some existing content
+    if (c4TarLen)
+    {
+        if (c4TarLen >= c4MaxChars)
+        {
+            TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InsufficientBuffer);
+            return kCIDLib::False;
+        }
+
+        if (pszToFill[c4TarLen - 1] != kCIDLib::chPathSep)
+        {
+            pszToFill[c4TarLen] = kCIDLib::chPathSep;
+            pszToFill[c4TarLen + 1] = kCIDLib::chNull;
+        }
+    }
+    return kCIDLib::True;
+}
+
+
+
 tCIDLib::TBoolean TKrnlPathStr::bFindPart(  const   tCIDLib::TCh* const pszSrc
                                             ,       tCIDLib::TCard4&    c4Start
                                             ,       tCIDLib::TCard4&    c4End

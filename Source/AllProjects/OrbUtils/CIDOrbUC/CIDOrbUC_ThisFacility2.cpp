@@ -38,18 +38,21 @@
 // ---------------------------------------------------------------------------
 namespace CIDOrbUC_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  If a binding fails this many times in a row, we just remove it because
-    //  it's clearly bad.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxBindFails = 10;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  If a binding fails this many times in a row, we just remove it because
+        //  it's clearly bad.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard4       c4MaxBindFails = 10;
 
 
-    // -----------------------------------------------------------------------
-    //  If we haven't had to talk to the NS for other reasons in this period
-    //  of time, we'll do an active ping.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TEncodedTime enctPingTime(kCIDLib::enctOneSecond * 15);
+        // -----------------------------------------------------------------------
+        //  If we haven't had to talk to the NS for other reasons in this period
+        //  of time, we'll do an active ping.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TEncodedTime enctPingTime(kCIDLib::enctOneSecond * 15);
+    }
 }
 
 
@@ -69,7 +72,7 @@ TFacCIDOrbUC::bDeregRebindObj(  const   TString&            strNodePath
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     // We have to lock during this, since the binder thread is running
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -134,7 +137,7 @@ TFacCIDOrbUC::RegRebindObj( const   TOrbObjId&  ooidSrvObject
                             , const TString&    strExtra4)
 {
     // We have to lock since the binder thread is probably running now
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // See if this path is already in our list. This isn't legal
     TNSRebindInfo* pnsrbiFound = pnsrbiFind(strNodePath);
@@ -208,13 +211,39 @@ tCIDLib::TVoid TFacCIDOrbUC::StopRebinder() noexcept
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
     catch(...)
     {
     }
+}
+
+
+//
+//  This is a convenience method that applications can call to unbind a set of
+//  bingings all at once. Typically it would do all of the application level ones
+//  it has registered, since this would usually be done in the process of
+//  shutting down.
+//
+//  We throw if anything anything fails. Since we indicate not to thrown for basic
+//  issues like the binding not being there, anything else is likely to stop any
+//  further progress.
+//
+tCIDLib::TVoid TFacCIDOrbUC::UnbindObjs(const tCIDLib::TStrCollect& colBindings)
+{
+    tCIDOrbUC::TNSrvProxy orbcNS = facCIDOrbUC().orbcNameSrvProxy(3000);
+    colBindings.bForEach
+    (
+        [this, &colBindings, &orbcNS](const TString& strBinding) -> tCIDLib::TBoolean
+        {
+            // Probably it's in the rebinder so remove it
+            bDeregRebindObj(strBinding, kCIDLib::False);
+            orbcNS->RemoveBinding(strBinding, kCIDLib::False);
+            return kCIDLib::True;
+        }
+    );
 }
 
 
@@ -234,7 +263,7 @@ TFacCIDOrbUC::UpdateExtraNSVal( const   TString&        strNodePath
     //  We have to lock since the binder thread is probably running now.
     //
     {
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         // Look up the binding info for this path
         TNSRebindInfo* pnsrbiFound = pnsrbiFind(strNodePath);
@@ -293,7 +322,7 @@ TFacCIDOrbUC::UpdateExtraNSVal( const   TString&        strNodePath
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -621,7 +650,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
         try
         {
             // Now we have to lock
-            TMtxLocker lockSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             tCIDOrbUC::TNSrvProxy orbcNS;
 
@@ -731,7 +760,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
             if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
 
             m_enctLastNSCheck = TTime::enctNow();
@@ -748,7 +777,7 @@ TFacCIDOrbUC::eBinderThread(TThread& thrThis, tCIDLib::TVoid*)
     }
 
     // Make sure the list is cleared
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     m_colList.RemoveAll();
 
     return tCIDLib::EExitCodes::Normal;

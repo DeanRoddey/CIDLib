@@ -83,6 +83,7 @@ class CIDLIBEXP TCardinal :
         );
 
         TCardinal(const TCardinal&) = default;
+        TCardinal(TCardinal&&) = default;
 
         ~TCardinal() = default;
 
@@ -90,12 +91,14 @@ class CIDLIBEXP TCardinal :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TCardinal& operator=(const TCardinal&) = default;
+
+        TCardinal& operator=(TCardinal&&) = default;
+
         constexpr operator tCIDLib::TCard4() const
         {
             return m_c4Val;
         }
-
-        TCardinal& operator=(const TCardinal&) = default;
 
         constexpr tCIDLib::TBoolean operator==(const TCardinal& cToTest) const
         {
@@ -109,7 +112,7 @@ class CIDLIBEXP TCardinal :
 
         TCardinal& operator=
         (
-                    tCIDLib::TCard4         c4Src
+            const   tCIDLib::TCard4         c4Src
         );
 
         tCIDLib::TBoolean operator==
@@ -182,6 +185,18 @@ class CIDLIBEXP TCardinal :
             const   tCIDLib::TCard4         c4Src
         );
 
+        TCardinal& operator--(int)
+        {
+            m_c4Val--;
+            return *this;
+        }
+
+        TCardinal& operator++(int)
+        {
+            m_c4Val++;
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -216,7 +231,7 @@ class CIDLIBEXP TCardinal :
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
@@ -269,6 +284,7 @@ class CIDLIBEXP TCardinal64 :
         );
 
         TCardinal64(const TCardinal64&) = default;
+        TCardinal64(TCardinal64&&) = default;
 
         ~TCardinal64() = default;
 
@@ -277,6 +293,7 @@ class CIDLIBEXP TCardinal64 :
         //  Public operators
         // -------------------------------------------------------------------
         TCardinal64& operator=(const TCardinal64&) = default;
+        TCardinal64& operator=(TCardinal64&&) = default;
 
         TCardinal64& operator=
         (
@@ -368,6 +385,18 @@ class CIDLIBEXP TCardinal64 :
             const   tCIDLib::TCard8         c8Src
         );
 
+        TCardinal64& operator--(int)
+        {
+            m_c8Val--;
+            return *this;
+        }
+
+        TCardinal64& operator++(int)
+        {
+            m_c8Val++;
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -402,7 +431,7 @@ class CIDLIBEXP TCardinal64 :
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
@@ -450,10 +479,8 @@ class CIDLIBEXP TLocCardinal : public TCardinal
             const   tCIDLib::TCard4         c4Val
         );
 
-        TLocCardinal
-        (
-            const   TLocCardinal&           cToCopy
-        );
+        TLocCardinal(const TLocCardinal&) = default;
+        TLocCardinal(TLocCardinal&&) = default;
 
         ~TLocCardinal();
 
@@ -461,10 +488,8 @@ class CIDLIBEXP TLocCardinal : public TCardinal
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLocCardinal& operator=
-        (
-            const   TLocCardinal&           cToAssign
-        );
+        TLocCardinal& operator=(const TLocCardinal&) = default;
+        TLocCardinal& operator=(TLocCardinal&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -504,7 +529,7 @@ class CIDLIBEXP TLocCardinal : public TCardinal
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -532,10 +557,8 @@ class CIDLIBEXP TLocCardinal64 : public TCardinal64
             const   tCIDLib::TCard8&        c8Val
         );
 
-        TLocCardinal64
-        (
-            const   TLocCardinal64&         cToCopy
-        );
+        TLocCardinal64(const TLocCardinal64&) = default;
+        TLocCardinal64(TLocCardinal64&&) = default;
 
         ~TLocCardinal64();
 
@@ -543,10 +566,8 @@ class CIDLIBEXP TLocCardinal64 : public TCardinal64
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLocCardinal64& operator=
-        (
-            const   TLocCardinal64&         cToAssign
-        );
+        TLocCardinal64& operator=(const TLocCardinal64&)  = default;
+        TLocCardinal64& operator=(TLocCardinal64&&)  = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -586,7 +607,7 @@ class CIDLIBEXP TLocCardinal64 : public TCardinal64
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------

@@ -100,11 +100,11 @@ tCIDLib::TVoid TKrnlPopup::Show(const   tCIDLib::TCh* const pszFileName
                                 , const tCIDLib::TCh* const pszMsg
                                 , const tCIDLib::TCh* const pszMsg2)
 {
-    const tCIDLib::TCard4 c4BufLen = 4095;
+    constexpr tCIDLib::TCard4 c4BufLen = 4095;
     tCIDLib::TCh achBuffer[c4BufLen + 1];
     achBuffer[0] = kCIDLib::chNull;
 
-    const tCIDLib::TCard4 c4TmpBufLen = 63;
+    constexpr tCIDLib::TCard4 c4TmpBufLen = 63;
     tCIDLib::TCh achTmpBuf[c4TmpBufLen + 1];
     achTmpBuf[0] = kCIDLib::chNull;
 

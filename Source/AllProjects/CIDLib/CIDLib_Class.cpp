@@ -63,14 +63,8 @@ TTypeFactoryKicker::~TTypeFactoryKicker()
 // ---------------------------------------------------------------------------
 TClass& TClass::Nul_TClass()
 {
-    static TClass* pclsNull = nullptr;
-    if (!pclsNull)
-    {
-        TBaseLock lockInit;
-        if (!pclsNull)
-            TRawMem::pExchangePtr(&pclsNull, new TClass);
-    }
-    return *pclsNull;
+    static TClass clsNull;
+    return clsNull;
 }
 
 
@@ -315,27 +309,15 @@ TClass& TClass::operator=(const TClass& clsSrc)
 // ---------------------------------------------------------------------------
 const TClass& TClass::clsIsA() const
 {
-    static TClass* pclsThis = nullptr;
-    if (!pclsThis)
-    {
-        TBaseLock lockInit;
-        if (!pclsThis)
-            TRawMem::pExchangePtr(&pclsThis, new TClass(L"TClass"));
-    }
-    return *pclsThis;
+    static TClass clsThis(L"TClass");
+    return clsThis;
 }
 
 
 const TClass& TClass::clsParent() const
 {
-    static TClass* pclsThis = nullptr;
-    if (!pclsThis)
-    {
-        TBaseLock lockInit;
-        if (!pclsThis)
-            TRawMem::pExchangePtr(&pclsThis, new TClass(L"TObject"));
-    }
-    return *pclsThis;
+    static TClass clsParent(L"TObject");
+    return clsParent;
 }
 
 

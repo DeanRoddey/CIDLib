@@ -54,8 +54,11 @@ TUPnPService::TUPnPService() :
     , m_c4SerialNum(1)
     , m_colVarList
       (
-        109, TStringKeyOps(), &TKeyValuePair::strExtractKey, tCIDLib::EMTStates::Safe
-      )
+          109
+          , TStringKeyOps()
+          , &TKeyValuePair::strExtractKey
+          , tCIDLib::EMTStates::Safe
+        )
     , m_pkupnpsThis(nullptr)
 {
 }
@@ -110,7 +113,7 @@ tCIDLib::TVoid
 TUPnPService::UPnPVarChanged(const  tCIDLib::TCh* const pszVarName
                             , const tCIDLib::TCh* const pszVarVal)
 {
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     //
     //  See if it's there or not. Since already have to lock because of the
@@ -120,14 +123,10 @@ TUPnPService::UPnPVarChanged(const  tCIDLib::TCh* const pszVarName
     //
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(pszVarName);
     if (pkvalVar)
-    {
         pkvalVar->strValue(pszVarVal);
-    }
-     else
-    {
-        TKeyValuePair kvalNew(pszVarName, pszVarVal);
-        m_colVarList.objAdd(kvalNew);
-    }
+    else
+        m_colVarList.objPlace(pszVarName, pszVarVal);
+
 
     m_c4SerialNum++;
     if (!m_c4SerialNum)
@@ -212,7 +211,7 @@ TUPnPService::bQueryStateVar(const  TString&            strVarName
     }
 
     // See if it's in our list
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     c4SerialNum = m_c4SerialNum;
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
@@ -271,7 +270,7 @@ TUPnPService::QueryStateVar(const   TString&            strVarName
     //
     if (m_bIsEvented)
     {
-        TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+        TLocker lockrVars(&m_colVarList);
 
         c4SerialNum = m_c4SerialNum;
         TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
@@ -375,7 +374,7 @@ TUPnPService::QueryStateVar(const   TString&                strVarName
 tCIDLib::TVoid TUPnPService::Release()
 {
     delete m_pkupnpsThis;
-    m_pkupnpsThis = 0;
+    m_pkupnpsThis = nullptr;
 
     m_bIsDead = kCIDLib::True;
     m_bIsEvented = kCIDLib::False;
@@ -477,7 +476,7 @@ TUPnPService::bParseXML(        TXMLTreeParser& xtprsItems
 tCIDLib::TVoid TUPnPService::BumpSerialNum() const
 {
     // We have to lock since we could need to do two operations if we wrap
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     m_c4SerialNum++;
     if (!m_c4SerialNum)
@@ -624,12 +623,17 @@ TUPnPService::SetKrnlObj(       TKrnlUPnPService* const pkupnpsToAdopt
             , strTypeID
             , clsIsA()
         );
+
+        // Won't happen, but makes analyzer happy
+        return;
     }
     #endif
 
     // If we have an object already, let it go
     delete m_pkupnpsThis;
-    m_pkupnpsThis = 0;
+    m_pkupnpsThis = nullptr;
+
+    CIDAssert(pkupnpsToAdopt != nullptr, L"The passed UPnP server cannot be null");
 
     m_pkupnpsThis = pkupnpsToAdopt;
     m_strTypeID = strTypeID;
@@ -670,7 +674,7 @@ tCIDLib::TVoid
 TUPnPService::SetStateVar(  const   TString& strVarName
                             , const TString& strVarVal) const
 {
-    TMtxLocker mtxlVars(m_colVarList.pmtxLock());
+    TLocker lockrVars(&m_colVarList);
 
     //
     //  For efficiency we lock first and do a check to see if we can
@@ -679,14 +683,9 @@ TUPnPService::SetStateVar(  const   TString& strVarName
     //
     TKeyValuePair* pkvalVar = m_colVarList.pobjFindByKey(strVarName);
     if (pkvalVar)
-    {
         pkvalVar->strValue(strVarVal);
-    }
-     else
-    {
-        TKeyValuePair kvalNew(strVarName, strVarVal);
-        m_colVarList.objAdd(kvalNew);
-    }
+    else
+        m_colVarList.objPlace(strVarName, strVarVal);
 }
 
 

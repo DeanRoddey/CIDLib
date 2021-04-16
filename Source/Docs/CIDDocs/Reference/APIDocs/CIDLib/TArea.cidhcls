@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass   Class="TArea" Prefix="area" Parent="TObject" Flags="Fmt Dup BStrm">
+
+    <Desc>
+        <P>TArea implements is a 2D rectangular area with a signed upper left origin and an unsigned size in the positive direction of each axis (left to right, top to bottom.) I.e. its a 4th quadrant coordinate system.</P>
+
+        <P>An area of 10x10 at an origin of 10,10 will cover the pixels from 10,10 to 19,19, since 10,10 is the first pixel. These kinds of "one off" issues are endlessly annoying no matter what type of representation you use for areas (or rectangles.) You have to very careful to understand what you are doing at each level, or you will end up with a hierarchy of offsetting errors that you can never undo.</P>
+
+        <SecTitle>Inclusive vs. Exclusive</SecTitle>
+
+        <P>The problem is even more annoying when these are converted to reactangles or points. This is often required to pass them to system APIs. When dealing with rectangles or corner points, you get into the issue of exclusive vs. non-exclusive coordinates.</P>
+
+        <P>An inclusive rectangle includes the left/bottom sides. So a rectangle of 0,0,0,0 would actually be 1 pixel in size. You can't really indicate an empty inclusive rectangle. In non-inclusive mode 0,0,0,0 does reflect an inclusive empty rectangle. 0,0,1,1 is one pixel in size, because it doesn't include the left/bottom.</P>
+
+        <P>The same applies when representing an area as individual coordinates or as points. When you create an area from a set of upper/left and lower/right points, unless you are given the choice of inclusive/exclusive, the assumption is that the lower/right coordinates are non-inclusive, i.e. not part of the created area. So points 10,10 and 20,20 create an area of 10x10. It covers coordinates 10 to 19 in each direction. </P>
+
+        <P>Exclusive mode may seem weird at first but it works better. It allows for empty rectangles and it also means that right minus left and bottom minus top give you the actual sizes, you don't have to always be adding or subtracting by 1, which is rife with potential errors.</P>
+
+        <P>Primarly you would want to get the points from an area as inclusive when you are going to pass them to something that literally interprets them as points, and doesn't realize they come from an area or rectangle. Just be aware that an empty area and a 1x1 area will result in the same inclusive lower/right values.</P>
+
+        <P>So just be careful when converting between the two. Mostly you want non-inclusive but be sure. The rules are:</P>
+
+        <List>
+            <LItem Ref="Inclusive Rectl to Area">The resulting area includes the outer edge. So 0,0,1,1 becomes 0,0-2,2 in terms of origin/size, so it's 2 pixels wide.</LItem>
+            <LItem Ref="Non-Inclusive Rectl to Area">The resulting area excludes the outer edge. So 0,0,1,1 becomes 0,0 - 1,1 so it's 1 pixel wide, which maps well.</LItem>
+            <LItem Ref="Area to Inculsive Rectl">An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle includes the edges, so it becomes 0,0,0,0. If you convert an empty area, it will also come out 0,0,0,0, so you will lose information.</LItem>
+            <LItem Ref="Area to Non-Inculsive Rectl">An area of 0,0 - 1,1 is 1 pixel in size, and the inclusive rectangle does not include the edges, so it has to become 0,0,1,1, again it maps well.</LItem>
+        </List>
+
+    </Desc>
+
+    <PubIntf>
+
+        <Ctors DefMethods="CopyCtor DefCtor Dtor">
+
+            <Method Name="TArea">
+                <Desc>
+                    <P>There are various ways to construct area objects. You can construct from a host rectangle, indicating whether it is inclusive or not (see class comments above.) You can construct from an origin and size in a number of variations, and from origin and lower/right point.</P>
+
+                    <P>When constructing from points, you indicate whether the points represent an inclusive or non-inclusive rectangle. Be careful to get that right.</P>
+
+                    <P>There are host points and host areas, which are defined for the local host and are primarily used internally to construct from areas and points gotten from system APIs.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="rectlToCopy" Type="tCIDLib::THostRectl" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="areaToCopy" Type="tCIDLib::TRawArea" PBy="CRef"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                    <MethParam Name="ptLRight" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="pntLRight" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="i4X" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4Y" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntULeft" Type="" PBy="CRef"/>
+                    <MethParam Name="szExtent" Type="TSize" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+        </Ctors>
+
+        <Operators DefMethods="AssignOp">
+
+            <Method Name="operator==" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is equal to the passed area.</Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is not equal to the passed area.</Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator=" RetType="TArea" RetBy="CRef">
+                <Desc>Assigns a raw area to this area. Returns a reference to this area after the change.</Desc>
+                <MethVar><MethParam Name="areaToAssign" Type="tCIDLib::TRawArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator|=">
+                <Desc>Updates this area to contain both its current area and the passed area.</Desc>
+                <MethVar><MethParam Name="areaToOR" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator-=">
+                <Desc>Updates this area to remove any overlap with the passed area. If both area equal, this area will end up empty.</Desc>
+                <MethVar><MethParam Name="areaToSub" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator&amp;=">
+                <Desc>Updates this area to reflect any area that it and the passed area have in common. If they don't overlap at all in one or both axes, this area will end up empty, with its origin at the larger values of the origins of the two.</Desc>
+                <MethVar><MethParam Name="areaToAND" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator+=">
+                <Desc>Adds the values in the passed point to this area's origin.</Desc>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator-=">
+                <Desc>Subtracts the values in teh passed point from this area's origin.</Desc>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+        </Operators>
+
+        <NVirtMeths>
+
+            <Method Name="AdjustAndShrink">
+                <Desc>This method is a convenience that will increase the origin by the passed adjustment values, and decrease the size by the same amount. This is different from Deflate() in that this only takes unsigned values, so it can never make the area bigger.</Desc>
+                <MethVar>
+                    <MethParam Name="c4XAdj" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YAdj" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="AdjustOrg">
+                <Desc>Adjusts the origin by the passed values. One variation takes unsigned values, so it can never move the area upwards or leftwards. The other takes a point (signed values), so it can adjust in either direction.</Desc>
+                <MethVar>
+                    <MethParam Name="c4XAdj" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YAdj" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntOffset" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="AdjustSides">
+                <Desc>Adjusts the left/right and bottom/top sides by the indicted offsets, either as separate values or as a point.</Desc>
+                <MethVar>
+                    <MethParam Name="i4XAdj" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4YAdj" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntAdjust" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+
+            <Method Name="AdjustSize">
+                <Desc>Adjusts the area's sizes by the passed value, either as separate values or as a point. These are signed values so it can adjust them in either direction.</Desc>
+                <MethVar>
+                    <MethParam Name="i4XAdj" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4YAdj" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntAdjust" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bContainsArea" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area contains the passed area. It's an inclusive check, so its sides can equal our sides and still be considered contained.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bContainsPoint" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area contains the passed point. It's an inclusive check, so the point can be on our edges and still be considered contained.</Desc>
+                <MethVar>
+                    <MethParam Name="i4X" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4Y" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar><MethParam Name="pntCheck" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bHorzOverlap" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area intersects the passed area in the horizontal axis. Having a common edge counts as overlap.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bIsEmpty" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area is zero sized in either axis.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIntersects" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Returns kCIDLib::True if this area and the passed area intersect. Touching edges counts in this case.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bIsInside" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>This is like calling bContainsArea() and swapping the two areas, so in this case this object is being checked to see if it is contained inside the passed area.</Desc>
+                <MethVar><MethParam Name="areaCheck" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bMoveWithin" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>Adjusts the passed point the least amount necessary to get it within this area. This is inclusive so it will be moved onto an edge if it outside of the area in a given direction. Returns kCIDLib::True if the point had to be adjusted.</Desc>
+                <MethVar><MethParam Name="pntToMove" Type="TPoint" PBy="Ref"/></MethVar>
+            </Method>
+
+            <Method Name="bParseFromText" RetType="tCIDLib::TBoolean">
+                <Desc>
+                    <P>This method will parse an area from text and set this object to reflect the results. It returns kCIDLib::True if successful, else it was not and this object was not changed.</P>
+
+                    <P>The format is assumed to be x,y,cx,cy, but you can indicate a different separator character. White space doesn't matter, so there can be space between the numbers and commas. You can also indicate the radix to interpret the numbers as, which defaults to auto detection.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strText" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                    <MethParam Name="chSepChar" Type="tCIDLib::TCh" DefVal="','"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bPercentFromOrg" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Calculates the percentage of the passed point relative to this area's extent. So, if the point was at this point's origin, it would be 0 and 0. If the point was at the lower left corner of this area, it would be 1 and 1. If the point was at the center of this area, it would be 0.5 and 0.5, and so forth. If the point is not within this area, the return is kCIDLib::False and the output parameters are not set.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pntToTest" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="f8XPercent" Type="tCIDLib::TFloat8" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="f8XPercent" Type="tCIDLib::TFloat8" PBy="Ref" Dir="Out"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="bSameOrg" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Returns kCIDLib::True if the passed area has the same origin as this one. Of course you could compare yourself, but this is more efficient and maybe a bit more self-documenting, so it's provided as an option.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bSameSize" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Returns kCIDLib::True if the passed area has the same size as this one. Of course you could compare yourself, but this is more efficient and maybe a bit more self-documenting, so it's provided as an option.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="bVertOverlap" RetType="tCIDLib::TBoolean" Attrs="Const">
+                <Desc>
+                    <P>Returns kCIDLib::True if this area intersects the passed area in the vertical axis. Having a common edge counts as overlap.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="BottomAlign">
+                <Desc>
+                    <P>Adjusts the vertical origin to make this area's bottom edge fall on the indicated vertical coordinate. That could make the vertical origin go negative of course.</P>
+                </Desc>
+                <MethVar><MethParam Name="i4NewBottom" Type="tCIDLib::TInt4"/></MethVar>
+            </Method>
+
+            <Method Name="BottomJustifyIn">
+                <Desc>
+                    <P>Adjusts this area's vertical origin to make this area's bottom edge the same as the passed area to justify within. It can also center this area horizontally in the target area if desired, though the default is to not affect the horizontal position.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaJustifyIn" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="bHCenter" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="c4Height" RetType="tCIDLib::TCard4" Dir="Both">
+                Get or set the height of this area.
+            </GetSet>
+
+            <GetSet Name="c4SquareUnits" RetType="tCIDLib::TCard4" Dir="Get">
+                Get the square units that this area represents, i.e. the width times the height.
+            </GetSet>
+
+            <GetSet Name="c4Width" RetType="tCIDLib::TCard4" Dir="Both">
+                Get or set the width of this area.
+            </GetSet>
+
+            <Method Name="CenterIn">
+                <Desc>
+                    <P>Centers this area in the passed area. It doesn't have to be actually 'in', as in inside. It just means that this area's center point is made to be the same as the passed area's center point. If either axis is an even number size, it will take the lower of the two center values.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaIn" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="CenterOn">
+                <Desc>
+                    <P>Adjusts this area's origin to make its center lie on the passed point If either axis is an even size, it will take the smaller of the two center values.</P>
+                </Desc>
+                <MethVar><MethParam Name="pntOn" Type="TPoint" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="Deflate">
+                <Desc>
+                    <P>Adjusts this area's origin and size to move all the edges inwards by the indicated amount it will not go beyond zero size though. If the deflation amount is too large on a given axis, the origin on that axis will be at the center point of original area and the size will be zero.</P>
+
+                    <P>You can adjust both axes separately, or apply the same adjustment to all of the edges.</P>
+
+                    <Note>The values are unsigned, so this can only make the area smaller.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Offset" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c4XOfs" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YOfs" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromAreaAtOrg">
+                <Desc>
+                    <P>Sets this area to the origin (0.0), and with the size of the passed area.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="FromAreaScaled">
+                <Desc>
+                    <P>Sets this area's origin to that of the passed area. Then sets this area's size to a scaled representation of the passed area's size, where the scaling values are 0.0 to 1.0 percents, i.e. 1.0 and 1.0 would create the same area though in much more expensive way than just assigning or copying it.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaSrc" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="f8XPercent" Type="tCIDLib::TFloat8" PBy="CRef"/>
+                    <MethParam Name="f8XPercent" Type="tCIDLib::TFloat8" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromPoints">
+                <Desc>
+                    <P>Sets this area's origin and size from a set of upper/left and lower/right points. We take three different types of points for convenience, including system defined points. You indicate whether the passed points represent inclusive or non-inclusive lower/right coordinates.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="pntUL" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="pntLR" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntUL" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                    <MethParam Name="pntLR" Type="tCIDLib::THostPoint" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntUL" Type="tCIDLib::TRawPoint" PBy="CRef"/>
+                    <MethParam Name="pntLR" Type="tCIDLib::TRawPoint" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FromRectl">
+                <Desc>
+                    <P>Sets up this area from the passed host rectangle. You must indicate whether the passed rectangle is inclusive or non-inclusive. See the class comments above for what that entails.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="rectlSrc" Type="tCIDLib::THostRectl" PBy="CRef"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ForceWithin">
+                <Desc>
+                    <P>This area is forced to be within the passed area. It will not change the size unless bTotal is true, it will just try to get as much of us inside the target as it can. And it will do the least movement possible. Inside includes the edges.</P>
+
+                    <P>If we are smaller than the target, and our origin is less than his, our origin is set to his origin. Else, if our origin or right/bottom edge is beyond his right/bottom edge, we will get right/bottom justified within the target.</P>
+
+                    <P>If we are bigger than the target, we will get set to his origin. If bTotal is set, then our size will get clipped to match his, else we just continue to hang off the edge. So, if you call this with bTotal set and our area is equal to or larger than his in both directions, this area will end up equal to the target.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaTarget" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="bTotal" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="FormatToTest" Attrs="Const">
+                <Desc>
+                    <P>Formats this area out to the passed string. You get to indicate the separator character, which defaults to the very likely comma. If you are using the comma, then the result for an area at 1,2 and length 3,4, would look like:</P>
+
+                    <Code>    1,2,3,4</Code>
+
+                    <P>You can choose to append the output to the existing string content, but the default is to clear the target string first, then append the formatted content.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strTar" Type="TString" PBy="Ref" Dir="Out"/>
+                    <MethParam Name="chSpecChar" Type="tCIDLib::TCh" DefVal="kCIDLib::chComma"/>
+                    <MethParam Name="bAppend" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="i4Bottom" RetType="tCIDLib::TInt4" Dir="Both">
+                <P>Get or set the bottom coordinate of this area. When getting, this is inclusive. So, if you have an area at 0,0, with size 2,2, then the bottom is at 1, because 0 is the first coordinate and 1 is the second.</P>
+
+                <P>When setting, this doesn't move the origin, it only moves the bottom, so it is changing the height. That means that the new value cannot be less than the original or an exception will be thrown.</P>
+            </GetSet>
+
+            <GetSet Name="i4Left" RetType="tCIDLib::TInt4" Dir="Get">
+                <P>Get the left coordinate of the area.</P>
+            </GetSet>
+
+            <Method Name="i4Left" RetType="tCIDLib::TInt4">
+                <Desc>
+                    <P>Set the left coordinate of the area. You can either just change the left and leave the size alone, i.e. just move the area left or right. Or you can lock the right side, which means that the size is being changed.</P>
+
+                    <P>If you lock the right, then you cannot move the left beyond the right. The new coordinate wil be clipped at the right side if so, basically leaving you with a zero sized area at the original right edge.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="i4ToSet" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="bLockRight" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <GetSet Name="i4Right" RetType="tCIDLib::TInt4" Dir="Both">
+                <P>Get or set the right coordinate of this area. When getting, this is inclusive. So, if you have an area at 0,0, with size 2,2, then the right is at 1, because 0 is the first coordinate and 1 is the second.</P>
+
+                <P>When setting, this doesn't move the origin, it only moves the right, so it is changing the width. That means that the new value cannot be less than the original or an exception will be thrown.</P>
+            </GetSet>
+
+            <GetSet Name="i4Top" RetType="tCIDLib::TInt4" Dir="Get">
+                <P>Get the top coordinate of the area.</P>
+            </GetSet>
+
+            <Method Name="i4Top" RetType="tCIDLib::TInt4">
+                <Desc>
+                    <P>Set the top coordinate of the area. You can either just change the top and leave the size alone, i.e. just move the area up or down. Or you can lock the bottom side, which means that the size is being changed.</P>
+
+                    <P>If you lock the bottom, then you cannot move the top beyond the bottom. The new coordinate wil be clipped at the bottom side if so, basically leaving you with a zero sized area at the original bottom edge.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="i4ToSet" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="bLockBottom" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="i4X" RetType="tCIDLib::TInt4">
+                <Desc>
+                    This is just a synonym for i4Left, for folks who prefer X/Y syntax instead of Left/Top.
+                </Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar>
+                    <MethParam Name="i4ToSet" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="bLockRight" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="i4Y" RetType="tCIDLib::TInt4">
+                <Desc>
+                    This is just a synonym for i4Top, for folks who prefer X/Y syntax instead of Left/Top.
+                </Desc>
+                <MethVar Attrs="Const"/>
+                <MethVar>
+                    <MethParam Name="i4ToSet" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="bLockBottom" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Inflate">
+                <Desc>
+                    <P>Adjusts this area's origin and size to move all the edges outwards by the indicated amount. You can adjust both axes separately, or apply the same adjustment to all of the edges.</P>
+
+                    <Note>The values are unsigned, so this can only make the area larger.</Note>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4Offset" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="c4XOfs" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4YOfs" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="JustifyIn">
+                <Desc>
+                    <P>Justifies this area in the passed area. I.e. if justifying left our left coordinate is set to the target area's left coordinate, and so forth.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaTar" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="eHJustify" Type="tCIDLib::EHJustify"/>
+                    <MethParam Name="eVJustify" Type="tCIDLib::EVJustify"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="LeftJustifyIn">
+                <Desc>
+                    <P>Left justifies this area in the passed area. You have the option to also vertically center this area as well, though the default is not to.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaTar" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="bVCenter" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Move">
+                <Desc>
+                    <P>It is fairly common to need to do a series of operations in vertically or horizontally adjacent areas. So this method will move this area in the indicated direction by incrementing or decrementing our origin by our size in that axis. So, if you indicate down, it will add our height to our top coordinate.</P>
+                </Desc>
+                <MethVar><MethParam Name="eDir" Type="tCIDLib::EDirs"/></MethVar>
+            </Method>
+
+            <Method Name="NegateOrg">
+                <Desc>
+                    This will flip the sign of the origin coordinates. So this will move the area to the diagonal quandrant.
+                </Desc>
+                <MethVar/>
+            </Method>
+
+            <GetSet Name="pntCenter" RetType="TPoint" Dir="Get">
+                Returns the center point of this area.
+            </GetSet>
+
+            <GetSet Name="pntLL" RetType="TPoint" Dir="Get">
+                Returns the lower left point of this area.
+            </GetSet>
+
+            <GetSet Name="pntLR" RetType="TPoint" Dir="Get">
+                Returns the lower right point of this area.
+            </GetSet>
+
+            <GetSet Name="pntOrigin" RetType="TPoint" Dir="Get">
+                Returns the origin point of this area.
+            </GetSet>
+
+            <GetSet Name="pntUL" RetType="TPoint" Dir="Get">
+                Returns the upper left point of this area.
+            </GetSet>
+
+            <GetSet Name="pntUR" RetType="TPoint" Dir="Get">
+                Returns the upper right point of this area.
+            </GetSet>
+
+            <Method Name="ParseFromText">
+                <Desc>
+                    <P>Parses an area from text. It is assumed to be the form x,y,cx,cy, though you can tell it to expect a different separator character, it just defaults to a comma. You can tell it to expect a particular radix for the values, but the default is auto.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="strText" Type="TString" PBy="CRef"/>
+                    <MethParam Name="eRadix" Type="tCIDLib::ERadices" DefVal="tCIDLib::ERadices::Auto"/>
+                    <MethParam Name="chSepChar" Type="tCIDLib::TCh" DefVal="kCIDLib::chComma"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="RightAlign">
+                <Desc>
+                    <P>Adjusts the horizontal origin to make this area's right side fall on the indicated coordinate.</P>
+                </Desc>
+                <MethVar><MethParam Name="i4NewRight" Type="tCIDLib::TInt4"/></MethVar>
+            </Method>
+
+            <Method Name="RightJustifyIn">
+                <Desc>
+                    Right justifies this area in the passed area. You have the option to also vertically center this area as well, though the default is not to.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaTar" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="bVCenter" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ScaleSize">
+                <Desc>
+                    Scales this area's size by the indicated percentages (0.0 to whatever.) If you don't want to affect one of the axes, pass 1.0.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="f8CXScale" Type="tCIDLib::TFloat8"/>
+                    <MethParam Name="f8CYScale" Type="tCIDLib::TFloat8"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="Set">
+                <Desc>
+                    Set up this area's origin and size after the fact via individual values or via a point and size object.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="i4X" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4Y" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntOrg" Type="TPoint" PBy="CRef"/>
+                    <MethParam Name="szSize" Type="TSize" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetOrg">
+                <Desc>
+                    Set up this area's origin after the fact via individual values or via a point object.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="i4XToSet" Type="tCIDLib::TInt4"/>
+                    <MethParam Name="i4YToSet" Type="tCIDLib::TInt4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="pntToSet" Type="TPoint" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SetSize">
+                <Desc>
+                    Set up this area's size after the fact via individual values or via a size object.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4CXToSet" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CYToSet" Type="tCIDLib::TCard4"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="szToSet" Type="TSize" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="SubFromOrg">
+                <Desc>
+                    Subtract a point from this area's origin, either the origin of another area or a point object.
+                </Desc>
+                <MethVar><MethParam Name="pntToSub" Type="TPoint" PBy="CRef"/></MethVar>
+                <MethVar><MethParam Name="areaToSub" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="szArea" Attrs="Const">
+                <Desc>Returns the size of this area.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="TakeLarger">
+                <Desc>
+                    Sets this area's size to the larger of this area's size or the size of the passed area. This is done separately on each axis.
+                </Desc>
+                <MethVar><MethParam Name="szSrc" Type="TSize" PBy="CRef"/></MethVar>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="TakeSmaller">
+                <Desc>
+                    Sets this area's size to the smaller of this area's size or the size of the passed area. This is done separately on each axis.
+                </Desc>
+                <MethVar><MethParam Name="szSrc" Type="TSize" PBy="CRef"/></MethVar>
+                <MethVar><MethParam Name="areaSrc" Type="TArea" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="ToPointArray" Attrs="Const">
+                <Desc>
+                    <P>The passed array must be an array of at least five host point objects. The first five elements will set to the points that make up this area, in the order LL, UL, UR, LR, and back to the LL. So it represents a full path back around to the start.</P>
+
+                    <P>You indicate whether you you want the points to represent an inclusive or non-inclusive version of this area.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="aptTarget" Type="tCIDLib::THostPoint" PBy="PtrC"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ToCornerPoints" Attrs="Const">
+                <Desc>
+                    <P>The passed four points are set to the corner points of this area. You can provide host points or TPoint objects.</P>
+
+                    <P>You indicate whether you you want the points to represent an inclusive or non-inclusive version of this area.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="ptURight" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="ptLRight" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="ptLLeft" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="ptURight" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="ptLRight" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="ptLLeft" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ToPoints" Attrs="Const">
+                <Desc>
+                    <P>The passed points are set to the upper left and lower right corners of this area. You can provide host points or TPoint objects.</P>
+
+                    <P>You indicate whether you you want the points to represent an inclusive or non-inclusive version of this area.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="ptLRight" Type="tCIDLib::THostPoint" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="ptULeft" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="ptLRight" Type="TPoint" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+            </Method>
+
+                <Method Name="ToRawArea" Attrs="Const">
+                <Desc>
+                    <P>Sets the passed raw area to match this area's origin and size.</P>
+                </Desc>
+                <MethVar><MethParam Name="areaTarget" Type="TArea" PBy="Ref"/></MethVar>
+
+            </Method>
+
+            <Method Name="TopJustifyIn">
+                <Desc>
+                    Top justifies this area in the passed area. You have the option to also horizontally center this area as well, though the default is not to.
+                </Desc>
+                <MethVar>
+                    <MethParam Name="areaTar" Type="TArea" PBy="CRef"/>
+                    <MethParam Name="bHCenter" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ToRectl" Attrs="Const">
+                <Desc>
+                    <P>Sets the passed host rectangle to match this area's origin and size. You can indicate whether the result should represent an inclusive or exclusive version of this area. Be careful if you say inclusive, since you won't be able to tell the difference between an empty and 1 unit sized area.</P>
+
+                    <P>We also have another version that takes a point to which will be added to the target rectangle's origin, to offset it at the same time if desired.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="rectlTar" Type="tCIDLib::THostRectl" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="rectlTar" Type="tCIDLib::THostRectl" PBy="Ref"/>
+                    <MethParam Name="eInclusive" Type="tCIDLib::ERectlTypes"/>
+                    <MethParam Name="pntOfs" Type="TPoint" PBy="CRef"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="UpdateSizesIfZero">
+                <Desc>
+                    <P>If either of our area's sizes are zero, then the passed value is used to replace that zero size. If non-zero, it's left alone.</P>
+                </Desc>
+                <MethVar>
+                    <MethParam Name="c4CX" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4CY" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+
+            <Method Name="ZeroAll">
+                <Desc>Sets this area's origin and size to zero.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ZeroOrg">
+                <Desc>Sets this area's origin to zero.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="ZeroSizes">
+                <Desc>Sets this area's size to zero.</Desc>
+                <MethVar/>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

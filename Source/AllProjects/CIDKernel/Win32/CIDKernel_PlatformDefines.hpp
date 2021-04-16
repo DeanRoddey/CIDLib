@@ -91,14 +91,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  This one is used to force local data to be correctly cache aligned, which
-//  is required if it is going to be interlocked exchanged.
-// ---------------------------------------------------------------------------
-#define CID_CACHEALIGN __declspec(align(32))
-
-
-
-// ---------------------------------------------------------------------------
 //  If our local wide character type (tCIDLib::TCh) is the same as a UTF-16
 //  Unicode character, then define this. Else don't define it. This will allow
 //  some streaming code in CIDLib to be more efficient.
@@ -173,3 +165,23 @@ int wmain() \
 #pragma warning(disable : 4251 4121)
 
 
+// ---------------------------------------------------------------------------
+//  Suppress a single line warning
+// ---------------------------------------------------------------------------
+#define CIDLib_Suppress(wid) __pragma(warning(suppress : wid))
+
+
+// ---------------------------------------------------------------------------
+//  To allow for some use of annotations, which are going to be compiler specific.
+//  These are debug mode only, and are defined away for release mode.
+// ---------------------------------------------------------------------------
+#if defined(_DEBUG)
+#include <sal.h>
+#define COP _Out_
+#define CIP _In_
+#define CIOP _Inout_
+#else
+#define COP
+#define CIP
+#define CIOP
+#endif

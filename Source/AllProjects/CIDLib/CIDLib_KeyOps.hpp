@@ -58,6 +58,7 @@ class CIDLIBEXP TStringKeyOps
         );
 
         TStringKeyOps(const TStringKeyOps&) = default;
+        TStringKeyOps(TStringKeyOps&&) = default;
 
         ~TStringKeyOps() = default;
 
@@ -66,6 +67,7 @@ class CIDLIBEXP TStringKeyOps
         //  Public operators
         // -------------------------------------------------------------------
         TStringKeyOps& operator=(const TStringKeyOps&) = default;
+        TStringKeyOps& operator=(TStringKeyOps&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -117,11 +119,7 @@ template <typename T> class TNumKeyOps
         tCIDLib::TBoolean bCompKeys(const   T&  t1
                                     , const T&  t2) const
         {
-            if (t1 < t2)
-                return tCIDLib::ESortComps::FirstLess;
-            else if (t1 > t2)
-                return tCIDLib::ESortComps::FirstGreater;
-            return tCIDLib::ESortComps::Equal;
+            return t1 == t2;
         }
 
         tCIDLib::THashVal hshKey(const T& tVal, const tCIDLib::TCard4 c4Modulus) const

@@ -83,6 +83,7 @@ class CIDSOCKEXP TSockPinger : public TObject
             const   TString&                strRemAddr
             , const tCIDSock::EAddrTypes    eType
             ,       TIPAddress&             ipaTar
+            , const tCIDLib::TCard4         c4TTL = 128
         );
 
         tCIDLib::TVoid SendRequest();

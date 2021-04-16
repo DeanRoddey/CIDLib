@@ -39,7 +39,6 @@
 #pragma comment(lib, "odbc32.lib")
 
 
-
 // ---------------------------------------------------------------------------
 //  An internal method for translating errors
 // ---------------------------------------------------------------------------
@@ -104,10 +103,10 @@ kerrcXlatDBError(const  SQLSMALLINT     iType
 
 tCIDLib::TVoid TFacCIDDBase::Initialize()
 {
-    if (!m_pEnvHandle)
+    if (!m_atomInit)
     {
         TBaseLock lockInit;
-        if (!m_pEnvHandle)
+        if (!m_atomInit)
         {
             SQLHANDLE hSQLEnv = SQL_NULL_HANDLE;
             SQLRETURN ResVal = ::SQLAllocHandle
@@ -157,6 +156,8 @@ tCIDLib::TVoid TFacCIDDBase::Initialize()
             // Mark us initialized now
             m_pEnvHandle = new tCIDDBase::TDBEnvHandle{0};
             m_pEnvHandle->hEnv = hSQLEnv;
+
+            m_atomInit.Set();
         }
     }
 }
@@ -238,14 +239,17 @@ TFacCIDDBase::QuerySources(         tCIDLib::TKVPCollect&   colToFill
 
 tCIDLib::TVoid TFacCIDDBase::Terminate()
 {
-    if (m_pEnvHandle)
+    if (m_atomInit)
     {
         TBaseLock lockInit;
-        if (m_pEnvHandle)
+        if (m_atomInit)
         {
             ::SQLFreeHandle(SQL_HANDLE_ENV, m_pEnvHandle->hEnv);
             delete m_pEnvHandle;
             m_pEnvHandle = nullptr;
+
+            // We have to reset our init flag
+            m_atomInit.SetValue(kCIDLib::False);
         }
     }
 }

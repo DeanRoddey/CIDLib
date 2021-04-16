@@ -51,7 +51,7 @@
 // ---------------------------------------------------------------------------
 //  Forward references
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps> class TKeyedHashSet;
+template <typename TElem, class TKey, class TKeyOps> class TKeyedHashSet;
 
 
 // ---------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class TClassInfo
         }
 
         TClassInfo(const TClassInfo&)  = default;
+        TClassInfo(TClassInfo&&)  = default;
 
         ~TClassInfo() = default;
 
@@ -84,6 +85,7 @@ class TClassInfo
         //  Public operators
         // -------------------------------------------------------------------
         TClassInfo& operator=(const TClassInfo&) = default;
+        TClassInfo& operator=(TClassInfo&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -152,7 +154,7 @@ class TClassKeyOps
 //  CLASS: TPolyStreamer
 // PREFIX: pstmr
 // ---------------------------------------------------------------------------
-template <class TElem> class TPolyStreamer : public TObject
+template <typename TElem> class TPolyStreamer : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -175,6 +177,7 @@ template <class TElem> class TPolyStreamer : public TObject
         }
 
         TPolyStreamer(const TPolyStreamer<TElem>&) = delete;
+        TPolyStreamer(TPolyStreamer<TElem>&&) = delete;
 
         ~TPolyStreamer()
         {
@@ -186,6 +189,7 @@ template <class TElem> class TPolyStreamer : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TPolyStreamer<TElem>& operator=(const TPolyStreamer<TElem>&) = delete;
+        TPolyStreamer<TElem>& operator=(TPolyStreamer<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -193,19 +197,24 @@ template <class TElem> class TPolyStreamer : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bEndOfStream() const
         {
+            CheckHaveStream(kCIDLib::True);
             return m_pstrmIn->bEndOfStream();
         }
 
         tCIDLib::TVoid FullReset()
         {
             m_c2CurId = 1;
-            m_pstrmIn->Reset();
-            m_pstrmOut->Reset();
+            if (m_pstrmIn)
+                m_pstrmIn->Reset();
+            if (m_pstrmOut)
+                m_pstrmOut->Reset();
             m_pcolClassSet->RemoveAll();
         }
 
         [[nodiscard]] TElem* pobjStreamIn()
         {
+            CheckHaveStream(kCIDLib::True);
+
             //
             //  Stream in the next record type. There could be a class record
             //  before the next object type.
@@ -216,7 +225,7 @@ template <class TElem> class TPolyStreamer : public TObject
             tCIDLib::TBoolean   bNewClass = kCIDLib::False;
             TClass              clsNewType;
             tCIDLib::TCard2     c2NewId = 0;
-            if (c1RecordType == tCIDLib::TCard1(0xAC))
+            if (c1RecordType == static_cast<tCIDLib::TCard1>(0xAC))
             {
                 //
                 //  Stream in the new record object. First we pull in the new
@@ -234,7 +243,7 @@ template <class TElem> class TPolyStreamer : public TObject
             }
 
             // Make sure its a legal record type
-            if (c1RecordType != tCIDLib::TCard1(0xEA))
+            if (c1RecordType != static_cast<tCIDLib::TCard1>(0xEA))
             {
                 facCIDLib().ThrowErr
                 (
@@ -303,27 +312,31 @@ template <class TElem> class TPolyStreamer : public TObject
 
         tCIDLib::TVoid ResetIn()
         {
+            CheckHaveStream(kCIDLib::True);
             m_pstrmIn->Reset();
         }
 
         tCIDLib::TVoid ResetOut()
         {
+            CheckHaveStream(kCIDLib::False);
             m_pstrmOut->Reset();
         }
 
         tCIDLib::TVoid StreamOut(const TElem& objToStream)
         {
+            CheckHaveStream(kCIDLib::False);
+
             //
             //  See if this object's type has been streamed out yet. If its a
             //  new class, then we stream out the class record first.
             //
-            tCIDLib::TCard2 c2ThisId;
+            tCIDLib::TCard2 c2ThisId = 0;
             const TClass&   clsThisObj = objToStream.clsIsA();
 
             if (bCheckOrAdd(clsThisObj, c2ThisId))
             {
                 // Stream out the class record id
-                *m_pstrmOut << tCIDLib::TCard1(0xAC);
+                *m_pstrmOut << static_cast<tCIDLib::TCard1>(0xAC);
 
                 // Now stream out the id for this class and the class itself
                 *m_pstrmOut << c2ThisId;
@@ -331,7 +344,7 @@ template <class TElem> class TPolyStreamer : public TObject
             }
 
             // Now write out the record id and the id of this type
-            *m_pstrmOut << tCIDLib::TCard1(0xEA);
+            *m_pstrmOut << static_cast<tCIDLib::TCard1>(0xEA);
             *m_pstrmOut << c2ThisId;
 
             // And finally stream out the object itself
@@ -374,6 +387,21 @@ template <class TElem> class TPolyStreamer : public TObject
             return kCIDLib::True;
         }
 
+        tCIDLib::TVoid CheckHaveStream(const tCIDLib::TBoolean bInput) const
+        {
+            if ((bInput && !m_pstrmIn) || (!bInput && !m_pstrmOut))
+            {
+                facCIDLib().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kCIDErrs::errcStrm_DontHaveStream
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::Format
+                    , TString(bInput ? L"input" : L"output")
+                );
+            }
+        }
 
         tCIDLib::TVoid FindClassById(const  tCIDLib::TCard2 c2NextId
                                     ,       TClass&         clsNewType)

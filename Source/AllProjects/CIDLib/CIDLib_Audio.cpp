@@ -52,6 +52,64 @@ tCIDLib::TVoid TAudio::AudioCue(const tCIDLib::EAudioCues eCue)
 }
 
 
+// A fault tolerant WAV player. PlayWAVFile below works in terms of this
+tCIDLib::TBoolean
+TAudio::bPlayWAVFile(const  TString&            strFileToPlay
+                    , const tCIDLib::EWaitModes eWait)
+{
+    return TKrnlAudio::bPlayWAVFile(strFileToPlay.pszBuffer(), eWait);
+}
+
+
+tCIDLib::TBoolean
+TAudio::bQuerySystemVolume(         tCIDLib::TCard4&    c4ToFill
+                            , const tCIDLib::TBoolean   bThrowIfNot)
+{
+    if (!TKrnlAudio::bQuerySystemVolume(c4ToFill))
+    {
+        if (bThrowIfNot)
+        {
+            facCIDLib().ThrowKrnlErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcAudio_QuerySystemVol
+                , TKrnlError::kerrLast()
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+            );
+        }
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TAudio::bSetSystemVolume(const  tCIDLib::TCard4     c4Percent
+                        , const tCIDLib::TBoolean   bThrowIfNot)
+{
+    if (!TKrnlAudio::bSetSystemVolume(c4Percent))
+    {
+        if (bThrowIfNot)
+        {
+            facCIDLib().ThrowKrnlErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcAudio_SetSystemVol
+                , TKrnlError::kerrLast()
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+            );
+        }
+        return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+
+// Play a simple local system speaker beep, if it has one
 tCIDLib::TVoid
 TAudio::Beep(   const   tCIDLib::TCard4 c4Frequency
                 , const tCIDLib::TCard4 c4Duration)
@@ -81,7 +139,7 @@ TAudio::c4EnumAudioDevices(tCIDLib::TKVPCollect& colToFill)
 
     // It worked, set up a stream on the string and let's parse it
     TString strInfo(achToFill);
-    TTextStringInStream strmSrc(&strInfo);
+    TTextStringInStream strmSrc(tCIDLib::ForceMove(strInfo));
     colToFill.RemoveAll();
 
     TString strName;
@@ -116,7 +174,8 @@ tCIDLib::TVoid
 TAudio::PlayWAVFile(const   TString&            strFileToPlay
                     , const tCIDLib::EWaitModes eWait)
 {
-    if (!TKrnlAudio::bPlayWAVFile(strFileToPlay.pszBuffer(), eWait))
+    // Call the fault tolerant one above and throw if he fails
+    if (!bPlayWAVFile(strFileToPlay, eWait))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -132,23 +191,6 @@ TAudio::PlayWAVFile(const   TString&            strFileToPlay
 }
 
 
-tCIDLib::TVoid TAudio::QuerySystemVolume(tCIDLib::TCard4& c4ToFill)
-{
-    if (!TKrnlAudio::bQuerySystemVolume(c4ToFill))
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcAudio_QuerySystemVol
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-        );
-    }
-}
-
-
 tCIDLib::TVoid TAudio::SetWAVForCue(const   tCIDLib::EAudioCues eCue
                                     , const TString&            strFileForCue)
 {
@@ -156,7 +198,7 @@ tCIDLib::TVoid TAudio::SetWAVForCue(const   tCIDLib::EAudioCues eCue
     //  If the string is a null string, then we want to empty this cue's
     //  file entry out, so pass in a zero. Else pass in the file name.
     //
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
     if (TString::bIsNullObject(strFileForCue))
         bRes = TKrnlAudio::bSetWAVForCue(eCue, 0);
     else
@@ -182,22 +224,5 @@ tCIDLib::TVoid TAudio::SetWAVForCue(const   tCIDLib::EAudioCues eCue
 TString TAudio::strDevInfo()
 {
     return TString(TKrnlAudio::pszDevInfo());
-}
-
-
-tCIDLib::TVoid TAudio::SetSystemVolume(const tCIDLib::TCard4 c4Percent)
-{
-    if (!TKrnlAudio::bSetSystemVolume(c4Percent))
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcAudio_SetSystemVol
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-        );
-    }
 }
 

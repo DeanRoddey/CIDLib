@@ -110,21 +110,19 @@ namespace tCIDImage
         TopDown
         , BottomUp
     };
+
+
+    // ---------------------------------------------------------------------------
+    //  Provide streaming support and standard enum tricks for some of our enums
+    // ---------------------------------------------------------------------------
+    #if !defined(CIDIMAGE_NOCLASSES)
+    EnumStreamMacros(tCIDImage::EBmpTypes)
+    EnumStreamMacros(tCIDImage::EBmpComp)
+    EnumBinStreamMacros(tCIDImage::EPalTxtFmts)
+    EnumBinStreamMacros(tCIDImage::ERowOrders)
+    #endif
+
+    StdEnumTricks(tCIDImage::EBmpTypes)
+    StdEnumTricks(tCIDImage::EBmpComp)
+    StdEnumTricks(tCIDImage::EDefPalettes)
 }
-
-
-
-// ---------------------------------------------------------------------------
-//  Provide streaming support and standard enum tricks for some of our enums
-// ---------------------------------------------------------------------------
-#if !defined(CIDIMAGE_NOCLASSES)
-EnumStreamMacros(tCIDImage::EBmpTypes)
-EnumStreamMacros(tCIDImage::EBmpComp)
-EnumBinStreamMacros(tCIDImage::EPalTxtFmts)
-EnumBinStreamMacros(tCIDImage::ERowOrders)
-#endif
-
-StdEnumTricks(tCIDImage::EBmpTypes)
-StdEnumTricks(tCIDImage::EBmpComp)
-StdEnumTricks(tCIDImage::EDefPalettes)
-

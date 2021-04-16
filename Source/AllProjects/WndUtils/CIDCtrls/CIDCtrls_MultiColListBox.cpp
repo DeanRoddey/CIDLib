@@ -884,7 +884,7 @@ TMultiColListBox::c4FindByUserData( const   TString&            strToFind
             if (!idCur.m_pstrUserData)
                 return kCIDLib::False;
             if (bCase)
-                idCur.m_pstrUserData->bCompare(strToFind);
+                return idCur.m_pstrUserData->bCompare(strToFind);
             return idCur.m_pstrUserData->bCompareI(strToFind);
         }
         , kCIDLib::c4MaxCard
@@ -1691,20 +1691,12 @@ TMultiColListBox::QueryColArea( const   tCIDLib::TCard4     c4Row
     if (bScreenRel)
     {
         TArea areaTmp;
-        areaTmp.FromRectl
-        (
-            reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-            , tCIDLib::ERectlTypes::NonInclusive
-        );
+        areaTmp.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
         ToScreenCoordinates(areaTmp, areaToFill);
     }
      else
     {
-       areaToFill.FromRectl
-        (
-            reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-            , tCIDLib::ERectlTypes::NonInclusive
-        );
+       areaToFill.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
     }
 }
 
@@ -1779,11 +1771,7 @@ TMultiColListBox::QueryRowArea( const tCIDLib::TCard4 c4Row, TArea& areaToFill) 
         );
     }
 
-    areaToFill.FromRectl
-    (
-        reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
 }
 
 
@@ -1982,11 +1970,11 @@ TSize TMultiColListBox::szGridExtent() const
     TSize szRet;
     TArea areaCell;
     QueryColArea(0, c4ColCnt - 1, areaCell);
-    szRet.c4Width(tCIDLib::TCard4(areaCell.i4Right() + 1));
+    szRet.c4Width(tCIDLib::TCard4(areaCell.i4Right()));
 
     // Get the 0th cell of the last row
     QueryColArea(c4RowCnt - 1, 0, areaCell);
-    szRet.c4Height(tCIDLib::TCard4(areaCell.i4Bottom() + 1));
+    szRet.c4Height(tCIDLib::TCard4(areaCell.i4Bottom()));
 
     return szRet;
 }
@@ -2256,6 +2244,50 @@ TMultiColListBox::SetMCLBStyle( const   tCIDCtrls::EMCLBStyles  eToChange
 }
 
 
+// Set a new sort column and resort
+tCIDLib::TVoid TMultiColListBox::SetSortColumn(const tCIDLib::TCard4 c4ColIndex)
+{
+    // If not sorted, this is a meaningless call
+    if (!tCIDLib::bAllBitsOn(m_eMCLBStyles, tCIDCtrls::EMCLBStyles::Sorted))
+    {
+        facCIDCtrls().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCtrlsErrs::errcList_NotSorted
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::AppError
+        );
+    }
+
+    // Don't do anything if the same as the current one, since this can be heavy
+    if (c4ColIndex != m_c4SortCol)
+    {
+        // Store the incoming column, which may be the same thing
+        m_c4SortCol = c4ColIndex;
+
+        // If we have any rows, then let's update
+        if (!m_colList.bIsEmpty())
+        {
+            // And save the current item index
+            const tCIDLib::TCard4 c4OrgInd = c4CurItem();
+
+
+            // Sort by the currently selected direction and redraw any visible ones
+            SortList();
+            RedrawVisible();
+
+            //
+            //  Reselect the original item if there was one. Force an event so that any
+            //  data dependent on the current selection updates.
+            //
+            if (c4OrgInd != kCIDLib::c4MaxCard)
+                SelectByIndex(c4OrgInd, kCIDLib::True);
+        }
+    }
+}
+
+
 // Set the per-row user data value for the indicated index
 tCIDLib::TVoid
 TMultiColListBox::SetUserDataAt(const   tCIDLib::TCard4 c4Index
@@ -2522,24 +2554,8 @@ tCIDLib::TVoid TMultiColListBox::TitleClicked(const tCIDLib::TCard4 c4ColIndex)
             else
                 m_bSortAsc = kCIDLib::True;
 
-            // Store the incoming column, which may be the same thing
-            m_c4SortCol = c4ColIndex;
-
-            // And save the current item index
-            const tCIDLib::TCard4 c4OrgInd = c4CurItem();
-
-            // Sort by the currently selected direction
-            SortList();
-
-            // Redraw now to make it pick up the changes
-            RedrawVisible();
-
-            //
-            //  Reselect the original item if there was one. Force an event so that any
-            //  data dependent on the current selection updates.
-            //
-            if (c4OrgInd != kCIDLib::c4MaxCard)
-                SelectByIndex(c4OrgInd, kCIDLib::True);
+            // After this it's the same as calling the public API
+            SetSortColumn(c4ColIndex);
         }
     }
      else
@@ -3039,12 +3055,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 m_hwndListView, pDraw->nmcd.dwItemSpec, &rectRow, LVIR_BOUNDS
                             );
 
-                            TArea areaRow
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectRow)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaRow(reinterpret_cast<tCIDLib::THostRectl&>(rectRow));
                             if (areaClient().bIntersects(areaRow))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3082,12 +3093,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 , &rectCol
                             );
 
-                            TArea areaCol
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaCol(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
                             if (areaClient().bIntersects(areaCol))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3121,12 +3127,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 m_hwndListView, pDraw->nmcd.dwItemSpec, &rectRow, LVIR_BOUNDS
                             );
 
-                            TArea areaRow
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectRow)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaRow(reinterpret_cast<tCIDLib::THostRectl&>(rectRow));
                             if (areaClient().bIntersects(areaRow))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);
@@ -3157,12 +3158,7 @@ TMultiColListBox::bNotReflect(          TWindow&                wndTar
                                 , &rectCol
                             );
 
-                            TArea areaCol
-                            (
-                                reinterpret_cast<tCIDLib::THostRectl&>(rectCol)
-                                , tCIDLib::ERectlTypes::NonInclusive
-                            );
-
+                            TArea areaCol(reinterpret_cast<tCIDLib::THostRectl&>(rectCol));
                             if (areaClient().bIntersects(areaCol))
                             {
                                 TGraphWndDev gdevTmp(pDraw->nmcd.hdc, tCIDLib::EAdoptOpts::NoAdopt);

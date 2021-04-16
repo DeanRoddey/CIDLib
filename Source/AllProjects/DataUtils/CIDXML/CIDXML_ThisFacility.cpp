@@ -94,7 +94,7 @@ TFacCIDXML::TFacCIDXML() :
     TFacility
     (
         L"CIDXML"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -172,6 +172,23 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
         else
             strmOut << chCur;
     }
+}
+
+
+tCIDLib::TVoid
+TFacCIDXML::EscapeFor(  const   TString&            strInText
+                        ,       TTextOutStream&     strmOut
+                        , const tCIDXML::EEscTypes  eType)
+{
+    EscapeFor(strInText.pszBuffer(), strmOut, eType);
+}
+
+tCIDLib::TVoid
+TFacCIDXML::EscapeFor(  const   TString&            strInText
+                        ,       TString&            strOutText
+                        , const tCIDXML::EEscTypes  eType)
+{
+    EscapeFor(strInText.pszBuffer(), strOutText, eType);
 }
 
 

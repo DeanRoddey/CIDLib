@@ -791,6 +791,7 @@ tCIDLib::TBoolean TTreeView::bPathExists(const TString& strToCheck) const
 tCIDLib::TBoolean
 TTreeView::bQueryItemArea(  const TString&              strPath
                             ,       TArea&              areaToFill
+                            , const tCIDLib::TBoolean   bJustText
                             , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     tCIDLib::TCard4 c4At;
@@ -801,13 +802,11 @@ TTreeView::bQueryItemArea(  const TString&              strPath
     // Get the area of the item clicked
     RECT rcDummy;
     *(HTREEITEM*)&rcDummy = (HTREEITEM)ptmiQ->m_hItem;
-    if (!::SendMessage(hwndSafe(), TVM_GETITEMRECT, TRUE, tCIDCtrls::TLParam(&rcDummy)))
+    const BOOL bFullWidth(bJustText ? FALSE : TRUE);
+    if (!::SendMessage(hwndSafe(), TVM_GETITEMRECT, bFullWidth, tCIDCtrls::TLParam(&rcDummy)))
         return kCIDLib::False;
 
-    areaToFill.FromRectl
-    (
-        *reinterpret_cast<tCIDLib::THostRectl*>(&rcDummy), tCIDLib::ERectlTypes::Inclusive
-    );
+    areaToFill.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&rcDummy));
     return kCIDLib::True;
 }
 

@@ -43,34 +43,20 @@
 RTTIDecls(TTextOutStream,TObject)
 
 
-// ---------------------------------------------------------------------------
-//  Local types and constants
-// ---------------------------------------------------------------------------
-namespace CIDLib_TextOutStream
-{
-    // -----------------------------------------------------------------------
-    //  Some stream format objects we fault in upon use
-    // -----------------------------------------------------------------------
-    static const TStreamFmt* pstrmfDef = 0;
-    static const TStreamFmt* pstrmfHex = 0;
-    static const TStreamFmt* pstrmfHex2 = 0;
-    static const TStreamFmt* pstrmfHex4 = 0;
-}
-
 
 // ---------------------------------------------------------------------------
 //  Local functions
 // ---------------------------------------------------------------------------
 static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 {
-    static volatile tCIDLib::TBoolean   bInitDone  = kCIDLib::False;
-    static const tCIDLib::TCh*          pszFalse   = kCIDLib_::pszFalse;
-    static const tCIDLib::TCh*          pszTrue    = kCIDLib_::pszTrue;
+    static TAtomicFlag          atomInitDone;
+    static const tCIDLib::TCh*  pszFalse   = kCIDLib_::pszFalse;
+    static const tCIDLib::TCh*  pszTrue    = kCIDLib_::pszTrue;
 
-    if (!bInitDone)
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const tCIDLib::TCh* pszTmp;
             pszTmp = facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
@@ -81,7 +67,7 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
             if (pszTmp)
                 pszTrue = TRawStr::pszReplicate(pszTmp);
 
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
     if (bVal)
@@ -100,70 +86,35 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 // ---------------------------------------------------------------------------
 const TStreamFmt& TTextOutStream::strmfDefault()
 {
-    if (!CIDLib_TextOutStream::pstrmfDef)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfDef)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfDef
-                , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfDef;
+    static const TStreamFmt strmfDef(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
+    return strmfDef;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex
-                , new TStreamFmt(0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex;
+    static const TStreamFmt strmfHex
+    (
+        0, 2, tCIDLib::EHJustify::Left, kCIDLib::chSpace, tCIDLib::ERadices::Hex
+    );
+    return strmfHex;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex2()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex2)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex2)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex2
-                , new TStreamFmt(2, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex2;
+    static const TStreamFmt strmfHex2
+    (
+        2, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex
+    );
+    return strmfHex2;
 }
 
 const TStreamFmt& TTextOutStream::strmfHex4()
 {
-    if (!CIDLib_TextOutStream::pstrmfHex4)
-    {
-        TBaseLock lockInit;
-        if (!CIDLib_TextOutStream::pstrmfHex4)
-        {
-            TRawMem::pExchangePtr<const TStreamFmt>
-            (
-                &CIDLib_TextOutStream::pstrmfHex4
-                , new TStreamFmt(4, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex)
-            );
-        }
-    }
-    return *CIDLib_TextOutStream::pstrmfHex4;
+    static const TStreamFmt strmfHex4
+    (
+        4, 2, tCIDLib::EHJustify::Right, kCIDLib::chDigit0, tCIDLib::ERadices::Hex
+    );
+    return strmfHex4;
 }
 
 
@@ -171,6 +122,9 @@ const TStreamFmt& TTextOutStream::strmfHex4()
 // ---------------------------------------------------------------------------
 //  TTextOutStream: Constructors and operators
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
                                 ,       TTextConverter* const   ptcvtToAdopt) :
 
@@ -194,6 +148,8 @@ TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
         m_ptcvtThis = new TUTFConverter;
 }
 
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
                                 , const TStreamFmt&             strmfToUse
                                 ,       TTextConverter* const   ptcvtToAdopt) :
@@ -217,6 +173,8 @@ TTextOutStream::TTextOutStream(         TBinOutStream* const    pstrmToAdopt
         m_ptcvtThis = new TUTFConverter;
 }
 
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextOutStream::TTextOutStream( const   TStreamFmt&             strmfToUse
                                 ,       TTextConverter* const   ptcvtToAdopt) :
 
@@ -351,7 +309,7 @@ TTextOutStream& TTextOutStream::operator<<(const TTextOutStream::Width NewWidth)
 
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TBoolean bToWrite)
 {
-    tCIDLib::TZStr8 szTmp;
+    tCIDLib::TZStr8 szTmp = L"";
     if (bToWrite)
         TRawStr::CopyStr(szTmp, pszBool(bToWrite), c4MaxBufChars(szTmp));
     else
@@ -836,6 +794,7 @@ tCIDLib::TVoid TTextOutStream::Flush()
     //  output encoding.
     //
     const tCIDLib::TCard4 c4TmpBufSz = 2048;
+    #pragma warning(suppress : 26494) // Don't need to initialize this
     tCIDLib::TCard1 ac1TmpBuf[c4TmpBufSz];
 
     //
@@ -844,7 +803,7 @@ tCIDLib::TVoid TTextOutStream::Flush()
     //  many chars from the cache we've processed so far.
     //
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard4 c4OutCount;
+    tCIDLib::TCard4 c4OutCount = 0;
     while (c4Count < m_c4Index)
     {
         //
@@ -946,73 +905,6 @@ const TTextConverter& TTextOutStream::tcvtThis() const
     return *m_ptcvtThis;
 }
 
-
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Hidden constructors
-// ---------------------------------------------------------------------------
-TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
-
-    m_bIndentNext(kCIDLib::False)
-    , m_bSawOD(kCIDLib::False)
-    , m_bSuppressIndent(kCIDLib::False)
-    , m_chFill(kCIDLib::chSpace)
-    , m_c4Indent(0)
-    , m_c4Index(0)
-    , m_c4Precision(2)
-    , m_c4TrailingSp(0)
-    , m_c4Width(0)
-    , m_eJustification(tCIDLib::EHJustify::Left)
-    , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
-    , m_eRadix(tCIDLib::ERadices::Dec)
-    , m_pstrmOut(0)
-    , m_ptcvtThis(ptcvtToAdopt)
-{
-    // If no converter is provided, then create a default one
-    if (!m_ptcvtThis)
-        m_ptcvtThis = new TUTFConverter;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid
-TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
-{
-    if (m_pstrmOut)
-    {
-        // Clean up passed stream since we are responsible for it
-        delete pstrmToAdopt;
-
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcTStrm_StrmAlreadySet
-            , tCIDLib::ESeverities::Failed
-             , tCIDLib::EErrClasses::AppError
-            , clsIsA()
-        );
-    }
-    m_pstrmOut = pstrmToAdopt;
-}
-
-
-TBinOutStream& TTextOutStream::strmOut()
-{
-    return *m_pstrmOut;
-}
-
-
-const TBinOutStream& TTextOutStream::strmOut() const
-{
-    return *m_pstrmOut;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TTextOutStream: Private, non-virtual methods
-// ---------------------------------------------------------------------------
 
 //
 //  This method is the one point of actual output of text, so all other
@@ -1130,6 +1022,7 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
 
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Indent; c4Index++)
                 {
+                    #pragma warning(suppress : 6386) // We are flushing and resetting
                     m_achCache[m_c4Index++] = kCIDLib::chSpace;
                     if (m_c4Index == c4CacheBufSize)
                         Flush();
@@ -1140,6 +1033,7 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
             m_bIndentNext = kCIDLib::False;
 
             // And finally put the actual new character out
+            #pragma warning(suppress : 6386) // We are flushing and resetting as required
             m_achCache[m_c4Index++] = chCur;
         }
 
@@ -1150,5 +1044,141 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
         if (m_c4Index == c4CacheBufSize)
             Flush();
     }
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  TTextOutStream: Hidden constructors
+// ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
+TTextOutStream::TTextOutStream(TTextConverter* const ptcvtToAdopt) :
+
+    m_bIndentNext(kCIDLib::False)
+    , m_bSawOD(kCIDLib::False)
+    , m_bSuppressIndent(kCIDLib::False)
+    , m_chFill(kCIDLib::chSpace)
+    , m_c4Indent(0)
+    , m_c4Index(0)
+    , m_c4Precision(2)
+    , m_c4TrailingSp(0)
+    , m_c4Width(0)
+    , m_eJustification(tCIDLib::EHJustify::Left)
+    , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
+    , m_eRadix(tCIDLib::ERadices::Dec)
+    , m_pstrmOut(nullptr)
+    , m_ptcvtThis(ptcvtToAdopt)
+{
+    // If no converter is provided, then create a default one
+    if (!m_ptcvtThis)
+        m_ptcvtThis = new TUTFConverter;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTextOutStream: Protected, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid
+TTextOutStream::AdoptStream(TBinOutStream* const pstrmToAdopt)
+{
+    //
+    //  We are responsible for the new stream, so make sure it's
+    //  cleaned up if we don't end up taking it.
+    //
+    TJanitor<TBinOutStream> janAdopt(pstrmToAdopt);
+
+    // The passed stream can't be null and we can't already have a stream
+    if (bCIDPreCond(pstrmToAdopt != nullptr)
+    &&  bCIDPreCond(m_pstrmOut == nullptr))
+    {
+        m_pstrmOut = janAdopt.pobjOrphan();
+    }
+}
+
+
+TBinOutStream& TTextOutStream::strmOut()
+{
+    // It won't actually ever return false, it'll throw
+    if (!bCIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set"))
+        return *static_cast<TBinOutStream*>(nullptr);
+
+    return *m_pstrmOut;
+}
+
+
+const TBinOutStream& TTextOutStream::strmOut() const
+{
+    // It won't actually ever return false, it'll throw
+    if (!bCIDAssert(m_pstrmOut != nullptr, L"The underlying binary stream isn't set"))
+        return *static_cast<TBinOutStream*>(nullptr);
+
+    return *m_pstrmOut;
+}
+
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamJanitor
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+//  Constructors and Destructor
+// -------------------------------------------------------------------
+TStreamJanitor::TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
+
+    m_pstrmToSanitize(pstrmToSanitize)
+    , m_strmfSave()
+{
+    if (m_pstrmToSanitize)
+        m_strmfSave.SetFrom(*pstrmToSanitize);
+}
+
+TStreamJanitor::~TStreamJanitor()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->SetFormat(m_strmfSave);
+}
+
+
+// -------------------------------------------------------------------
+//  Public, non-virtual methods
+// -------------------------------------------------------------------
+const TStreamFmt& TStreamJanitor::strmfSaved() const
+{
+    return m_strmfSave;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamIndentJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+//  Constructors and Destructor
+// -------------------------------------------------------------------
+TStreamIndentJan::TStreamIndentJan(         TTextOutStream* const   pstrmToSanitize
+                                    , const tCIDLib::TCard4         c4Adjust) :
+
+    m_c4OldIndent(0)
+    , m_pstrmToSanitize(pstrmToSanitize)
+{
+    // Set the new indent as the old plus the adjustment
+    if (m_pstrmToSanitize)
+    {
+        m_c4OldIndent = m_pstrmToSanitize->c4Indent();
+        m_pstrmToSanitize->c4Indent(m_c4OldIndent + c4Adjust);
+    }
+}
+
+TStreamIndentJan::~TStreamIndentJan()
+{
+    if (m_pstrmToSanitize)
+        m_pstrmToSanitize->c4Indent(m_c4OldIndent);
 }
 

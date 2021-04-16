@@ -16,6 +16,7 @@ TestPrgs=CIDLib Test Suite
     TestPrg=CIDLib
         TestPath=<Root>\TestCIDLib2.exe
         Description=Tests the core classes in CIDLib
+        WorkDir=TestCIDLib2
     EndTestPrg;
 
     TestPrg=MathLib
@@ -83,6 +84,12 @@ TestPrgs=CIDLib Test Suite
     TestPrg=StressTests
         TestPath=<Root>\StressTests.exe
         Description=Runs higher level stress tests
+        WorkDir=StressTests
+    EndTestPrg;
+
+    TestPrg=TestServers
+        TestPath=<Root>\TestServers.exe
+        Description=Long running ORB server abuse tests
         WorkDir=StressTests
     EndTestPrg;
 
@@ -176,6 +183,14 @@ Groups=
         Description=Runs the higher level stress tests
         TestPrgs=
             StressTests
+            TestServers
+        EndTestPrgs;
+    EndGroup;
+
+    Group=Servers
+        Description=Runs the ORB server abuse tests
+        TestPrgs=
+            TestServers
         EndTestPrgs;
     EndGroup;
 
@@ -194,7 +209,6 @@ Groups=
             ArtInt
         EndTestPrgs;
     EndGroup;
-
 
 EndGroups;
 

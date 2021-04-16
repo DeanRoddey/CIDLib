@@ -31,7 +31,12 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <process.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------
@@ -55,30 +60,29 @@ struct TStartUpData
 
 namespace CIDKernel_Thread_Win32
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  tidPrimary
-    //      Used to save the primary thread id. This is the thread that our
-    //      initialization occurs on, so we just store away the calling thread
-    //      id during it.
-    // -----------------------------------------------------------------------
-    tCIDLib::TThreadId  tidPrimary;
-
-
-    // -----------------------------------------------------------------------
-    //  A per thread slot id for our own internal use
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4     c4SlotId;
-
-
-    // -----------------------------------------------------------------------
-    //  Our per-thread info structure
-    // -----------------------------------------------------------------------
-    struct  TPerThreadInfo
+    namespace
     {
-        tCIDLib::TBoolean   bIsGUIThread;
-    };
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  tidPrimary
+        //      Used to save the primary thread id. This is the thread that our
+        //      initialization occurs on, so we just store away the calling thread
+        //      id during it.
+        // -----------------------------------------------------------------------
+        tCIDLib::TThreadId  tidPrimary;
+
+
+        // -----------------------------------------------------------------------
+        //  Our per-thread info structure and storage per thread
+        // -----------------------------------------------------------------------
+        struct  TPerThreadInfo
+        {
+            tCIDLib::TBoolean   bIsGUIThread = kCIDLib::False;
+        };
+
+        thread_local TPerThreadInfo ptiThread;
+    }
 }
 
 
@@ -138,9 +142,6 @@ tCIDLib::TUInt __stdcall uThreadStart(tCIDLib::TVoid* pStartUp)
     delete [] pData->pszName;
     delete pData;
 
-    // Clean up the per-thread data structure slot
-    delete ::TlsGetValue(CIDKernel_Thread_Win32::c4SlotId);
-
     return tCIDLib::TUInt(eRet);
 }
 
@@ -163,13 +164,6 @@ TCIDKrnlModule::bInitTermThread(const tCIDLib::EInitTerm eState)
     {
         // Store away the calling thread, which is the primary thread id
         CIDKernel_Thread_Win32::tidPrimary = ::GetCurrentThreadId();
-
-        //
-        //  Allocate a per-thread slot that we can use to store some info
-        //  that is of use to us. For every thread that is created it will
-        //  allocate a structure and set it on this slot.
-        //
-        CIDKernel_Thread_Win32::c4SlotId = ::TlsAlloc();
     }
     return kCIDLib::True;
 }
@@ -192,13 +186,20 @@ TThreadHandle::TThreadHandle() :
     m_phthriThis->tidThis = kCIDLib::tidInvalid;
 }
 
-TThreadHandle::TThreadHandle(const TThreadHandle& hthrToCopy) :
+TThreadHandle::TThreadHandle(const TThreadHandle& hthrSrc) :
 
     m_phthriThis(nullptr)
 {
     m_phthriThis = new TThreadHandleImpl;
-    m_phthriThis->hThread = hthrToCopy.m_phthriThis->hThread;
-    m_phthriThis->tidThis = hthrToCopy.m_phthriThis->tidThis;
+    m_phthriThis->hThread = hthrSrc.m_phthriThis->hThread;
+    m_phthriThis->tidThis = hthrSrc.m_phthriThis->tidThis;
+}
+
+TThreadHandle::TThreadHandle(TThreadHandle&& hthrSrc) :
+
+    TThreadHandle()
+{
+    *this = tCIDLib::ForceMove(hthrSrc);
 }
 
 TThreadHandle::~TThreadHandle()
@@ -211,29 +212,34 @@ TThreadHandle::~TThreadHandle()
 // -------------------------------------------------------------------
 //  TThreadHandle: Public operators
 // -------------------------------------------------------------------
-TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrToAssign)
+TThreadHandle& TThreadHandle::operator=(const TThreadHandle& hthrSrc)
 {
-    if (this == &hthrToAssign)
-        return *this;
-
-    m_phthriThis->hThread = hthrToAssign.m_phthriThis->hThread;
-    m_phthriThis->tidThis = hthrToAssign.m_phthriThis->tidThis;
-
+    if (this != &hthrSrc)
+    {
+        m_phthriThis->hThread = hthrSrc.m_phthriThis->hThread;
+        m_phthriThis->tidThis = hthrSrc.m_phthriThis->tidThis;
+    }
     return *this;
 }
 
-
-tCIDLib::TBoolean
-TThreadHandle::operator==(const TThreadHandle& hthrToCompare) const
+TThreadHandle& TThreadHandle::operator=(TThreadHandle&& hthrSrc)
 {
-    return ((m_phthriThis->hThread == hthrToCompare.m_phthriThis->hThread)
-    &&      (m_phthriThis->tidThis == hthrToCompare.m_phthriThis->tidThis));
+    if (this != &hthrSrc)
+    {
+        tCIDLib::Swap(m_phthriThis, hthrSrc.m_phthriThis);
+    }
+    return *this;
 }
 
-tCIDLib::TBoolean
-TThreadHandle::operator!=(const TThreadHandle& hthrToCompare) const
+tCIDLib::TBoolean TThreadHandle::operator==(const TThreadHandle& hthrSrc) const
 {
-    return !operator==(hthrToCompare);
+    return ((m_phthriThis->hThread == hthrSrc.m_phthriThis->hThread)
+    &&      (m_phthriThis->tidThis == hthrSrc.m_phthriThis->tidThis));
+}
+
+tCIDLib::TBoolean TThreadHandle::operator!=(const TThreadHandle& hthrSrc) const
+{
+    return !operator==(hthrSrc);
 }
 
 
@@ -308,13 +314,7 @@ tCIDLib::TBoolean TKrnlThread::bIsCaller(const TKrnlThread& kthrToTest)
 // Return whether the callng thread is a GUI marked thread
 tCIDLib::TBoolean TKrnlThread::bIsCallerGUIThread()
 {
-    CIDKernel_Thread_Win32::TPerThreadInfo* pInfo =
-    (
-        (CIDKernel_Thread_Win32::TPerThreadInfo*)::TlsGetValue(CIDKernel_Thread_Win32::c4SlotId)
-    );
-    if (pInfo)
-        return pInfo->bIsGUIThread;
-    return kCIDLib::False;
+    return CIDKernel_Thread_Win32::ptiThread.bIsGUIThread;
 }
 
 
@@ -395,16 +395,8 @@ tCIDLib::TVoid TKrnlThread::Exit(const tCIDLib::EExitCodes eExitCode)
 //
 tCIDLib::TVoid TKrnlThread::Sleep(const tCIDLib::TCard4 c4WaitMillis)
 {
-    tCIDLib::TBoolean bIsGUIThread = kCIDLib::False;
-    CIDKernel_Thread_Win32::TPerThreadInfo* pInfo =
-    (
-        (CIDKernel_Thread_Win32::TPerThreadInfo*)::TlsGetValue(CIDKernel_Thread_Win32::c4SlotId)
-    );
-    if (pInfo)
-        bIsGUIThread = pInfo->bIsGUIThread;
-
     // If this is the GUI thread, just do a sleep and return. Else the other thing
-    if (bIsGUIThread)
+    if (CIDKernel_Thread_Win32::ptiThread.bIsGUIThread)
     {
         ::Sleep(c4WaitMillis);
         return;
@@ -474,13 +466,6 @@ tCIDLib::TVoid TKrnlThread::Sleep(const tCIDLib::TCard4 c4WaitMillis)
 
 
 
-// Return the thread if of the primary thread (the first one started)
-tCIDLib::TThreadId TKrnlThread::tidPrimary()
-{
-    return CIDKernel_Thread_Win32::tidPrimary;
-}
-
-
 //
 //  Return the thread id of the calling thread, which is useful if the caller doesn't
 //  have or need to pay the cost of getting the thread object for the calling thread.
@@ -488,6 +473,13 @@ tCIDLib::TThreadId TKrnlThread::tidPrimary()
 tCIDLib::TThreadId TKrnlThread::tidCaller()
 {
     return ::GetCurrentThreadId();
+}
+
+
+// Return the thread if of the primary thread (the first one started)
+tCIDLib::TThreadId TKrnlThread::tidPrimary()
+{
+    return CIDKernel_Thread_Win32::tidPrimary;
 }
 
 
@@ -501,12 +493,7 @@ tCIDLib::TVoid TKrnlThread::KrnlThreadInit()
 {
     ::OleInitialize(0);
 
-    CIDKernel_Thread_Win32::TPerThreadInfo* pInfo
-    (
-        new CIDKernel_Thread_Win32::TPerThreadInfo
-    );
-    pInfo->bIsGUIThread = kCIDLib::False;
-    ::TlsSetValue(CIDKernel_Thread_Win32::c4SlotId, pInfo);
+    CIDKernel_Thread_Win32::ptiThread.bIsGUIThread = kCIDLib::False;
 }
 
 
@@ -515,6 +502,11 @@ tCIDLib::TVoid TKrnlThread::KrnlThreadInit()
 // ---------------------------------------------------------------------------
 TKrnlThread::TKrnlThread()
 {
+}
+
+TKrnlThread::TKrnlThread(TKrnlThread&& kthrSrc)
+{
+    *this = tCIDLib::ForceMove(kthrSrc);
 }
 
 TKrnlThread::~TKrnlThread()
@@ -540,6 +532,19 @@ TKrnlThread::~TKrnlThread()
             #endif
         }
     }
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlThread: Public operators
+// ---------------------------------------------------------------------------
+TKrnlThread& TKrnlThread::operator=(TKrnlThread&& kthrSrc)
+{
+    if (this != &kthrSrc)
+    {
+        m_hthrThis = tCIDLib::ForceMove(kthrSrc.m_hthrThis);
+    }
+    return *this;
 }
 
 
@@ -570,13 +575,7 @@ tCIDLib::TBoolean TKrnlThread::bAdoptCaller()
 // Return whether we are marked as the GUI thread, which is in the per-thread data
 tCIDLib::TBoolean TKrnlThread::bIsGUIThread() const
 {
-    CIDKernel_Thread_Win32::TPerThreadInfo* pInfo =
-    (
-        (CIDKernel_Thread_Win32::TPerThreadInfo*)::TlsGetValue(CIDKernel_Thread_Win32::c4SlotId)
-    );
-    if (pInfo)
-        return pInfo->bIsGUIThread;
-    return kCIDLib::False;
+    return CIDKernel_Thread_Win32::ptiThread.bIsGUIThread;
 }
 
 
@@ -897,12 +896,7 @@ TKrnlThread::bWaitForDeath(         tCIDLib::TBoolean&      bState
 //
 tCIDLib::TVoid TKrnlThread::MarkAsGUIThread()
 {
-    CIDKernel_Thread_Win32::TPerThreadInfo* pInfo =
-    (
-        (CIDKernel_Thread_Win32::TPerThreadInfo*)::TlsGetValue(CIDKernel_Thread_Win32::c4SlotId)
-    );
-    if (pInfo)
-        pInfo->bIsGUIThread = kCIDLib::True;
+    CIDKernel_Thread_Win32::ptiThread.bIsGUIThread = kCIDLib::True;
 }
 
 

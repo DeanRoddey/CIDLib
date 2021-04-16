@@ -43,6 +43,7 @@ class TEditTextDlg : public TDlgBox
         TEditTextDlg();
 
         TEditTextDlg(const TEditTextDlg&) = delete;
+        TEditTextDlg(TEditTextDlg&&) = delete;
 
         ~TEditTextDlg();
 
@@ -51,6 +52,7 @@ class TEditTextDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TEditTextDlg& operator=(const TEditTextDlg&) = delete;
+        TEditTextDlg& operator=(TEditTextDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -31,8 +31,8 @@ namespace kCIDCrypto
     // -----------------------------------------------------------------------
     //  Constants for the TUniqueId class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4UniqueIdBytes     = 16;
-    const tCIDLib::TCard4   c4UniqueIdStrLen    = 33;
+    constexpr tCIDLib::TCard4   c4UniqueIdBytes     = 16;
+    constexpr tCIDLib::TCard4   c4UniqueIdStrLen    = 33;
 
 
     // -----------------------------------------------------------------------
@@ -42,20 +42,20 @@ namespace kCIDCrypto
     //          be a problem, since they really need to be the same, but have
     //          separate names for self-documenting reasons.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MD5HashBytes      = 16;
+    constexpr tCIDLib::TCard4   c4MD5HashBytes      = 16;
 
 
     // -----------------------------------------------------------------------
     //  Constants for the TSHA1Hash class
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SHA1HashBytes     = 20;
+    constexpr tCIDLib::TCard4   c4SHA1HashBytes     = 20;
 
 
     // -----------------------------------------------------------------------
     //  Constants for the TSHA256Hash class. These are 256 bytes
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SHA256HashBytes   = 32;
-    const tCIDLib::TCard4   c4SHA256BlockSize   = 64;
+    constexpr tCIDLib::TCard4   c4SHA256HashBytes   = 32;
+    constexpr tCIDLib::TCard4   c4SHA256BlockSize   = 64;
 
 
     // -----------------------------------------------------------------------

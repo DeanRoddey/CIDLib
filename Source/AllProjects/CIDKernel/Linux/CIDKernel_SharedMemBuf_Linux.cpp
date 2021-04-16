@@ -43,18 +43,20 @@
 //  TMemoryHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TMemoryHandle::TMemoryHandle() :
-    __phmemiThis(0)
+
+    m_phmemiThis(nullptr)
 {
 }
 
 TMemoryHandle::TMemoryHandle(const TMemoryHandle& hmemToCopy) :
-    __phmemiThis(hmemToCopy.__phmemiThis)
+
+    m_phmemiThis(hmemToCopy.m_phmemiThis)
 {
 }
 
 TMemoryHandle::~TMemoryHandle()
 {
-    __phmemiThis = 0;
+    m_phmemiThis = nullptr;
 }
 
 
@@ -66,8 +68,7 @@ TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hmemToAssign)
     if (this == &hmemToAssign)
         return *this;
 
-    __phmemiThis = hmemToAssign.__phmemiThis;
-
+    m_phmemiThis = hmemToAssign.m_phmemiThis;
     return *this;
 }
 
@@ -75,22 +76,24 @@ TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hmemToAssign)
 tCIDLib::TBoolean
 TMemoryHandle::operator==(const TMemoryHandle& hmemToCompare) const
 {
-    return (__phmemiThis == hmemToCompare.__phmemiThis);
+    return (m_phmemiThis == hmemToCompare.m_phmemiThis);
 }
 
 
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TMemoryHandle::bValid() const
+tCIDLib::TBoolean TMemoryHandle::bIsValid() const
 {
-    return (__phmemiThis && __phmemiThis->c4RefCount);
+    return (m_phmemiThis && m_phmemiThis->c4RefCount);
 }
+
 
 tCIDLib::TVoid TMemoryHandle::Clear()
 {
-    __phmemiThis = 0;
+    m_phmemiThis = nullptr;
 }
+
 
 tCIDLib::TVoid
 TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
@@ -98,7 +101,7 @@ TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
 {
     TRawStr::bFormatVal
     (
-        tCIDLib::TInt4(__phmemiThis)
+        tCIDLib::TInt4(m_phmemiThis)
         , pszToFill
         , c4MaxChars
         , tCIDLib::ERadices::Hex
@@ -112,10 +115,12 @@ TMemoryHandle::FormatToStr(         tCIDLib::TCh* const pszToFill
 //  TKrnlSharedMemBuf: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlSharedMemBuf::TKrnlSharedMemBuf() :
-    __c4Size(0)
-    , __eAccess(tCIDLib::EMemAccFlags::ReadOnly)
-    , __pBuffer(0)
-    , __pszName(0)
+
+    m_c4AllocatedPages(0)
+    , m_c4MaxSize(0)
+    , m_eAccess(tCIDLib::EMemAccFlags::ReadOnly)
+    , m_pBuffer(nullptr)
+    , m_pszName(nullptr)
 {
 }
 
@@ -153,10 +158,10 @@ TKrnlSharedMemBuf::operator==(const TKrnlSharedMemBuf& ksmbToCompare) const
     //  the actual memory comparison.
     //
 
-    if (!TRawStr::bCompareStr(__pszName, ksmbToCompare.__pszName))
+    if (!TRawStr::bCompareStr(m_pszName, ksmbToCompare.m_pszName))
         return kCIDLib::False;
 
-    if (__eAccess != ksmbToCompare.__eAccess)
+    if (m_eAccess != ksmbToCompare.m_eAccess)
         return kCIDLib::False;
 
     return kCIDLib::True;
@@ -167,25 +172,16 @@ TKrnlSharedMemBuf::operator==(const TKrnlSharedMemBuf& ksmbToCompare) const
 // ---------------------------------------------------------------------------
 //  TKrnlSharedMemBuf: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
-                            , const tCIDLib::TCard4         c4Size
-                            , const tCIDLib::EMemAccFlags   eAccess
-                            , const tCIDLib::ECreateActs eCreateFlags)
-{
-    tCIDLib::TBoolean bDummy;
-    return bAlloc(pszName, c4Size, eAccess, bDummy, eCreateFlags);
-}
-
 
 tCIDLib::TBoolean
-TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
-                            , const tCIDLib::TCard4         c4Size
+TKrnlSharedMemBuf::bAlloc(  const   tCIDLib::TCh* const     pszName
+                            , const tCIDLib::TCard4         c4MaxSize
+                            , const tCIDLib::EAllocTypes    eAllocType
                             , const tCIDLib::EMemAccFlags   eAccess
                             ,       tCIDLib::TBoolean&      bCreated
-                            , const tCIDLib::ECreateActs eCreateFlags)
+                            , const tCIDLib::ECreateActs    eCreateFlags)
 {
-    if (__hmemThis.bValid())
+    if (m_hmemThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyAllocated);
         return kCIDLib::False;
@@ -204,12 +200,22 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
     }
 
     // Replicate the name of the buffer
-    __pszName = TRawStr::pszReplicate(pszName);
+    m_pszName = TRawStr::pszReplicate(pszName);
 
-    // Store the size and access flags
-    __c4Size = c4Size;
-    __eAccess = eAccess;
+    // Store the size and allocate type stuff
+    m_c4MaxSize = c4MaxSize;
+    m_eAccess = eAccess;
+    m_eAllocType = eAllocType;
 
+    // Calculate the maximum pages
+    m_c4MaxPages = (c4MaxSize / kCIDLib::c4MemPageSize);
+    if (c4MaxSize % kCIDLib::c4MemPageSize)
+        m_c4MaxPages++;
+
+    // <TBD> For now, just say all allocated. We need to come back to this
+    m_c4AllocatedPages = m_c4MaxPages;
+
+    // Translate the creation flags
     tCIDLib::TSInt iFlags;
     tCIDLib::TBoolean bOwner;
     if (eCreateFlags == tCIDLib::ECreateActs::CreateAlways
@@ -225,9 +231,10 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
         bOwner = kCIDLib::False;
     }
 
-    if (__eAccess == tCIDLib::EMemAccFlags::ReadOnly)
+    // Translate the access flags
+    if (m_eAccess == tCIDLib::EMemAccFlags::ReadOnly)
         iFlags |= S_IRUSR | S_IRGRP | S_IROTH;
-    else if (__eAccess == tCIDLib::EMemAccFlags::ReadWrite)
+    else if (m_eAccess == tCIDLib::EMemAccFlags::ReadWrite)
         iFlags |= S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
     else
     {
@@ -237,7 +244,7 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
 
     key_t key = TRawStr::hshHashStr(pszName, kCIDLib::i4MaxInt);
 
-    tCIDLib::TSInt iTmpId = ::shmget(key, c4Size, iFlags);
+    tCIDLib::TSInt iTmpId = ::shmget(key, c4MaxSize, iFlags);
     if (iTmpId == -1)
     {
         if (errno == EEXIST
@@ -247,7 +254,7 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
 
             iFlags &= ~(IPC_CREAT | IPC_EXCL);
 
-            iTmpId = ::shmget(key, c4Size, iFlags);
+            iTmpId = ::shmget(key, c4MaxSize, iFlags);
 
             if (iTmpId == -1)
             {
@@ -263,7 +270,7 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
 
     }
 
-    iFlags = (__eAccess == tCIDLib::EMemAccFlags::ReadOnly) ? SHM_RDONLY : 0;
+    iFlags = (m_eAccess == tCIDLib::EMemAccFlags::ReadOnly) ? SHM_RDONLY : 0;
 
     tCIDLib::TVoid* pTmp = ::shmat(iTmpId, 0, iFlags);
     if (pTmp == reinterpret_cast<tCIDLib::TVoid*>(-1))
@@ -274,113 +281,146 @@ TKrnlSharedMemBuf::bAlloc(  const  tCIDLib::TCh* const      pszName
         return kCIDLib::False;
     }
 
-    __pBuffer = pTmp;
+    m_pBuffer = pTmp;
 
-    __hmemThis.__phmemiThis = new TMemoryHandleImpl;
-    __hmemThis.__phmemiThis->c4RefCount = 1;
-    __hmemThis.__phmemiThis->iShmId = iTmpId;
-    __hmemThis.__phmemiThis->bOwner = bCreated = bOwner;
+    m_hmemThis.m_phmemiThis = new TMemoryHandleImpl;
+    m_hmemThis.m_phmemiThis->c4RefCount = 1;
+    m_hmemThis.m_phmemiThis->iShmId = iTmpId;
+    m_hmemThis.m_phmemiThis->bOwner = bCreated = bOwner;
 
-    __hmemThis.__phmemiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
-    __hmemThis.__phmemiThis->prmtxThis->iInitialize();
+    m_hmemThis.m_phmemiThis->prmtxThis = new TKrnlLinux::TRecursiveMutex();
+    m_hmemThis.m_phmemiThis->prmtxThis->iInitialize();
 
     return kCIDLib::True;
 }
 
 
 tCIDLib::TBoolean
-TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
+TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbSrc)
 {
     // Can't do this if there is already a buffer in this object
-    if (__hmemThis.bValid())
+    if (m_hmemThis.bIsValid())
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyAllocated);
         return kCIDLib::False;
     }
 
-    __pBuffer = ksmbToCopy.__pBuffer;
-    __eAccess = ksmbToCopy.__eAccess;
-    __c4Size = ksmbToCopy.__c4Size;
-    if (ksmbToCopy.__pszName)
+    m_pBuffer = ksmbSrc.m_pBuffer;
+    m_eAccess = ksmbSrc.m_eAccess;
+    m_c4AllocatedPages = ksmbSrc.m_c4AllocatedPages;
+    m_c4MaxPages = ksmbSrc.m_c4MaxPages;
+    m_c4MaxSize = ksmbSrc.m_c4MaxSize;
+    if (ksmbSrc.m_pszName)
     {
-        delete [] __pszName;
-        __pszName = TRawStr::pszReplicate(ksmbToCopy.__pszName);
+        delete [] m_pszName;
+        m_pszName = TRawStr::pszReplicate(ksmbSrc.m_pszName);
     }
 
-    __hmemThis = ksmbToCopy.__hmemThis;
-    if (__hmemThis.bValid())
+    m_hmemThis = ksmbSrc.m_hmemThis;
+    if (m_hmemThis.bIsValid())
     {
-        __hmemThis.__phmemiThis->prmtxThis->iLock();
-        __hmemThis.__phmemiThis->c4RefCount++;
-        __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+        m_hmemThis.m_phmemiThis->prmtxThis->iLock();
+        m_hmemThis.m_phmemiThis->c4RefCount++;
+        m_hmemThis.m_phmemiThis->prmtxThis->iUnlock();
     }
 
     return kCIDLib::True;
 }
 
 
+// Fow now a no-op, since we are always fully committed
+tCIDLib::TBoolean
+TKrnlSharedMemBuf::bCommitToSize(const tCIDLib::TCard4 c4NewSize)
+{
+    // If this is beyond the max size, its an error
+    if (c4NewSize > m_c4MaxSize)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
+        return kCIDLib::False;
+    }
+
+
+    return kCIDLib::True;
+}
+
+
+
 tCIDLib::TBoolean TKrnlSharedMemBuf::bFree()
 {
     // If the name got allocated, then free it
-    delete [] __pszName;
-    __pszName = 0;
+    delete [] m_pszName;
+    m_pszName = nullptr;
 
-    if (__hmemThis.bValid())
+    if (m_hmemThis.bIsValid())
     {
-        __hmemThis.__phmemiThis->prmtxThis->iLock();
+        m_hmemThis.m_phmemiThis->prmtxThis->iLock();
 
-        if (!--__hmemThis.__phmemiThis->c4RefCount)
+        // Copy our buffer pointer and then zero it, so we ar esure it's cleraed
+        tCIDLib::TVoid* pBuf = m_pBuffer;
+        m_pBuffer = nullptr;
+
+        if (!--m_hmemThis.m_phmemiThis->c4RefCount)
         {
 
-            if (::shmdt(reinterpret_cast<tCIDLib::TSCh*>(__pBuffer)))
+            if (::shmdt(reinterpret_cast<tCIDLib::TSCh*>(pBuf)))
             {
-                __hmemThis.__phmemiThis->c4RefCount++;
-                __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+                m_hmemThis.m_phmemiThis->c4RefCount++;
+                m_hmemThis.m_phmemiThis->prmtxThis->iUnlock();
                 TKrnlError::SetLastHostError(errno);
                 return kCIDLib::False;
             }
 
-            if (__hmemThis.__phmemiThis->bOwner)
+            if (m_hmemThis.m_phmemiThis->bOwner)
             {
-                if (::shmctl(__hmemThis.__phmemiThis->iShmId, IPC_RMID, 0))
+                if (::shmctl(m_hmemThis.m_phmemiThis->iShmId, IPC_RMID, 0))
                 {
-                    __hmemThis.__phmemiThis->c4RefCount++;
-                    __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+                    m_hmemThis.m_phmemiThis->c4RefCount++;
+                    m_hmemThis.m_phmemiThis->prmtxThis->iUnlock();
                     TKrnlError::SetLastHostError(errno);
                     return kCIDLib::False;
                 }
             }
 
-            __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+            m_hmemThis.m_phmemiThis->prmtxThis->iUnlock();
             tCIDLib::TOSErrCode HostErr;
-            HostErr = __hmemThis.__phmemiThis->prmtxThis->iDestroy();
+            HostErr = m_hmemThis.m_phmemiThis->prmtxThis->iDestroy();
             if (HostErr)
             {
                 TKrnlError::SetLastHostError(HostErr);
                 return kCIDLib::False;
             }
 
-            delete __hmemThis.__phmemiThis->prmtxThis;
-            delete __hmemThis.__phmemiThis;
+            delete m_hmemThis.m_phmemiThis->prmtxThis;
+            delete m_hmemThis.m_phmemiThis;
+
         }
         else
         {
-            __hmemThis.__phmemiThis->prmtxThis->iUnlock();
+            m_hmemThis.m_phmemiThis->prmtxThis->iUnlock();
         }
     }
 
     return kCIDLib::True;
 }
 
+
+// <TBD> For now a no-op for us
+tCIDLib::TBoolean TKrnlSharedMemBuf::bSyncView()
+{
+    return kCIDLib::True;
+}
+
+
+
 tCIDLib::TBoolean TKrnlSharedMemBuf::bZero()
 {
-    if (!__pBuffer)
+    if (!m_pBuffer)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
-    TRawMem::SetMemBuf(__pBuffer, tCIDLib::TCard1(0), __c4Size);
-
+    // Zero out the allocated pages
+    TRawMem::SetMemBuf(m_pBuffer, tCIDLib::TCard1(0), m_c4AllocatedPages * kCIDLib::c4MemPageSize);
     return kCIDLib::True;
 }

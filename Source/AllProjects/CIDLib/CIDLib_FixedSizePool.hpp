@@ -22,6 +22,9 @@
 //  new or returned ones on the end of their respective lists, and take elements
 //  off the end of the lists.
 //
+//  The thread safety issues are exactly the same as the simple pool class so see
+//  it for details.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -43,10 +46,6 @@ template <typename TElem> class TFixedSizePool;
 //  This is a smart pointer for objects in a pool. It gets an object out of a pool
 //  and makes sure it gets given back. It will reference copy the object, so it knows
 //  when the last ref is gone.
-//
-//  This guy will use the mutex of the pool to sync the ref counting. If the pool
-//  is not thread safe, then these guys are not. Typically they either both are
-//  or both are not.
 // ---------------------------------------------------------------------------
 template <typename TElem> class TFixedPoolPtr
 {
@@ -62,6 +61,11 @@ template <typename TElem> class TFixedPoolPtr
                 TakeSource(spptrSrc);
         }
 
+        TFixedPoolPtr(TFixedPoolPtr&& spptrSrc) : TFixedPoolPtr()
+        {
+            *this = tCIDLib::ForceMove(spptrSrc);
+        }
+
         virtual ~TFixedPoolPtr()
         {
             DecRefCnt();
@@ -75,6 +79,13 @@ template <typename TElem> class TFixedPoolPtr
         {
             if (&spptrSrc != this)
                 TakeSource(spptrSrc);
+            return *this;
+        }
+
+        TFixedPoolPtr& operator=(TFixedPoolPtr&& spptrSrc)
+        {
+            if (&spptrSrc != this)
+                tCIDLib::Swap(m_percThis, spptrSrc.m_percThis);
             return *this;
         }
 
@@ -175,9 +186,9 @@ template <typename TElem> class TFixedPoolPtr
         // -------------------------------------------------------------------
         struct TElemRefCnt
         {
-            volatile tCIDLib::TCard4    m_c4RefCnt;
-            TElem*                      m_pobjElem;
-            TFixedSizePool<TElem>*      m_psplSrc;
+            tCIDLib::TCard4         m_c4RefCnt;
+            TElem*                  m_pobjElem;
+            TFixedSizePool<TElem>*  m_psplSrc;
         };
 
 
@@ -197,19 +208,16 @@ template <typename TElem> class TFixedPoolPtr
 
             try
             {
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
-
                 // We shouldn't have a pointer if the ref count is zero, but check
                 CIDAssert(m_percThis->m_c4RefCnt, L"Simple pool ptr ref cnt underflow");
 
-                m_percThis->m_c4RefCnt--;
-                if (!m_percThis->m_c4RefCnt)
+                if (m_percThis->m_c4RefCnt && (--m_percThis->m_c4RefCnt == 0))
                 {
                     m_percThis->m_psplSrc->ReleaseElem(m_percThis->m_pobjElem);
                     delete m_percThis;
                 }
 
-                // And we are letting this guy go either way
+                // We drop our pointer either way
                 m_percThis = nullptr;
             }
 
@@ -246,10 +254,8 @@ template <typename TElem> class TFixedPoolPtr
             if (spptrSrc.m_percThis)
             {
                 m_percThis = spptrSrc.m_percThis;
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
                 m_percThis->m_c4RefCnt++;
             }
-
         }
 
 
@@ -289,7 +295,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         {
             {
                 // Lock if we are MT safe
-                TMtxLocker mtxlSync(m_pmtxSync);
+                TLocker lockrSync(m_pmtxSync);
 
                 //
                 //  Neither our free or used lists are adopting, so we have to
@@ -345,7 +351,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         //
         tCIDLib::TCard4 c4ElemCount() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return m_colFreeList.c4ElemCount() + m_colUsedList.c4ElemCount();
         }
 
@@ -355,7 +361,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         //
         tCIDLib::TCard4 c4ElemsAvail() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return (m_c4MaxPoolSize - m_colUsedList.c4ElemCount());
         }
 
@@ -376,7 +382,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         [[nodiscard]] TElem* pobjReserveElem()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Make sure that we can reserve another one
             const tCIDLib::TCard4 c4FreeCnt = m_colFreeList.c4ElemCount();
@@ -433,7 +439,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid QueryListSizes(tCIDLib::TCard4& c4Used, tCIDLib::TCard4& c4Free)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             c4Used = m_colUsedList.c4ElemCount();
             c4Free = m_colFreeList.c4ElemCount();
@@ -449,7 +455,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid ReleaseAll()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             //
             //  Take all of the elements from the used list and put them back into
@@ -478,7 +484,7 @@ template <typename TElem> class TFixedSizePool : public TObject
         tCIDLib::TVoid ReleaseElem(TElem* const pobjToRelease)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Find this guy in the used list, which is sorted by address
             tCIDLib::TCard4 c4AtUsed;
@@ -523,9 +529,13 @@ template <typename TElem> class TFixedSizePool : public TObject
                 );
             }
 
-            //  Let's put it back into the free list and orphan from the used list
-            m_colUsedList.pobjOrphanAt(c4AtUsed);
-            m_colFreeList.Add(pobjToRelease);
+            //
+            //  Let's put it back into the free list and orphan from the used list.
+            //  We have to suppress the nodiscard warning from the orphan call, which
+            //  we can do by just pass that to Add instead of the incoming value.
+            //  They are the same object.
+            //
+            m_colFreeList.Add(m_colUsedList.pobjOrphanAt(c4AtUsed));
 
             // Make sure combined count hasn't gone past max
             CIDAssert
@@ -557,20 +567,18 @@ template <typename TElem> class TFixedSizePool : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TFixedSizePool(const   tCIDLib::TCard4  c4MaxAlloc
-                    , const TString&            strName
-                    , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TFixedSizePool( const   tCIDLib::TCard4     c4MaxAlloc
+                        , const TString&            strName
+                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             m_c4MaxPoolSize(c4MaxAlloc ? c4MaxAlloc : 8192)
             , m_colFreeList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_colUsedList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_pmtxSync(nullptr)
             , m_strName(strName)
@@ -578,7 +586,7 @@ template <typename TElem> class TFixedSizePool : public TObject
             // If MT safe, then allocate the critical section
             if (eMTSafe == tCIDLib::EMTStates::Safe)
                 m_pmtxSync = new TMutex;
-        }
+         }
 
 
         // -------------------------------------------------------------------
@@ -740,7 +748,7 @@ template <typename TElem> class TFixedSizePoolJan
         //  The caller becomes responsible for return to the pool. Could be null
         //  if already released or orphaned.
         //
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjGotten;
             if (m_psplSrc)

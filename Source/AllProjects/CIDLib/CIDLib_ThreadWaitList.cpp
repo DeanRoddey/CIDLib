@@ -244,7 +244,7 @@ TThreadWaitList::bWaitOnList(const  tCIDLib::TCard4 c4Reason
 
 
 tCIDLib::TBoolean
-TThreadWaitList::bWaitOnList(       TMtxLocker&     lockSync
+TThreadWaitList::bWaitOnList(       TLocker&        lockSync
                             , const tCIDLib::TCard4 c4Reason
                             , const tCIDLib::TCard4 c4Millis)
 {
@@ -303,7 +303,7 @@ TThreadWaitList::bWaitOnList(       TMtxLocker&     lockSync
 // ---------------------------------------------------------------------------
 tCIDLib::TCard4 TThreadWaitList::c4AddToList(const tCIDLib::TCard4 c4Reason)
 {
-    tCIDLib::TCard4 c4Index;
+    tCIDLib::TCard4 c4Index = 0;
 
     // If we need to expand the list, then do it now
     if (m_c4ActiveCount == m_c4CurAlloc)
@@ -314,7 +314,10 @@ tCIDLib::TCard4 TThreadWaitList::c4AddToList(const tCIDLib::TCard4 c4Reason)
 
         // Copy over the existing stuff
         for (c4Index = 0; c4Index < m_c4CurAlloc; c4Index++)
+        {
+            #pragma warning(suppress : 6386) // We know the index is OK
             apTmp[c4Index] = m_apItems[c4Index];
+        }
 
         // And allocate the new ones
         for (; c4Index < c4NewSz; c4Index++)
@@ -345,6 +348,7 @@ tCIDLib::TCard4 TThreadWaitList::c4AddToList(const tCIDLib::TCard4 c4Reason)
     //  We found our slot, so mark it taken, and bump the active count. Be
     //  sure to reset the mutex before we set it active.
     //
+    #pragma warning(suppress : 6385) // We made sure the index is good above
     m_apItems[c4Index]->m_evWait.Reset();
     m_apItems[c4Index]->m_eState = EStates::Active;
     m_apItems[c4Index]->m_c4Reason = c4Reason;

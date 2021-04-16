@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Namespace PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<Namespace Name="TAudio">
+
+    <Desc>
+        <P>TAudio is s small namespace that provides some basic audio oriented helper functions for programs that are not audio-heavy but need to make some sounds, play WAV files, or control the volume.</P>
+    </Desc>
+
+    <Method Name="AudioCue">
+        <Desc>Plays one of the predefined audio cue sounds, which is often all a simple program needs, to notify the user when something has happened or an error occurred.</Desc>
+        <MethVar>
+            <MethParam Name="eCue" Type="tCIDLib::EAudioCues"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="bPlayWAVFile" RetType="tCIDLib::TBoolean">
+        <Desc>
+            <P>Plays a WAV file from disc. This may not be super-snappy, depending on how long it takes to access the WAV file. This is a fault tolerant one and just returns a boolean as to whether it could play the file or not. You can use PlayWAVFile() below if you just want an exception in case of failure.</P>
+
+            <P>The default is to wait for the playback to complete, but you can let it continue to play while this method returns immediately.</P>
+        </Desc>
+        <MethVar>
+            <MethParam Name="strFileToPlay" Type="TString" PBy="CRef"/>
+            <MethParam Name="eWait" Type="tCIDLib::EWaitModes" DefVal="tCIDLib::EWaitModes::Wait"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="bQuerySystemVolume" RetType="tCIDLib::TBoolean">
+        <Desc>Queries the volume level of the system default audio output. The returned value is a percentage. If the volume cannot be queried, you have a choice to  throw an exception or just return a boolean status. It defaults to returning a status.</Desc>
+        <MethVar>
+            <MethParam Name="c4ToFill" Type="tCIDLib::TCard4" PBy="Ref"/>
+            <MethParam Name="bThrowIfNot" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="bSetSystemVolume" RetType="tCIDLib::TBoolean">
+        <Desc>Set the volume level of the system default audio output. The passed value should be a percentage. If the volume cannot be set, you have a choice to  throw an exception or just return a boolean status. It defaults to returning a status.</Desc>
+        <MethVar>
+            <MethParam Name="c4ToSet" Type="tCIDLib::TCard4"/>
+            <MethParam Name="bThrowIfNot" Type="tCIDLib::TBoolean" DefVal="kCIDLib::False"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="Beep">
+        <Desc>Plays a simple beep via the computer's built in speaker, assuming it has one. You indicate the frequency in Hertz and the duration in milliseconds.</Desc>
+        <MethVar>
+            <MethParam Name="c4Freqency" Type="tCIDLib::TCard4"/>
+            <MethParam Name="c4Duration" Type="tCIDLib::TCard4"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="c4EnumAudioDevices" RetType="tCIDLib::TCard4">
+        <Desc>Does an enumeration of available audio devices. It fills in a collection of key/value pairs, where the key is the system identifier for the device and the value is the human readable description if available.</Desc>
+        <MethVar>
+            <MethParam Name="colToFill" Type="tCIDLib::TKVPCollect" PBy="Ref" Dir="Out"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="MuteSystemAudio">
+        <Desc>Sets the mute state of the default audio output. You pass kCIDLib::True to mute the audio and kCIDLib::False to unmute.</Desc>
+        <MethVar>
+            <MethParam Name="bState" Type="tCIDLib::TBoolean"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="PlayWAVFile">
+        <Desc>
+            <P>Plays a WAV file from disc. This may not be super-snappy, depending on how long it takes to access the WAV file, and an exception could occur if the file is not found. If you want to not deal with exceptions, use bPlayWAVFile() above.</P>
+
+            <P>The default is to wait for the playback to complete, but you can let it continue to play while this method returns immediately.</P>
+        </Desc>
+        <MethVar>
+            <MethParam Name="strFileToPlay" Type="TString" PBy="CRef"/>
+            <MethParam Name="eWait" Type="tCIDLib::EWaitModes" DefVal="tCIDLib::EWaitModes::Wait"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="SetWAVForCue">
+        <Desc>
+            <P>The standard ECues (played by AudioCue() above) have default WAV files, but you can override those if you want.</P>
+        </Desc>
+        <MethVar>
+            <MethParam Name="eCue" Type="tCIDLib::EAudioCues"/>
+            <MethParam Name="strFileToSet" Type="TString" PBy="CRef"/>
+        </MethVar>
+    </Method>
+
+    <Method Name="strDevInfo" RetType="TString">
+        <Desc>Returns the id of the default audio device of the local system, by value.</Desc>
+        <MethVar/>
+    </Method>
+
+</Namespace>

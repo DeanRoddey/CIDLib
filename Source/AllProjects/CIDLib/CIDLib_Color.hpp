@@ -78,6 +78,7 @@ class CIDLIBEXP TRGBClr :
         );
 
         TRGBClr(const TRGBClr&) = default;
+        TRGBClr(TRGBClr&&) = default;
 
         ~TRGBClr() = default;
 
@@ -86,6 +87,7 @@ class CIDLIBEXP TRGBClr :
         //  Public operators
         // -------------------------------------------------------------------
         TRGBClr& operator=(const TRGBClr&) = default;
+        TRGBClr& operator=(TRGBClr&&) = default;
 
         TRGBClr& operator=
         (
@@ -360,17 +362,17 @@ class CIDLIBEXP TRGBClr :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private         :

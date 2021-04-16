@@ -55,6 +55,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         );
 
         TCIDObjStore(const TCIDObjStore&) = delete;
+        TCIDObjStore(TCIDObjStore&&) = delete;
 
         ~TCIDObjStore();
 
@@ -63,6 +64,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDObjStore& operator=(const TCIDObjStore&) = delete;
+        TCIDObjStore& operator=(TCIDObjStore&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -146,6 +148,12 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
 
         tCIDLib::TCard4 c4ObjectsInStore() const;
 
+        tCIDLib::TCard4 c4QueryKeysInScope
+        (
+            const   TString&                strParScope
+            ,       tCIDLib::TStrCollect&   colToFill
+        );
+
         tCIDLib::TCard4 c4QueryObjectsInScope
         (
             const   TString&                strParScope
@@ -191,7 +199,7 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       MStreamable&            strmblToFill
             , const tCIDLib::TBoolean       bThrowIfNot
         );
@@ -199,9 +207,9 @@ class CIDOBJSTOREEXP TCIDObjStore : public TObject
         tCIDLib::ELoadRes eReadObjectDirect
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 

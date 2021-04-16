@@ -43,6 +43,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         TCIDCfgServerImpl();
 
         TCIDCfgServerImpl(const TCIDCfgServerImpl&) = delete;
+        TCIDCfgServerImpl(TCIDCfgServerImpl&&) = delete;
 
         ~TCIDCfgServerImpl();
 
@@ -51,6 +52,7 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
         //  Public operators
         // -------------------------------------------------------------------
         TCIDCfgServerImpl& operator=(const TCIDCfgServerImpl&) = delete;
+        TCIDCfgServerImpl& operator=(TCIDCfgServerImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -62,100 +64,100 @@ class TCIDCfgServerImpl : public TCIDCfgSrvServerBase
             , const tCIDLib::TCard4         c4DataBytes
             , const THeapBuf&               mbufObjData
             , const tCIDLib::TCard4         c4Reserve
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bAddOrUpdate
         (
-            const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            const   TString&               strKey
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const tCIDLib::TCard4         c4DataBytes
             , const THeapBuf&               mbufObjData
             , const tCIDLib::TCard4         c4Reserve
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bAllObjectsUnder
         (
             const   TString&                strStartPath
             ,       tCIDLib::TStrList&      colToFill
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bDeleteObjectIfExists
         (
-            const   TString&                strKey
-        )   override;
+            const    TString&               strKey
+        )   final;
 
         tCIDLib::TBoolean bFindNameUnder
         (
             const   TString&                strName
             , const TString&                strStartPath
             ,       tCIDLib::TStrList&      colToFill
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bKeyExists
         (
-            const   TString&                strKey
-        )   override;
+            const    TString&               strKey
+        )   final;
 
         tCIDLib::TBoolean bKeyExists2
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
-        )   override;
+            , CIOP  tCIDLib::TCard4&        c4Version
+        )   final;
 
         tCIDLib::TBoolean bReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4Version
-        )   override;
+            , CIOP  tCIDLib::TCard4&        c4Version
+        )   final;
 
         tCIDLib::TCard4 c4QueryObjectsInScope
         (
             const   TString&                strParScope
             ,       tCIDLib::TStrList&      colToFill
-        )   override;
+        )   final;
 
         tCIDLib::TCard4 c4QuerySubScopes
         (
             const   TString&                strParScope
             ,       tCIDLib::TStrList&      colToFill
-        )   override;
+        )   final;
 
         tCIDLib::TCard4 c4UpdateObject
         (
             const   TString&                strKey
             , const tCIDLib::TCard4         c4DataBytes
             , const THeapBuf&               mbufObjData
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DeleteObject
         (
             const   TString&                strKey
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DeleteScope
         (
-            const   TString&                strScopeKey
-        )   override;
+            const    TString&               strScopeKey
+        )   final;
 
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       THeapBuf&               mbufToFill
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const tCIDLib::TBoolean       bThrowIfNot
-        )   override;
+        )   final;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

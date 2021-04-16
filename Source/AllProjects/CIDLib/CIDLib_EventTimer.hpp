@@ -58,9 +58,17 @@ class TEventTimer
         {
         }
 
-        ~TEventTimer()
-        {
-        }
+        TEventTimer(const TEventTimer&) = delete;
+        TEventTimer(TEventTimer&&) = delete;
+
+        ~TEventTimer() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TEventTimer& operator=(const TEventTimer&) = delete;
+        TEventTimer& operator=(TEventTimer&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -93,7 +101,7 @@ class TEventTimer
                 return;
             }
 
-            tCIDLib::TEncodedTime enctElapsed = TTime::enctNow() - m_enctStart;
+            const tCIDLib::TEncodedTime enctElapsed = TTime::enctNow() - m_enctStart;
             if (enctElapsed && (enctElapsed < m_enctShortest))
                 m_enctShortest = enctElapsed;
             if (enctElapsed > m_enctLongest)

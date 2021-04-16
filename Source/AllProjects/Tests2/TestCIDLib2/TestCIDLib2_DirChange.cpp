@@ -75,7 +75,7 @@ TTest_DirChange1::eRunTest( TTextStringOutStream&   strmOut
     //
     TPathStr pathTest;
     TFileSys::QueryCurrentDir(pathTest);
-    pathTest.AddLevels(L"TestCIDLib2", L"DirChanges");
+    pathTest.AddLevel(L"DirChanges");
     TFileSys::CleanPath(pathTest, tCIDLib::ETreeDelModes::Clean);
 
     // Now set up monitoring on that path
@@ -187,7 +187,7 @@ TTest_DirChange1::eRunTest( TTextStringOutStream&   strmOut
     //
     TPathStr pathNew;
     TFileSys::QueryCurrentDir(pathNew);
-    pathNew.AddLevels(L"TestCIDLib2", L"DirChanges", L"Test1");
+    pathNew.AddLevels(L"DirChanges", L"Test1");
     pathNew.AppendExt(L"Renamed");
     TFileSys::Rename(pathSrcFile, pathNew);
 

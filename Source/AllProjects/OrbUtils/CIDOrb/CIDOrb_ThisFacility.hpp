@@ -16,7 +16,8 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDOrb_ThisFacility.cpp file, which implements
-//  the facility class for this facility.
+//  the standard CIDLib style facility class for CIDOrb. It provides some helper
+//  methods that various players within this facility need.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -60,6 +61,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         TFacCIDOrb();
 
         TFacCIDOrb(const TFacCIDOrb&) = delete;
+        TFacCIDOrb( TFacCIDOrb&&) = delete;
 
         ~TFacCIDOrb();
 
@@ -68,6 +70,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDOrb& operator=(const TFacCIDOrb&) = delete;
+        TFacCIDOrb& operator=(TFacCIDOrb&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -79,18 +82,29 @@ class CIDORBEXP TFacCIDOrb : public TFacility
             ,       TOrbObjId&              ooidToFill
         );
 
-        tCIDLib::TBoolean bHasInterface
+        [[nodiscard]] tCIDLib::TBoolean bHasInterface
         (
             const   TOrbObjId&              ooidToCheck
         )   const;
 
-        tCIDLib::TCard4 c4CmdOverhead() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsInitialized
+        (
+            const   tCIDLib::ECSSides       eSide
+        )   const;
 
-        tCIDLib::TCard4 c4ReplyOverhead() const;
+        [[nodiscard]] tCIDLib::TCard4 c4CmdOverhead() const
+        {
+            return m_c4CmdOverhead;
+        }
 
-        tCIDLib::TCard4 c4TimeoutAdjust() const;
+        [[nodiscard]] tCIDLib::TCard4 c4ReplyOverhead() const
+        {
+            return m_c4ReplyOverhead;
+        }
 
-        tCIDLib::TCard8 c8LastNSCookie() const;
+        [[nodiscard]] tCIDLib::TCard4 c4TimeoutAdjust() const;
+
+        [[nodiscard]] tCIDLib::TCard8 c8LastNSCookie() const;
 
         tCIDLib::TVoid CheckNSCookie
         (
@@ -101,7 +115,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid DeregisterObject
         (
-                    TOrbServerBase* const   porbsToDereg
+            const   TOrbServerBase* const   porbsToDereg
         );
 
         tCIDLib::TVoid DispatchCmd
@@ -110,15 +124,15 @@ class CIDORBEXP TFacCIDOrb : public TFacility
             ,       TOrbCmd&                orbcToDispatch
         );
 
-        tCIDLib::TEncodedTime enctTimeoutAdjust() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctTimeoutAdjust() const;
 
         tCIDOrb::EReadRes eReadPacket
         (
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
             , const tCIDLib::TCard4         c4WaitFor
-            ,       tCIDLib::TCard4&        c4BytesRead
+            , COP   tCIDLib::TCard4&        c4BytesRead
             ,       TMemBuf&                mbufToFill
         );
 
@@ -126,7 +140,7 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         (
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
-            ,       tCIDLib::TCard4&        c4Id
+            , COP   tCIDLib::TCard4&        c4Id
             , const tCIDLib::TCard4         c4WaitFor
             ,       TMemBuf&                mbufTmp
             ,       TBinMBufInStream&       strmTmp
@@ -163,7 +177,8 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid RegisterObject
         (
-                    TOrbServerBase* const   porbsToAdopt
+                    TOrbServerBase* const   porbsToReg
+            , const tCIDLib::EAdoptOpts     eAdopt
         );
 
         tCIDLib::TVoid RemoveFromOIDCache
@@ -201,11 +216,6 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 
         tCIDLib::TVoid Terminate();
 
-        tCIDLib::TVoid UpdateWorkQItemStat
-        (
-            const   tCIDLib::TCard4         c4Count
-        );
-
 
     protected :
         // -------------------------------------------------------------------
@@ -219,12 +229,18 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eMonThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
         tCIDOrb::EReadRes eReadPacketData
         (
                     TThread&                thrCaller
             ,       TStreamSocket&          sockSrc
             , const tCIDOrb::TPacketHdr&    hdrRead
-            ,       tCIDLib::TCard4&        c4DataBytes
+            , COP   tCIDLib::TCard4&        c4DataBytes
             ,       TMemBuf&                mbufToFill
         );
 
@@ -240,8 +256,8 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bClientInit
-        //  m_bServerInit
+        //  m_atomClientInit
+        //  m_atomServerInit
         //      These flags indicate whether the client or server support has
         //      been initialized. It tells us what to shut down when we clean
         //      up.
@@ -272,12 +288,11 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      id cache.
         //
         //  m_colObjList
-        //      This is our list of server objects. Its a specialized collection
-        //      class, which is optimized for our needs.
+        //      This is our list of server objects. Its a specialized collection class
+        //      which is optimized for our needs.
         //
         //  m_colNSCache
-        //      A cache of object ids that we maintain for often accessed
-        //      servers.
+        //      A cache of object ids that we maintain for often accessed servers.
         //
         //  m_crsAddrInfo
         //  m_crsObjList
@@ -312,6 +327,22 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      use a pointer so that we don't force the crypto facility
         //      headers on our clients.
         //
+        //  m_scntActiveCmds
+        //      This is bumped up by DispatchCmd() and then decremented on exit.
+        //      So we knwo how many server side threads are actively in callbacks.
+        //      The monitor thread periodically grabs this value and updates the
+        //      m_sciActiveCmds stat.
+        //
+        //  m_sciActiveCmds
+        //      The monitor thread periodically updates this from the active
+        //      cmds counter above.
+        //
+        //  m_sciQueuedCmds
+        //      Periodically our monitor thread calls into the client connection
+        //      manager and gets the number of currently queued up commands from
+        //      clients (waiting to be processed by server side objects.) It will
+        //      update this statistic with that value.
+        //
         //  m_sciRegisteredObjs
         //      A stats cache object that we need up to date with the number
         //      of registered ORB objects on the server side.
@@ -320,23 +351,31 @@ class CIDORBEXP TFacCIDOrb : public TFacility
         //      The number of items (free and reserved) in our work queue item
         //      pool (which is in the WorkQItem file. We call a method on it
         //      periodically to update the stat.
+        //
+        //  m_thrMonitor
+        //      A thread that can sit outside the ORB activity and monitor things
+        //      and keep some status updated and such. We start it on m_eMonThread.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TBoolean  m_bClientInit;
-        volatile tCIDLib::TBoolean  m_bServerInit;
-        tCIDLib::TCard4             m_c4CmdOverhead;
-        tCIDLib::TCard4             m_c4ReplyOverhead;
-        tCIDLib::TCard4             m_c4TimeoutAdjust;
-        tCIDLib::TCard8             m_c8LastNSCookie;
-        TOrbSObjList                m_colObjList;
-        TObjIdCache                 m_colNSCache;
-        TCriticalSection            m_crsAddrInfo;
-        TCriticalSection            m_crsObjList;
-        tCIDLib::TEncodedTime       m_enctNextForcedNS;
-        tCIDLib::TEncodedTime       m_enctTimeoutAdjust;
-        TOrbClientConnMgr*          m_poccmSrv;
-        TBlockEncrypter*            m_pcrypSecure;
-        TStatsCacheItem             m_sciRegisteredObjs;
-        TStatsCacheItem             m_sciWorkQItems;
+        TAtomicFlag             m_atomClientInit;
+        TAtomicFlag             m_atomServerInit;
+        tCIDLib::TCard4         m_c4CmdOverhead;
+        tCIDLib::TCard4         m_c4ReplyOverhead;
+        tCIDLib::TCard4         m_c4TimeoutAdjust;
+        tCIDLib::TCard8         m_c8LastNSCookie;
+        TOrbSObjList            m_colObjList;
+        TObjIdCache             m_colNSCache;
+        TCriticalSection        m_crsAddrInfo;
+        TCriticalSection        m_crsObjList;
+        tCIDLib::TEncodedTime   m_enctNextForcedNS;
+        tCIDLib::TEncodedTime   m_enctTimeoutAdjust;
+        TOrbClientConnMgr*      m_poccmSrv;
+        TBlockEncrypter*        m_pcrypSecure;
+        TSafeCard4Counter       m_scntActiveCmds;
+        TStatsCacheItem         m_sciActiveCmds;
+        TStatsCacheItem         m_sciQueuedCmds;
+        TStatsCacheItem         m_sciRegisteredObjs;
+        TStatsCacheItem         m_sciWorkQItems;
+        TThread                 m_thrMonitor;
 
 
         // -------------------------------------------------------------------
@@ -346,16 +385,4 @@ class CIDORBEXP TFacCIDOrb : public TFacility
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// Inlined methods
-inline tCIDLib::TCard4 TFacCIDOrb::c4CmdOverhead() const
-{
-    return m_c4CmdOverhead;
-}
-
-inline tCIDLib::TCard4 TFacCIDOrb::c4ReplyOverhead() const
-{
-    return m_c4ReplyOverhead;
-}
 

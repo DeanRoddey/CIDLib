@@ -49,86 +49,89 @@ RTTIDecls(TXMLEntSpooler,TObject)
 
 namespace CIDXML_EntitySpooler
 {
-    // ---------------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c4SeqLen
-    //      The length of each of the byte arrays in the aac1EncodingSeqs
-    //      array.
-    //
-    //  aac1EncodingSeqs
-    //      An array of byte arrays. Each of these arrays contains the bytes
-    //      necessary to recogize the XMLDecl of a particular base encoding. Its
-    //      not the whole XMLDecl, just enough to recognize which encoding its
-    //      in.
-    //
-    //  ac4DeclBytes
-    //      This is an array that contains the number of bytes in each of the
-    //      apc1Decls sub-arrays.
-    //
-    //  aac1Decls
-    //      This is an array of pointers to byte sequences. Each sequence
-    //      is the set of bytes that spell out "<?xml " in that encoding. The
-    //      order is driven by the EBaseEncodings enum.
-    //
-    //  apszEncodingNames
-    //      This is an array of strings that hold the names of the encodings
-    //      in the EBaseEncodings enum.
-    //
-    //  pszDeclString
-    //      A static const XMLDecl string in native wide char format, for use in
-    //      a number of places in the code below.
-    // ---------------------------------------------------------------------------
-    const tCIDLib::TCard4 c4SeqLen = 6;
-    const tCIDLib::TCard1
-    aac1EncodingSeqs[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][c4SeqLen] =
+    namespace
     {
-            { 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00 }
-        ,   { 0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78 }
-        ,   { 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00 }
-        ,   { 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00 }
-        ,   { 0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
-        ,   { 0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
-    };
-    const tCIDLib::TCard1
-    aac1Decls[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][24] =
-    {
+        // ---------------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c4SeqLen
+        //      The length of each of the byte arrays in the aac1EncodingSeqs
+        //      array.
+        //
+        //  aac1EncodingSeqs
+        //      An array of byte arrays. Each of these arrays contains the bytes
+        //      necessary to recogize the XMLDecl of a particular base encoding. Its
+        //      not the whole XMLDecl, just enough to recognize which encoding its
+        //      in.
+        //
+        //  ac4DeclBytes
+        //      This is an array that contains the number of bytes in each of the
+        //      apc1Decls sub-arrays.
+        //
+        //  aac1Decls
+        //      This is an array of pointers to byte sequences. Each sequence
+        //      is the set of bytes that spell out "<?xml " in that encoding. The
+        //      order is driven by the EBaseEncodings enum.
+        //
+        //  apszEncodingNames
+        //      This is an array of strings that hold the names of the encodings
+        //      in the EBaseEncodings enum.
+        //
+        //  pszDeclString
+        //      A static const XMLDecl string in native wide char format, for use in
+        //      a number of places in the code below.
+        // ---------------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4SeqLen = 6;
+        constexpr tCIDLib::TCard1
+        aac1EncodingSeqs[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][c4SeqLen] =
+        {
+                { 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00 }
+            ,   { 0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78 }
+            ,   { 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00 }
+            ,   { 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00 }
+            ,   { 0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
+            ,   { 0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
+        };
+        constexpr tCIDLib::TCard1
+        aac1Decls[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)][24] =
+        {
             {
                 0x00, 0x00, 0x00, 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78
-              , 0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20
+                , 0x00, 0x00, 0x00, 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20
             }
-        ,   {   0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20 }
-        ,   {
+            , { 0x00, 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20 }
+            , {
                 0x3C, 0x00, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00
-              , 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00
-            }
-        ,   {   0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20, 0x00 }
-        ,   {   0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
-        ,   {   0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
-    };
-    const tCIDLib::TCard4 ac4DeclBytes[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)] =
-    {
-        24, 12, 24, 12, 6, 6
-    };
+                , 0x6D, 0x00, 0x00, 0x00, 0x6C, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00
+              }
+            , { 0x3C, 0x00, 0x3F, 0x00, 0x78, 0x00, 0x6D, 0x00, 0x6C, 0x00, 0x20, 0x00 }
+            , { 0x3C, 0x3F, 0x78, 0x6D, 0x6C, 0x20 }
+            , { 0x4C, 0x6F, 0xA7, 0x94, 0x93, 0x40 }
+        };
+        constexpr tCIDLib::TCard4 ac4DeclBytes[tCIDLib::c4EnumOrd(tCIDXML::EBaseEncodings::Count)] =
+        {
+            24, 12, 24, 12, 6, 6
+        };
 
 
-    const TString astrEncodingVals[] =
-    {
-        TString(L"UCS4-BE")
-        , TString(L"UTF16-BE")
-        , TString(L"UCS4-LE")
-        , TString(L"UTF16-LE")
-        , TString(L"UTF-8")
-        , TString(L"EBCDIC-US")
-    };
-    TEArray<TString, tCIDXML::EBaseEncodings, tCIDXML::EBaseEncodings::Count> astrEncodingNames
-    (
-        astrEncodingVals
-    );
+        const TString astrEncodingVals[] =
+        {
+            TString(L"UCS4-BE")
+            , TString(L"UTF16-BE")
+            , TString(L"UCS4-LE")
+            , TString(L"UTF16-LE")
+            , TString(L"UTF-8")
+            , TString(L"EBCDIC-US")
+        };
+        TEArray<TString, tCIDXML::EBaseEncodings, tCIDXML::EBaseEncodings::Count> astrEncodingNames
+        (
+            astrEncodingVals
+        );
 
-    const tCIDLib::TCh* const pszXMLDeclString = L"<?xml ";
-    const tCIDLib::TCard4 c4DeclStrLen = 6;
-    const tCIDLib::TCard4 c4DeclStrBytes = 6 * kCIDLib::c4CharBytes;
+        const tCIDLib::TCh* const pszXMLDeclString = L"<?xml ";
+        constexpr tCIDLib::TCard4 c4DeclStrLen = 6;
+        constexpr tCIDLib::TCard4 c4DeclStrBytes = 6 * kCIDLib::c4CharBytes;
+    }
 }
 
 
@@ -366,8 +369,8 @@ TXMLEntSpooler::TXMLEntSpooler( const   TString&                strSystemId
         // Tell the decoder our desired action on bad source
         m_ptcvtDecode->eErrorAction
         (
-            m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                              : tCIDLib::ETCvtActions::StopThenThrow
+            m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                              : tCIDLib::ETCvtActs::StopThenThrow
         );
 
         //
@@ -901,13 +904,16 @@ tCIDLib::TBoolean TXMLEntSpooler::bSkippedChar(const tCIDLib::TCh chToSkip)
 }
 
 
-tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(tCIDLib::TCh& chSkipped)
+tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(COP tCIDLib::TCh& chSkipped)
 {
     // If we are out of chars, try to reload. If we cannot, then fail
     if (m_c4CharBufInd == m_c4CharBufCount)
     {
         if (!bReloadCharBuf())
+        {
+            chSkipped = kCIDLib::chNull;
             return kCIDLib::False;
+        }
     }
 
     // Get the next char and check it for a quote char
@@ -920,6 +926,7 @@ tCIDLib::TBoolean TXMLEntSpooler::bSkippedQuote(tCIDLib::TCh& chSkipped)
         m_c4CurColumn++;
         return kCIDLib::True;
     }
+    chSkipped = kCIDLib::chNull;
     return kCIDLib::False;
 }
 
@@ -1200,7 +1207,12 @@ TXMLEntSpooler::SetDeclEncoding(const TString& strDeclEncoding)
     //  creating one for the basic auto-sensed format or the one that was
     //  set in the passed encoding string.
     //
-    m_ptcvtDecode = facCIDEncode().ptcvtMakeNew(m_strEncoding);
+    m_ptcvtDecode = facCIDEncode().ptcvtMake
+    (
+        m_strEncoding
+        , m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                            : tCIDLib::ETCvtActs::StopThenThrow
+    );
     if (!m_ptcvtDecode)
     {
         facCIDXML().ThrowErr
@@ -1213,17 +1225,6 @@ TXMLEntSpooler::SetDeclEncoding(const TString& strDeclEncoding)
             , m_strEncoding
         );
     }
-
-    //
-    //  Tell it our desired action on bad source. If it's to replace, the
-    //  default replacement character is a space, so we don't need to set
-    //  it.
-    //
-    m_ptcvtDecode->eErrorAction
-    (
-        m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                          : tCIDLib::ETCvtActions::StopThenThrow
-    );
 }
 
 
@@ -1354,21 +1355,17 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
             return;
 
         // See if we need to swap byte order on the input
-        tCIDLib::TBoolean bSwapped;
+        tCIDLib::TBoolean bSwapped = kCIDLib::False;
         if (eEncoding == tCIDXML::EBaseEncodings::UTF16_B)
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
          else
         {
             #if defined(CIDLIB_BIGENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
 
@@ -1452,21 +1449,17 @@ TXMLEntSpooler::DecodeDecl(const tCIDXML::EBaseEncodings eEncoding)
             return;
 
         // See if we need to swap byte order on the input
-        tCIDLib::TBoolean bSwapped;
+        tCIDLib::TBoolean bSwapped = kCIDLib::False;
         if (eEncoding == tCIDXML::EBaseEncodings::UCS4_B)
         {
             #if defined(CIDLIB_LITTLEENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
          else
         {
             #if defined(CIDLIB_BIGENDIAN)
             bSwapped = kCIDLib::True;
-            #else
-            bSwapped = kCIDLib::False;
             #endif
         }
 
@@ -1651,7 +1644,12 @@ tCIDLib::TBoolean TXMLEntSpooler::bReloadCharBuf()
         //  the encoding. If there was one, then we will put off the
         //  creation of the transcoder until the decl is processed.
         //
-        m_ptcvtDecode = facCIDEncode().ptcvtMakeNew(m_strEncoding);
+        m_ptcvtDecode = facCIDEncode().ptcvtMake
+        (
+            m_strEncoding
+            , m_bIgnoreBadChars ? tCIDLib::ETCvtActs::Replace
+                                : tCIDLib::ETCvtActs::StopThenThrow
+        );
         if (!m_ptcvtDecode)
         {
             facCIDXML().ThrowErr
@@ -1664,13 +1662,6 @@ tCIDLib::TBoolean TXMLEntSpooler::bReloadCharBuf()
                 , m_strEncoding
             );
         }
-
-        // Tell it our desired action on bad source
-        m_ptcvtDecode->eErrorAction
-        (
-            m_bIgnoreBadChars ? tCIDLib::ETCvtActions::Replace
-                              : tCIDLib::ETCvtActions::StopThenThrow
-        );
     }
 
     // Calculate the chars we can now load up max

@@ -74,6 +74,7 @@ class CIDWUTILSEXP TTextOutWnd : public TCtrlWnd
         );
 
         TTextOutWnd(const TTextOutWnd&) = delete;
+        TTextOutWnd(TTextOutWnd&&) = delete;
 
         ~TTextOutWnd();
 
@@ -82,6 +83,7 @@ class CIDWUTILSEXP TTextOutWnd : public TCtrlWnd
         //  Public operators
         // -------------------------------------------------------------------
         TTextOutWnd& operator=(const TTextOutWnd&) = delete;
+        TTextOutWnd& operator=(TTextOutWnd&&) = delete;
 
 
                 // -------------------------------------------------------------------
@@ -289,13 +291,15 @@ class CIDWUTILSEXP TTextOutWnd2 : public TCtrlWnd
         TTextOutWnd2();
 
         TTextOutWnd2(const TTextOutWnd2&) = delete;
+        TTextOutWnd2(TTextOutWnd2&&) = delete;
 
         ~TTextOutWnd2();
 
         // -------------------------------------------------------------------
-        //  Public oeprators
+        //  Public operators
         // -------------------------------------------------------------------
         TTextOutWnd2& operator=(const TTextOutWnd2&) = delete;
+        TTextOutWnd2& operator=(TTextOutWnd2&&) = delete;
 
 
         // -------------------------------------------------------------------

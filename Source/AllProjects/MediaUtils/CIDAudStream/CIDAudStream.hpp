@@ -51,16 +51,6 @@
 #include    "CIDLib.hpp"
 
 
-
-// ---------------------------------------------------------------------------
-//  Facility constants namespace
-// ---------------------------------------------------------------------------
-namespace kCIDAudStream
-{
-
-}
-
-
 // ---------------------------------------------------------------------------
 //  Subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
@@ -77,5 +67,4 @@ namespace kCIDAudStream
 //  main module, as usual.
 // ---------------------------------------------------------------------------
 extern CIDAUDSTREAMEXP TFacCIDAudStream& facCIDAudStream();
-
 

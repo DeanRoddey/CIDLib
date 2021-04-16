@@ -56,42 +56,14 @@ TNativeWCConverter::TNativeWCConverter() :
 {
 }
 
-TNativeWCConverter::TNativeWCConverter(const TNativeWCConverter& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-{
-}
-
-TNativeWCConverter::~TNativeWCConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-// TNativeWCConverter: Public operators
-// ---------------------------------------------------------------------------
-TNativeWCConverter&
-TNativeWCConverter::operator=(const TNativeWCConverter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-    TTextConverter::operator=(tcvtToAssign);
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 // TNativeWCConverter: Public, inherited methods
 // ---------------------------------------------------------------------------
 tCIDLib::EBaseTextFmts TNativeWCConverter::eBaseFmt() const
 {
-    #if defined(CIDLIB_LITTLEENDIAN)
-    return tCIDLib::EBaseTextFmts::TwoByte_LE;
-    #endif
-
-    #if defined(CIDLIB_BIGENDIAN)
-    return tCIDLib::EBaseTextFmts::TwoByte_BE;
-    #endif
+    // This comes from the per-platfrom stuff
+    return kCIDLib::eWCCharFmt;
 }
 
 

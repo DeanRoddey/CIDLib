@@ -1,0 +1,19 @@
+Class=[Final]
+    ClassPath MEng.User.Customize;
+    ParentClass MEng.Object;
+EndClass;
+
+Methods=[Public,Final]
+
+    Constructor()
+    Begin
+    EndConstructor;
+
+    Method Start([Out] String Name, [Out] String Addr) Returns Int4
+    Begin
+        Name := "Bob Jones";
+        Addr := "123 Way Place Road, Townville, CA";
+        Return 0;
+    EndMethod;
+
+EndMethods;

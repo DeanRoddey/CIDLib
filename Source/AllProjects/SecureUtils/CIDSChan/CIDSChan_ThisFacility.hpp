@@ -46,6 +46,7 @@ class CIDSCHANEXP TFacCIDSChan : public TFacility
         TFacCIDSChan();
 
         TFacCIDSChan(const TFacCIDSChan&) = delete;
+        TFacCIDSChan(TFacCIDSChan&&) = delete;
 
         ~TFacCIDSChan();
 
@@ -54,6 +55,7 @@ class CIDSCHANEXP TFacCIDSChan : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDSChan& operator=(const TFacCIDSChan&) = delete;
+        TFacCIDSChan& operator=(TFacCIDSChan&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -585,7 +584,9 @@ static tCIDLib::TVoid TestPatternSearch(TTextOutStream& strmOut)
     {
         bCaughtIt = kCIDLib::False;
         c4Index = 50;
-        strTest.bNextOccurrence(kCIDLib::chDigit4, c4Index);
+        if (strTest.bNextOccurrence(kCIDLib::chDigit4, c4Index))
+        {
+        }
     }
 
     catch(const TError&)
@@ -604,7 +605,9 @@ static tCIDLib::TVoid TestPatternSearch(TTextOutStream& strmOut)
     {
         bCaughtIt = kCIDLib::False;
         c4Index = 50;
-        strTest.bPrevOccurrence(kCIDLib::chDigit4, c4Index);
+        if (strTest.bPrevOccurrence(kCIDLib::chDigit4, c4Index))
+        {
+        }
     }
 
     catch(const TError&)

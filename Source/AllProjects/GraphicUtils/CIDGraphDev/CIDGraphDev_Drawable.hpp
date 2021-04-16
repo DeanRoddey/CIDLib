@@ -42,16 +42,16 @@ class CIDGRDEVEXP MDrawable
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         MDrawable(const MDrawable&) = delete;
+        MDrawable(MDrawable&&) = delete;
 
-        ~MDrawable()
-        {
-        }
+        ~MDrawable() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         MDrawable& operator=(const MDrawable&) = delete;
+        MDrawable& operator=(MDrawable&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -74,9 +74,7 @@ class CIDGRDEVEXP MDrawable
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        MDrawable()
-        {
-        }
+        MDrawable() = default;
 };
 
 #pragma CIDLIB_POPPACK

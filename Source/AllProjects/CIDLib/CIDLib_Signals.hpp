@@ -77,7 +77,17 @@ class TSignalJanitor
                     MSignalHandler* const   pmshToAdd
         );
 
+        TSignalJanitor(const TSignalJanitor&) = delete;
+        TSignalJanitor(TSignalJanitor&&) = delete;
+
         ~TSignalJanitor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TSignalJanitor& operator=(const TSignalJanitor&) = delete;
+        TSignalJanitor& operator=(TSignalJanitor&&) = delete;
 
 
     private :
@@ -85,8 +95,6 @@ class TSignalJanitor
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
         TSignalJanitor();
-        TSignalJanitor(const TSignalJanitor&);
-        tCIDLib::TVoid operator=(const TSignalJanitor&);
 
 
         // -------------------------------------------------------------------

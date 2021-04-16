@@ -103,6 +103,8 @@ class TProjectInfo
         TProjectInfo
         (
             const   TBldStr&                strName
+            , const tCIDBuild::TStrList&    listPlatIncl
+            , const tCIDBuild::TStrList&    listPlatExcl
         );
 
         TProjectInfo(const TProjectInfo&) = delete;
@@ -143,6 +145,10 @@ class TProjectInfo
 
         tCIDLib::TBoolean bPlatformDir() const;
 
+        tCIDLib::TBoolean bPureCpp() const;
+
+        tCIDLib::TBoolean bSupportsThisPlatform() const;
+
         tCIDLib::TBoolean bSupportsPlatform
         (
             const   TBldStr&                strToCheck
@@ -175,8 +181,6 @@ class TProjectInfo
 
         tCIDBuild::EDisplayTypes eDisplayType() const;
 
-        tCIDBuild::ERTLModes eRTLMode() const;
-
         tCIDBuild::EProjTypes eType() const;
 
         const TList<TFindInfo>& listCpps() const;
@@ -197,10 +201,9 @@ class TProjectInfo
 
         tCIDLib::TVoid LoadFileLists();
 
-        const TKeyValuePair* pkvpFindPlatOpt
+        const TKeyValuePair* pkvpFindOption
         (
-            const   TBldStr&                strPlatform
-            , const TBldStr&                strOption
+            const   TBldStr&                strOption
         )   const;
 
         tCIDLib::TVoid ParseContent
@@ -237,16 +240,16 @@ class TProjectInfo
 
     private :
         // -------------------------------------------------------------------
-        //  Private class types
-        // -------------------------------------------------------------------
-        using TKVPList      = TList<TKeyValuePair>;
-        using TStrList      = TList<TBldStr>;
-        using TPlatOptList  = TList<TKVPList>;
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bBlockForThisPlatform
+        (
+                    TLineSpooler&           lsplSource
+            , const TBldStr&                strPlatforms
+            , const TBldStr&                strEndBlock
+            , const tCIDLib::TCh* const     pszExpected
+        );
+
         tCIDLib::TBoolean bSetSetting
         (
             const   TBldStr&                strName
@@ -265,7 +268,8 @@ class TProjectInfo
 
         tCIDLib::TVoid ParseDependents
         (
-                    TLineSpooler&           lsplSource
+            const   TBldStr&                strOptions
+            ,       TLineSpooler&           lsplSource
         );
 
         tCIDLib::TVoid ParseExtLibs
@@ -286,17 +290,20 @@ class TProjectInfo
 
         tCIDLib::TVoid ParseIncludePaths
         (
-                    TLineSpooler&           lsplSource
+            const   TBldStr&                strOptions
+            ,       TLineSpooler&           lsplSource
         );
 
-        tCIDLib::TVoid ParsePlatforms
+        tCIDLib::TVoid ParseInitLine
         (
-                    TLineSpooler&           lsplSource
+            const   TBldStr&                strList
+            , const tCIDLib::TCard4         c4Line
         );
 
-        tCIDLib::TVoid ParsePlatOpts
+        tCIDLib::TVoid ParseOptions
         (
-                    TLineSpooler&           lsplSource
+            const   TBldStr&                strPlatforms
+            ,       TLineSpooler&           lsplSource
         );
 
         tCIDLib::TVoid ParseSettings
@@ -334,10 +341,10 @@ class TProjectInfo
         //      kCIDBuild, which is set by conditional compilation for each
         //      platform.
         //
-        //  m_bPlatformInclude
-        //      This indicates whether the m_listPlatforms list is a list to include
-        //      (only build on those) or ignore (build on all but those.) Defaults to
-        //      ignore and and empty list.
+        //  m_bPureCpp
+        //      This is defaulted to enabled, but can be disabled for lower level
+        //      stuff that has to import system headers that will require some sort
+        //      of permissive mode or suppression of errors.
         //
         //  m_bResFile
         //      This project has a resource file that must be built. It is
@@ -364,11 +371,6 @@ class TProjectInfo
         //  m_eDisplayMode
         //      The type of display this project has, which is N/A for DLLs,
         //      and is either GUI or Console for Exes.
-        //
-        //  m_eRTLMode
-        //      The mode to use when linking to the C++ runtime libs. For CIDLib,
-        //      this is mainly multi-threaded/dynamic, but some utility programs might
-        //      be different.
         //
         //  m_eType
         //      The type of project this is, which tells the platform driver what
@@ -418,25 +420,28 @@ class TProjectInfo
         //      assumed to be set up in the environment. From the
         //      EXTINCLUDEPATHS block.
         //
-        //  m_listPlatforms
-        //      The list of platforms that this project are eitner to be ignored
-        //      for (build on all but these) or included (only build on these) based
-        //      on the m_bPlatformInclude flag. Defaults to this being empty and
-        //      include being false (i.e. build on all platforms.)
+        //  m_listOptions
+        //      A list of key/value pairs that contain options that apply to the current
+        //      platform.
         //
-        //  m_listPlatOpts
-        //      A list of key/value lists. For each one, the first entry's key is
-        //      the platform name. The subsequent values are key=value pairs that
-        //      the per-platform build tools will use to set per-platform options.
+        //  m_listPlatformsIncl
+        //  m_listPlatformsExcl
+        //      Lists of platforms to explicitly include or exclude. By default both
+        //      are empty and this project applies to all platforms. See the
+        //      TUtils::bSupportsPlatform() method for a description of how these
+        //      work together.
+        //
+        //  m_listTmpX
+        //      For local use during parsing to avoid creating and destroying them all
+        //      the time.
         //
         //  m_strDirectory
-        //      The directory under the AllProjects directory for this
-        //      project. Usually the same as the project name, but not always.
+        //      The directory under the AllProjects directory for this project. Usually
+        //      the same as the project name, but not always.
         //
         //  m_strExportKeyword
-        //      This is the export keyword used by this project. We use this
-        //      anywhere in the build process that we are expected to insert
-        //      an export keyword.
+        //      This is the export keyword used by this project. We use this anywhere in
+        //      the build process that we are expected to insert an export keyword.
         //
         //  m_strMsgSrc
         //      The path to the source message text file, if there is one.
@@ -499,25 +504,27 @@ class TProjectInfo
         tCIDLib::TBoolean           m_bMsgFile;
         tCIDLib::TBoolean           m_bNeedsAdminPrivs;
         tCIDLib::TBoolean           m_bPlatformDir;
-        tCIDLib::TBoolean           m_bPlatformInclude;
+        tCIDLib::TBoolean           m_bPureCpp;
         tCIDLib::TBoolean           m_bResFile;
         tCIDLib::TBoolean           m_bUseSysLibs;
         tCIDLib::TBoolean           m_bVarArgs;
         tCIDLib::TBoolean           m_bVersioned;
         tCIDBuild::EDisplayTypes    m_eDisplayType;
-        tCIDBuild::ERTLModes        m_eRTLMode;
         tCIDBuild::EProjTypes       m_eType;
         TList<TFindInfo>            m_listCpps;
-        TStrList                    m_listCustomCmds;
-        TKVPList                    m_listDefs;
-        TStrList                    m_listDeps;
-        TStrList                    m_listExtLibs;
+        tCIDBuild::TStrList         m_listCustomCmds;
+        tCIDBuild::TKVPList         m_listDefs;
+        tCIDBuild::TStrList         m_listDeps;
+        tCIDBuild::TStrList         m_listExtLibs;
         TList<TProjFileCopy>        m_listFileCopies;
         TList<TFindInfo>            m_listHpps;
         TList<TIDLInfo>             m_listIDLFiles;
-        TStrList                    m_listIncludePaths;
-        TStrList                    m_listPlatforms;
-        TPlatOptList                m_listPlatOpts;
+        tCIDBuild::TStrList         m_listIncludePaths;
+        tCIDBuild::TKVPList         m_listOptions;
+        tCIDBuild::TStrList         m_listPlatformsExcl;
+        tCIDBuild::TStrList         m_listPlatformsIncl;
+        tCIDBuild::TStrList         m_listTmp1;
+        tCIDBuild::TStrList         m_listTmp2;
         TBldStr                     m_strCopyOutDir;
         TBldStr                     m_strDirectory;
         TBldStr                     m_strExportKeyword;

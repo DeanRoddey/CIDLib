@@ -41,14 +41,14 @@ RTTIDecls(TMutex,TObject)
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TMtxLocker
+//  CLASS: TLocker
 // PREFIX: lock
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TMtxLocker: Private, non-virtual methods
+//  TLocker: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMtxLocker::CheckLocked(const tCIDLib::TBoolean bToCheck)
+tCIDLib::TVoid TLocker::CheckLocked(const tCIDLib::TBoolean bToCheck)
 {
     // If we already have it locked/unlocked, this is illegal
     if (m_bLocked == bToCheck)
@@ -113,10 +113,7 @@ TMutex::TMutex( const   TResourceName&          rsnToUse
                 , const tCIDLib::ECreateActs eAction) :
 
     m_bNamed(kCIDLib::True)
-    , m_kmtxImpl
-      (
-        rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer()
-      )
+    , m_kmtxImpl(rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer())
     , m_rsnThis(rsnToUse)
 {
     tCIDLib::TBoolean bCreated;
@@ -129,10 +126,7 @@ TMutex::TMutex( const   TResourceName&          rsnToUse
                 , const tCIDLib::ECreateActs eAction) :
 
     m_bNamed(kCIDLib::True)
-    , m_kmtxImpl
-      (
-        rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer()
-      )
+    , m_kmtxImpl(rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Mutex).pszBuffer())
     , m_rsnThis(rsnToUse)
 {
     InitNamed(bCreated, eInitState, eAction);
@@ -142,17 +136,14 @@ TMutex::~TMutex()
 {
     if (!m_kmtxImpl.bClose())
     {
-        //
-        //  If we get an error, log it but don't throw out of the destructor
-        //  so we use a warning message.
-        //
-        facCIDLib().ThrowKrnlErr
+        // Not much we can do but log it
+        facCIDLib().LogKrnlErr
         (
             CID_FILE
             , CID_LINE
             , kCIDErrs::errcMtx_Close
             , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Warn
+            , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Internal
             , m_rsnThis.strFullName(tCIDLib::ENamedRscTypes::Mutex)
         );
@@ -161,14 +152,8 @@ TMutex::~TMutex()
 
 
 // ---------------------------------------------------------------------------
-//  TMutex: Public, non-virtual methods
+//  TMutex: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TMutex::bIsNamed() const
-{
-    return m_bNamed;
-}
-
-
 tCIDLib::TBoolean TMutex::bTryLock(const tCIDLib::TCard4 c4Timeout) const
 {
     if (!m_kmtxImpl.bLock(c4Timeout))
@@ -221,12 +206,6 @@ tCIDLib::TVoid TMutex::Lock(const tCIDLib::TCard4 c4Timeout) const
 }
 
 
-const TResourceName& TMutex::rsnName() const
-{
-    return m_rsnThis;
-}
-
-
 tCIDLib::TVoid TMutex::Unlock() const
 {
     if (!m_kmtxImpl.bUnlock())
@@ -245,10 +224,26 @@ tCIDLib::TVoid TMutex::Unlock() const
 }
 
 
+
+// ---------------------------------------------------------------------------
+//  TMutex: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TBoolean TMutex::bIsNamed() const
+{
+    return m_bNamed;
+}
+
+
+const TResourceName& TMutex::rsnName() const
+{
+    return m_rsnThis;
+}
+
+
 // ---------------------------------------------------------------------------
 //  TMutex: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMutex::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TMutex::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     strmToWriteTo << m_rsnThis.strFullName(tCIDLib::ENamedRscTypes::Mutex);
 }
@@ -270,7 +265,7 @@ TMutex::InitNamed(          tCIDLib::TBoolean&      bCreated
         if (!m_kmtxImpl.bCreate(eInitState))
         {
             const TKrnlError& kerrLast = TKrnlError::kerrLast();
-            tCIDLib::TErrCode errcToThrow;
+            tCIDLib::TErrCode errcToThrow = kKrnlErrs::errcNoError;
             if (kerrLast.errcId() == kKrnlErrs::errcGen_AlreadyExists)
                 errcToThrow = kCIDErrs::errcMtx_AlreadyExists;
             else

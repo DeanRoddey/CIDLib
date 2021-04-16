@@ -173,7 +173,7 @@ class KRNLEXPORT TKrnlSharedMemBuf
 //   CLASS: TKrnlTypedSharedBuf
 //  PREFIX: ktsb
 // ---------------------------------------------------------------------------
-template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
+template <typename T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
 {
     public  :
         // -------------------------------------------------------------------
@@ -184,6 +184,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
         }
 
         TKrnlTypedSharedBuf(const TKrnlTypedSharedBuf<T>&) = delete;
+        TKrnlTypedSharedBuf(TKrnlTypedSharedBuf<T>&&) = delete;
 
         ~TKrnlTypedSharedBuf()
         {
@@ -194,6 +195,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlTypedSharedBuf<T>& operator=(const TKrnlTypedSharedBuf<T>&) = delete;
+        TKrnlTypedSharedBuf<T>& operator=(TKrnlTypedSharedBuf<T>&&) = delete;
 
         T* operator->()
         {
@@ -224,6 +226,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
             (
                 pszName
                 , sizeof(T)
+                , tCIDLib::EAllocTypes::Commit
                 , eAccess
                 , bCreated
                 , eCreateFlags
@@ -241,6 +244,7 @@ template <class T> class TKrnlTypedSharedBuf : public TKrnlSharedMemBuf
             (
                 pszName
                 , sizeof(T)
+                , tCIDLib::EAllocTypes::Commit
                 , eAccess
                 , bDummy
                 , eCreateFlags

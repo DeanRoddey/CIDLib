@@ -26,7 +26,7 @@
 #pragma once
 
 
-namespace kMacroEng
+namespace kCIDMacroEng
 {
     // -----------------------------------------------------------------------
     //  The number of indices that an opcode can support

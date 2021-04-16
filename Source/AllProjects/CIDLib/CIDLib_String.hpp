@@ -15,36 +15,38 @@
 //
 // DESCRIPTION:
 //
-//  This file implements the TString class, which (suprise) implements a
-//  wrapper for XMLCh based strings. The string is maintained null terminated,
-//  so that it can be passed to system APIs, but the length is also maintained
-//  at all times. So appends or other ops that require access to the end of
-//  the string are very fast.
-//
-//  TStrBuf is the object that actually contains the string buffer. It provides
-//  a simple set of fundamental operations via which all string manipulations
-//  can be done. Each TString object has one of these objects, via which it
-//  manages the actual string data. At this time, these buffer objects are not
-//  reference counted, but it might be in the future. Using this buffer object
-//  will allow us to implement copy on write, ref counted buffers later if
-//  we decide to.
+//  This file implements the TString class, which (suprise) implements a wrapper
+//  for an array of (wide) characters strings. The string is maintained null
+//  terminated at least any time you look at the raw buffer, so that it can be
+//  passed to system APIs, but the length is also  maintained at all times. So
+//  appends or other ops that require access to the end of the string are very fast.
 //
 //  String capacity is not considered part of equality between strings, only the
 //  current length and actual character content. So the capacity can be changed
 //  at any time as required.
 //
+//  Buffer Issues.
+//
+//  We take the complexity hit here to provide for greater performance, in that we
+//  allow our buffer to be null. This is both so that default ctor'd strings that
+//  never get actually used don't allocate anything. And so that we can move
+//  strings without having to pay the cost to allocate a buffer that in most case
+//  will just get discarded. This makes the common scenario where we create some
+//  string contents locally and return it much cheaper since we can just move the
+//  contents to the caller.
+//
+//  So we almost never directly access the buffer member, we call methods that will
+//  get the buffer for const or non-const access and the same at a specific index
+//  within the buffer. This will fault in the buffer if it doesn't exist, so that
+//  we never are caught with a null buffer.
+//
+//  In some rare scenarios where we have already called the wrapper and know we have
+//  a buffer we'll use the buffer directly (mostly to play tricks where the buffer
+//  has been extended but the new length isn't stored yet, which would make the
+//  wrappers throw an index exception.)
+//
 // CAVEATS/GOTCHAS:
 //
-//  1)  TStrBuf doesn't implement TObject, since its purely for use by the
-//      TString class.
-//
-//  2)  Only const access is provided to the raw buffer, for passing to system
-//      APIs internally (or in your code if you must wrap some third party
-//      code.) Because we may move to a ref counted buffer at some point in
-//      the future, direct access cannot be allowed.
-//
-//  3)  Basically almost all of the TString class is made up of inlined
-//      methods which just delegate to the string buffer object.
 //
 // LOG:
 //
@@ -193,23 +195,38 @@ class CIDLIBEXP TString :
 {
     public  :
         // -------------------------------------------------------------------
+        //  Public types
+        // -------------------------------------------------------------------
+
+        // Used in the low level token processing method, pszFindToken()
+        enum class ETokenFind
+        {
+            End
+            , Token
+            , TextRun
+            , NewLine
+            , BadFormat
+        };
+
+
+        // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
         {
             return str1.bCompare(str2);
         }
 
-        static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)
         {
             return str1.bCompareI(str2);
         }
 
-        static tCIDLib::TCard1 c1ToHex(const tCIDLib::TSCh chToXlat)
+        [[nodiscard]] static tCIDLib::TCard1 c1ToHex(const tCIDLib::TSCh chToXlat)
         {
-            tCIDLib::TCard1 c1Ret(0);
+            tCIDLib::TCard1 c1Ret =(0);
             if ((chToXlat >= 0x41) && (chToXlat <= 0x46))
-                c1Ret = tCIDLib::TCard1(10) + (chToXlat - 0x41);
+                c1Ret = 10 + (chToXlat - 0x41);
             else if ((chToXlat >= 0x30) && (chToXlat <= 0x39))
                 c1Ret = chToXlat - 0x30;
             else
@@ -217,40 +234,63 @@ class CIDLIBEXP TString :
             return c1Ret;
         }
 
-        static tCIDLib::TCard1 c1ToHex(const tCIDLib::TCh chToXlat)
+        [[nodiscard]] static tCIDLib::TCard1 c1ToHex(const tCIDLib::TCh chToXlat)
         {
             tCIDLib::TCard1 c1Ret(0);
             if ((chToXlat >= kCIDLib::chLatin_A) && (chToXlat <= kCIDLib::chLatin_F))
-                c1Ret = tCIDLib::TCard1(10 + (chToXlat - kCIDLib::chLatin_A));
+                c1Ret = static_cast<tCIDLib::TCard1>(10 + (chToXlat - kCIDLib::chLatin_A));
             else if ((chToXlat >= kCIDLib::chDigit0) && (chToXlat <= kCIDLib::chDigit9))
-                c1Ret = tCIDLib::TCard1(chToXlat - kCIDLib::chDigit0);
+                c1Ret = static_cast<tCIDLib::TCard1>(chToXlat - kCIDLib::chDigit0);
             else
                 BadHexChar(chToXlat);
             return c1Ret;
         }
 
-        static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2)
         {
             return str1.eCompare(str2);
         }
 
-        static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2)
         {
             return str1.eCompareI(str2);
         }
 
-        static tCIDLib::TVoid FromHex
+        [[nodiscard]] static ETokenFind eFindToken
         (
-            const   tCIDLib::TCard1         c1ToXlat
-            ,       tCIDLib::TSCh&          chOne
-            ,       tCIDLib::TSCh&          chTwo
+            const   tCIDLib::TCh*&          pszStart
+            , COP    tCIDLib::TCh&          chToken
+            , COP    tCIDLib::EHJustify&    eJustify
+            , COP    tCIDLib::TCard4&       c4FldWidth
+            , COP    tCIDLib::TCh&          chFill
+            , COP    tCIDLib::TCard4&       c4Precision
+            , COP const tCIDLib::TCh*&      pszEnd
         );
 
         static tCIDLib::TVoid FromHex
         (
             const   tCIDLib::TCard1         c1ToXlat
-            ,       tCIDLib::TCh&           chOne
-            ,       tCIDLib::TCh&           chTwo
+            , COP   tCIDLib::TSCh&          chOne
+            , COP   tCIDLib::TSCh&          chTwo
+        );
+
+        static tCIDLib::TVoid FromHex
+        (
+            const   tCIDLib::TCard1         c1ToXlat
+            , COP   tCIDLib::TCh&           chOne
+            , COP   tCIDLib::TCh&           chTwo
+        );
+
+        [[nodiscard]] static const tCIDLib::TCh* pszFindToken
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCh            chToFind
+            , COP   tCIDLib::EHJustify&     eJustify
+            , COP   tCIDLib::TCard4&        c4FldWidth
+            , COP   tCIDLib::TCh&           chFill
+            , COP   tCIDLib::TCard4&        c4Precision
+            , COP   tCIDLib::TCard4&        c4TokenChars
+            , COP   tCIDLib::TCard4&        c4TokenCnt
         );
 
         static const TString& strEmpty();
@@ -271,11 +311,6 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh            chInit
         );
 
-        TString
-        (
-            const   tCIDLib::TCh*           pszInitValue
-        );
-
         explicit TString
         (
             const   tCIDLib::TSCh* const    pszInitValue
@@ -284,7 +319,7 @@ class CIDLIBEXP TString :
         TString
         (
             const   tCIDLib::TCh* const     pszInitValue
-            , const tCIDLib::TCard4         c4ExtraChars
+            , const tCIDLib::TCard4         c4ExtraChars = 0
         );
 
         TString
@@ -359,7 +394,16 @@ class CIDLIBEXP TString :
                     TString&&               strSrc
         );
 
-        ~TString() = default;
+        TString
+        (
+            const   TKrnlString&            kstrSrc
+        );
+        TString
+        (
+                    TKrnlString&&           kstrSrc
+        );
+
+        ~TString();
 
 
         // -------------------------------------------------------------------
@@ -378,6 +422,11 @@ class CIDLIBEXP TString :
         TString& operator=
         (
                     TString&&               strSrc
+        );
+
+        TString& operator=
+        (
+                    TKrnlString&&           kstrSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -455,11 +504,6 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh* const     pszSrc
         )   const;
 
-        tCIDLib::TCh& operator[]
-        (
-            const   tCIDLib::TCard4         c4Ind
-        );
-
         tCIDLib::TCh operator[]
         (
             const   tCIDLib::TCard4         c4Ind
@@ -481,27 +525,27 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         tCIDLib::TVoid Append
         (
+            const   TString&                strSrc
+        );
+
+        tCIDLib::TVoid Append
+        (
             const   TString&                strToAppend1
             , const TString&                strToAppend2
         );
 
-        tCIDLib::TVoid Append(const TString& strSrc)
-        {
-            m_strbData.Append(strSrc.m_strbData);
-        }
+        tCIDLib::TVoid Append
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCh* const     pszSrc2 = nullptr
+            , const tCIDLib::TCh* const     pszSrc3 = nullptr
+        );
 
-        tCIDLib::TVoid Append(  const   tCIDLib::TCh* const pszSrc
-                                , const tCIDLib::TCh* const pszSrc2 = nullptr
-                                , const tCIDLib::TCh* const pszSrc3 = nullptr)
-        {
-            m_strbData.Append(pszSrc, pszSrc2, pszSrc3);
-        }
-
-        tCIDLib::TVoid Append(  const   tCIDLib::TCh    chSrc
-                                , const tCIDLib::TCard4 c4Count = 1)
-        {
-            m_strbData.Append(chSrc, c4Count);
-        }
+        tCIDLib::TVoid Append
+        (
+            const   tCIDLib::TCh            chSrc
+            , const tCIDLib::TCard4         c4Count = 1
+        );
 
         tCIDLib::TVoid AppendFormatted
         (
@@ -589,310 +633,313 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid AppendFormatted
         (
-            const   MFormattable&           fmtblSrc
+            const   tCIDLib::TSInt          iToFmt
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
+            , const tCIDLib::TCh            chNegSign = kCIDLib::chHyphenMinus
+            , const tCIDLib::TCard4         c4GroupSize = 0
+            , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
         );
 
-        tCIDLib::TVoid AppendSubStr(const   TString&        strSrc
-                                    , const tCIDLib::TCard4 c4Start
-                                    , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.AppendSubStr(strSrc.m_strbData, c4Start, c4Len);
-        }
+        //
+        //  The precision parameter is a dummy parameter that is not used. This
+        //  exists purely to deal with an otherwise really ugly issue with
+        //  the variadice Format() method.
+        //
+        tCIDLib::TVoid AppendFormatted
+        (
+            const   MFormattable&           fmtblSrc
+            , const tCIDLib::TCard4         c4Prec = 0
+        );
 
-        tCIDLib::TVoid AppendSubStr(const   tCIDLib::TCh* const pszSrc
-                                    , const tCIDLib::TCard4     c4Start
-                                    , const tCIDLib::TCard4     c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.AppendSubStr(pszSrc, c4Start, c4Len);
-        }
+        tCIDLib::TVoid AppendSubStr
+        (
+            const   TString&                strSrc
+            , const tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
+
+        tCIDLib::TVoid AppendSubStr
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
 
         tCIDLib::TBoolean bCapAtChar
         (
             const   tCIDLib::TCh            chAt
         );
 
-        tCIDLib::TBoolean bCompare
+        [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   TString&                strSrc
         )   const;
 
-        tCIDLib::TBoolean bCompare
+        [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   tCIDLib::TCh* const     pszSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareI
+        [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   TString&                strSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareI
+        [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   tCIDLib::TCh* const     pszSrc
         )   const;
 
-        tCIDLib::TBoolean bCompareN
-        (
-            const   TString&                strSrc
-            , const tCIDLib::TCard4         c4Count
-        )   const;
-
-        tCIDLib::TBoolean bCompareN
-        (
-            const   tCIDLib::TCh* const     pszSrc
-            , const tCIDLib::TCard4         c4Count
-        )   const;
-
-        tCIDLib::TBoolean bCompareNI
+        [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   TString&                strSrc
             , const tCIDLib::TCard4         c4Count
         )   const;
 
-        tCIDLib::TBoolean bCompareNI
+        [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   tCIDLib::TCh* const     pszSrc
             , const tCIDLib::TCard4         c4Count
         )   const;
 
-        tCIDLib::TBoolean bContainsChar
+        [[nodiscard]] tCIDLib::TBoolean bCompareNI
+        (
+            const   TString&                strSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bCompareNI
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bContainsChar
         (
             const   tCIDLib::TCh            chToFind
         )   const noexcept;
 
-        tCIDLib::TBoolean bContainsSubStr
+        [[nodiscard]] tCIDLib::TBoolean bContainsSubStr
         (
             const   TString&                strToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
 
-        tCIDLib::TBoolean bEndsWith(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWith(const tCIDLib::TCh* const pszToCheck) const
         {
-            return m_strbData.bCheckSuffix(pszToCheck, kCIDLib::True);
+            return bCheckSuffix(pszToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bEndsWith(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWith(const TString& strToCheck) const
         {
-            return m_strbData.bCheckSuffix(strToCheck.m_strbData, kCIDLib::True);
+            return bCheckSuffix(strToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bEndsWithI(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWithI(const tCIDLib::TCh* const pszToCheck) const
         {
-            return m_strbData.bCheckSuffix(pszToCheck, kCIDLib::False);
+            return bCheckSuffix(pszToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bEndsWithI(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bEndsWithI(const TString& strToCheck) const
         {
-            return m_strbData.bCheckSuffix(strToCheck.m_strbData, kCIDLib::False);
+            return bCheckSuffix(strToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bExtractNthToken
+        [[nodiscard]] tCIDLib::TBoolean bExtractNthToken
         (
             const   tCIDLib::TCard4         c4Index
             , const tCIDLib::TCh            chSepChar
-            ,       TString&                strToFill
+            , COP   TString&                strToFill
             , const tCIDLib::TBoolean       bStripWS = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bFindTokenList
+        [[nodiscard]] tCIDLib::TBoolean bFindTokenList
         (
-                    TString&                strToFill
+            COP     TString&                strToFill
         )   const;
 
-        tCIDLib::TBoolean bFirstOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bFirstOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bIsAlpha() const
+        [[nodiscard]] tCIDLib::TBoolean bIsAlpha() const;
+
+        [[nodiscard]] tCIDLib::TBoolean bIsAlphaNum() const;
+
+        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const
         {
-            return m_strbData.bIsAlpha();
+            return(m_c4CurEnd == 0);
         }
 
-        tCIDLib::TBoolean bIsAlphaNum() const
-        {
-            return m_strbData.bIsAlphaNum();
-        }
-
-        tCIDLib::TBoolean bIsEmpty() const
-        {
-            return (m_strbData.c4Length() == 0);
-        }
-
-        tCIDLib::TBoolean bLastOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bLastOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bLastOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bLastOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4Pos
+            , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bNextOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bNextOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP   tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bNextOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bNextOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bPrevOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bPrevOccurrence
         (
             const   tCIDLib::TCh            chToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bPrevOccurrence
+        [[nodiscard]] tCIDLib::TBoolean bPrevOccurrence
         (
             const   TString&                strSubStrToFind
-            ,       tCIDLib::TCard4&        c4StartPos
+            , CIOP  tCIDLib::TCard4&        c4StartPos
             , const tCIDLib::TBoolean       bAnyChar = kCIDLib::False
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        tCIDLib::TBoolean bReplaceChar( const   tCIDLib::TCh    chToReplace
-                                        , const tCIDLib::TCh    chReplaceWith)
-        {
-            return m_strbData.bReplaceChar(chToReplace, chReplaceWith);
-        }
+        tCIDLib::TBoolean bReplaceChar
+        (
+            const   tCIDLib::TCh            chToReplace
+            , const tCIDLib::TCh            chReplaceWith
+        );
 
         tCIDLib::TBoolean bReplaceSubStr
         (
             const   TString&                strToReplace
             , const TString&                strReplaceWith
-            ,       tCIDLib::TCard4&        c4StartAt
+            , CIOP  tCIDLib::TCard4&        c4StartAt
             , const tCIDLib::TBoolean       bReplaceAll
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         );
 
         tCIDLib::TBoolean bSplit
         (
-                    TString&                strSecondHalf
+            COP     TString&                strSecondHalf
             , const tCIDLib::TCh            chDivider
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         );
 
-        tCIDLib::TBoolean bStartsWith(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith(const tCIDLib::TCh* const pszToCheck) const
         {
-            return m_strbData.bCheckPrefix(pszToCheck, kCIDLib::True);
+            return bCheckPrefix(pszToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bStartsWith(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith(const TString& strToCheck) const
         {
-            return m_strbData.bCheckPrefix(strToCheck.m_strbData, kCIDLib::True);
+            return bCheckPrefix(strToCheck, kCIDLib::True);
         }
 
-        tCIDLib::TBoolean bStartsWithI(const tCIDLib::TCh* const pszToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWithI(const tCIDLib::TCh* const pszToCheck) const
         {
-            return m_strbData.bCheckPrefix(pszToCheck, kCIDLib::False);
+            return bCheckPrefix(pszToCheck, kCIDLib::False);
         }
 
-        tCIDLib::TBoolean bStartsWithI(const TString& strToCheck) const
+        [[nodiscard]] tCIDLib::TBoolean bStartsWithI(const TString& strToCheck) const
         {
-            return m_strbData.bCheckPrefix(strToCheck.m_strbData, kCIDLib::False);
+            return bCheckPrefix(strToCheck, kCIDLib::False);
         }
 
         tCIDLib::TBoolean bToBoolean
         (
-                    tCIDLib::TBoolean&      bToFill
+            COP    tCIDLib::TBoolean&      bToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard1
         (
-                    tCIDLib::TCard1&        c1ToFill
+            COP     tCIDLib::TCard1&        c1ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard2
         (
-                    tCIDLib::TCard2&        c2ToFill
+            COP     tCIDLib::TCard2&        c2ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard4
         (
-                    tCIDLib::TCard4&        c4ToFill
+            COP     tCIDLib::TCard4&        c4ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToCard8
         (
-                    tCIDLib::TCard8&        c8ToFill
+            COP     tCIDLib::TCard8&        c8ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToFloat4
         (
-                    tCIDLib::TFloat4&       f4ToFill
+            COP   tCIDLib::TFloat4&       f4ToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToFloat8
         (
-                    tCIDLib::TFloat8&       f8ToFill
+            COP   tCIDLib::TFloat8&       f8ToFill
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt1
         (
-                    tCIDLib::TInt1&         i1ToFill
+            COP     tCIDLib::TInt1&         i1ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt2
         (
-                    tCIDLib::TInt2&         i2ToFill
+            COP     tCIDLib::TInt2&         i2ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt4
         (
-                    tCIDLib::TInt4&         i4ToFill
+            COP     tCIDLib::TInt4&         i4ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
         tCIDLib::TBoolean bToInt8
         (
-                    tCIDLib::TInt8&         i8ToFill
+            COP     tCIDLib::TInt8&         i8ToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const noexcept;
 
-        tCIDLib::TBoolean bTokenExists
+        [[nodiscard]] tCIDLib::TBoolean bTokenExists
         (
             const   tCIDLib::TCh            chToken
         )   const;
 
-        tCIDLib::TCard4 c4BufChars() const
-        {
-            return m_strbData.c4BufChars();
-        }
+        [[nodiscard]] tCIDLib::TCard4 c4BufChars() const;
 
-        tCIDLib::TCard4 c4Length() const
-        {
-            return m_strbData.c4Length();
-        }
+        [[nodiscard]] tCIDLib::TCard4 c4Length() const;
 
         tCIDLib::TCard4 c4Val
         (
@@ -904,104 +951,88 @@ class CIDLIBEXP TString :
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
 
-        tCIDLib::TCh chAt(const tCIDLib::TCard4 c4Index) const
-        {
-            return m_strbData.chAt(c4Index);
-        }
+        [[nodiscard]] tCIDLib::TCh chAt
+        (
+            const   tCIDLib::TCard4         c4Index
+        )   const;
 
-        tCIDLib::TCh chFirst() const
-        {
-            return m_strbData.chAt(0);
-        }
+        [[nodiscard]] tCIDLib::TCh chFirst() const;
 
-        tCIDLib::TCh chLast() const
-        {
-            return m_strbData.chLast();
-        }
+        [[nodiscard]] tCIDLib::TCh chLast() const;
 
-        tCIDLib::TVoid CapAt(const tCIDLib::TCard4 c4Index)
-        {
-            m_strbData.CapAt(c4Index);
-        }
+        tCIDLib::TVoid CapAt
+        (
+            const   tCIDLib::TCard4         c4Index
+        );
 
-        tCIDLib::TVoid Clear()
-        {
-            m_strbData.Clear();
-        }
+        tCIDLib::TVoid Clear();
 
-        tCIDLib::TVoid
-        CopyInSubStr(const  TString&        strSource
-                    , const tCIDLib::TCard4 c4Start
-                    , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.Clear();
-            m_strbData.AppendSubStr(strSource.m_strbData, c4Start, c4Len);
-        }
+        tCIDLib::TVoid CopyInSubStr
+        (
+            const   TString&                strSource
+            , const tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
 
-        tCIDLib::TVoid
-        CopyOutSubStr(          TString&        strTarget
-                        , const tCIDLib::TCard4 c4Start
-                        , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard) const
-        {
-            strTarget.m_strbData.Clear();
-            strTarget.m_strbData.AppendSubStr(m_strbData, c4Start, c4Len);
-        }
+        tCIDLib::TVoid CopyOutSubStr
+        (
+            COP     TString&               strTarget
+            , const tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        )   const;
 
-        tCIDLib::TVoid Cut( const   tCIDLib::TCard4 c4Start
-                            , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.Cut(c4Start, c4Len);
-        }
+        tCIDLib::TVoid Cut
+        (
+            const   tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
 
-        tCIDLib::TVoid CutUpTo(const tCIDLib::TCh chFind)
-        {
-            m_strbData.CutUpTo(chFind);
-        }
+        tCIDLib::TVoid CutUpTo
+        (
+            const   tCIDLib::TCh            chFind
+        );
 
-        tCIDLib::TVoid DeleteLast()
-        {
-            m_strbData.DeleteLast();
-        }
+        tCIDLib::TVoid DeleteLast();
 
-        tCIDLib::ESortComps eCompare
+        [[nodiscard]] tCIDLib::ESortComps eCompare
         (
             const   tCIDLib::TCh* const     pszToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompare
+        [[nodiscard]] tCIDLib::ESortComps eCompare
         (
             const   TString&                strToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareN
+        [[nodiscard]] tCIDLib::ESortComps eCompareN
         (
             const   tCIDLib::TCh* const     pszToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareN
+        [[nodiscard]] tCIDLib::ESortComps eCompareN
         (
             const   TString&                strToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareI
+        [[nodiscard]] tCIDLib::ESortComps eCompareI
         (
             const   tCIDLib::TCh* const     pszToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareI
+        [[nodiscard]] tCIDLib::ESortComps eCompareI
         (
             const   TString&                strToCompare
         )   const;
 
-        tCIDLib::ESortComps eCompareNI
+        [[nodiscard]] tCIDLib::ESortComps eCompareNI
         (
             const   tCIDLib::TCh* const     pszToCompare
             , const tCIDLib::TCard4         c4MaxComp
         )   const;
 
-        tCIDLib::ESortComps eCompareNI
+        [[nodiscard]] tCIDLib::ESortComps eCompareNI
         (
             const   TString&                strToCompare
             , const tCIDLib::TCard4         c4MaxComp
@@ -1094,18 +1125,17 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chToken
         );
 
-        tCIDLib::EFindRes eTokenExists
+        [[nodiscard]] tCIDLib::EFindRes eTokenExists
         (
             const   tCIDLib::TCh            chToken
         )   const;
 
-        tCIDLib::TVoid ExportChars(         tCIDLib::TCh* const pszTarget
-                                    , const tCIDLib::TCard4     c4MaxChars
-                                    , const tCIDLib::TCard4     c4StartInd = 0) const
-        {
-            // Tell it not to add any null terminator
-            m_strbData.ToZStr(pszTarget, c4MaxChars, c4StartInd, kCIDLib::False);
-        }
+        tCIDLib::TVoid ExportChars
+        (
+                    tCIDLib::TCh* const     pszTarget
+            , const tCIDLib::TCard4         c4MaxChars
+            , const tCIDLib::TCard4         c4StartInd = 0
+        )   const;
 
         tCIDLib::TVoid FormatToFld
         (
@@ -1116,49 +1146,75 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCard4         c4TrailingSp = 0
         );
 
-        tCIDLib::TVoid FromZStr(const   tCIDLib::TCh* const pszSource
-                                , const tCIDLib::TCard4     c4Count = 0)
+        tCIDLib::TVoid FromShortZStr
+        (
+            const    tCIDLib::TSCh* const   pszNewValue
+        );
+
+        tCIDLib::TVoid FromZStr
+        (
+            const   tCIDLib::TCh* const     pszSource
+            , const tCIDLib::TCard4         c4Count = 0
+        );
+
+        //
+        //  This will append the formatted content to us. We have another that will
+        //  clear us first and then call appending version. To avoid having to
+        //  replicate a lot of code, we pass a temp string which will be used to
+        //  format the token values out.
+        //
+        template <typename... TArgs>
+        tCIDLib::TVoid Format(const TString& strFmt, const TArgs... Args)
         {
-            m_strbData.FromZStr(pszSource, c4Count);
+            Clear();
+            FormatAppend(strFmt, Args...);
         }
 
-        tCIDLib::TVoid FromShortZStr(const tCIDLib::TSCh* const pszNewValue)
+        template <typename... TArgs>
+        tCIDLib::TVoid FormatAppend(const TString& strFmt, const TArgs... Args)
         {
-            m_strbData.SetFromShort(pszNewValue);
+            TString strTmp;
+            TString strTmp2;
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), strTmp, strTmp2, Args...) == strFmt.pszBuffer())
+                Append(strFmt);
         }
 
         tCIDLib::TFloat8 f8Val() const;
 
-        tCIDLib::THashVal hshCalcHash
+        [[nodiscard]] tCIDLib::THashVal hshCalcHash
         (
             const   tCIDLib::TCard4         c4Modulus
         )   const;
 
-        tCIDLib::TInt4 i4Val
+        [[nodiscard]] tCIDLib::TInt4 i4Val
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
 
-        tCIDLib::TInt8 i8Val
+        [[nodiscard]] tCIDLib::TInt8 i8Val
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         )   const;
 
-        tCIDLib::TVoid ImportChars( const  tCIDLib::TCh* const pszSource
-                                    , const tCIDLib::TCard4     c4SrcCount)
-        {
-            m_strbData.ImportChars(pszSource, c4SrcCount);
-        }
+        tCIDLib::TVoid ImportChars
+        (
+            const   tCIDLib::TCh* const     pszSource
+            , const tCIDLib::TCard4         c4SrcCount
+        );
 
-        tCIDLib::TVoid Insert(const TString& strInsert, const tCIDLib::TCard4 c4Ind)
-        {
-            m_strbData.Insert(strInsert.m_strbData, c4Ind);
-        }
+        tCIDLib::TVoid Insert
+        (
+            const   TString&                strInsert
+            , const tCIDLib::TCard4         c4Ind
+        );
 
-        tCIDLib::TVoid Insert(const tCIDLib::TCh* const pszInsert, const tCIDLib::TCard4 c4Ind)
-        {
-            m_strbData.Insert(pszInsert, c4Ind);
-        }
+        tCIDLib::TVoid Insert
+        (
+            const   tCIDLib::TCh* const     pszInsert
+            , const tCIDLib::TCard4         c4Ind
+        );
 
         tCIDLib::TVoid Insert
         (
@@ -1182,57 +1238,53 @@ class CIDLIBEXP TString :
             , const MFormattable&           fmtblToken4 = MFormattable::Nul_MFormattable()
         );
 
-        const tCIDLib::TCh* pszBuffer() const
-        {
-            return m_strbData.pszBuffer();
-        }
+        [[nodiscard]] const tCIDLib::TCh* pszBuffer() const;
 
-        const tCIDLib::TCh* pszBufferAt(const tCIDLib::TCard4 c4At) const
-        {
-            return m_strbData.pszBufferAt(c4At);
-        }
+        [[nodiscard]] const tCIDLib::TCh* pszBufferAt
+        (
+            const   tCIDLib::TCard4         c4At
+        )   const;
 
-        [[nodiscard]] tCIDLib::TCh* pszDupBuffer() const
-        {
-            return m_strbData.pszDupBuffer();
-        }
+        [[nodiscard]] tCIDLib::TCh* pszDupBuffer() const;
 
-        const tCIDLib::TCh* pszEnd() const
-        {
-            return m_strbData.pszBufferAt(m_strbData.c4Length());
-        }
+        const tCIDLib::TCh* pszEnd() const;
 
         tCIDLib::TVoid Prepend
         (
             const   tCIDLib::TCh            chToPrepend
         );
 
-        tCIDLib::TVoid Prepend(const TString& strPrepend)
-        {
-            m_strbData.Insert(strPrepend.m_strbData, 0);
-        }
+        tCIDLib::TVoid Prepend
+        (
+            const   TString&                strPrepend
+        );
 
-        tCIDLib::TVoid Prepend(const tCIDLib::TCh* const pszPrepend)
-        {
-            m_strbData.Insert(pszPrepend, 0);
-        }
+        tCIDLib::TVoid Prepend
+        (
+            const   tCIDLib::TCh* const     pszPrepend
+        );
 
-        tCIDLib::TVoid PutAt(const  tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh    chToPut)
-        {
-            m_strbData.PutAt(c4Index, chToPut);
-        }
+        tCIDLib::TVoid PutAt
+        (
+            const   tCIDLib::TCard4         c4Index
+            , const tCIDLib::TCh            chToPut
+        );
 
-        tCIDLib::TVoid
-        Reallocate( const   tCIDLib::TCard4     c4NewSize
-                    , const tCIDLib::TBoolean   bPreserveContent = kCIDLib::True)
-        {
-            m_strbData.Reallocate(c4NewSize, bPreserveContent);
-        }
+        tCIDLib::TVoid Reallocate
+        (
+            const   tCIDLib::TCard4         c4NewSize
+            , const tCIDLib::TBoolean       bPreserveContent = kCIDLib::True
+        );
 
+        //
+        //  The precision parameter is a dummy parameter that is not used. This
+        //  exists purely to deal with an otherwise really ugly issue with
+        //  the variadice Format() method.
+        //
         tCIDLib::TVoid SetFormatted
         (
             const   MFormattable&           fmtblSrc
+            , const tCIDLib::TCard4         c4Prec = 0
         );
 
         tCIDLib::TVoid SetFormatted
@@ -1319,26 +1371,33 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
         );
 
-        tCIDLib::TVoid SetLast(const tCIDLib::TCh chNew)
-        {
-            m_strbData.SetLast(chNew);
-        }
+        tCIDLib::TVoid SetFormatted
+        (
+            const   tCIDLib::TSInt          iToFmt
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
+            , const tCIDLib::TCh            chNegSign = kCIDLib::chHyphenMinus
+            , const tCIDLib::TCard4         c4GroupSize = 0
+            , const tCIDLib::TCh            chGroupSep = kCIDLib::chNull
+        );
 
-        tCIDLib::TVoid
-        Strip(  const   tCIDLib::TCh* const pszChars
-                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
-        {
-            m_strbData.Strip(pszChars, eStripMode, chRepChar);
-        }
+        tCIDLib::TVoid SetLast
+        (
+            const   tCIDLib::TCh            chNew
+        );
 
-        tCIDLib::TVoid
-        Strip(  const   TString&            strChars
-                , const tCIDLib::EStripModes eStripMode = tCIDLib::EStripModes::LeadTrail
-                , const tCIDLib::TCh        chRepChar = kCIDLib::chSpace)
-        {
-            m_strbData.Strip(strChars.m_strbData.pszBuffer(), eStripMode, chRepChar);
-        }
+        tCIDLib::TVoid Strip
+        (
+            const   tCIDLib::TCh* const     pszChars
+            , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
+            , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace
+        );
+
+        tCIDLib::TVoid Strip
+        (
+            const   TString&                strChars
+            , const tCIDLib::EStripModes    eStripMode = tCIDLib::EStripModes::LeadTrail
+            , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace
+        );
 
         tCIDLib::TVoid StripWhitespace
         (
@@ -1346,24 +1405,24 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace
         );
 
-        tCIDLib::TVoid ToLower( const   tCIDLib::TCard4 c4StartInd = 0
-                                , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.ToLower(c4StartInd, c4Len);
-        }
+        tCIDLib::TVoid ToLower
+        (
+            const   tCIDLib::TCard4         c4StartInd = 0
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
 
-        tCIDLib::TVoid ToUpper( const   tCIDLib::TCard4 c4StartInd = 0
-                                , const tCIDLib::TCard4 c4Len = kCIDLib::c4MaxCard)
-        {
-            m_strbData.ToUpper(c4StartInd, c4Len);
-        }
+        tCIDLib::TVoid ToUpper
+        (
+            const   tCIDLib::TCard4         c4StartInd = 0
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
+        );
 
-        tCIDLib::TVoid ToZStr(          tCIDLib::TCh* const pszTarget
-                                , const tCIDLib::TCard4     c4MaxChars
-                                , const tCIDLib::TCard4     c4StartInd = 0) const
-        {
-            m_strbData.ToZStr(pszTarget, c4MaxChars, c4StartInd, kCIDLib::True);
-        }
+        tCIDLib::TVoid ToZStr
+        (
+                    tCIDLib::TCh* const     pszTarget
+            , const tCIDLib::TCard4         c4MaxChars
+            , const tCIDLib::TCard4         c4StartInd = 0
+        )   const;
 
 
     protected :
@@ -1378,416 +1437,21 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
-                    TBinInStream&           strmToReadFrom
-        ) override;
+            CIOP    TBinInStream&           strmToReadFrom
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
-                    TBinOutStream&          strmToWriteTo
+            CIOP    TBinOutStream&          strmToWriteTo
         )   const override;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  CLASS: TStrBuf
-        // PREFIX: strb
-        // -------------------------------------------------------------------
-        class CIDLIBEXP TStrBuf
-        {
-            public :
-                // -----------------------------------------------------------
-                //  Constructors and Destructor
-                // -----------------------------------------------------------
-                TStrBuf();
-
-                TStrBuf
-                (
-                    const   tCIDLib::TCard4         c4BufSize
-                );
-
-                TStrBuf
-                (
-                    const   tCIDLib::TCh            chInit
-                );
-
-                TStrBuf
-                (
-                    const   tCIDLib::TCh* const     pszInit
-                    , const tCIDLib::TCard4         c4ExtraChars
-                );
-
-                TStrBuf
-                (
-                    const   TStrBuf&                strbInit
-                    , const tCIDLib::TCard4         c4ExtraChars
-                );
-
-                TStrBuf
-                (
-                            tCIDLib::TCh* const     pszToAdopt
-                    , const tCIDLib::EAdoptOpts     eAdopt
-                );
-
-                TStrBuf
-                (
-                    const   tCIDLib::TCh* const     pszInit1
-                    , const tCIDLib::TCh* const     pszInit2
-                );
-
-                TStrBuf
-                (
-                    const   TStrBuf&                strInit1
-                    , const TStrBuf&                strInit2
-                );
-
-                TStrBuf
-                (
-                    const   TStrBuf&                strInit1
-                    , const tCIDLib::TCh* const     pszInit2
-                );
-
-                TStrBuf
-                (
-                    const   tCIDLib::TCh* const     pszInit1
-                    , const TStrBuf&                strInit2
-                );
-
-                TStrBuf
-                (
-                    const   TStrCat&                scatSrc
-                );
-
-                TStrBuf
-                (
-                    const   TStrBuf&                strbSrc
-                );
-
-                TStrBuf
-                (
-                            TStrBuf&&               strbSrc
-                );
-
-                ~TStrBuf();
-
-
-                // -----------------------------------------------------------
-                //  Public operators
-                // -----------------------------------------------------------
-                TStrBuf& operator=
-                (
-                    const   TStrBuf&                strbSrc
-                );
-
-                TStrBuf& operator=
-                (
-                            TStrBuf&&               strbSrc
-                );
-
-
-                // -----------------------------------------------------------
-                //  Public, non-virtual methods
-                // -----------------------------------------------------------
-                tCIDLib::TVoid Append
-                (
-                    const   tCIDLib::TCh            chToAppend
-                    , const tCIDLib::TCard4         c4Count
-                );
-
-                tCIDLib::TVoid Append
-                (
-                    const   tCIDLib::TCh* const     pszToAppend
-                    , const tCIDLib::TCh* const     pszToAppend2
-                    , const tCIDLib::TCh* const     pszToAppend3
-                );
-
-                tCIDLib::TVoid Append
-                (
-                    const   TStrBuf&                strToAppend
-                );
-
-                tCIDLib::TVoid AppendSubStr
-                (
-                    const   TStrBuf&                strbCopyFrom
-                    , const tCIDLib::TCard4         c4Start
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TVoid AppendSubStr
-                (
-                    const   tCIDLib::TCh* const     pszCopyFrom
-                    , const tCIDLib::TCard4         c4Start
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TBoolean bCapAtChar
-                (
-                    const   tCIDLib::TCh            chAt
-                );
-
-                tCIDLib::TBoolean bCheckPrefix
-                (
-                    const   tCIDLib::TCh* const     pszToCheck
-                    , const tCIDLib::TBoolean       bCaseSensitive
-                )   const;
-
-                tCIDLib::TBoolean bCheckPrefix
-                (
-                    const   TStrBuf&                strbToCheck
-                    , const tCIDLib::TBoolean       bCaseSensitive
-                )   const;
-
-                tCIDLib::TBoolean bCheckSuffix
-                (
-                    const   tCIDLib::TCh* const     pszToCheck
-                    , const tCIDLib::TBoolean       bCaseSensitive
-                )   const;
-
-                tCIDLib::TBoolean bCheckSuffix
-                (
-                    const   TStrBuf&                strbToCheck
-                    , const tCIDLib::TBoolean       bCaseSensitive
-                )   const;
-
-                tCIDLib::TBoolean bIsAlpha() const;
-
-                tCIDLib::TBoolean bIsAlphaNum() const;
-
-                tCIDLib::TBoolean bEqual
-                (
-                    const   TStrBuf&                strbToComp
-                )   const;
-
-                tCIDLib::TBoolean bReplaceChar
-                (
-                    const   tCIDLib::TCh            chToReplace
-                    , const tCIDLib::TCh            chReplaceWith
-                );
-
-                tCIDLib::TCard4 c4BufChars() const
-                {
-                    return m_c4BufChars;
-                }
-
-                tCIDLib::TCard4 c4Length() const
-                {
-                    return m_c4CurEnd;
-                }
-
-                tCIDLib::TCh& chAt
-                (
-                    const   tCIDLib::TCard4         c4Index
-                );
-
-                //
-                //  The writable version of this is out of line and always checks the index,
-                //  but this one just returns a character, so it is inlined for speed and only
-                //  checks the index in debug mode. This is an extremely commonly method and
-                //  often in a loop over large strings, so the benefits are large to inline
-                //  it.
-                //
-                tCIDLib::TCh chAt(const tCIDLib::TCard4 c4Ind) const
-                {
-                    #if CID_DEBUG_ON
-                    TestIndex(c4Ind);
-                    #endif
-                    return m_pszBuffer[c4Ind];
-                }
-
-                tCIDLib::TCh chLast() const;
-
-                tCIDLib::TVoid CapAt
-                (
-                    const   tCIDLib::TCard4         c4Index
-                );
-
-                tCIDLib::TVoid Clear();
-
-                tCIDLib::TVoid CopyInSubStr
-                (
-                    const   TString&                strSource
-                    , const tCIDLib::TCard4         c4Start
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TVoid CopyOutSubStr
-                (
-                            TString&                strTarget
-                    , const tCIDLib::TCard4         c4Start
-                    , const tCIDLib::TCard4         c4Len
-                )   const;
-
-                tCIDLib::TVoid Cut
-                (
-                    const   tCIDLib::TCard4         c4Start
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TVoid CutUpTo
-                (
-                    const   tCIDLib::TCh            chFind
-                );
-
-                tCIDLib::TVoid DeleteLast();
-
-                tCIDLib::TVoid FormatToFld
-                (
-                    const   TStrBuf&                strbToFormat
-                    , const tCIDLib::TCard4         c4FldWidth
-                    , const tCIDLib::EHJustify      eJustify
-                    , const tCIDLib::TCh            chFill
-                    , const tCIDLib::TCard4         c4TrailingSp
-                );
-
-                tCIDLib::TVoid FromZStr
-                (
-                    const   tCIDLib::TCh* const     pszSource
-                    , const tCIDLib::TCard4         c4Count
-                );
-
-                tCIDLib::THashVal hshCalcHash
-                (
-                    const   tCIDLib::TCard4         c4Modulus
-                )   const;
-
-                tCIDLib::TVoid ImportChars
-                (
-                    const   tCIDLib::TCh* const     pszSource
-                    , const tCIDLib::TCard4         c4SrcCount
-                );
-
-                tCIDLib::TVoid Insert
-                (
-                    const   TStrBuf&                strbInsert
-                    , const tCIDLib::TCard4         c4Ind
-                );
-
-                tCIDLib::TVoid Insert
-                (
-                    const   tCIDLib::TCh* const     pszInsert
-                    , const tCIDLib::TCard4         c4Ind
-                );
-
-                const tCIDLib::TCh* pszBuffer() const;
-
-                const tCIDLib::TCh* pszBufferAt
-                (
-                    const   tCIDLib::TCard4         c4At
-                )   const;
-
-                tCIDLib::TCh* pszDupBuffer() const;
-
-                tCIDLib::TVoid PutAt
-                (
-                    const   tCIDLib::TCard4         c4Index
-                    , const tCIDLib::TCh            chToPut
-                );
-
-                tCIDLib::TVoid Reallocate
-                (
-                    const   tCIDLib::TCard4         c4NewSize
-                    , const tCIDLib::TBoolean       bPreserveContent
-                );
-
-                tCIDLib::TVoid Replace
-                (
-                    const   tCIDLib::TCard4         c4RepStart
-                    , const tCIDLib::TCard4         c4RepEnd
-                    , const tCIDLib::TCh* const     pszRepText
-                    , const tCIDLib::TCard4         c4RepLen
-                );
-
-                tCIDLib::TVoid Set
-                (
-                    const   tCIDLib::TCh* const     pszNewValue
-                );
-
-                tCIDLib::TVoid Set
-                (
-                    const   TStrBuf&                strbNewValue
-                );
-
-                tCIDLib::TVoid SetFromShort
-                (
-                    const   tCIDLib::TSCh* const    pszNewValue
-                );
-
-                tCIDLib::TVoid SetLast
-                (
-                    const   tCIDLib::TCh            chNew
-                );
-
-                tCIDLib::TVoid StreamFrom
-                (
-                            TBinInStream&           strmToReadFrom
-                );
-
-                tCIDLib::TVoid StreamTo
-                (
-                            TBinOutStream&          strmToWriteTo
-                )   const;
-
-                tCIDLib::TVoid Strip
-                (
-                    const   tCIDLib::TCh* const     pszStripChars
-                    , const tCIDLib::EStripModes    eStripMode
-                    , const tCIDLib::TCh            chRepChar = kCIDLib::chSpace
-                );
-
-                tCIDLib::TVoid TestIndex
-                (
-                    const   tCIDLib::TCard4         c4ToTest
-                )   const;
-
-                tCIDLib::TVoid ToLower
-                (
-                    const   tCIDLib::TCard4         c4StartInd
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TVoid ToUpper
-                (
-                    const   tCIDLib::TCard4         c4StartInd
-                    , const tCIDLib::TCard4         c4Len
-                );
-
-                tCIDLib::TVoid ToZStr
-                (
-                            tCIDLib::TCh* const     pszTarget
-                    , const tCIDLib::TCard4         c4MaxChars
-                    , const tCIDLib::TCard4         c4StartInd
-                    , const tCIDLib::TBoolean       bAddNull
-                )   const;
-
-
-            private :
-                // -----------------------------------------------------------
-                //  Private data members.
-                //
-                //  m_c4CurEnd
-                //      This is the index of the null terminator, i.e. this is
-                //      where you'd end up appending (and its the number of
-                //      chars actually in the buffer now.)
-                //
-                //  m_c4BufChars
-                //      This is the current size of the buffer, minus one.
-                //      I.e. the buffer is one bigger than this (so that there
-                //      is room for the null terminator even if there are this
-                //      many chars in it.) It will grow as required.
-                //
-                //  m_pszBuffer
-                //      This is the buffer for this string.
-                // -----------------------------------------------------------
-                tCIDLib::TCard4 m_c4CurEnd;
-                tCIDLib::TCard4 m_c4BufChars;
-                tCIDLib::TCh*   m_pszBuffer;
-        };
-
-
         // -------------------------------------------------------------------
         //  Private, static methods
         // -------------------------------------------------------------------
@@ -1798,16 +1462,197 @@ class CIDLIBEXP TString :
 
 
         // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_strbData
-        //      This is the string buffer object that holds the actual string
-        //      data. We do all our work via it, in order to remain very
-        //      flexible in how it is actually managed. We might at some point
-        //      decide to reference count these, and do a copy on write type
-        //      of deal.
+        //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        TStrBuf m_strbData;
+        [[nodiscard]] tCIDLib::TBoolean bCheckPrefix
+        (
+            const   tCIDLib::TCh* const     pszToCheck
+            , const tCIDLib::TBoolean       bCaseSensitive
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bCheckPrefix
+        (
+            const   TString&                strToCheck
+            , const tCIDLib::TBoolean       bCaseSensitive
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bCheckSuffix
+        (
+            const   tCIDLib::TCh* const     pszToCheck
+            , const tCIDLib::TBoolean       bCaseSensitive
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bCheckSuffix
+        (
+            const   TString&                strToCheck
+            , const tCIDLib::TBoolean       bCaseSensitive
+        )   const;
+
+        [[nodiscard]] tCIDLib::TCard4 c4CalcBufDiff
+        (
+            const   tCIDLib::TCh* const     pszUpper
+            , const tCIDLib::TCh* const     pszLower
+        )   const;
+
+        [[nodiscard]] tCIDLib::TCard4 c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const
+        {
+            return c4CalcBufDiff(pszUpper, m_pszBuffer);
+        }
+
+        //
+        //  Helpers for Format() which needs to process a list of variadic
+        //  parameters.
+        //
+        template <typename TOne, typename... TOthers>
+        const tCIDLib::TCh* pszFmtHelper(const  tCIDLib::TCh* const pszFmt
+                                        ,       TString&            strTmp
+                                        ,       TString&            strTmp2
+                                        , const TOne                tOne
+                                        , const TOthers...          tOthers)
+        {
+            tCIDLib::TCh chFill = kCIDLib::chNull;
+            tCIDLib::TCh chToken = kCIDLib::chNull;
+            tCIDLib::TCard4 c4Width = 0;
+            tCIDLib::TCard4 c4Precision = 0;
+            tCIDLib::EHJustify eJustify = tCIDLib::EHJustify::Count;
+
+            //
+            //  We have to loop until we get a token, since we could have text bits
+            //  which we just copy straight out as text.
+            //
+            const tCIDLib::TCh* pszStart = pszFmt;
+            const tCIDLib::TCh* pszEnd = nullptr;
+            while (kCIDLib::True)
+            {
+                const TString::ETokenFind eFindRes = TString::eFindToken
+                (
+                    pszStart, chToken, eJustify, c4Width, chFill, c4Precision, pszEnd
+                );
+
+                // If it fails, then give up and stop recursing
+                if ((eFindRes == TString::ETokenFind::BadFormat)
+                ||  (eFindRes == TString::ETokenFind::End))
+                {
+                    return nullptr;
+                }
+                 else if (eFindRes == TString::ETokenFind::Token)
+                {
+                    //
+                    //  If no width, then just append it formatted, else we need
+                    //  to use a temp string and formatted into a field, then append
+                    //  that.
+                    //
+                    if (tCIDLib::IsTFloatX<TOne>::bState)
+                    {
+                        if (c4Width)
+                        {
+                            strTmp.SetFormatted(tOne, c4Precision);
+                            strTmp2.FormatToFld(strTmp, c4Width, eJustify, chFill);
+                            Append(strTmp2);
+                        }
+                         else
+                        {
+                            AppendFormatted(tOne, c4Precision);
+                        }
+                    }
+                     else
+                    {
+                        if (c4Width)
+                        {
+                            strTmp.SetFormatted(tOne);
+                            strTmp2.FormatToFld(strTmp, c4Width, eJustify, chFill);
+                            Append(strTmp2);
+                        }
+                         else
+                        {
+                            AppendFormatted(tOne);
+                        }
+                    }
+
+                    // Now we need to recurse to move to the next parameter
+                    pszEnd = pszFmtHelper(pszEnd, strTmp, strTmp2, tOthers...);
+                }
+                 else if (eFindRes == TString::ETokenFind::TextRun)
+                {
+                    // It's a text run, so just copy those as is
+                    AppendSubStr(pszStart, 0, pszEnd - pszStart);
+                }
+
+                // Move forward
+                pszStart = pszEnd;
+            }
+            return pszEnd;
+        }
+
+        [[nodiscard]] tCIDLib::TCh* pszBufferW();
+
+        [[nodiscard]] tCIDLib::TCh* pszBufferWAt
+        (
+            const   tCIDLib::TCard4         c4At
+        );
+
+        [[nodiscard]] const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt, TString&, TString&)
+        {
+            return pszFmt;
+        }
+
+        tCIDLib::TVoid Replace
+        (
+            const   tCIDLib::TCard4         c4RepStart
+            , const tCIDLib::TCard4         c4RepEnd
+            , const tCIDLib::TCh* const     pszRepText
+            , const tCIDLib::TCard4         c4RepLen
+        );
+
+        tCIDLib::TVoid Set
+        (
+            const   tCIDLib::TCh* const     pszSrc
+            , const tCIDLib::TCard4         c4Extra = 0
+        );
+
+        tCIDLib::TVoid SetFromShort
+        (
+            const   tCIDLib::TSCh* const    pszSrc
+        );
+
+        tCIDLib::TVoid Set
+        (
+            const   TString&                strSrc
+            , const tCIDLib::TCard4         c4Extra = 0
+        );
+
+        tCIDLib::TVoid ToZStr
+        (
+                    tCIDLib::TCh* const     pszTarget
+            , const tCIDLib::TCard4         c4MaxChars
+            , const tCIDLib::TCard4         c4StartInd
+            , const tCIDLib::TBoolean       bAddNull
+        )   const;
+
+
+        // -------------------------------------------------------------------
+        //  Private data members.
+        //
+        //  It's all mutable because we need to be super-efficient wrt to move
+        //  semantics for strings. We want to move a null into the source, but be
+        //  able to fault the buffer back in if need be.
+        //
+        //  m_c4BufChars
+        //      This is the current size of the buffer, minus one. I.e. the buffer is
+        //      one bigger than this (so that there is room for the null terminator
+        //      even if there are this many chars in it.) It will grow as required.
+        //
+        //  m_c4CurEnd
+        //      This is the index of the null terminator, i.e. this is where you'd
+        //      end up appending (and its the number of chars actually in the buffer
+        //      now.)
+        //
+        //  m_pszBuffer
+        //      This is the buffer for this string.
+        // -------------------------------------------------------------------
+        mutable tCIDLib::TCard4 m_c4BufChars;
+        mutable tCIDLib::TCard4 m_c4CurEnd;
+        mutable tCIDLib::TCh*   m_pszBuffer;
 
 
         // -------------------------------------------------------------------
@@ -1830,6 +1675,5 @@ inline TString operator+(const TString& str1, const TString& str2)
 {
     TString strRet(str1, str2.c4Length());
     strRet.Append(str2);
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
-

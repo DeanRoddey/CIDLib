@@ -404,10 +404,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 THeapBuf mbufDump;
                 orbcLogger->DebugDump(c4Bytes, mbufDump);
 
-                // Create a text input stream over the buffer
+                // Give the buffer contents to a text input straem
                 TTextMBufInStream strmSrc
                 (
-                    &mbufDump, c4Bytes, tCIDLib::EAdoptOpts::NoAdopt, new TUTF8Converter
+                    tCIDLib::ForceMove(mbufDump), c4Bytes, new TUTF8Converter
                 );
 
                 // For each line, pull it in and write it out

@@ -224,11 +224,8 @@ tCIDLib::TVoid TCIDCfgServerImpl::Initialize()
 
     catch(TError& errToCatch)
     {
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        TModule::LogEventObj(errToCatch);
 
         facCIDCfgSrv.ThrowErr
         (

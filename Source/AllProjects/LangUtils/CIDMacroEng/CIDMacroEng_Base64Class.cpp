@@ -45,12 +45,14 @@ RTTIDecls(TMEngBase64Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_Base64
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strB64Name(L"Base64");
-    const TString   strB64ClassPath(L"MEng.System.Runtime.Base64");
-
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strB64Name(L"Base64");
+        const TString   strB64ClassPath(L"MEng.System.Runtime.Base64");
+    }
 }
 
 
@@ -134,12 +136,12 @@ TMEngBase64Info::TMEngBase64Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_DecodeToBuf(kMacroEng::c2BadId)
-    , m_c2MethId_EncodeBuf(kMacroEng::c2BadId)
-    , m_c2MethId_EncodeStr(kMacroEng::c2BadId)
-    , m_c2MethId_SetLineWidth(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DecodeToBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EncodeBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EncodeStr(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetLineWidth(kCIDMacroEng::c2BadId)
     , m_c4Err_Decode(kCIDLib::c4MaxCard)
     , m_c4Err_Encode(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)

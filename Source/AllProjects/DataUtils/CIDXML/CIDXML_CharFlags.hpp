@@ -51,46 +51,68 @@ class CIDXMLEXP TXMLCharFlags
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bIsFirstNameChar
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+        static constexpr tCIDLib::TBoolean bIsFirstNameChar(const tCIDLib::TCh chToCheck)
+        {
+            constexpr tCIDLib::TCard1 c1NameMask = kCIDXML::c1BaseChar
+                                                 | kCIDXML::c1LetterChar;
 
-        static tCIDLib::TBoolean bIsMarkupTestChar
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+            // Do the obvious check first and return success if ok
+            if ((s_ac1CharFlags[chToCheck] & c1NameMask) != 0)
+                return kCIDLib::True;
 
-        static tCIDLib::TBoolean bIsNameChar
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+            // Check the two special case chars
+            return ((chToCheck == kCIDLib::chUnderscore) || (chToCheck == kCIDLib::chColon));
+        }
+
+        static constexpr tCIDLib::TBoolean bIsMarkupTestChar(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1MarkupTestChar) != 0;
+        }
+
+        static constexpr  tCIDLib::TBoolean bIsNameChar(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1NameChar) != 0;
+        }
 
         static tCIDLib::TBoolean bIsPublicIDChar
         (
             const   tCIDLib::TCh            chToCheck
         );
 
-        static tCIDLib::TBoolean bIsSpace
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+        static constexpr tCIDLib::TBoolean bIsSpace(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1WhitespaceChar) != 0;
+        }
 
-        static tCIDLib::TBoolean bIsSpecialCharData
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+        static constexpr tCIDLib::TBoolean bIsSpecialCharData(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1SpecialCharData) != 0;
+        }
 
-        static tCIDLib::TBoolean bIsStartTagChar
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+        static constexpr  tCIDLib::TBoolean bIsStartTagChar(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1StartTagChar) != 0;
+        }
 
-        static tCIDLib::TBoolean bIsXMLChar
-        (
-            const   tCIDLib::TCh            chToCheck
-        );
+        static constexpr tCIDLib::TBoolean bIsXMLChar(const tCIDLib::TCh chToCheck)
+        {
+            return (s_ac1CharFlags[chToCheck] & kCIDXML::c1XMLChar) != 0;
+        }
 
+
+        // -------------------------------------------------------------------
+        //  Constructors and destructors
+        // -------------------------------------------------------------------
+        TXMLCharFlags() = default;
+        TXMLCharFlags(const TXMLCharFlags&) = delete;
+        TXMLCharFlags(TXMLCharFlags&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLCharFlags& operator=(const TXMLCharFlags&) = delete;
+        TXMLCharFlags& operator=(TXMLCharFlags&&) = delete;
 
 
     private :
@@ -98,73 +120,11 @@ class CIDXMLEXP TXMLCharFlags
         //  Static data members
         //
         //  s_ac1CharFlags
-        //      This is the character flags array. Its contents are hard
-        //      coded into the Cpp flag in the declaration. But it has to
-        //      be visible here by name in order to allow for inline access
-        //      below. These methods are called A LOT so inlining is very
-        //      important.
+        //      This is the character flags array. Its contents are hard coded into the Cpp file
+        //       in the declaration. But it has to be visible here by name in order to allow for
+        //      inline access below. These methods are called A LOT so inlining is very important.
         // -------------------------------------------------------------------
         static const tCIDLib::TCard1    s_ac1CharFlags[0x10000];
-
-
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCharFlags();
-        TXMLCharFlags(const TXMLCharFlags&);
-        tCIDLib::TVoid operator=(const TXMLCharFlags&);
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCharFlags: Public static methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean
-TXMLCharFlags::bIsFirstNameChar(const tCIDLib::TCh chToCheck)
-{
-    static const tCIDLib::TCard1 c1NameMask = kCIDXML::c1BaseChar
-                                              | kCIDXML::c1LetterChar;
-
-    // Do the obvious check first and return success if ok
-    if ((s_ac1CharFlags[chToCheck] & c1NameMask) != 0)
-        return kCIDLib::True;
-
-    // Check the two special case chars
-    return ((chToCheck == kCIDLib::chUnderscore) || (chToCheck == kCIDLib::chColon));
-}
-
-inline tCIDLib::TBoolean
-TXMLCharFlags::bIsMarkupTestChar(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1MarkupTestChar) != 0;
-}
-
-inline tCIDLib::TBoolean TXMLCharFlags::bIsNameChar(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1NameChar) != 0;
-}
-
-inline tCIDLib::TBoolean TXMLCharFlags::bIsSpace(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1WhitespaceChar) != 0;
-}
-
-inline tCIDLib::TBoolean
-TXMLCharFlags::bIsSpecialCharData(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1SpecialCharData) != 0;
-}
-
-inline tCIDLib::TBoolean
-TXMLCharFlags::bIsStartTagChar(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1StartTagChar) != 0;
-}
-
-inline tCIDLib::TBoolean TXMLCharFlags::bIsXMLChar(const tCIDLib::TCh chToCheck)
-{
-    return (s_ac1CharFlags[chToCheck] & kCIDXML::c1XMLChar) != 0;
-}
-

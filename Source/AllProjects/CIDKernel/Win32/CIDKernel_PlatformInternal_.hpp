@@ -39,8 +39,14 @@
 #define _WINSOCKAPI_
 #endif
 
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <windows.h>
 #include    <winsock2.h>
+#include    <ws2tcpip.h>
+#pragma     warning(pop)
+
 
 // ---------------------------------------------------------------------------
 //  Define the contents of our 'handle' types. There are small structures
@@ -142,13 +148,26 @@ struct  TMutexHandleImpl
 
 //
 //  A process under Win32 is represented by a process handle and a
-//  process id. By putting them together in a single blob, we abstract
-//  whether the platform has one or both of these.
+//  process id.
 //
 struct  TProcessHandleImpl
 {
     HANDLE          hProcess;
     tCIDLib::TCard4 pidThis;
+
+    TProcessHandleImpl() :
+
+        hProcess(0)
+        , pidThis(0)
+    {
+    }
+
+    TProcessHandleImpl(HANDLE hProc, const tCIDLib::TCard4 pidProc) :
+
+        hProcess(hProc)
+        , pidThis(pidProc)
+    {
+    }
 };
 
 

@@ -75,6 +75,7 @@ class CIDLIBEXP TMemStreamImplInfo
         );
 
         TMemStreamImplInfo(const TMemStreamImplInfo&) = delete;
+        TMemStreamImplInfo(TMemStreamImplInfo&&) = delete;
 
         ~TMemStreamImplInfo();
 
@@ -83,6 +84,7 @@ class CIDLIBEXP TMemStreamImplInfo
         //  Public operators
         // -------------------------------------------------------------------
         TMemStreamImplInfo& operator=(const TMemStreamImplInfo&) = delete;
+        TMemStreamImplInfo& operator=(TMemStreamImplInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -133,10 +135,17 @@ class CIDLIBEXP TMemInStreamImpl : public TInStreamImpl
 
         TMemInStreamImpl
         (
+                    THeapBuf&&              mbufToStream
+            , const tCIDLib::TCard4         c4InitLogicalEnd = 0
+        );
+
+        TMemInStreamImpl
+        (
             const   TMemOutStreamImpl&      strmiToSyncTo
         );
 
         TMemInStreamImpl(const TMemInStreamImpl&) = delete;
+        TMemInStreamImpl(TMemInStreamImpl&&) = delete;
 
         ~TMemInStreamImpl();
 
@@ -145,6 +154,7 @@ class CIDLIBEXP TMemInStreamImpl : public TInStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TMemInStreamImpl& operator=(const TMemInStreamImpl&) = delete;
+        TMemInStreamImpl& operator=(TMemInStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -238,9 +248,7 @@ class CIDLIBEXP TMemOutStreamImpl : public TOutStreamImpl
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TMemOutStreamImpl() = delete
-        ;
-        TMemOutStreamImpl(const TMemOutStreamImpl&) = delete;
+        TMemOutStreamImpl() = delete;
 
         TMemOutStreamImpl
         (
@@ -249,6 +257,9 @@ class CIDLIBEXP TMemOutStreamImpl : public TOutStreamImpl
             , const tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::NoAdopt
         );
 
+        TMemOutStreamImpl(const TMemOutStreamImpl&) = delete;
+        TMemOutStreamImpl(TMemOutStreamImpl&&) = delete;
+
         ~TMemOutStreamImpl();
 
 
@@ -256,6 +267,7 @@ class CIDLIBEXP TMemOutStreamImpl : public TOutStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TMemOutStreamImpl& operator=(const TMemOutStreamImpl&) = delete;
+        TMemOutStreamImpl& operator=(TMemOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------

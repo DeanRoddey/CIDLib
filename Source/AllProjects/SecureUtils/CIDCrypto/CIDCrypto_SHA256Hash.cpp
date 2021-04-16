@@ -64,13 +64,6 @@ TSHA256Hash::TSHA256Hash(const TMemBuf& mbufBytes) :
 {
 }
 
-TSHA256Hash::TSHA256Hash(TSHA256Hash&& mhashSrc) :
-
-    TSHA256Hash()
-{
-    *this = tCIDLib::ForceMove(mhashSrc);
-}
-
 TSHA256Hash::~TSHA256Hash()
 {
 }
@@ -79,14 +72,6 @@ TSHA256Hash::~TSHA256Hash()
 // ---------------------------------------------------------------------------
 //  TSHA256Hash: Public operators
 // ---------------------------------------------------------------------------
-
-TSHA256Hash& TSHA256Hash::operator=(TSHA256Hash&& mhashSrc)
-{
-    if (this != &mhashSrc)
-        TParent::operator=(tCIDLib::ForceMove(mhashSrc));
-    return *this;
-}
-
 
 tCIDLib::TBoolean TSHA256Hash::operator==(const TSHA256Hash& mhashSrc) const
 {
@@ -155,9 +140,9 @@ tCIDLib::TVoid TSHA256Hash::ParseFormatted(const TString& strFormatted)
     );
 
     // Get the raw buffer to work with
-    tCIDLib::TCard1* pc1This = pc1Writeable();
+    tCIDLib::TCard1* pc1This = pc1HashW();
 
-    tCIDLib::TCard1 c1Cur;
+    tCIDLib::TCard1 c1Cur = 0;
     tCIDLib::TCard4 c4SrcInd = 0;
     tCIDLib::TCard4 c4OutInd = 0;
     while (c4SrcInd < kCIDCrypto::c4SHA256HashBytes * 2)

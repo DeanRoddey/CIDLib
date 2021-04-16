@@ -35,22 +35,7 @@ namespace TUniqueId
 {
     CIDCRYPTEXP TMD5Hash mhashMakeId();
 
-    CIDCRYPTEXP tCIDLib::TVoid MakeId
-    (
-                TString&                strToFill
-    );
-
-    CIDCRYPTEXP tCIDLib::TVoid MakeId
-    (
-                TMD5Hash&               mhashToFill
-    );
-
-    CIDCRYPTEXP tCIDLib::TVoid MakeSystemId
-    (
-                TMD5Hash&               mhashToFill
-    );
+    CIDCRYPTEXP TMD5Hash mhashMakeSystemId();
 
     CIDCRYPTEXP TString strMakeId();
 }
-
-

@@ -66,6 +66,20 @@ tCIDLib::TBoolean THelpNode::bIsEmpty() const
 }
 
 
+// We output a magic indenting wrapper node, then call the recursive private method
+tCIDLib::TVoid
+THelpNode::OutputHelpText(          TTextOutStream&     strmTar
+                            , const tCIDLib::TBoolean   bIndented) const
+{
+    if (bIndented)
+        strmTar << L"<div class=\"HelpTextCont\">";
+    OutputNodes(strmTar);
+    if (bIndented)
+        strmTar << L"</div>";
+}
+
+
+
 //
 //  Parse our content out from source XML. We have one that takes the XML element
 //  itself and another that takes a parent node and the name of the XML element
@@ -190,7 +204,7 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
                 //  So we actually need to get the type here ourself, so that we know whether
                 //  the id is needed or not.
                 //
-                hnNew.m_strType = xtnodeElem.xtattrNamed(L"Type").strValue();
+                hnNew.m_strType = xtnodeElem.strAttr(L"Type");
                 if (hnNew.m_strType == L"Page")
                     bGetID = kCIDLib::True;
                 bGetRef = kCIDLib::True;
@@ -249,13 +263,13 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
 
             // If indicated, get some well known attributes
             if (bGetID)
-                hnNew.m_strID = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Id).strValue();
+                hnNew.m_strID = xtnodeElem.strAttr(kCIDDocComp::strXML_Id);
 
             if (bGetRef)
-                hnNew.m_strRef = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Ref).strValue();
+                hnNew.m_strRef = xtnodeElem.strAttr(kCIDDocComp::strXML_Ref);
 
             if (bGetType)
-                hnNew.m_strType = xtnodeElem.xtattrNamed(kCIDDocComp::strXML_Type).strValue();
+                hnNew.m_strType = xtnodeElem.strAttr(kCIDDocComp::strXML_Type);
 
             // If the current node has children, then recurse
             if (bGetChildren && xtnodeElem.c4ChildCount())
@@ -266,6 +280,71 @@ THelpNode::Parse(const TXMLTreeElement& xtnodeText)
 
 
 
+// Just add create a single text node
+tCIDLib::TVoid THelpNode::SetToText(const  tCIDLib::TCh* const     pszToSet)
+{
+    m_colNodes.RemoveAll();
+    THelpNode& hnNew = m_colNodes.objAdd(THelpNode());
+    hnNew.m_eType = tCIDDocComp::EMUTypes::Text;
+    hnNew.m_strText = pszToSet;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  THelpNode: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+
+//
+//  Called from then general node processor above to handle a table, since it includes
+//  a fair bit of stuff. We allow markup inside row columns, so we recurse to get the
+//  column content.
+//
+tCIDLib::TVoid THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow)
+{
+    const tCIDLib::TCard4 c4Count = xtnodeRow.c4ChildCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TXMLTreeElement& xtnodeCol = xtnodeRow.xtnodeChildAtAsElement(c4Index);
+
+        // Add a new node to fill in and set its type to table column
+        THelpNode& hnCol = m_colNodes.objAdd(THelpNode());
+        hnCol.m_eType = tCIDDocComp::EMUTypes::TableCol;
+
+        // Store the column span
+        hnCol.m_c4Extra = xtnodeCol.xtattrNamed(kCIDDocComp::strXML_ColSpan).c4ValueAs();
+
+        // And recurse to get that content
+        hnCol.Parse(xtnodeCol);
+    }
+}
+
+
+tCIDLib::TVoid THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl)
+{
+    // Get the class if it is present, and store it as the type of the table node
+    xtnodeTbl.bAttrExists(L"Class", m_strType);
+
+    // Now we process any defined row nodes
+    const tCIDLib::TCard4 c4Count = xtnodeTbl.c4ChildCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TXMLTreeElement& xtnodeRow = xtnodeTbl.xtnodeChildAtAsElement(c4Index);
+
+        // Add a new node to fill in and set its type to table row
+        THelpNode& hnRow = m_colNodes.objAdd(THelpNode());
+        hnRow.m_eType = tCIDDocComp::EMUTypes::TableRow;
+
+        // And now lt's process the columns of this row
+        hnRow.ProcessTableRow(xtnodeRow);
+    }
+}
+
+
+//
+//  The public OutputHelpText() method puts out a top level indenting wrapper div
+//  then calls this to recursively output the help nodes.
+//
 tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
 {
     const tCIDLib::TCard4 c4Count = m_colNodes.c4ElemCount();
@@ -505,67 +584,6 @@ tCIDLib::TVoid THelpNode::OutputNodes(TTextOutStream& strmTar) const
                         << L"        Unknown help text node type" << kCIDLib::EndLn;
                 break;
         };
-    }
-}
-
-
-// Just add create a single text node
-tCIDLib::TVoid THelpNode::SetToText(const tCIDLib::TCh* const pszToSet)
-{
-    m_colNodes.RemoveAll();
-    THelpNode& hnNew = m_colNodes.objAdd(THelpNode());
-    hnNew.m_eType = tCIDDocComp::EMUTypes::Text;
-    hnNew.m_strText = pszToSet;
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  THelpNode: Private, non-virtual methods
-// ---------------------------------------------------------------------------
-
-//
-//  Called from then general node processor above to handle a table, since it includes
-//  a fair bit of stuff. We allow markup inside row columns, so we recurse to get the
-//  column content.
-//
-tCIDLib::TVoid THelpNode::ProcessTableRow(const TXMLTreeElement& xtnodeRow)
-{
-    const tCIDLib::TCard4 c4Count = xtnodeRow.c4ChildCount();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-    {
-        const TXMLTreeElement& xtnodeCol = xtnodeRow.xtnodeChildAtAsElement(c4Index);
-
-        // Add a new node to fill in and set its type to table column
-        THelpNode& hnCol = m_colNodes.objAdd(THelpNode());
-        hnCol.m_eType = tCIDDocComp::EMUTypes::TableCol;
-
-        // Store the column span
-        hnCol.m_c4Extra = xtnodeCol.xtattrNamed(kCIDDocComp::strXML_ColSpan).c4ValueAs();
-
-        // And recurse to get that content
-        hnCol.Parse(xtnodeCol);
-    }
-}
-
-
-tCIDLib::TVoid THelpNode::ProcessTable(const TXMLTreeElement& xtnodeTbl)
-{
-    // Get the class if it is present, and store it as the type of the table node
-    xtnodeTbl.bAttrExists(L"Class", m_strType);
-
-    // Now we process any defined row nodes
-    const tCIDLib::TCard4 c4Count = xtnodeTbl.c4ChildCount();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-    {
-        const TXMLTreeElement& xtnodeRow = xtnodeTbl.xtnodeChildAtAsElement(c4Index);
-
-        // Add a new node to fill in and set its type to table row
-        THelpNode& hnRow = m_colNodes.objAdd(THelpNode());
-        hnRow.m_eType = tCIDDocComp::EMUTypes::TableRow;
-
-        // And now lt's process the columns of this row
-        hnRow.ProcessTableRow(xtnodeRow);
     }
 }
 

@@ -63,6 +63,11 @@ class KRNLEXPORT TKrnlKVPair
             const   TKrnlKVPair&            kkvpSrc
         );
 
+        TKrnlKVPair
+        (
+                    TKrnlKVPair&&            kkvpSrc
+        );
+
         ~TKrnlKVPair();
 
 
@@ -72,6 +77,11 @@ class KRNLEXPORT TKrnlKVPair
         TKrnlKVPair& operator=
         (
             const   TKrnlKVPair&            kkvpSrc
+        );
+
+        TKrnlKVPair& operator=
+        (
+                    TKrnlKVPair&&           kkvpSrc
         );
 
 

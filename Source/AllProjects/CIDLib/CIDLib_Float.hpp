@@ -92,6 +92,7 @@ class CIDLIBEXP TFloat :
         );
 
         TFloat(const TFloat&) = default;
+        TFloat(TFloat&&) = default;
 
         ~TFloat() = default;
 
@@ -100,6 +101,7 @@ class CIDLIBEXP TFloat :
         //  Public operators
         // -------------------------------------------------------------------
         TFloat& operator=(const TFloat&) = default;
+        TFloat& operator=(TFloat&&) = default;
 
         constexpr operator tCIDLib::TFloat8() const
         {
@@ -289,10 +291,8 @@ class CIDLIBEXP TLocFloat : public TFloat
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
         );
 
-        TLocFloat
-        (
-            const   TLocFloat&              fToCopy
-        );
+        TLocFloat(const TLocFloat&) = default;
+        TLocFloat(TLocFloat&&) = default;
 
         ~TLocFloat();
 
@@ -300,10 +300,8 @@ class CIDLIBEXP TLocFloat : public TFloat
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLocFloat& operator=
-        (
-            const   TLocFloat&              fToAssign
-        );
+        TLocFloat& operator=(const TLocFloat&) = default;
+        TLocFloat& operator=(TLocFloat&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -343,7 +341,7 @@ class CIDLIBEXP TLocFloat : public TFloat
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
     private :

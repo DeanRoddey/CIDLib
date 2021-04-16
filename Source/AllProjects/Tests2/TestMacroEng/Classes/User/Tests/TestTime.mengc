@@ -23,6 +23,7 @@ Members=
     Card4               m_Minute;
     Card4               m_Second;
     TimeCompList        m_ParsePattern;
+    String              m_FmtStr;
 EndMembers;
 
 
@@ -145,6 +146,14 @@ Methods=[Public,Final]
         m_TimeInfo2.SetDateTime(2018, Months.October, 3, 22, 55, 0);
         If (m_TimeInfo.GetCurStamp() != m_TimeInfo2.GetCurStamp())
             m_Helper.PrintErr("Pattern based parse of ISO8601 failed", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndIf;
+
+
+        m_TimeInfo2.SetDateTime(1996, Months.February, 04, 22, 55, 10);
+        m_TimeInfo2.FormatToStr(m_FmtStr, "%(a), %(m) %(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0) %(Y,4,0)");
+        If (m_FmtStr != "Sun, Feb 04 22:55:10 1996")
+            m_Helper.PrintErr("FormatToStr failed", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;
 

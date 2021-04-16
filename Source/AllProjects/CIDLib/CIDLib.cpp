@@ -72,6 +72,7 @@ template class CIDLIBEXP TFundVector<tCIDLib::TFloat4>;
 template class CIDLIBEXP TFundVector<tCIDLib::TFloat8>;
 
 template class CIDLIBEXP TFundStack<tCIDLib::TBoolean>;
+template class CIDLIBEXP TFundStack<tCIDLib::TCard1>;
 template class CIDLIBEXP TFundStack<tCIDLib::TCard4>;
 
 template class CIDLIBEXP TObjArray<TString>;
@@ -108,19 +109,19 @@ template class CIDLIBEXP TRefVector<TThread>;
 namespace tCIDLib
 {
     //
-    //  For the TEArray template class, to keep this out of line. We do this very
-    //  primitively, creating the event ourself and throwing it directly, to avoid
-    //  possible issues, since these simple arrays might be used in some lower
-    //  level code.
+    //  For the TEArray template class and some raw array indexing templates, to
+    //  keep this out of line. We do this very primitively, creating the event
+    //  ourself and throwing it directly, to avoid possible issues, since these
+    //  simple and raw arrays might be used in some lower level code.
     //
-    tCIDLib::TVoid ThrowEArrayIndexErr( const   tCIDLib::TCard4     c4At
+    tCIDLib::TVoid ThrowArrayIndexErr( const   tCIDLib::TCard4     c4At
                                         , const tCIDLib::TCard4     c4Size)
     {
         TString strMsg(L"Bad index (", 32UL);
         strMsg.AppendFormatted(c4At);
-        strMsg.Append(L") used for TEArray, size is ");
+        strMsg.Append(L") used for array, size is ");
         strMsg.AppendFormatted(c4Size);
-        TLogEvent errToThrow
+        throw TLogEvent
         (
             L"CIDLib"
             , L"CIDLib.cpp"
@@ -129,8 +130,15 @@ namespace tCIDLib
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Index
         );
-        throw errToThrow;
     }
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  tCIDLib::TCh* const pszErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line)
+{
+    ThrowAssert(TString(pszErr), pszFile, c4Line);
 }
 
 tCIDLib::TVoid
@@ -148,6 +156,15 @@ tCIDLib::ThrowAssert(const  TString&            strErr
         , tCIDLib::ESeverities::Failed
         , tCIDLib::EErrClasses::Assert
     );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowAssert(const  tCIDLib::TCh* const pszErr
+                    , const tCIDLib::TCh* const pszFile
+                    , const tCIDLib::TCard4     c4Line
+                    , const MFormattable&       mfbtlToken1)
+{
+    ThrowAssert(TString(pszErr), pszFile, c4Line, mfbtlToken1);
 }
 
 tCIDLib::TVoid
@@ -171,6 +188,58 @@ tCIDLib::ThrowAssert(const  TString&            strErr
 }
 
 
+tCIDLib::TVoid
+tCIDLib::ThrowPreCond(  const   tCIDLib::TCh* const pszCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    ThrowPreCond(TString(pszCond), pszFile, c4Line);
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowPreCond(  const   TString&            strCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , pszFile
+        , c4Line
+        , kCIDErrs::errcDbg_PreCondFailed
+        , facCIDLib().strMsg(kCIDErrs::errcDbg_PreCondFailed)
+        , strCond
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowPostCond( const   tCIDLib::TCh* const pszCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    ThrowPostCond(TString(pszCond), pszFile, c4Line);
+}
+
+tCIDLib::TVoid
+tCIDLib::ThrowPostCond( const   TString&            strCond
+                        , const tCIDLib::TCh* const pszFile
+                        , const tCIDLib::TCard4     c4Line)
+{
+    throw TLogEvent
+    (
+        L"CIDLib"
+        , pszFile
+        , c4Line
+        , kCIDErrs::errcDbg_PostCondFailed
+        , facCIDLib().strMsg(kCIDErrs::errcDbg_PreCondFailed)
+        , strCond
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Assert
+    );
+}
+
 
 // ---------------------------------------------------------------------------
 //  If debugging, then force instantiations of some template classes that are not
@@ -179,7 +248,6 @@ tCIDLib::ThrowAssert(const  TString&            strErr
 #if CID_DEBUG_ON
 template class TArrayJanitor<TArea>;
 template class TBag<TArea>;
-template class TBasicTreeCol<TArea>;
 template class TBasicDLinkedCol<TArea>;
 template class TBasicDLinkedRefCol<TArea>;
 template class TBasicTreeCol<TArea>;
@@ -197,7 +265,6 @@ template class TKeyObjPair<TString,TArea>;
 template class TMngPtr<TArea>;
 template class TNamedValMap<TArea>;
 template class TObjArray<TArea>;
-template class TQueue<TString>;
 template class TPolyStreamer<TArea>;
 template class TRefBag<TArea>;
 template class TRefDeque<TArea>;
@@ -219,7 +286,7 @@ eCompTest(const tCIDLib::TCard4& c41, const tCIDLib::TCard4& c42)
         return tCIDLib::ESortComps::FirstLess;
     else if (c41 > c42)
         return tCIDLib::ESortComps::FirstGreater;
-    tCIDLib::ESortComps::Equal;
+    return tCIDLib::ESortComps::Equal;
 }
 
 static tCIDLib::TVoid DummyFunc()
@@ -228,6 +295,8 @@ static tCIDLib::TVoid DummyFunc()
     pairTmp.m_tF.Set(0, 1, 2, 3);
 
     TArrayJanitor<tCIDLib::TCard4> janBuf(10);
+
+//    TMemberPtr<TArea> mbptrTest;
 
     TVector<TString> colOne;
     TVector<TString> colTwo;
@@ -240,10 +309,17 @@ static tCIDLib::TVoid DummyFunc()
     {
     }
     colOne.AddXCopies(TString::strEmpty(), 4);
-    colOne.bForEach([] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; });
+    colOne.bForEach
+    (
+        [] (const TString& strCur) -> tCIDLib::TBoolean { return kCIDLib::True; }
+    );
+
+    colOne.objPlace(L"Test in place");
 
     TStringPool splStrings(L"Test", 8);
     THeapBufPool splHeapBufs(L"Test", 8);
+
+    colOne.objAdd(TPathStr(L"Testing"));
 
     tCIDLib::TCard4 ac4Array[10];
     TArrayOps::TSort<tCIDLib::TCard4>
@@ -275,7 +351,8 @@ static tCIDLib::TVoid DummyFunc()
     (
         [](const TString& str1, const TString& str2) { return str1.eCompareI(str2); }
     );
-
+    colBagOStrings.objAdd(L"Added");
+    colBagOStrings.objPlace(L"Placed");
 
     TRefSortedBag<TString> colRefBagOStrings
     (
@@ -284,11 +361,17 @@ static tCIDLib::TVoid DummyFunc()
     );
 
 
+    TBag<TKeyValuePair> colBag;
+    colBag.objPlace(L"Key", L"Value");
+
+
     tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     if (tCIDLib::bCompareElems(col1, col2, TKeyValuePair::bComp))
     {
     }
+
+    col1.objPlace(L"Key", L"Value");
 
     TEArray<tCIDLib::TCard4, tCIDLib::EDirs, tCIDLib::EDirs::Count> eaTest(0UL);
     eaTest[tCIDLib::EDirs::Left] = 1;
@@ -332,6 +415,8 @@ static tCIDLib::TVoid DummyFunc()
     TQueue<TString> colStrQ;
     colStrQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
+    colStrQ.objPlace(L"Test placement");
+
     TRefQueue<TString> colStrRQ(tCIDLib::EAdoptOpts::Adopt);
     colStrRQ.bForEachNC([] (const TString& areaCur) { return kCIDLib::True; });
 
@@ -351,6 +436,8 @@ static tCIDLib::TVoid DummyFunc()
         23, TStringKeyOps(kCIDLib::False), &TKeyValuePair::strExtractKey
     );
     colKHS.bForEachNC([](TKeyValuePair&) { return kCIDLib::False; } );
+
+    colKHS.objPlace(L"Key", L"Value");
 
 
     // Unique pointer template expansion to make sure it's good
@@ -389,18 +476,16 @@ static tCIDLib::TVoid DummyFunc()
     );
 
     TFundVector<tCIDLib::TCard8> fcolCard8s;
-    tCIDLib::TCard8 c8MaxDup
+    const tCIDLib::TCard8 c8MaxDup
         = tCIDColAlgo::tFindMaxFundSeqDup<TFundVector<tCIDLib::TCard8>>(fcolCard8s);
 
     TTextStringOutStream strmTest(1024UL);
-    TMutex mtxSync;
-    TSafeTStrmJan janStrm(&strmTest, &mtxSync);
-    *janStrm << L"This is a test" << kCIDLib::EndLn;
+    strmTest.Format(L"Value %(1) is really %(2)", TString(L"Test"), TCardinal(2));
 
 
     TVector<TArea> colTestCurs(2);
-    colTestCurs.objAdd(TArea(1, 1, 1, 1));
-    colTestCurs.objAdd(TArea(2, 2, 2, 2));
+    colTestCurs.objAdd(TArea(1, 1, 1UL, 1UL));
+    colTestCurs.objAdd(TArea(2, 2, 2UL, 2UL));
     TVector<TArea>::TCursor cursTest(&colTestCurs);
     cursTest++;
     --cursTest;
@@ -413,12 +498,17 @@ static tCIDLib::TVoid DummyFunc()
     cursNCTest++;
     --cursNCTest;
 
-    if ((cursTest->i4Y() == 0) && (*cursTest == TArea(0, 0, 0, 0)))
+    if ((cursTest->i4Y() == 0) && (*cursTest == TArea(0, 0, 0UL, 0UL)))
     {
     }
 
-    TVector<TArea>::TCursor cursFind = tCIDColAlgo::cursFind(colTestCurs, TArea(1,1,1,1));
+    TVector<TArea>::TCursor cursFind = tCIDColAlgo::cursFind(colTestCurs, TArea(1,1,1UL,1UL));
     if (cursFind.bIsValid())
+    {
+    }
+
+    TVector<TArea>::TNCCursor cursFindNC = tCIDColAlgo::cursFindNC(colTestCurs, TArea(1,1,1UL,1UL));
+    if (cursFindNC.bIsValid())
     {
     }
 
@@ -430,6 +520,90 @@ static tCIDLib::TVoid DummyFunc()
 
     TVector<const TString> colConstStr;
     const TString& strNC = colConstStr[0];
+
+    TUniquePtr<TString> uptrTest(new TString(L"Testing"));
+
+    TObjLocker<TArea> olockrTest(10, 12, 14UL, 16UL);
+    TObjLock<TArea> olockTest = olockrTest.olockGet(5000);
+    if (*olockTest != TArea(10, 12, 14UL, 16UL))
+    {
+    }
+    TObjLock<TArea> olockTest2 = olockrTest.olockTryGet(1000);
+    if (olockTest2)
+    {
+    }
+
+    TBasicTreeCol<TString> colTree;
+    StreamOutBasicTree<TString>(colTree, strmOut);
+
+//    TString strFmtTest;
+//    strFmtTest.Format(L"%(1) %(2)", TPoint(1, 2), TSize(3, 4));
+//    if (strFmtTest == L"1,2 3,4")
+//    {
+//    }
+
+    constexpr tCIDLib::TFloat4 f4Test = 0;
+    if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
+    {
+    }
+
+    tCIDLib::TCard4 c4Val1 = 16;
+    tCIDLib::TCard4 c4Val2 = 32;
+    alignas(4) tCIDLib::TCard4* pTest1 = &c4Val1;
+    alignas(4) tCIDLib::TCard4* pTest2 = &c4Val2;
+    if (TAtomic::pFencedGet(&pTest1) != &c4Val1)
+    {
+    }
+
+    CIDLib_Suppress(6386)
+    TAtomicPtr<TString> atomStr;
+    if (!atomStr.pValue())
+    {
+        atomStr.SetValue(new TString());
+    }
+    if (atomStr->bIsEmpty())
+    {
+    }
+
+
+    if (bCIDPreCond(c4Val1 > c4Val2) || !bCIDPostCond(c4Val1 < c4Val2))
+    {
+    }
+
+    if (!bCIDAssert(c4Val1 > c4Val2, L"It was wrong, dude"))
+    {
+    }
+
+    if (!bCIDAssertX(c4Val1 > c4Val2, L"It was wrong, %(1)", TString(L"Dude")))
+    {
+    }
+
+    TSingleton<TString> singleTest;
+
+    tCIDLib::TCard4 ac4Test[4] = { 0, 1, 2, 3 };
+    tCIDLib::c4ArrayElems(ac4Test);
+    if (tCIDLib::c4ArrayAt(ac4Test, 2) != 3)
+    {
+        tCIDLib::TCard4* pc4End = tCIDLib::pArrayEndPtr(ac4Test);
+    }
+
+    const tCIDLib::TCard4 ac4TestC[4] = { 0, 1, 2, 3 };
+    tCIDLib::c4ArrayElems(ac4TestC);
+    if (tCIDLib::c4ArrayAt(ac4TestC, 2) != 3)
+    {
+        const tCIDLib::TCard4* pc4End = tCIDLib::pArrayEndPtr(ac4TestC);
+    }
+
+    tCIDLib::ForEachE<tCIDLib::ELogFlags>([](const tCIDLib::ELogFlags eFlag)
+    {
+        if (eFlag == tCIDLib::ELogFlags::DataSrc)
+        {
+
+        }
+    });
+
+    // Test ignoring return values
+    tCIDLib::IgnoreRet(strNC.i4Val());
 }
 #endif
 
@@ -445,13 +619,7 @@ static tCIDLib::TVoid DummyFunc()
 //
 TFacCIDLib& facCIDLib()
 {
-    static TFacCIDLib* pfacCIDLib = nullptr;
-    if (!pfacCIDLib)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDLib)
-            pfacCIDLib = new TFacCIDLib;
-    }
+    static TFacCIDLib* pfacCIDLib = new TFacCIDLib();
     return *pfacCIDLib;
 }
 

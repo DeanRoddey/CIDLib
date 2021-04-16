@@ -47,17 +47,20 @@ class   TRegNode;
 
 namespace CIDLib_TypeRegistry
 {
-    // ---------------------------------------------------------------------------
-    //  Local, static data
-    //
-    //  apnodeTable
-    //      This is the hash table for type names. It is an array of pointers
-    //      to nodes. Each pointer is a slot in the hash table and all of the
-    //      entries in that slot's linked list has the same hash value. The
-    //      hash table's size is driven by the modulus value used by the TClass
-    //      class' internally.
-    // ---------------------------------------------------------------------------
-    TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
+    namespace
+    {
+        // ---------------------------------------------------------------------------
+        //  Local, static data
+        //
+        //  apnodeTable
+        //      This is the hash table for type names. It is an array of pointers
+        //      to nodes. Each pointer is a slot in the hash table and all of the
+        //      entries in that slot's linked list has the same hash value. The
+        //      hash table's size is driven by the modulus value used by the TClass
+        //      class' internally.
+        // ---------------------------------------------------------------------------
+        TRegNode*   apnodeTable[kCIDLib::c4ClassModulus];
+    }
 }
 
 
@@ -153,14 +156,8 @@ TRegNode::TRegNode( const   tCIDLib::TCh* const     pszToReg
 //
 static TCriticalSection* pcrsLock()
 {
-    static  TCriticalSection* pcrsTRLock = nullptr;
-    if (!pcrsTRLock)
-    {
-        TBaseLock lockInit;
-        if (!pcrsTRLock)
-            TRawMem::pExchangePtr(&pcrsTRLock, new TCriticalSection);
-    }
-    return pcrsTRLock;
+    static  TCriticalSection crsTRLock;
+    return &crsTRLock;
 }
 
 
@@ -367,6 +364,7 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     //  find the slot in the hash table. If the slot is open, then this is
     //  the new head of that slot. Else insert at the start of the list.
     //
+    CIDLib_Suppress(6385)  // The modulus is the size of the table
     TRegNode* pHead = CIDLib_TypeRegistry::apnodeTable[hshOfClass];
     if (!pHead)
     {
@@ -377,6 +375,7 @@ TClass::RegisterClass(  const   tCIDLib::TCh* const     pszClassName
     }
      else
     {
+        CIDLib_Suppress(6386)  // The hash is always going to be in range
         CIDLib_TypeRegistry::apnodeTable[hshOfClass] = new TRegNode
         (
             pszClassName, pFactoryFunc, pHead

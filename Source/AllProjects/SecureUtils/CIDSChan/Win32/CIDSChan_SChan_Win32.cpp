@@ -215,7 +215,7 @@ TSChannel::Terminate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd)
     //  If we didn't already do the disconnect due to the other side closing, and the
     //  data source still appears connected, then do the disconnect from our side.
     //
-    if (!m_pInfo->bOtherSideClosed && cdsTar.bConnected())
+    if (!m_pInfo->bOtherSideClosed && cdsTar.bIsConnected())
     {
         try
         {
@@ -232,7 +232,6 @@ TSChannel::Terminate(TCIDDataSrc& cdsTar, const tCIDLib::TEncodedTime enctEnd)
     // Clean up the resources stored in our internal data
     Cleanup();
 }
-
 
 
 

@@ -73,10 +73,8 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
             , const tCIDLib::TCh* const     pszEntityValue
         );
 
-        TDTDEntityDecl
-        (
-            const   TDTDEntityDecl&         xdeclToCopy
-        );
+        TDTDEntityDecl(const TDTDEntityDecl&) = default;
+        TDTDEntityDecl(TDTDEntityDecl&&) = default;
 
         ~TDTDEntityDecl();
 
@@ -84,10 +82,8 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDTDEntityDecl& operator=
-        (
-            const   TDTDEntityDecl&         xdeclToAssign
-        );
+        TDTDEntityDecl& operator=(const TDTDEntityDecl&) = default;
+        TDTDEntityDecl& operator=(TDTDEntityDecl&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -97,7 +93,7 @@ class CIDXMLEXP TDTDEntityDecl : public TXMLEntityDecl
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------

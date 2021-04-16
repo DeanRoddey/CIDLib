@@ -61,28 +61,18 @@ TExpByteBuf::TExpByteBuf(const tCIDLib::TCard4 c4InitAlloc) :
 
 TExpByteBuf::TExpByteBuf(const TExpByteBuf& expbSrc) :
 
-    m_c4CurSize(expbSrc.m_c4CurSize)
-    , m_c4CurOfs(expbSrc.m_c4CurOfs)
+    m_c4CurSize(0)
+    , m_c4CurOfs(0)
     , m_pc1Buffer(nullptr)
 {
-    m_pc1Buffer = new tCIDLib::TCard1[m_c4CurSize];
-    try
-    {
-        TRawMem::CopyMemBuf(m_pc1Buffer, expbSrc.m_pc1Buffer, m_c4CurSize);
-    }
+    tCIDLib::TCard1* pszNew = new tCIDLib::TCard1[expbSrc.m_c4CurSize];
+    TArrayJanitor<tCIDLib::TCard1> janBuffer(pszNew);
+    TRawMem::CopyMemBuf(pszNew, expbSrc.m_pc1Buffer, expbSrc.m_c4CurSize);
 
-    catch(...)
-    {
-        delete m_pc1Buffer;
-        throw;
-    }
-}
-
-TExpByteBuf::TExpByteBuf(TExpByteBuf&& expbSrc) :
-
-    TExpByteBuf(1UL)
-{
-    *this = tCIDLib::ForceMove(expbSrc);
+    // It appears to have worked, so store the info away
+    m_c4CurSize = expbSrc.m_c4CurSize;
+    m_c4CurOfs = expbSrc.m_c4CurOfs;
+    m_pc1Buffer = janBuffer.paOrphan();
 }
 
 TExpByteBuf::~TExpByteBuf()
@@ -102,10 +92,12 @@ TExpByteBuf& TExpByteBuf::operator=(const TExpByteBuf& expbSrc)
         // Reallocate our buffer if not the same size
         if (m_c4CurSize != expbSrc.m_c4CurSize)
         {
-            TArrayJanitor<tCIDLib::TCard1> janOld(m_pc1Buffer);
+            // Make sure we can allocate the new buffer before we change anything
+            tCIDLib::TCard1* pc1New = new tCIDLib::TCard1[expbSrc.m_c4CurSize];
 
+            TArrayJanitor<tCIDLib::TCard1> janOld(m_pc1Buffer);
+            m_pc1Buffer = pc1New;
             m_c4CurSize = expbSrc.m_c4CurSize;
-            m_pc1Buffer = new tCIDLib::TCard1[m_c4CurSize];
         }
 
         m_c4CurOfs = expbSrc.m_c4CurOfs;
@@ -240,6 +232,25 @@ tCIDLib::TCard1 TExpByteBuf::c1Last() const
 }
 
 
+tCIDLib::TCard1 TExpByteBuf::c1PopLast()
+{
+    if (!m_c4CurOfs)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcExpb_NoData
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Index
+        );
+    }
+    const tCIDLib::TCard1 c1Ret = m_pc1Buffer[m_c4CurOfs - 1];
+    m_c4CurOfs--;
+    return c1Ret;
+}
+
+
 tCIDLib::TCard4 TExpByteBuf::c4CheckSum() const
 {
     tCIDLib::TCard4 c4Sum = 0;
@@ -253,13 +264,13 @@ tCIDLib::TCard4 TExpByteBuf::c4CheckSum() const
 }
 
 
-tCIDLib::TCard4 TExpByteBuf::c4Bytes() const
+tCIDLib::TCard4 TExpByteBuf::c4Bytes() const noexcept
 {
     return m_c4CurOfs;
 }
 
 
-const tCIDLib::TCard1* TExpByteBuf::pc1Buffer() const
+const tCIDLib::TCard1* TExpByteBuf::pc1Buffer() const noexcept
 {
     return m_pc1Buffer;
 }
@@ -274,7 +285,8 @@ tCIDLib::TCard1* TExpByteBuf::pszReplicateBuffer()
 }
 
 
-tCIDLib::TVoid TExpByteBuf::Reset()
+// Just reset our current offset, which makes us empty
+tCIDLib::TVoid TExpByteBuf::Reset() noexcept
 {
     m_c4CurOfs = 0;
 }

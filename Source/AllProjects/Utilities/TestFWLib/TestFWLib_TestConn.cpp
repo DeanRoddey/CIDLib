@@ -387,7 +387,7 @@ TTestFWConn::TTestFWConn(const tCIDLib::TBoolean bCreate) :
     m_pConnInfo = reinterpret_cast<TConnInfo*>(m_pmbufInfo->pc1Data());
     if (bCreate)
     {
-        TRawMem::SetMemBuf(m_pConnInfo, tCIDLib::TCard1(0), sizeof(TConnInfo));
+        TRawMem::SetMemBuf(m_pConnInfo, kCIDLib::c1MinCard, sizeof(TConnInfo));
         m_pConnInfo->c4MaxLevel = kTestFWLib::c4MaxTestLevel;
     }
 }
@@ -413,6 +413,12 @@ TTestFWConn::~TTestFWConn()
 // ---------------------------------------------------------------------------
 //  TTestFWConn: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TBoolean TTestFWConn::bNoLong() const
+{
+    return m_pConnInfo->bNoLong;
+}
+
 
 // Called by the test framework to query the results back out
 tTestFWLib::EPhases
@@ -526,9 +532,11 @@ tCIDLib::TVoid TTestFWConn::SetPhase(const tTestFWLib::EPhases ePhase)
 //
 tCIDLib::TVoid
 TTestFWConn::SetTestData(const  tTestFWLib::EVerbosity  eToSet
-                        , const tCIDLib::TCard4         c4MaxLevel)
+                        , const tCIDLib::TCard4         c4MaxLevel
+                        , const tCIDLib::TBoolean       bNoLong)
 {
     // Store the incoming info
+    m_pConnInfo->bNoLong = bNoLong;
     m_pConnInfo->c4MaxLevel = c4MaxLevel;
     m_pConnInfo->eVerbosity = eToSet;
 

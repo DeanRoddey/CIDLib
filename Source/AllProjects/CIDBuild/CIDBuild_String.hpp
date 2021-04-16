@@ -56,21 +56,31 @@ class TBldStr
             const   tCIDLib::TCh* const     pszSrc
         );
 
+        TBldStr
+        (
+            const   tCIDLib::TCh            chSrc
+        );
+
+        TBldStr
+        (
+            const   tCIDLib::TSCh* const    pszSrc
+        );
+
         ~TBldStr();
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean operator==
-        (
-            const   TBldStr&                strToCompare
-        )   const;
+        tCIDLib::TBoolean operator==(const TBldStr& strSrc) const
+        {
+            return !TRawStr::iCompStr(m_pszBuf, strSrc.m_pszBuf);
+        }
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TBldStr&                strToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TBldStr& strToCompare) const
+        {
+            return !operator==(strToCompare);
+        }
 
         TBldStr& operator=
         (
@@ -96,16 +106,15 @@ class TBldStr
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Append
-        (
-            const   TBldStr&                strToAppend
-        );
+        tCIDLib::TVoid Append(const TBldStr& strToAppend)
+        {
+            Append(strToAppend.m_pszBuf);
+        }
 
-        tCIDLib::TVoid Append
-        (
-            const   TBldStr&                str1
-            , const TBldStr&                str2
-        );
+        tCIDLib::TVoid Append(const TBldStr& str1, const TBldStr& str2)
+        {
+            Append(str1.m_pszBuf, str2.m_pszBuf);
+        }
 
         tCIDLib::TVoid Append
         (
@@ -130,38 +139,92 @@ class TBldStr
             , const tCIDLib::TCard4         c4StartAt
         );
 
-        tCIDLib::TVoid AppendCh
+        tCIDLib::TVoid Append
         (
             const   tCIDLib::TCh            chToAppend
         );
 
+        tCIDLib::TVoid AppendPathComp
+        (
+            const   tCIDLib::TCh* const     pszComp
+            , const tCIDLib::TBoolean       bTrailingSep = kCIDLib::False
+        );
+
+        tCIDLib::TVoid AppendPathComps
+        (
+            const   tCIDLib::TCh* const     pszComp1
+            , const tCIDLib::TCh* const     pszComp2
+            , const tCIDLib::TBoolean       bTrailingSep = kCIDLib::False
+        );
+
+        tCIDLib::TVoid AppendPathComps
+        (
+            const   tCIDLib::TCh* const     pszComp1
+            , const tCIDLib::TCh* const     pszComp2
+            , const tCIDLib::TCh* const     pszComp3
+            , const tCIDLib::TBoolean       bTrailingSep = kCIDLib::False
+        );
+
         tCIDLib::TBoolean bAsBoolean() const;
 
-        tCIDLib::TBoolean bEmpty() const;
-
-        tCIDLib::TBoolean bIEquals
+        tCIDLib::TBoolean bContainsChar
         (
-            const   TBldStr&                strToCompare
+            const   tCIDLib::TCh            chToCheck
         )   const;
+
+        tCIDLib::TBoolean bIContainsChar
+        (
+            const   tCIDLib::TCh            chToCheck
+        )   const;
+
+        tCIDLib::TBoolean bEmpty() const
+        {
+            return (m_pszBuf[0] == kCIDLib::chNull);
+        }
+
+        tCIDLib::TBoolean bIEquals(const TBldStr& strToCompare) const
+        {
+            return bIEquals(strToCompare.m_pszBuf);
+        }
 
         tCIDLib::TBoolean bIEquals
         (
             const   tCIDLib::TCh* const     pszToCompare
         )   const;
 
-        tCIDLib::TBoolean bStartsWith
-        (
-            const   TBldStr&                strToCheck
-        )   const;
+        tCIDLib::TBoolean bStartsWith(const TBldStr& strToCheck) const
+        {
+            return bStartsWith(strToCheck.m_pszBuf);
+        }
 
         tCIDLib::TBoolean bStartsWith
         (
             const   tCIDLib::TCh* const     pszToCheck
         )   const;
 
-        tCIDLib::TCh chFirst() const;
+        tCIDLib::TBoolean bIStartsWithN(const TBldStr& strToCheck, const tCIDLib::TCard4 c4Count) const
+        {
+            return bIStartsWithN(strToCheck.m_pszBuf, c4Count);
+        }
 
-        tCIDLib::TCh chLast() const;
+        tCIDLib::TBoolean bIStartsWithN
+        (
+            const   tCIDLib::TCh* const     pszToCheck
+            , const tCIDLib::TCard4         c4Count
+        )   const;
+
+        tCIDLib::TCh chFirst() const
+        {
+            return m_pszBuf[0];
+        }
+
+        tCIDLib::TCh chLast() const
+        {
+            if (!m_pszBuf[0])
+                return kCIDLib::chNull;
+
+            return m_pszBuf[TRawStr::c4StrLen(m_pszBuf) - 1];
+        }
 
         tCIDLib::TCard4 c4AsCard
         (
@@ -177,13 +240,16 @@ class TBldStr
             const   tCIDLib::TCard4         c4Index
         );
 
-        tCIDLib::TVoid Clear();
+        tCIDLib::TVoid Clear()
+        {
+            m_pszBuf[0] = kCIDLib::chNull;
+        }
 
-        tCIDLib::TVoid CopyAt
-        (
-            const   TBldStr&                strSrc
-            , const tCIDLib::TCard4         c4StartAt
-        );
+        tCIDLib::TVoid CopyAt(  const   TBldStr&        strSrc
+                                , const tCIDLib::TCard4 c4StartAt)
+        {
+            CopyAt(strSrc.m_pszBuf, c4StartAt);
+        }
 
         tCIDLib::TVoid CopyAt
         (
@@ -214,13 +280,31 @@ class TBldStr
 
         tCIDLib::TInt4 i4AsInt() const;
 
-        tCIDLib::TCh* pszDupBuffer() const;
+        [[nodiscard]] tCIDLib::TCh* pszDupBuffer() const
+        {
+            tCIDLib::TCh* pszRet = new tCIDLib::TCh[TRawStr::c4StrLen(m_pszBuf) + 1];
+            *pszRet = kCIDLib::chNull;
+            TRawStr::CopyStr(pszRet, m_pszBuf);
+            return pszRet;
+        }
 
-        const tCIDLib::TCh* pszBuffer() const;
+        const tCIDLib::TCh* pszBuffer() const
+        {
+            return m_pszBuf;
+        }
 
-        tCIDLib::TCh* pszBuffer();
+        tCIDLib::TCh* pszBuffer()
+        {
+            return m_pszBuf;
+        }
 
-        tCIDLib::TCh* pszOrphanBuffer();
+        [[nodiscard]] tCIDLib::TCh* pszOrphanBuffer()
+        {
+            tCIDLib::TCh* pszRet = m_pszBuf;
+            m_pszBuf = new tCIDLib::TCh[2];
+            m_pszBuf[0] = kCIDLib::chNull;
+            return pszRet;
+        }
 
         tCIDLib::TVoid ReplaceChar
         (
@@ -230,13 +314,13 @@ class TBldStr
 
         tCIDLib::TVoid ReplaceExt
         (
-            const   TBldStr&                strNewExt
-        );
-
-        tCIDLib::TVoid ReplaceExt
-        (
             const   tCIDLib::TCh* const     pszNewExt
         );
+
+        tCIDLib::TVoid ReplaceExt(const TBldStr& strNewExt)
+        {
+            ReplaceExt(strNewExt.m_pszBuf);
+        }
 
         tCIDLib::TVoid StripWhitespace();
 
@@ -266,104 +350,4 @@ class TBldStr
 // ---------------------------------------------------------------------------
 //  Global operators
 // ---------------------------------------------------------------------------
-TTextFile& operator<<(TTextFile& strmOut, const TBldStr& strOut);
-
-
-// ---------------------------------------------------------------------------
-//  TBldStr: Public operators
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TBldStr::operator==(const TBldStr& strToCompare) const
-{
-    return !TRawStr::iCompStr(m_pszBuf, strToCompare.m_pszBuf);
-}
-
-inline tCIDLib::TBoolean TBldStr::operator!=(const TBldStr& strToCompare) const
-{
-    return !operator==(strToCompare);
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  TBldStr: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TVoid TBldStr::Append(const TBldStr& strToAppend)
-{
-    Append(strToAppend.m_pszBuf);
-}
-
-inline tCIDLib::TVoid TBldStr::Append(const TBldStr& str1, const TBldStr& str2)
-{
-    Append(str1.m_pszBuf, str2.m_pszBuf);
-}
-
-inline tCIDLib::TBoolean TBldStr::bEmpty() const
-{
-    return (m_pszBuf[0] == 0);
-}
-
-inline tCIDLib::TBoolean TBldStr::bIEquals(const TBldStr& strToCompare) const
-{
-    return bIEquals(strToCompare.m_pszBuf);
-}
-
-inline tCIDLib::TBoolean TBldStr::bStartsWith(const TBldStr& strToCheck) const
-{
-    return bStartsWith(strToCheck.m_pszBuf);
-}
-
-inline tCIDLib::TCh TBldStr::chFirst() const
-{
-    return m_pszBuf[0];
-}
-
-inline tCIDLib::TCh TBldStr::chLast() const
-{
-    if (!m_pszBuf[0])
-        return 0;
-
-    return m_pszBuf[TRawStr::c4StrLen(m_pszBuf)-1];
-}
-
-inline tCIDLib::TVoid TBldStr::Clear()
-{
-    m_pszBuf[0] = 0;
-}
-
-inline tCIDLib::TVoid TBldStr::CopyAt(  const   TBldStr&        strSrc
-                                        , const tCIDLib::TCard4 c4StartAt)
-{
-    CopyAt(strSrc.m_pszBuf, c4StartAt);
-}
-
-inline tCIDLib::TCh* TBldStr::pszDupBuffer() const
-{
-    tCIDLib::TCh* pszRet = new tCIDLib::TCh[TRawStr::c4StrLen(m_pszBuf) + 1];
-    *pszRet = 0;
-    TRawStr::CopyStr(pszRet, m_pszBuf);
-    return pszRet;
-}
-
-inline const tCIDLib::TCh* TBldStr::pszBuffer() const
-{
-    return m_pszBuf;
-}
-
-inline tCIDLib::TCh* TBldStr::pszBuffer()
-{
-    return m_pszBuf;
-}
-
-inline tCIDLib::TCh* TBldStr::pszOrphanBuffer()
-{
-    tCIDLib::TCh* pszRet = m_pszBuf;
-    m_pszBuf = new tCIDLib::TCh[2];
-    m_pszBuf[0] = 0;
-    return pszRet;
-}
-
-inline tCIDLib::TVoid TBldStr::ReplaceExt(const TBldStr& strNewExt)
-{
-    ReplaceExt(strNewExt.m_pszBuf);
-}
-
+extern TTextFile& operator<<(TTextFile& strmOut, const TBldStr& strOut);

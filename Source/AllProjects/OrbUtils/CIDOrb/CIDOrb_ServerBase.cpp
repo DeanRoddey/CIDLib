@@ -37,53 +37,34 @@
 RTTIDecls(TOrbServerBase,TObject)
 
 
+// ---------------------------------------------------------------------------
+//  Local static data
+// ---------------------------------------------------------------------------
+namespace CIDOrb_ServerBase
+{
+    namespace
+    {
+        //
+        //  For now there's nothing we need to do in order to initialize the server
+        //  side ORB. But, we may in the future and we need to provide an indicator
+        //  as to whether we are initailized or not. So we need to remember when
+        //  init/term calls are made.
+        //
+        tCIDLib::TBoolean   bInitialized = kCIDLib::False;
+    }
+}
+
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TOrbServerBase
 //  PREFIX: orbs
 // ---------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------
-//  TOrbServerBase: Public destructor
-// ---------------------------------------------------------------------------
-TOrbServerBase::~TOrbServerBase()
+// Just advisory, since it could changed if init/term is not coordinated by client
+tCIDLib::TBoolean TOrbServerBase::bIsInitialized()
 {
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  TOrbServerBase: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean TOrbServerBase::bCleanup() const
-{
-    return m_bCleanup;
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4DecEnteredCount()
-{
-    // We want to return the post-dec count so use prefix
-    return --m_scntEntered;
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4EnteredCount() const
-{
-    return m_scntEntered.c4Value();
-}
-
-
-tCIDLib::TCard4 TOrbServerBase::c4IncEnteredCount()
-{
-    // We want to return the post-inc count so use prefix
-    return ++m_scntEntered;
-}
-
-
-const TOrbObjId& TOrbServerBase::ooidThis() const
-{
-    return m_ooidThis;
+    return CIDOrb_ServerBase::bInitialized;
 }
 
 
@@ -93,7 +74,9 @@ const TOrbObjId& TOrbServerBase::ooidThis() const
 
 //
 //  We create an object id for this instance. We use the passed interface id
-//  and client proxy class. We provide a new unique instance id.
+//  and client proxy class. We provide a new unique instance id. The derived
+//  class tells us the name of the client proxy class that was generated for
+//  this interface.
 //
 TOrbServerBase::TOrbServerBase( const   TString&    strInterfaceId
                                 , const TString&    strClientProxyClass) :
@@ -174,25 +157,18 @@ tCIDLib::TVoid TOrbServerBase::Terminate()
 
 
 // ---------------------------------------------------------------------------
-//  TOrbServerBase: Protected, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid TOrbServerBase::SetCleanupFlag()
-{
-    m_bCleanup = kCIDLib::True;
-}
-
-
-// ---------------------------------------------------------------------------
 //  TOrbServerBase: Private, static methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TOrbServerBase::InitializeOrbServer()
 {
-    // No-op for now
+    // For now we set a flag to remember we are intialized
+    CIDOrb_ServerBase::bInitialized = kCIDLib::True;
 }
 
 
 tCIDLib::TVoid TOrbServerBase::TerminateOrbServer()
 {
-    // No-op for now
+    // For now we clear a flag to remember we are not intialized
+    CIDOrb_ServerBase::bInitialized = kCIDLib::False;
 }
 

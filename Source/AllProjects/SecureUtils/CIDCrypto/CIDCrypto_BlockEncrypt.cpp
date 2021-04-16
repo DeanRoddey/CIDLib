@@ -43,7 +43,10 @@ RTTIDecls(TBlockEncrypter,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDCrypto_BlockEncrypt
 {
-    const tCIDLib::TCard4   c4BufSz = 4096;
+    namespace
+    {
+        constexpr tCIDLib::TCard4   c4BufSz = 4096;
+    }
 }
 
 

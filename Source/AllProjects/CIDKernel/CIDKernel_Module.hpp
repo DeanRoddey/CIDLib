@@ -17,13 +17,17 @@
 //
 //  This is the header for the CIDKernel_Module.Cpp file, which implements
 //  the TKrnlModule class. This class encapsulates the concept of a loadable
-//  module (Exe or Dll) and the things that you do via it.
+//  module (Exe or shared library) and the things that you do via it.
 //
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  LoadFromName() loads a module, and should be used for dynamic loading.
-//      QueryFromName just queries the handle for an existing loaded module.
+//  1)  LoadXXX() loads a module, and should be used for dynamic loading.
+//      QueryXXX() just queries the handle for an existing loaded module.
+//
+//  2)  We have to support loading external modules (not CIDLib facilities)
+//      so we have some methods for that, which don't try to load any
+//      associated CIDLib resources (since there are none.)
 //
 // LOG:
 //
@@ -46,34 +50,33 @@ class KRNLEXPORT TKrnlModule
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bBuildRawModName
+        static tCIDLib::TBoolean bBuildModNames
         (
-            const   tCIDLib::TCh* const     pszBaseName
-            , const tCIDLib::TCard4         c4MajVersion
-            , const tCIDLib::TCard4         c4MinVersion
+             const  tCIDLib::TCh* const     pszModName
+            ,       TKrnlString&            kstrPortableName
+            ,       TKrnlString&            kstrLoadableName
+            , const tCIDLib::TCard4         c4MajVer
+            , const tCIDLib::TCard4         c4MinVer
             , const tCIDLib::EModTypes      eModType
-            , const tCIDLib::TCard4         c4MaxChars
-            ,       tCIDLib::TCh* const     pchToFill
         );
 
         static tCIDLib::TBoolean bRawQueryModName
         (
             const   TModuleHandle&          hmodToQuery
-            ,       tCIDLib::TCh* const     pszNameToFill
-            ,       tCIDLib::TCh* const     pszPathToFill
-            , const tCIDLib::TCard4         c4MaxChars
+            ,       TKrnlString&            kstrNameToFill
+            ,       TKrnlString&            kstrPathToFill
+        );
+
+        static tCIDLib::TBoolean bRawQueryModPath
+        (
+            const   TModuleHandle&          hmodToQuery
+            ,       TKrnlString&            kstrPathToFill
         );
 
         static tCIDLib::TBoolean bLoadMessages
         (
-            const   TModuleHandle&          hmodSrc
-            ,       tCIDLib::TMsgIndex*&    pmiLoadMessages
-        );
-
-        static tCIDLib::TBoolean bLoadMessages
-        (
-            const   tCIDLib::TCh* const     pszPath
-            , const tCIDLib::TCh* const     pszFile
+            const   TKrnlString&            kstrPath
+            , const TKrnlString&            kstrFile
             ,       tCIDLib::TMsgIndex*&    pmiLoadMessages
         );
 
@@ -91,6 +94,7 @@ class KRNLEXPORT TKrnlModule
         TKrnlModule();
 
         TKrnlModule(const TKrnlModule&) = delete;
+        TKrnlModule(TKrnlModule&&) = delete;
 
         ~TKrnlModule();
 
@@ -99,6 +103,7 @@ class KRNLEXPORT TKrnlModule
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlModule& operator=(const TKrnlModule&) = delete;
+        TKrnlModule& operator=(TKrnlModule&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -121,31 +126,46 @@ class KRNLEXPORT TKrnlModule
 
         tCIDLib::TBoolean bLoadFromName
         (
-            const   tCIDLib::TCh* const     pszModuleName
-            , const tCIDLib::EModTypes      eModType
+            const   tCIDLib::TCh* const     pszBaseName
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::EModTypes      eModType
             , const tCIDLib::EModFlags      eModFlags
         );
 
-        tCIDLib::TBoolean bLoadFromName
+        tCIDLib::TBoolean bLoadFromPath
         (
-            const   tCIDLib::TCh* const     pszFullPath
+            const   tCIDLib::TCh* const     pszBaseName
+            , const tCIDLib::TCard4         c4MajVer
+            , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::TCh* const     pszFromPath
+            , const tCIDLib::EModTypes      eModType
+            , const tCIDLib::EModFlags      eModFlags
+        );
+
+        tCIDLib::TBoolean bLoadExternal
+        (
+            const   tCIDLib::TCh* const     pszPath
         );
 
         tCIDLib::TBoolean bQueryFromName
         (
-            const   tCIDLib::TCh* const     pszModuleName
-            , const tCIDLib::EModTypes      eModType
+            const   tCIDLib::TCh* const     pszBaseName
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::EModTypes      eModType
             , const tCIDLib::EModFlags      eModFlags
         );
 
-        tCIDLib::TBoolean bQueryFromName
+        tCIDLib::TBoolean bQueryExternal
         (
-            const   tCIDLib::TCh* const     pszFullPath
+            const   tCIDLib::TCh* const     pszName
         );
+
+        tCIDLib::EModTypes eModType() const
+        {
+            return m_eModType;
+        }
 
         const TModuleHandle& hmodThis() const;
 
@@ -160,12 +180,68 @@ class KRNLEXPORT TKrnlModule
             const   tCIDLib::TMsgId         midToLoad
         )   const;
 
+        const TKrnlString& kstrBaseName() const
+        {
+            return m_kstrBaseName;
+        }
+
+        const TKrnlString& kstrLoadableName() const
+        {
+            return m_kstrLoadName;
+        }
+
+        const TKrnlString& kstrPortableName() const
+        {
+            return m_kstrPortName;
+        }
+
+        const TKrnlString& kstrSrcPath() const
+        {
+            return m_kstrSrcPath;
+        }
+
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bClearHandle();
+        tCIDLib::TBoolean bCleanup();
+
+        tCIDLib::TBoolean bPlatCleanup();
+
+        tCIDLib::TBoolean bLoadPlatExt
+        (
+            const   tCIDLib::TCh* const     pszLoadPath
+            , const tCIDLib::EModTypes      eModType
+        );
+
+        tCIDLib::TBoolean bLoadPlatByName();
+
+        tCIDLib::TBoolean bLoadPlatByPath
+        (
+            const   tCIDLib::TCh* const     pszLoadPath
+        );
+
+        tCIDLib::TBoolean bQueryPlatExt
+        (
+            const   tCIDLib::TCh* const     pszName
+        );
+
+        tCIDLib::TBoolean bQueryPlatByName();
+
+
+        // -------------------------------------------------------------------
+        //  Private, statiic methods
+        // -------------------------------------------------------------------
+        static tCIDLib::TVoid MakePlatNames
+        (
+             const  tCIDLib::TCh* const     pszModName
+            ,       TKrnlString&            kstrPortable
+            ,       TKrnlString&            kstrLoadable
+            , const tCIDLib::TCard4         c4MajVer
+            , const tCIDLib::TCard4         c4MinVer
+            , const tCIDLib::EModTypes      eModType
+        );
 
 
         // -------------------------------------------------------------------
@@ -176,16 +252,35 @@ class KRNLEXPORT TKrnlModule
         //      the library or just querying the handle of an existing
         //      one.  If loaded, we free it when the handle is destroyed.
         //
+        //  m_eModeType
+        //      The module type.
+        //
         //  m_hmodThis
         //      The 'handle' to the module controlled by this object.
         //
         //  m_pmiThis
         //      This is a pointer to the message file data for this module,
-        //      if there are any. If not, then its 0.
+        //      if there are any. If not, then its null.
+        //
+        //  m_kstrBaseName
+        //  m_kstrLoadName
+        //  m_kstrPortNmame
+        //      The base name is the basic facility name, when loading a CIDLib
+        //      facility type module. When loading an external module it's
+        //      the name extracted from the path to load. The load name is the
+        //      platform specific loadable name. This is the same as base name if
+        //      loading an external module. The portable name is only for CIDLib
+        //      type modules and is the base name, plus versioning for libraries.
+        //      For externals, it's not set.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bViaLoad;
+        tCIDLib::EModTypes  m_eModType;
         TModuleHandle       m_hmodThis;
         tCIDLib::TMsgIndex* m_pmiThis;
+        TKrnlString         m_kstrBaseName;
+        TKrnlString         m_kstrLoadName;
+        TKrnlString         m_kstrPortName;
+        TKrnlString         m_kstrSrcPath;
 
 
         // -------------------------------------------------------------------

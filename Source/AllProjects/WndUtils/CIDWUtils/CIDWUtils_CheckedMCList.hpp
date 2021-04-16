@@ -58,6 +58,7 @@ class CIDWUTILSEXP TCheckedMCListWnd : public TMultiColListBox
         TCheckedMCListWnd();
 
         TCheckedMCListWnd(const TCheckedMCListWnd&) = delete;
+        TCheckedMCListWnd(TCheckedMCListWnd&&) = delete;
 
         ~TCheckedMCListWnd();
 
@@ -66,6 +67,7 @@ class CIDWUTILSEXP TCheckedMCListWnd : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         TCheckedMCListWnd& operator=(const TCheckedMCListWnd&) = delete;
+        TCheckedMCListWnd& operator=(TCheckedMCListWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -87,14 +89,14 @@ class CIDWUTILSEXP TCheckedMCListWnd : public TMultiColListBox
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bAutoCheck() const;
+        [[nodiscard]] tCIDLib::TBoolean bAutoCheck() const;
 
         tCIDLib::TBoolean bAutoCheck
         (
             const   tCIDLib::TBoolean       bToSet
         );
 
-        tCIDLib::TBoolean bIsCheckedAt
+        [[nodiscard]] tCIDLib::TBoolean bIsCheckedAt
         (
             const   tCIDLib::TCard4         c4At
         )   const;

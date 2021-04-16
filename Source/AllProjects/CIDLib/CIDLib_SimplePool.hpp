@@ -59,9 +59,6 @@
 //  element for itself. So you just need to declare an instance of the smart pointer
 //  to get an element.
 //
-//  These guys effectively are thread safe if the pool itself is thread safe, since
-//  they are just getting and returning elements via the pool interface.
-//
 //  String/Heap Buffer Pool
 //
 //  It will be fairly common to use pools of strings or heap buffers, so we provide
@@ -74,11 +71,24 @@
 //  beyond this threshold, it will be reallocated back down to something small during
 //  element prep.
 //
-//
 //  Fixed Size Elements
 //
 //  If the elements are all the same size, use the TFixedSizedPool class instead which
 //  is much more efficient for such things.
+//
+//  Thread Safety
+//
+//  Pools can be marked as thread safe or not. If you are going to have multiple
+//  threads getting objects out, then it must be marked as asafe.
+//
+//  The smart pointers are NOT thread safe, and you shouldn't have multiple thread
+//  sharing a single object from the pool anyway. The whole point of the pool is to
+//  let them all get their own objects. Multiple threads can create their own to get
+//  their own objects from a single pool, as long as that pool itself is marked
+//  thread safe. You can pass these pointers from one thread to another if you are
+//  using some sort of thread safe transfer mechanism to do so.
+//
+//  The janitors are not, inherently so since they are for scoped access.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -98,13 +108,13 @@ template<typename TElem> class TSimplePool;
 //  CLASS: TSimplePoolPtr
 // PREFIX: spptr
 //
-//  This is a smart pointer for objects in a pool. It gets an object out of a
-//  pool and makes sure it gets given back. It will reference copy the object,
+//  This is a smart pointer for objects in a simple pool. It gets an object out
+//  of a pool and makes sure it gets given back. It will reference copy the object,
 //  so it knows when the last ref is gone.
 //
-//  This guy will use the mutex of the pool to sync the ref counting. If the pool
-//  is not thread safe, then these guys are not. Typically they either both are
-//  or both are not. If that's not the case, don't use this, create your own.
+//  Though in theory these are thread safe, you should never actually be sharing
+//  them between threads. The ref counting is just to let you pass them around
+//  and use them as by value objects conveniently. See the class comments above.
 // ---------------------------------------------------------------------------
 template <typename TElem> class TSimplePoolPtr
 {
@@ -120,6 +130,13 @@ template <typename TElem> class TSimplePoolPtr
                 TakeSource(spptrSrc);
         }
 
+        TSimplePoolPtr(TSimplePoolPtr&& spptrSrc) :
+
+            TSimplePoolPtr()
+        {
+            operator=(tCIDLib::ForceMove(spptrSrc));
+        }
+
         virtual ~TSimplePoolPtr()
         {
             DecRefCnt();
@@ -133,6 +150,13 @@ template <typename TElem> class TSimplePoolPtr
         {
             if (&spptrSrc != this)
                 TakeSource(spptrSrc);
+            return *this;
+        }
+
+        TSimplePoolPtr& operator=(TSimplePoolPtr&& spptrSrc)
+        {
+            if (&spptrSrc != this)
+                tCIDLib::Swap(m_percThis, spptrSrc.m_percThis);
             return *this;
         }
 
@@ -225,15 +249,26 @@ template <typename TElem> class TSimplePoolPtr
         }
 
 
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
+        TSimplePool<TElem>* psplOwner()
+        {
+            if (!m_percThis)
+                return nullptr;
+            return m_percThis->m_psplSrc;
+        }
+
+
     private :
         // -------------------------------------------------------------------
         //  A little structure to let us wrap and ref count the objects
         // -------------------------------------------------------------------
         struct TElemRefCnt
         {
-            volatile tCIDLib::TCard4    m_c4RefCnt;
-            TElem*                      m_pobjElem;
-            TSimplePool<TElem>*         m_psplSrc;
+            tCIDLib::TCard4     m_c4RefCnt;
+            TElem*              m_pobjElem;
+            TSimplePool<TElem>* m_psplSrc;
         };
 
 
@@ -253,19 +288,16 @@ template <typename TElem> class TSimplePoolPtr
 
             try
             {
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
-
                 // We shouldn't have a pointer if the ref count is zero, but check
                 CIDAssert(m_percThis->m_c4RefCnt, L"Simple pool ptr ref cnt underflow");
 
-                m_percThis->m_c4RefCnt--;
-                if (!m_percThis->m_c4RefCnt)
+                if (m_percThis->m_c4RefCnt && (--m_percThis->m_c4RefCnt == 0))
                 {
                     m_percThis->m_psplSrc->ReleaseElem(m_percThis->m_pobjElem);
                     delete m_percThis;
                 }
 
-                // And we are letting this guy go either way
+                // We drop our pointer either way
                 m_percThis = nullptr;
             }
 
@@ -279,10 +311,9 @@ template <typename TElem> class TSimplePoolPtr
 
         //
         //  Do the stuff for us to take on another pointer's object, decrementing
-        //  and releasing ours as required, and incrementing his. We know the source
-        //  cannot change other than the ref count (which cannot go to zero while we
-        //  are here since the copy we have is keeping it alive.) So we just have to
-        //  sync the ref counting.
+        //  and releasing ours as required, and incrementing his. These pointers
+        //  are not thread safe so we expect it cannot change whlie we are in
+        //  here.
         //
         tCIDLib::TVoid TakeSource(const TSimplePoolPtr& spptrSrc)
         {
@@ -302,10 +333,8 @@ template <typename TElem> class TSimplePoolPtr
             if (spptrSrc.m_percThis)
             {
                 m_percThis = spptrSrc.m_percThis;
-                TMtxLocker mtxlSync(m_percThis->m_psplSrc->pmtxSync());
                 m_percThis->m_c4RefCnt++;
             }
-
         }
 
 
@@ -326,7 +355,7 @@ template <typename TElem> class TSimplePoolPtr
 //  CLASS: TSimplePool
 // PREFIX: spl
 // ---------------------------------------------------------------------------
-template<typename TElem> class TSimplePool : public TObject
+template<typename TElem> class TSimplePool : public TObject, public MLockable
 {
     public  :
         // -------------------------------------------------------------------
@@ -345,7 +374,7 @@ template<typename TElem> class TSimplePool : public TObject
         {
             {
                 // Lock if we are MT safe
-                TMtxLocker mtxlSync(m_pmtxSync);
+                TLocker lockrSync(m_pmtxSync);
 
                 //
                 //  Neither our free or used lists are adopting, so we have to
@@ -395,18 +424,41 @@ template<typename TElem> class TSimplePool : public TObject
         TSimplePool& operator=(TSimplePool&&) = delete;
 
 
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTryLock(const tCIDLib::TCard4 c4WaitMS) const final
+        {
+            if (m_pmtxSync)
+                return m_pmtxSync->bTryLock(c4WaitMS);
+
+            return kCIDLib::True;
+        }
+
+        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4WaitMSs) const final
+        {
+            if (m_pmtxSync)
+                m_pmtxSync->Lock(c4WaitMSs);
+        }
+
+        tCIDLib::TVoid Unlock() const override
+        {
+            if (m_pmtxSync)
+                m_pmtxSync->Unlock();
+        }
+
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
 
         //
-        //  Return the overall count of elements. We have to lock here since we
-        //  have to get the current size of both lists.
+        //  Return the overall count of elements, so what's in both lists.
         //
         tCIDLib::TCard4 c4ElemCount() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return m_colFreeList.c4ElemCount() + m_colUsedList.c4ElemCount();
         }
 
@@ -416,8 +468,16 @@ template<typename TElem> class TSimplePool : public TObject
         //
         tCIDLib::TCard4 c4ElemsAvail() const
         {
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
             return (m_c4MaxPoolSize - m_colUsedList.c4ElemCount());
+        }
+
+
+        // Return the number of elements in use
+        tCIDLib::TCard4 c4ElemsUsed() const
+        {
+            TLocker lockrSync(m_pmtxSync);
+            return m_colUsedList.c4ElemCount();
         }
 
 
@@ -432,7 +492,7 @@ template<typename TElem> class TSimplePool : public TObject
         [[nodiscard]] TElem* pobjReserveElem(const tCIDLib::TCard4 c4Size)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Make sure that we can add another used object
             const tCIDLib::TCard4 c4UsedCnt = m_colUsedList.c4ElemCount();
@@ -447,6 +507,9 @@ template<typename TElem> class TSimplePool : public TObject
                     , tCIDLib::EErrClasses::OutResource
                     , m_strName
                 );
+
+                // Won't happen, but makes the analyzer happy
+                return nullptr;
             }
 
             //
@@ -487,6 +550,9 @@ template<typename TElem> class TSimplePool : public TObject
                             , tCIDLib::EErrClasses::OutResource
                             , m_strName
                         );
+
+                        // Won't happen but makes the analyzer happyer
+                        return nullptr;
                     }
                 }
             }
@@ -512,18 +578,11 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
-        // In case someone needs to do more than atomic ops
-        TMutex* pmtxSync()
-        {
-            return m_pmtxSync;
-        }
-
-
         // Return the current sizes of our used and free lists
         tCIDLib::TVoid QueryListSizes(tCIDLib::TCard4& c4Used, tCIDLib::TCard4& c4Free)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             c4Used = m_colUsedList.c4ElemCount();
             c4Free = m_colFreeList.c4ElemCount();
@@ -539,7 +598,7 @@ template<typename TElem> class TSimplePool : public TObject
         tCIDLib::TVoid ReleaseAll()
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             //
             //  Take all of the elements from the used list and put them back into
@@ -583,10 +642,10 @@ template<typename TElem> class TSimplePool : public TObject
         tCIDLib::TVoid ReleaseElem(TElem* const pobjToRelease)
         {
             // Lock if we are MT safe
-            TMtxLocker mtxlSync(m_pmtxSync);
+            TLocker lockrSync(m_pmtxSync);
 
             // Find this guy in the used list, which is by address
-            tCIDLib::TCard4 c4AtUsed;
+            tCIDLib::TCard4 c4AtUsed = kCIDLib::c4MaxCard;
             if (!m_colUsedList.pobjBinarySearch(*pobjToRelease, eCompAddr, c4AtUsed))
             {
                 //
@@ -628,12 +687,14 @@ template<typename TElem> class TSimplePool : public TObject
                 );
             }
 
+
             //
             //  Let's put it back into the free list at its size sorted position,
-            //  and orphan from the used list
+            //  and orphan from the used list. We have to suppress the nodiscard
+            //  warning from the orphan call, so we pass it to AddToFreeList()
+            //  instead of the original parameter version.
             //
-            AddToFreeList(pobjToRelease);
-            m_colUsedList.pobjOrphanAt(c4AtUsed);
+            AddToFreeList(m_colUsedList.pobjOrphanAt(c4AtUsed));
 
             // Make sure combined count hasn't gone past max
             CIDAssert
@@ -672,13 +733,11 @@ template<typename TElem> class TSimplePool : public TObject
             m_c4MaxPoolSize(c4MaxAlloc ? c4MaxAlloc : 8192)
             , m_colFreeList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_colUsedList
               (
-                tCIDLib::EAdoptOpts::NoAdopt
-                , tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
+                tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::MinVal(m_c4MaxPoolSize / 8, 128UL)
               )
             , m_pmtxSync(nullptr)
             , m_strName(strName)
@@ -743,7 +802,7 @@ template<typename TElem> class TSimplePool : public TObject
         }
 
 
-        TElem* pobjFindCandidate(const tCIDLib::TCard4 c4Size)
+        [[nodiscard]] TElem* pobjFindCandidate(const tCIDLib::TCard4 c4Size)
         {
             const tCIDLib::TCard4 c4FreeCnt = m_colFreeList.c4ElemCount();
             tCIDLib::TCard4 c4At;
@@ -967,7 +1026,7 @@ template <typename TElem> class TSimplePoolJan
         //  The caller becomes responsible for return to the pool. Could be null
         //  if already released or orphaned.
         //
-        TElem* pobjOrphan()
+        [[nodiscard]] TElem* pobjOrphan()
         {
             TElem* pobjRet = m_pobjGotten;
             if (m_psplSrc)
@@ -1157,6 +1216,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         }
 
         THeapBufPool(const THeapBufPool&) = delete;
+        THeapBufPool(THeapBufPool&&) = delete;
 
         ~THeapBufPool() {}
 
@@ -1165,6 +1225,7 @@ class THeapBufPool : public TSimplePool<THeapBuf>
         //  Public operators
         // -------------------------------------------------------------------
         THeapBufPool& operator=(const THeapBufPool&) = delete;
+        THeapBufPool& operator=(THeapBufPool&&) = delete;
 
 
         // -------------------------------------------------------------------

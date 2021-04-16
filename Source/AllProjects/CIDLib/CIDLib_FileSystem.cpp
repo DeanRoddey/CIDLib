@@ -45,10 +45,13 @@ RTTIDecls(TVolFailureInfo, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_FileSys
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format versions
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2VolFailFmtVer = 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format versions
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2VolFailFmtVer = 2;
+    }
 }
 
 
@@ -105,12 +108,9 @@ FindFiles(  const   TString&                    strWildCard
     TFindBuf::TNCCursor cursChildren = fndbTarget.cursChildrenNC();
     for (; cursChildren; ++cursChildren)
     {
-        //
-        //  If this one is a directory and not a special directory, then
-        //  search it.
-        //
+        //  If this one is a directory, then search it.
         TFindBuf& fndbCur = *cursChildren;
-        if (fndbCur.bIsNormalDir())
+        if (fndbCur.bIsDirectory())
             FindFiles(strWildCard, fndbCur, c4Matches, eFlags);
     }
 }
@@ -156,6 +156,51 @@ static tCIDLib::TVoid FindDirs( const   TString&            strWildCard
 }
 
 
+//  A recursive helper for the RemovePath() method.
+static tCIDLib::TVoid
+FSTreeDelete(const TString& strStartDir, const tCIDLib::ETreeDelModes eMode)
+{
+    TDirIter diterCur;
+    TFindBuf fndbCur;
+
+    //
+    //  Do sub-dirs first if not in shallow mode. In shallow mode we are just removing
+    //  the immediate contents of the start dir.
+    //
+    TPathStr pathCur;
+    if (eMode != tCIDLib::ETreeDelModes::Shallow)
+    {
+        pathCur = strStartDir;
+        pathCur.AddLevel(kCIDLib::pszAllDirsSpec);
+        if (diterCur.bFindFirst(pathCur, fndbCur, tCIDLib::EDirSearchFlags::AllDirs))
+        {
+            do
+            {
+                //
+                //  Recurse on this guy first. We don't get the special current/parent
+                //  directories, so we don't have to worry about that.
+                //
+                FSTreeDelete(fndbCur.pathFileName(), eMode);
+
+                // If not in clean mode, we want to remove this directory now
+                if (eMode != tCIDLib::ETreeDelModes::Clean)
+                    TFileSys::RemoveDirectory(fndbCur.pathFileName());
+
+            }   while (diterCur.bFindNext(fndbCur));
+        }
+    }
+
+    // And now do files
+    pathCur = strStartDir;
+    pathCur.AddLevel(kCIDLib::pszAllFilesSpec);
+    if (diterCur.bFindFirst(pathCur, fndbCur, tCIDLib::EDirSearchFlags::AllFiles))
+    {
+        do
+        {
+            TFileSys::DeleteFile(fndbCur.pathFileName());
+        }   while (diterCur.bFindNext(fndbCur));
+    }
+}
 
 
 // ---------------------------------------------------------------------------
@@ -463,6 +508,17 @@ tCIDLib::TBoolean TFileSys::bIsFQPath(const TString& strPath)
 }
 
 
+//
+//  We don't return the . and .. type directories in searches (and there may be
+//  others on some platforms), but we provide this in case they get directory
+//  info from elsewhere.
+//
+tCIDLib::TBoolean TFileSys::bIsNormalDir(const TString& strPath)
+{
+    return TKrnlFileSys::bIsNormalDir(strPath.pszBuffer());
+}
+
+
 tCIDLib::TBoolean TFileSys::bIsRedirected(const tCIDLib::EStdFiles eStdFile)
 {
     return TKrnlFileSys::bIsRedirected(eStdFile);
@@ -491,11 +547,8 @@ tCIDLib::TBoolean TFileSys::bRemoveTrailingSeparator(TString& strSrc)
 tCIDLib::TCard4
 TFileSys::c4BuildDirTree(const TString& strWildCard, TFindBuf& fndbMatches)
 {
-    //
-    //  Make sure the find buffer is valid. It has to be a directory and
-    //  not a special directory.
-    //
-    if (!fndbMatches.bIsNormalDir())
+    //  Make sure the find buffer is valid. It has to be a directory
+    if (!fndbMatches.bIsDirectory())
     {
         facCIDLib().ThrowErr
         (
@@ -532,8 +585,8 @@ TFileSys::c4BuildFileTree(  const   TString&                    strWildCard
                             ,       TFindBuf&                   fndbMatches
                             , const tCIDLib::EDirSearchFlags    eFlags)
 {
-    // The passed match must be a non-special directory
-    if (!fndbMatches.bIsNormalDir())
+    // The passed match must be a directory
+    if (!fndbMatches.bIsDirectory())
     {
         facCIDLib().ThrowErr
         (
@@ -609,7 +662,7 @@ tCIDLib::TCard4 TFileSys
     // Copy over the volumes we found
     if (kllistGood.bResetCursor())
     {
-        TKrnlVolumeInfo* pkvoliCur;
+        TKrnlVolumeInfo* pkvoliCur = nullptr;
         while (kllistGood.bNext(pkvoliCur))
             colVolsToFill.objAdd(TVolumeInfo(*pkvoliCur));
     }
@@ -617,7 +670,7 @@ tCIDLib::TCard4 TFileSys
     // Copy over the failres we got
     if (kllistBad.bResetCursor())
     {
-        TKrnlVolFailureInfo* pkvolfiList;
+        TKrnlVolFailureInfo* pkvolfiList = nullptr;
         while (kllistBad.bNext(pkvolfiList))
             colErrsToFill.objAdd(TVolFailureInfo(*pkvolfiList));
     }
@@ -666,28 +719,12 @@ TFileSys::c4SearchDir(  const   TString&                    strPath
 //  Cleans out a whole branch of the directory hierarchy, recursively. See the
 //  ETreeDelModes comments for what the modes mean.
 //
-//  We never remove the top level directory itself, we just clean it out, we pass
-//  false for the 'remove top level dir' parameter to bRemovePath().
-//
 tCIDLib::TVoid
 TFileSys::CleanPath(const   TString&                strStartDir
                     , const tCIDLib::ETreeDelModes  eMode)
 {
-    if (!TKrnlFileSys::bRemovePath( strStartDir.pszBuffer()
-                                    , eMode
-                                    , kCIDLib::False))
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcFile_PathDelete
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
-            , strStartDir
-        );
-    }
+    // The last parameter means don't remove the start dir
+    RemovePath(strStartDir, eMode, kCIDLib::False);
 }
 
 
@@ -985,10 +1022,10 @@ TFileSys::MakeSubDirectory( const   TString& strToCreate
         (
             CID_FILE
             , CID_LINE
-            , kCIDErrs::errcFile_MustBeDir
+            , kCIDErrs::errcFile_MustBeADir
+            , strParent
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
-            , strParent
         );
     }
 
@@ -1167,28 +1204,40 @@ tCIDLib::TVoid TFileSys::RemoveDirectory(const TString& strSpec)
 }
 
 
-tCIDLib::TVoid TFileSys::RemovePath(const TString& strStartDir)
+//
+//  Recursively removes the contents under the start directory. Depending on the mode
+//  we remove more or less stuff.
+//
+tCIDLib::TVoid
+TFileSys::RemovePath(const  TString&                strStartDir
+                    , const tCIDLib::ETreeDelModes  eMode
+                    , const tCIDLib::TBoolean       bRemoveStart)
 {
     //
-    //  Indicate we want to remove the start directory in addition to removing
-    //  its contents.
+    //  If the starting point doesn't exist, or is not a directory, then something is
+    //  wrong.
     //
-    if (!TKrnlFileSys::bRemovePath( strStartDir.pszBuffer()
-                                    , tCIDLib::ETreeDelModes::Remove
-                                    , kCIDLib::True))
+    if (!TFileSys::bIsDirectory(strStartDir))
     {
-        facCIDLib().ThrowKrnlErr
+        facCIDLib().ThrowErr
         (
             CID_FILE
             , CID_LINE
-            , kCIDErrs::errcFile_PathDelete
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::CantDo
+            , kCIDErrs::errcFile_MustBeADir
             , strStartDir
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::NotFound
         );
     }
+
+    // Call a local recursive helper to do the work
+    FSTreeDelete(strStartDir, eMode);
+
+    // And now, if asked, remove the start dir
+    if (bRemoveStart)
+        TFileSys::RemoveDirectory(strStartDir);
 }
+
 
 
 tCIDLib::TVoid

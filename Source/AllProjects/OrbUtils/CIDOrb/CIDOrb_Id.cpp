@@ -44,7 +44,10 @@ RTTIDecls(TOrbIdKeyOps,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_Id
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 
@@ -142,15 +145,6 @@ TOrbId::TOrbId( const   TString&    strInterface
     Set(strInterface, strInstance);
 }
 
-TOrbId::TOrbId(const TOrbId& oidToCopy) :
-
-    m_mhashInterface(oidToCopy.m_mhashInterface)
-    , m_mhashInstance(oidToCopy.m_mhashInstance)
-{
-    // Pre-calc our hash
-    m_hshThis = hshDoHashCalc(kCIDOrb::c4IdModulus);
-}
-
 TOrbId::~TOrbId()
 {
 }
@@ -159,18 +153,6 @@ TOrbId::~TOrbId()
 // ---------------------------------------------------------------------------
 //  TOrbId: Public operators
 // ---------------------------------------------------------------------------
-TOrbId& TOrbId::operator=(const TOrbId& oidToAssign)
-{
-    if (&oidToAssign == this)
-        return *this;
-
-    m_hshThis        = oidToAssign.m_hshThis;
-    m_mhashInterface = oidToAssign.m_mhashInterface;
-    m_mhashInstance  = oidToAssign.m_mhashInstance;
-
-    return *this;
-}
-
 
 tCIDLib::TBoolean TOrbId::operator==(const TOrbId& oidToCompare) const
 {

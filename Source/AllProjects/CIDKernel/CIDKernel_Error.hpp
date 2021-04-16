@@ -111,6 +111,7 @@ class KRNLEXPORT TKrnlError
         );
 
         TKrnlError(const TKrnlError&) = default;
+        TKrnlError(TKrnlError&&) = default;
 
         ~TKrnlError();
 
@@ -119,6 +120,7 @@ class KRNLEXPORT TKrnlError
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlError& operator=(const TKrnlError&) = default;
+        TKrnlError& operator=(TKrnlError&&) = default;
 
         tCIDLib::TBoolean operator==
         (

@@ -49,6 +49,9 @@ ERRORS=
     errcArea_UnderOverflow      131     The operation caused a(n) %(1) field to over/underflow
     errcArea_BadFormat          132     Could not parse area object from passed text
 
+    ; Atomic ops errors
+    errcAtomic_AcquireRel       140     An atomic acquire/release error occurred
+
     ; TAudio errors
     errcAudio_DoCue             150     Could not generate the audio cue
     errcAudio_PlayWav           151     Could not play the wav file: %(1)
@@ -141,6 +144,9 @@ ERRORS=
     errcCol_MustClearFirst      812     The target collection must be clared first
     errcCol_Full                813     The '%(1)' is is full, no more items can be added
     errcCol_HashChanged         814     The hash of an element in a hashed collection was modified in place
+    errcCol_MovedAdopted        815     Cannot move from an adopting collection to a non-adopting one (use GiveElements() for that.)
+    errcCol_StoreCounts         816     Got invalid counts when streaming in %(1) collection
+    errcCol_BadStoredNodeType   817     Invalid stored node type for %(1) collection (Value=%(2))
 
     ; Console errors
     errcCon_TextReadError       891     Could not read a text line from the console object
@@ -162,8 +168,10 @@ ERRORS=
     errcDSrc_AlreadyInit        1028    The data source is already initialized
     errcDSrc_JanDataNotSet      1029    The data source janitor has a null pointer
 
-    ; Debug mode errors
+    ; Asserts and pre/post conditions
     errcDbg_AssertFailed        1050    An assertion failed
+    errcDbg_PreCondFailed       1051    A pre-condition failed
+    errcDbg_PostCondFailed      1052    A post-condition failed
 
     ; Directory change monitoring errors
     errcDirCh_Start             1160    Could not start directory monitoring. Path=%(1)
@@ -232,7 +240,7 @@ ERRORS=
     ; File and file system errors
     errcFile_NoOpenSearch       1408    There must be an open search, call bStartSearch() first
     errcFile_PathFormat         1409    Invalid path format!
-    errcFile_MustBeDir          1410    %(1) must be a directory
+    errcFile_MustBeADir         1410    The target (or source) must be a directory
     errcFile_Close              1411    Could not close the file, name=%(1)
     errcFile_Seek               1412    Could not move the file pointer, name=%(1)
     errcFile_QuerySize          1413    Could not query the size of the file, name=%(1)
@@ -369,7 +377,7 @@ ERRORS=
     errcPrc_BadPrioLevel        2438    Bad priority level %(1), clipped it to %(2)
     errcPrc_BadPrioOffset       2439    %(1) is an invalid priority offset
     errcPrc_NotRunning          2440    Thread '%(1)' is not running
-    errcPrc_NotWhileRunning     2441    You cannot %(1) while thread is running
+    errcPrc_ThrIsRunning        2441    Thread '%(1)' is running, so %(2) is not legal
     errcPrc_NoProcessOverride   2442    TThread::Process() must be overridden
     errcPrc_CannotAddAt         2443    Thread slot %(1) is filled, cannot add there
     errcPrc_NoSyncRequest       2444    There was no outstanding thread sync to release on thread '%(1)'
@@ -416,6 +424,7 @@ ERRORS=
     errcPubSub_NotReady         2907    The pub/sub %(1) has not been filled in yet
     errcPubSub_NoEvent          2909    There is no event associated with subscription
     errcPubSub_SubQFull         2910    The subscription queue was full, msg dropped
+    errcPubSub_NullMsg          2911    The message object to publish cannot be null
 
     ; TRange errors
     errcRange_BadMinMax         2816    The max (%(1)) cannot be less than the min (%(2))
@@ -454,10 +463,13 @@ ERRORS=
     errcSize_BadFormat          3127    Could not parse size object from passed text
 
     ; Smart pointer related errors
-    errcSPtr_NoReference        3150    The counted pointer doesn't have a reference
-    errcSPtr_RefReleaseErr      3151    A ref count release error occurred
-    errcSPtr_RefUnderflow       3152    Ref count was at zero before release call
-    errcSPtr_RefAcquireErr      3153    A ref count acquire error occurred
+    errcSPtr_NoReference        3150    The %(1) pointer doesn't have a reference
+    errcSPtr_RefReleaseErr      3151    A %(1) pointer ref count release error occurred
+    errcSPtr_RefOverUnderflow   3152    %(1) count %(2) on %(3) pointer
+    errcSPtr_RefAcquireErr      3153    A %(1) pointer ref count acquire error occurred
+    errcSPtr_AlreadyLocked      3154    The %(1) pointer is already locked
+    errcSPtr_CantGetStrongRef   3155    Cannot acquire strong ref to counted pointer
+    errcSPtr_RefOverUnderflow2  3156    Reference count on %(1) pointer is already zero
 
     ; Speech related errors
     errcSpeech_SpeakFailed      3160    Text to speech operation failed
@@ -544,6 +556,10 @@ ERRORS=
     errcStrm_NotAllBytesEaten   3381    Not all received UTF-8 bytes (%(1)) were eaten during unflattening
     errcStrm_ImplDataSzErr      3382    The current stream impl data size is less than current position
     errcStrm_FileTextInit       3383    This text file stream has not been opened yet
+    errcStrm_PBNotEmpty         3384    The pushback stack must be empty at this point
+    errcStrm_PBStackIsFull      3385    The pushback stack is full
+    errcStrm_PBUnderflow        3386    You cannot push back beyond the start of the stream
+    errcStrm_DontHaveStream     3388    The %(1) stream has not been set
 
     ; System info errors
     errcSysI_QueryUserName      3450    Could not get the current user name
@@ -553,7 +569,9 @@ ERRORS=
     errcSysI_GetCmdLineParm     3454    Could not get command line parameter %(1)
     errcSysI_RemoveCmdLineParm  3455    Could not remove command line parameter %(1)
     errcSysI_QuerySpecialPath   3456    Could not get special path
-    errcSysInfo_BadArgIndex     3457    %(1) is not a valid command line argument index. Count=%(2)
+    errcSysI_BadArgIndex        3457    %(1) is not a valid command line argument index. Count=%(2)
+    errcSysI_ConvertArg         3458    Could not convert parameter %(1) to %(2)
+    errcSysI_ArgRange           3459    Parameter %(1) must be in the range %(2) to %(3)
 
     ; Text converter errors
     errcTCvt_Unrepresentable    3600    '%(1)' is not representable in the encoding '%(2)'
@@ -583,7 +601,6 @@ ERRORS=
     errcTReg_NotFound           4402    The class name %(1) was not in the type registry
 
     ; Text stream errors
-    errcTStrm_StrmAlreadySet    4500    The binary stream is already set for this %(1) text stream
     errcTStrm_WriteFailed       4501    Could not write transcoded text to the underlying binary stream
     errcTStrm_FormatFor         4502    Failed when formatting a fundamental value to write to the text stream
     errcTStrm_BadSpecial        4503    %(1) is not a valid value for the TTextOutStream::ESpecial enum

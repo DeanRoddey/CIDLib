@@ -36,8 +36,13 @@
 // Bring in a DDK header with the IOCTLS we need
 #define     _ANONYMOUS_UNION
 #pragma     warning(disable : 4200)
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <ntddcdrm.h>
 #include    <ntddscsi.h>
+#pragma     warning(pop)
 
 //
 // We have to define a couple things that aren't in any of the headers
@@ -163,26 +168,28 @@ typedef struct _GET_CONFIGURATION_IOCTL_INPUT
 // ---------------------------------------------------------------------------
 namespace CIDKernel_RemMedia
 {
-    // -----------------------------------------------------------------------
-    //  A template for the device path we need to open a drive.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const aszPathTmpl = L"\\\\.\\ :";
-
-
-    // -----------------------------------------------------------------------
-    //  The structure for our per-platform data that we allocate for each
-    //  CDROM object. We allocate an event to use in any ioctl calls we make,
-    //  to make the async overlapped calls into sync calls. and we pre-setup
-    //  the drive path.
-    // -----------------------------------------------------------------------
-    struct TPlatData
+    namespace
     {
-        HANDLE          hDevice;
-        HANDLE          hEvent;
-        tCIDLib::TCh    szDrivePath[8];
-    };
+        // -----------------------------------------------------------------------
+        //  A template for the device path we need to open a drive.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const aszPathTmpl = L"\\\\.\\ :";
+    }
 }
 
+
+// -----------------------------------------------------------------------
+//  The structure for our per-platform data that we allocate for each
+//  CDROM object. We allocate an event to use in any ioctl calls we make,
+//  to make the async overlapped calls into sync calls. and we pre-setup
+//  the drive path.
+// -----------------------------------------------------------------------
+struct TKrnlRemMediaDrv::TPlatData
+{
+    HANDLE          hDevice;
+    HANDLE          hEvent;
+    tCIDLib::TCh    szDrivePath[8];
+};
 
 
 // ---------------------------------------------------------------------------
@@ -210,13 +217,13 @@ TCIDKrnlModule::bInitTermRemMedia(const tCIDLib::EInitTerm eState)
 //  Local helper methods
 // ---------------------------------------------------------------------------
 static tCIDLib::TBoolean
-bDoIOCTL(       CIDKernel_RemMedia::TPlatData&  PlatData
+bDoIOCTL(       TKrnlRemMediaDrv::TPlatData&    PlatData
         , const tCIDLib::TCard4                 c4IOCode
         , const tCIDLib::TVoid*                 pInBuf
         , const tCIDLib::TCard4                 c4InBytes
         ,       tCIDLib::TVoid* const           pOutBuf
-        ,       tCIDLib::TCard4&                c4OutBytes
-        ,       tCIDLib::TCard4&                c4ErrCode)
+        , COP   tCIDLib::TCard4&                c4OutBytes
+        , COP   tCIDLib::TCard4&                c4ErrCode)
 {
     // If the event has not been created yet, then create it
     if (!PlatData.hEvent)
@@ -283,17 +290,14 @@ bDoIOCTL(       CIDKernel_RemMedia::TPlatData&  PlatData
 // ---------------------------------------------------------------------------
 TKrnlRemMediaDrv::TKrnlRemMediaDrv() :
 
-    m_pPlatData(0)
+    m_pPlatData(nullptr)
 {
     // Allocate our platform data and set it up
-    CIDKernel_RemMedia::TPlatData* pPlatData = new CIDKernel_RemMedia::TPlatData;
+    m_pPlatData = new TKrnlRemMediaDrv::TPlatData;
     TRawMem::SetMemBuf
     (
-        pPlatData, tCIDLib::TCard1(0), sizeof(CIDKernel_RemMedia::TPlatData)
+        m_pPlatData, kCIDLib::c1MinCard, sizeof(TKrnlRemMediaDrv::TPlatData)
     );
-
-    // And store it in the publically visible opaque pointer
-    m_pPlatData = pPlatData;
 
     // Initialize the drive id to empty
     m_szDriveId[0] = kCIDLib::chNull;
@@ -301,25 +305,17 @@ TKrnlRemMediaDrv::TKrnlRemMediaDrv() :
 
 TKrnlRemMediaDrv::TKrnlRemMediaDrv(const tCIDLib::TCh* const pszDevPath) :
 
-    m_pPlatData(0)
+    m_pPlatData(nullptr)
 {
     // Allocate our platform data and set it up
-    CIDKernel_RemMedia::TPlatData* pPlatData = new CIDKernel_RemMedia::TPlatData;
-    TRawMem::SetMemBuf
-    (
-        pPlatData, tCIDLib::TCard1(0), sizeof(CIDKernel_RemMedia::TPlatData)
-    );
+    m_pPlatData = new TKrnlRemMediaDrv::TPlatData;
+    TRawMem::SetMemBuf(m_pPlatData, kCIDLib::c1MinCard, sizeof(TKrnlRemMediaDrv::TPlatData));
 
     // Store the device path
     TRawStr::CopyStr
     (
-        pPlatData->szDrivePath
-        , pszDevPath
-        , c4MaxBufChars(pPlatData->szDrivePath)
+        m_pPlatData->szDrivePath, pszDevPath, c4MaxBufChars(m_pPlatData->szDrivePath)
     );
-
-    // And store it in the publically visible opaque pointer
-    m_pPlatData = pPlatData;
 
     // Store the device path
     bSetPath(pszDevPath);
@@ -330,25 +326,22 @@ TKrnlRemMediaDrv::TKrnlRemMediaDrv(const tCIDLib::TCh* const pszDevPath) :
 
 TKrnlRemMediaDrv::~TKrnlRemMediaDrv()
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
     // Close any existing handle
-    if (pPlatData->hDevice)
+    if (m_pPlatData->hDevice)
     {
-        ::CloseHandle(pPlatData->hDevice);
-        pPlatData->hDevice = 0;
+        ::CloseHandle(m_pPlatData->hDevice);
+        m_pPlatData->hDevice = 0;
     }
 
-    if (pPlatData->hEvent)
+    if (m_pPlatData->hEvent)
     {
-        ::CloseHandle(pPlatData->hEvent);
-        pPlatData->hDevice = 0;
+        ::CloseHandle(m_pPlatData->hEvent);
+        m_pPlatData->hEvent = 0;
     }
 
     // And clean up the platform data
-    delete pPlatData;
-    m_pPlatData = 0;
+    delete m_pPlatData;
+    m_pPlatData = nullptr;
 }
 
 
@@ -364,10 +357,7 @@ TKrnlRemMediaDrv::~TKrnlRemMediaDrv()
 //
 tCIDLib::TBoolean TKrnlRemMediaDrv::bCheckIsReady()
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -377,7 +367,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bCheckIsReady()
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_STORAGE_CHECK_VERIFY
         , 0
         , 0
@@ -391,9 +381,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bCheckIsReady()
 
 tCIDLib::TBoolean TKrnlRemMediaDrv::bIsOpen() const
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-    return (pPlatData->hDevice != 0);
+    return (m_pPlatData->hDevice != 0);
 }
 
 
@@ -403,10 +391,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bIsOpen() const
 //
 tCIDLib::TBoolean TKrnlRemMediaDrv::bLockEject(const tCIDLib::TBoolean bState)
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -420,7 +405,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bLockEject(const tCIDLib::TBoolean bState)
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_STORAGE_EJECTION_CONTROL
         , &Info
         , sizeof(Info)
@@ -435,11 +420,8 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bLockEject(const tCIDLib::TBoolean bState)
 tCIDLib::TBoolean
 TKrnlRemMediaDrv::bMediaType(TKrnlRemMedia::EMediaTypes& eToFill) const
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
     // We must be opened
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         eToFill = TKrnlRemMedia::EMediaTypes::None;
@@ -448,7 +430,7 @@ TKrnlRemMediaDrv::bMediaType(TKrnlRemMedia::EMediaTypes& eToFill) const
 
     // First try the get configuration call
     GET_CONFIGURATION_IOCTL_INPUT Input;
-    TRawMem::SetMemBuf(&Input, tCIDLib::TCard1(0), sizeof(Input));
+    TRawMem::SetMemBuf(&Input, kCIDLib::c1MinCard, sizeof(Input));
     Input.Feature = FeatureCdRead;
 
     GET_CONFIGURATION_HEADER Output = {0};
@@ -456,7 +438,7 @@ TKrnlRemMediaDrv::bMediaType(TKrnlRemMedia::EMediaTypes& eToFill) const
     tCIDLib::TCard4 c4OutBytes = sizeof(Output);
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_CDROM_GET_CONFIGURATION
         , &Input
         , sizeof(Input)
@@ -557,10 +539,7 @@ TKrnlRemMediaDrv::bMediaType(TKrnlRemMedia::EMediaTypes& eToFill) const
 //
 tCIDLib::TBoolean TKrnlRemMediaDrv::bOpenDoor(const tCIDLib::TBoolean bState)
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -570,7 +549,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpenDoor(const tCIDLib::TBoolean bState)
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , bState ? IOCTL_STORAGE_EJECT_MEDIA : IOCTL_STORAGE_LOAD_MEDIA
         , 0
         , 0
@@ -584,14 +563,11 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpenDoor(const tCIDLib::TBoolean bState)
 
 tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
     // Close any existing handle
-    if (pPlatData->hDevice != 0)
+    if (m_pPlatData->hDevice != 0)
     {
-        ::CloseHandle(pPlatData->hDevice);
-        pPlatData->hDevice = 0;
+        ::CloseHandle(m_pPlatData->hDevice);
+        m_pPlatData->hDevice = 0;
     }
 
     //
@@ -601,10 +577,10 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     //  it into the device style path.
     //
     tCIDLib::TCh szPath[8] = L"\\\\.\\ :";
-    szPath[4] = pPlatData->szDrivePath[0];
+    szPath[4] = m_pPlatData->szDrivePath[0];
 
     // And try to open the new one
-    pPlatData->hDevice = ::CreateFile
+    m_pPlatData->hDevice = ::CreateFile
     (
         szPath
         , GENERIC_READ | GENERIC_WRITE
@@ -615,9 +591,9 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
         , NULL
     );
 
-    if (pPlatData->hDevice == INVALID_HANDLE_VALUE)
+    if (m_pPlatData->hDevice == INVALID_HANDLE_VALUE)
     {
-        pPlatData->hDevice = 0;
+        m_pPlatData->hDevice = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_OpenFailed, ::GetLastError());
         return kCIDLib::False;
     }
@@ -639,7 +615,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     #pragma CIDLIB_POPPACK
 
     SPTD_WITH_BUFFER* pPTBuf = (SPTD_WITH_BUFFER*)ac1PTInfo;
-    TRawMem::SetMemBuf(pPTBuf, tCIDLib::TCard1(0), sizeof(ac1PTInfo));
+    TRawMem::SetMemBuf(pPTBuf, kCIDLib::c1MinCard, sizeof(ac1PTInfo));
 
     pPTBuf->PTInfo.Length          = sizeof(SCSI_PASS_THROUGH);
     pPTBuf->PTInfo.CdbLength       = 6;
@@ -656,7 +632,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_SCSI_PASS_THROUGH_DIRECT
         , pPTBuf
         , c4Len
@@ -668,8 +644,8 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     if (!bRes)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcRemM_QueryId, ::GetLastError());
-        ::CloseHandle(pPlatData->hDevice);
-        pPlatData->hDevice = 0;
+        ::CloseHandle(m_pPlatData->hDevice);
+        m_pPlatData->hDevice = 0;
         return kCIDLib::False;
     }
 
@@ -705,21 +681,18 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
 tCIDLib::TBoolean
 TKrnlRemMediaDrv::bQueryCDTOC(TKrnlRemMedia::TCDTOCInfo& ToFill)
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
     }
 
     tCIDLib::TCard4 c4IOSz = sizeof(TKrnlRemMedia::TCDTOCInfo);
-    TRawMem::SetMemBuf(&ToFill, tCIDLib::TCard1(0), c4IOSz);
+    TRawMem::SetMemBuf(&ToFill, kCIDLib::c1MinCard, c4IOSz);
     tCIDLib::TCard4 c4ErrCode;
     const tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_CDROM_READ_TOC
         , 0
         , 0
@@ -752,10 +725,7 @@ TKrnlRemMediaDrv::bReadSectors( const   tCIDLib::TCard4         c4Start
                                 ,       tCIDLib::TCard1* const  pc1Buf
                                 ,       tCIDLib::TCard4&        c4Bytes)
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice == 0)
+    if (m_pPlatData->hDevice == 0)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotReady);
         return kCIDLib::False;
@@ -770,7 +740,7 @@ TKrnlRemMediaDrv::bReadSectors( const   tCIDLib::TCard4         c4Start
     tCIDLib::TCard4 c4ErrCode;
     tCIDLib::TBoolean bRes = bDoIOCTL
     (
-        *pPlatData
+        *m_pPlatData
         , IOCTL_CDROM_RAW_READ
         , &RawInfo
         , sizeof(RawInfo)
@@ -822,7 +792,7 @@ TKrnlRemMediaDrv::bReadSectors( const   tCIDLib::TCard4         c4Start
             RawInfo.SectorCount = c4Count;
             bRes = bDoIOCTL
             (
-                *pPlatData
+                *m_pPlatData
                 , IOCTL_CDROM_RAW_READ
                 , &RawInfo
                 , sizeof(RawInfo)
@@ -839,17 +809,14 @@ TKrnlRemMediaDrv::bReadSectors( const   tCIDLib::TCard4         c4Start
 // Set's a new device path on this object
 tCIDLib::TBoolean TKrnlRemMediaDrv::bSetPath(const tCIDLib::TCh* const pszToSet)
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
     // Free up any existing stuff
     Close();
 
     TRawStr::CopyStr
     (
-        pPlatData->szDrivePath
+        m_pPlatData->szDrivePath
         , pszToSet
-        , c4MaxBufChars(pPlatData->szDrivePath)
+        , c4MaxBufChars(m_pPlatData->szDrivePath)
     );
     return kCIDLib::True;
 }
@@ -858,13 +825,10 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bSetPath(const tCIDLib::TCh* const pszToSet)
 // Close down any existing device handle
 tCIDLib::TVoid TKrnlRemMediaDrv::Close()
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-
-    if (pPlatData->hDevice)
+    if (m_pPlatData->hDevice)
     {
-        ::CloseHandle(pPlatData->hDevice);
-        pPlatData->hDevice = 0;
+        ::CloseHandle(m_pPlatData->hDevice);
+        m_pPlatData->hDevice = 0;
     }
 
     // Initialize the drive id to empty again
@@ -880,9 +844,7 @@ const tCIDLib::TCh* TKrnlRemMediaDrv::pszDriveId() const
 
 const tCIDLib::TCh* TKrnlRemMediaDrv::pszDrivePath() const
 {
-    CIDKernel_RemMedia::TPlatData* pPlatData
-                = reinterpret_cast<CIDKernel_RemMedia::TPlatData*>(m_pPlatData);
-    return pPlatData->szDrivePath;
+    return m_pPlatData->szDrivePath;
 }
 
 
@@ -901,8 +863,7 @@ const tCIDLib::TCh* TKrnlRemMediaDrv::pszDrivePath() const
 //  Enumerates the devices and returns a new line separate list of device
 //  paths for all the DVD/CDROMs found.
 //
-tCIDLib::TBoolean
-TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
+tCIDLib::TBoolean TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
 {
     kllstToFill.RemoveAll();
 
@@ -935,10 +896,10 @@ TKrnlRemMedia::bEnumDrvs(TKrnlLList<TKrnlString>& kllstToFill)
 tCIDLib::TBoolean
 TKrnlRemMedia::bExtractCDTrackInfo( const   TKrnlRemMedia::TCDTOCInfo&  SrcTOC
                                     , const tCIDLib::TCard4             c4TrackNum
-                                    ,       tCIDLib::TCard4&            c4StartBlock
-                                    ,       tCIDLib::TCard4&            c4BlockCnt
-                                    ,       tCIDLib::TCard4&            c4Minutes
-                                    ,       tCIDLib::TCard4&            c4Seconds)
+                                    , CIOP  tCIDLib::TCard4&            c4StartBlock
+                                    , CIOP  tCIDLib::TCard4&            c4BlockCnt
+                                    , CIOP  tCIDLib::TCard4&            c4Minutes
+                                    , CIOP  tCIDLib::TCard4&            c4Seconds)
 {
     // Make sure it's a valid track
     if (c4TrackNum > SrcTOC.c1LastTrack)

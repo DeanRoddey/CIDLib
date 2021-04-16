@@ -98,27 +98,7 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
     //  because calls to this method are thread serialized by the CIDLib
     //  code that calls it. This lets us avoid the creation on every call.
     //
-    static volatile tCIDLib::TBoolean   bFirstTime = kCIDLib::True;
-    static TTime                        tmCurrent;
-
-    //
-    //  If this is the first time through, then we need to set the default
-    //  format for the time object so that it will naturally format in the
-    //  style we want. It will be in the form:
-    //
-    //  MM:DD HH:MM:SS
-    //
-    //  In a 24 hour format.
-    //
-    if (bFirstTime)
-    {
-        TBaseLock lockInit;
-        if (bFirstTime)
-        {
-            tmCurrent.strDefaultFormat(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
-            bFirstTime = kCIDLib::False;
-        }
-    }
+    static TTime tmCurrent(L"%(M,2,0)/%(D,2,0) %(H,2,0):%(u,2,0):%(s,2,0)");
 
     // Set the time object to the time in the event
     tmCurrent = logevToLog.enctLogged();
@@ -143,15 +123,15 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
             pathBack.bRemoveExt();
             pathBack.AppendExt(L"BakLog");
 
-            enum EStates
+            enum class EStates
             {
-                EState_DelBack
-                , EState_CloseCur
-                , EState_RenCur
-                , EState_OpenNew
+                DelBack
+                , CloseCur
+                , RenCur
+                , OpenNew
             };
 
-            EStates eCurState = EState_DelBack;
+            EStates eCurState = EStates::DelBack;
             try
             {
                 // If a backup file exists, then delete it
@@ -162,17 +142,17 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
                 //  Close the current stream so that we can rename this
                 //  current file.
                 //
-                eCurState = EState_CloseCur;
+                eCurState = EStates::CloseCur;
                 m_pstrmTarget->Close();
 
-                eCurState = EState_RenCur;
+                eCurState = EStates::RenCur;
                 TFileSys::Rename(pathCur, pathBack);
 
                 //
                 //  And open up the current file again, which will create
                 //  a fresh log file.
                 //
-                eCurState = EState_OpenNew;
+                eCurState = EStates::OpenNew;
                 m_pstrmTarget->Open
                 (
                     pathCur
@@ -194,12 +174,12 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
             {
                 switch(eCurState)
                 {
-                    case EState_DelBack :
+                    case EStates::DelBack :
                         // Ignore it and stick with the current file
                         break;
 
-                    case EState_CloseCur :
-                    case EState_OpenNew :
+                    case EStates::CloseCur :
+                    case EStates::OpenNew :
                     {
                         // We just cannot reasonably recover from these
                         #if CID_DEBUG_ON
@@ -208,7 +188,7 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
                             CID_FILE
                             , CID_LINE
                             , L"CIDLib C++ Frameworks"
-                            , 0
+                            , nullptr
                             , L"The local log file could not be rolled over. "
                               L"In order to recover, the program will exit."
                         );
@@ -217,7 +197,7 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
                         break;
                     }
 
-                    case EState_RenCur :
+                    case EStates::RenCur :
                     {
                         //
                         //  Probably someone has the file open, so we just
@@ -251,7 +231,7 @@ tCIDLib::TVoid TTextFileLogger::LogEvent(const TLogEvent& logevToLog)
                                 CID_FILE
                                 , CID_LINE
                                 , L"CIDLib C++ Frameworks"
-                                , 0
+                                , nullptr
                                 , L"Could not re-open the local log file after "
                                   L"a failed rollover. In order to recover, the "
                                   L"program will exit."
@@ -388,7 +368,7 @@ TTextFileLogger::Open(  const   tCIDLib::TCh* const     pszFile
     if (!TResourceName::bIsNullObject(rsnMutex))
         m_pmtxSync = new TMutex(rsnMutex);
 
-    TMtxLocker lockFile(m_pmtxSync);
+    TLocker lockrFile(m_pmtxSync);
 
     // See if it exists yet
     TPathStr pathTmp;

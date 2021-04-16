@@ -32,7 +32,12 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_ServiceWin32.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <Dbt.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------
@@ -40,40 +45,43 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_SvcWin32
 {
-    // -----------------------------------------------------------------------
-    //  We can be started in debug mode, which is useful for debugging the
-    //  client app, since its hard to debug a service. This is set in the
-    //  init method according to the debug parm.
-    // -----------------------------------------------------------------------
-    tCIDLib::TBoolean           bDebugMode = kCIDLib::False;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We can be started in debug mode, which is useful for debugging the
+        //  client app, since its hard to debug a service. This is set in the
+        //  init method according to the debug parm.
+        // -----------------------------------------------------------------------
+        tCIDLib::TBoolean           bDebugMode = kCIDLib::False;
 
 
-    // -----------------------------------------------------------------------
-    //  The handler, if any, that the client app has installed
-    // -----------------------------------------------------------------------
-    TWin32ServiceHandler*       psrvhHandler = 0;
+        // -----------------------------------------------------------------------
+        //  The handler, if any, that the client app has installed
+        // -----------------------------------------------------------------------
+        TWin32ServiceHandler*       psrvhHandler = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Our service related status data
-    // -----------------------------------------------------------------------
-    SERVICE_STATUS              SrvStatus;
-    SERVICE_STATUS_HANDLE       hService;
-    HDEVNOTIFY                  hNotify;
+        // -----------------------------------------------------------------------
+        //  Our service related status data
+        // -----------------------------------------------------------------------
+        SERVICE_STATUS              SrvStatus;
+        SERVICE_STATUS_HANDLE       hService;
+        HDEVNOTIFY                  hNotify;
 
 
-    // -----------------------------------------------------------------------
-    //  The name of the service we were given in the init
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh*         pszServiceName;
+        // -----------------------------------------------------------------------
+        //  The name of the service we were given in the init
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh*         pszServiceName = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  The handle to a log file we use to log core service events. This is set
-    //  up during service init. If we can't open it, it's null and nothing will
-    //  be logged.
-    // -----------------------------------------------------------------------
-    HANDLE                      hflDbgLog = INVALID_HANDLE_VALUE;
+        // -----------------------------------------------------------------------
+        //  The handle to a log file we use to log core service events. This is set
+        //  up during service init. If we can't open it, it's null and nothing will
+        //  be logged.
+        // -----------------------------------------------------------------------
+        HANDLE                      hflDbgLog = INVALID_HANDLE_VALUE;
+    }
 }
 
 
@@ -421,7 +429,7 @@ static tCIDLib::TVoid LogDebugStr(const tCIDLib::TCh* const pszStr)
 {
     if (CIDKernel_SvcWin32::hflDbgLog != INVALID_HANDLE_VALUE)
     {
-        static const tCIDLib::TCard1 c1LF = 0xA;
+        constexpr tCIDLib::TCard1 c1LF = 0xA;
         DWORD c4BytesWritten;
 
         // Convert to local code page and write
@@ -444,7 +452,7 @@ static tCIDLib::TVoid LogDebugStr(const tCIDLib::TCh* const pszStr)
 
 static tCIDLib::TVoid LogDebugErr(const tCIDLib::TCh* const pszMsg)
 {
-    const tCIDLib::TCard4 c4BufSz = 2048;
+    constexpr tCIDLib::TCard4 c4BufSz = 2047;
     tCIDLib::TCh achErr[c4BufSz + 1];
 
     TRawStr::CopyStr(achErr, pszMsg, c4BufSz);
@@ -462,7 +470,7 @@ static tCIDLib::TVoid LogDebugErr(const tCIDLib::TCh* const pszMsg)
 
 static tCIDLib::TVoid LogDebugExcept(const tCIDLib::TCh* const pszText)
 {
-    const tCIDLib::TCard4 c4BufSz = 2048;
+    constexpr tCIDLib::TCard4 c4BufSz = 2047;
     tCIDLib::TCh achErr[c4BufSz + 1];
     TRawStr::CopyStr(achErr, pszText, c4BufSz);
     TRawStr::CatStr(achErr, L". Error=", c4BufSz);
@@ -480,7 +488,7 @@ static tCIDLib::TVoid LogDebugMsg(const tCIDLib::TCh* const pszMsg)
 
 static tCIDLib::TVoid LogDebugPowerOp(const tCIDKernel::EWSrvPwrOps ePwrOp)
 {
-    const tCIDLib::TCard4 c4BufSz = 2048;
+    constexpr tCIDLib::TCard4 c4BufSz = 2047;
     tCIDLib::TCh achErr[c4BufSz + 1];
     TRawStr::CopyStr(achErr, L"Got power Op: ", c4BufSz);
     TRawStr::CatStr(achErr, pszXlatPowerOp(ePwrOp), c4BufSz);
@@ -491,7 +499,7 @@ static tCIDLib::TVoid LogDebugPowerOp(const tCIDKernel::EWSrvPwrOps ePwrOp)
 
 static tCIDLib::TVoid LogDebugSrvOp(const tCIDKernel::EWSrvOps eOp)
 {
-    const tCIDLib::TCard4 c4BufSz = 2048;
+    constexpr tCIDLib::TCard4 c4BufSz = 2047;
     tCIDLib::TCh achErr[c4BufSz + 1];
     TRawStr::CopyStr(achErr, L"\nGot service Op: ", c4BufSz);
     TRawStr::CatStr(achErr, pszXlatSrvOp(eOp), c4BufSz);
@@ -658,28 +666,29 @@ CIDServiceStart(tCIDLib::TCard4 c4ArgC, tCIDLib::TCh** apszArgs)
     //
     if (CIDKernel_SvcWin32::hflDbgLog == INVALID_HANDLE_VALUE)
     {
-        tCIDLib::TCh achName[kCIDLib::c4MaxPathLen + 1];
-        tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+        TKrnlString kstrName;
+        TKrnlString kstrPath;
 
         tCIDLib::TBoolean bRes = TKrnlModule::bRawQueryModName
         (
-            kmodCIDKernel.hmodThis()
-            , achName
-            , achPath
-            , kCIDLib::c4MaxPathLen
+            kmodCIDKernel.hmodThis(), kstrName, kstrPath
         );
 
         if (bRes)
         {
-            TRawStr::CatStr(achPath, L"\\", kCIDLib::c4MaxPathLen);
-            TRawStr::CatStr(achPath, CIDKernel_SvcWin32::pszServiceName, kCIDLib::c4MaxPathLen);
-            TRawStr::CatStr(achPath, L"_DbgLog.Txt", kCIDLib::c4MaxPathLen);
+            TKrnlString kstrPath
+            (
+                kstrPath.pszValue()
+                , L"\\"
+                , CIDKernel_SvcWin32::pszServiceName
+                , L"_DbgLog.Txt"
+            );
 
             // If it's gotten too large, we want to clip it back
             DWORD OpenFlag = OPEN_ALWAYS;
 
             WIN32_FIND_DATA FileData;
-            HANDLE hFnd = ::FindFirstFile(achPath, &FileData);
+            HANDLE hFnd = ::FindFirstFile(kstrPath.pszValue(), &FileData);
             if (hFnd != INVALID_HANDLE_VALUE)
             {
                 ::FindClose(hFnd);
@@ -689,7 +698,7 @@ CIDServiceStart(tCIDLib::TCard4 c4ArgC, tCIDLib::TCh** apszArgs)
 
             CIDKernel_SvcWin32::hflDbgLog = ::CreateFile
             (
-                achPath
+                kstrPath.pszValue()
                 , GENERIC_WRITE
                 , FILE_SHARE_READ
                 , 0

@@ -35,64 +35,45 @@
 //  TProjectInfo: Private platform methods
 // ---------------------------------------------------------------------------
 
-
 //
-//  This method is called to build up the names of the files output from a
-//  message file compilation for a particular project. Some platforms need
-//  to do slightly different things here. The output files are the binary
-//  CIDMsg file, the Exe or Lib/DLL file, and the error/message id headers.
-//  The latter two are output to the project directory, while the former two
-//  are output to the output path and might be versioned.
+//  This method is called to build up the names of any project relative
+//  file names that might be platform specific.
 //
-tCIDBuild::TVoid
-TProjectInfo::__BuildOutputFileNames(const  TBldStr&        strOutPath
-                                    , const TBldStr&        strVerSuffix
-                                    , const TBldStr&        strLangSuffix
-                                    ,       TBldStr&        strMsgFile
-                                    ,       TBldStr&        strErrHpp
-                                    ,       TBldStr&        strMsgHpp
-                                    ,       TBldStr&        strBin)
+tCIDLib::TVoid TProjectInfo::BuildOutputFileName()
 {
-    // Build the name to the error ids header
-    strErrHpp = __strProjectDir;
-    strErrHpp.Append(__strProjectName);
-    strErrHpp.Append(L"_ErrorIds.hpp");
-
-    // Build the name to the message ids header
-    strMsgHpp = __strProjectDir;
-    strMsgHpp.Append(__strProjectName);
-    strMsgHpp.Append(L"_MessageIds.hpp");
-
-    //
-    //  Build up the output binary message file name. If this project
-    //  is versioned, then append the version postfix.
-    //
-    strMsgFile = strOutPath;
-    if (__eType == tCIDBuild::EProjTypes::Dll)
-        strMsgFile.Append(L"lib");
-    strMsgFile.Append(__strProjectName);
-    if (__eType == tCIDBuild::EProjTypes::Dll)
-        strMsgFile.Append(kCIDBuild::pszDllExt);
-    if (__bVersioned)
-        strMsgFile.Append(strVerSuffix);
-    strMsgFile.Append(L"_");
-    strMsgFile.Append(strLangSuffix);
-    strMsgFile.Append(L".CIDMsg");
-
-    // Build up the name of the DLL/Exe file
-    strBin = strOutPath;
-    if (__eType == tCIDBuild::EProjTypes::Dll)
+    m_strOutBin = facCIDBuild.strOutDir();
+    if (m_eType == tCIDBuild::EProjTypes::FileCopy)
     {
-        strBin.Append(L"lib");
-        strBin.Append(__strProjectName);
-        strBin.Append(kCIDBuild::pszDllExt);
-        strBin.Append(strVerSuffix);
+        //
+        //  Nothing to do for this one. If there is any m_strCopyOutDir
+        //  set, it'll get added to the output bin path to create the full
+        //  output path for file copies.
+        //
     }
      else
     {
-        strBin.Append(__strProjectName);
-        if (__bVersioned)
-            strBin.Append(strVerSuffix);
-        strBin.Append(kCIDBuild::pszExeExt);
+        if (m_eType == tCIDBuild::EProjTypes::SharedLib)
+        {
+            m_strOutBin.Append(L"lib");
+            m_strOutBin.Append(m_strProjectName);
+            m_strOutBin.Append(kCIDBuild::pszDllExt);
+            m_strOutBin.Append(facCIDBuild.strVersionSuffix());
+        }
+         else if (m_eType == tCIDBuild::EProjTypes::StaticLib)
+        {
+            m_strOutBin.Append(L".a");
+        }
+         else if ((m_eType == tCIDBuild::EProjTypes::Executable)
+              ||  (m_eType == tCIDBuild::EProjTypes::Service))
+        {
+            // No extension for executables
+            m_strOutBin.Append(m_strProjectName);
+        }
+         else
+        {
+            // This is bad, we don't know
+            stdOut  << L"Unknown project type, can't set extension" << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::Internal;
+        }
     }
 }

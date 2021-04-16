@@ -236,7 +236,7 @@ T24BitPalDlg::eClickHandler(TButtClickInfo& wnotEvent)
 {
     if (wnotEvent.widSource() == kCIDWUtils::ridDlg_CPal_Accept)
     {
-        // Save the current color for return
+        // Save the current color for dialog return
         m_rgbEdit = m_pwndPal->rgbCurrent();
         EndDlg(kCIDWUtils::ridDlg_CPal_Accept);
     }

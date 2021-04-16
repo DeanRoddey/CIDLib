@@ -48,14 +48,8 @@ AdvRTTIDecls(TSize,TObject)
 // ---------------------------------------------------------------------------
 TSize& TSize::Nul_TSize()
 {
-    static TSize* pszNull = nullptr;
-    if (!pszNull)
-    {
-        TBaseLock lockInit;
-        if (!pszNull)
-            TRawMem::pExchangePtr(&pszNull, new TSize);
-    }
-    return *pszNull;
+    static TSize szNull;
+    return szNull;
 }
 
 
@@ -204,19 +198,16 @@ TSize::bParseFromText(  const   TString&            strText
     strTmp.Append(kCIDLib::chSpace);
     TStringTokenizer stokParse(&strText, strTmp);
 
-    tCIDLib::TBoolean bOk;
-    tCIDLib::TCard4 c4CX;
-    tCIDLib::TCard4 c4CY;
-
+    tCIDLib::TBoolean bOk = kCIDLib::False;
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 

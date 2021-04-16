@@ -42,14 +42,17 @@ RTTIDecls(TXorStreamEncrypter,TStreamEncrypter)
 
 namespace CIDCrypto_Xor
 {
-    // -----------------------------------------------------------------------
-    //  Local, constant data
-    //
-    //  c4StreamBlockSize
-    //      The size of the block of bytes that the TXorStreamEncypter class
-    //      works on at a time (or up to that many at a time.)
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4StreamBlockSize = 512;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local, constant data
+        //
+        //  c4StreamBlockSize
+        //      The size of the block of bytes that the TXorStreamEncypter class
+        //      works on at a time (or up to that many at a time.)
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4StreamBlockSize = 512;
+    }
 }
 
 
@@ -166,6 +169,7 @@ tCIDLib::TVoid TXorStreamEncrypter::DecryptImpl()
     //  stream after xoring with the key bytes. To be more efficient, we do
     //  it blocks of up to m_c4StreamBlockSize bytes.
     //
+    CIDLib_Suppress(26494)
     tCIDLib::TCard1 ac1TempBuf[CIDCrypto_Xor::c4StreamBlockSize];
     tCIDLib::TBoolean bDone = kCIDLib::False;
     while (!bDone)
@@ -210,6 +214,7 @@ tCIDLib::TVoid TXorStreamEncrypter::EncryptImpl()
     //  stream after xoring with the key bytes. To be more efficient, we do
     //  it blocks of up to m_c4StreamBlockSize bytes.
     //
+    CIDLib_Suppress(26494)
     tCIDLib::TCard1 ac1TempBuf[CIDCrypto_Xor::c4StreamBlockSize];
     tCIDLib::TBoolean bDone = kCIDLib::False;
     while (!bDone)

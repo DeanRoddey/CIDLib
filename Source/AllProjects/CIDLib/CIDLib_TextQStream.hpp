@@ -61,6 +61,7 @@ class CIDLIBEXP TQOutStreamImpl : public TOutStreamImpl
         );
 
         TQOutStreamImpl(const TQOutStreamImpl&) = delete;
+        TQOutStreamImpl(TQOutStreamImpl&&) = delete;
 
         ~TQOutStreamImpl();
 
@@ -69,6 +70,7 @@ class CIDLIBEXP TQOutStreamImpl : public TOutStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TQOutStreamImpl& operator=(const TQOutStreamImpl&) = delete;
+        TQOutStreamImpl& operator=(TQOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -214,6 +216,7 @@ class CIDLIBEXP TTextQOutStream : public TTextOutStream
         );
 
         TTextQOutStream(const TTextQOutStream&) = delete;
+        TTextQOutStream(TTextQOutStream&&) = delete;
 
         ~TTextQOutStream();
 
@@ -222,6 +225,7 @@ class CIDLIBEXP TTextQOutStream : public TTextOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TTextQOutStream& operator=(const TTextQOutStream&) = delete;
+        TTextQOutStream& operator=(TTextQOutStream&) = delete;
 
 
         // -------------------------------------------------------------------

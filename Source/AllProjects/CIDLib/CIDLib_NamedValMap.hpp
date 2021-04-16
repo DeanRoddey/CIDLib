@@ -57,7 +57,7 @@
 //  CLASS: TNamedValMap
 // PREFIX: nvm
 // ---------------------------------------------------------------------------
-template <class TVal> class TNamedValMap : public TObject
+template <typename TVal> class TNamedValMap : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -74,7 +74,7 @@ template <class TVal> class TNamedValMap : public TObject
         using TMyType = TNamedValMap<TVal>;
         using TPair = TKeyObjPair<TString, TVal>;
 
-        template <class TVal> class TNVMItem
+        template <typename TVal> class TNVMItem
         {
             public  :
                 // -----------------------------------------------------------
@@ -110,21 +110,17 @@ template <class TVal> class TNamedValMap : public TObject
                 {
                 }
 
-                TNVMItem(const TNVMItem& nviToCopy) :
+                TNVMItem(const TNVMItem&) = default;
+                TNVMItem(TNVMItem&&) = default;
 
-                    m_colPairs(nviToCopy.m_colPairs)
-                    , m_strKey(nviToCopy.m_strKey)
-                {
-                }
-
-                ~TNVMItem() {}
+                ~TNVMItem() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TNVMItem& operator=(const TNVMItem&) = delete;
-                TNVMItem& operator=(TNVMItem&&) = delete;
+                TNVMItem& operator=(const TNVMItem&) = default;
+                TNVMItem& operator=(TNVMItem&&) = default;
 
 
                 // -----------------------------------------------------------
@@ -213,7 +209,7 @@ template <class TVal> class TNamedValMap : public TObject
                     // If the sub-key doesn't exist, return nul for failiure
                     TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);
                     if (!pkobjRet)
-                        return 0;
+                        return nullptr;
                     return &pkobjRet->objValue();
                 }
 
@@ -222,7 +218,7 @@ template <class TVal> class TNamedValMap : public TObject
                     // If the sub-key doesn't exist, return null for failure
                     const TPair* pkobjRet = m_colPairs.pobjFindByKey(strSubKey);
                     if (!pkobjRet)
-                        return 0;
+                        return nullptr;
                     return &pkobjRet->objValue();
                 }
 
@@ -271,7 +267,14 @@ template <class TVal> class TNamedValMap : public TObject
         {
         }
 
-        ~TNamedValMap() {}
+        TNamedValMap(TMyType&& nvmSrc) :
+
+            TNamedValMap()
+        {
+            *this = tCIDLib::ForceMove(nvmSrc);
+        }
+
+        ~TNamedValMap() = default;
 
 
         // -------------------------------------------------------------------
@@ -284,10 +287,17 @@ template <class TVal> class TNamedValMap : public TObject
             return *this;
         }
 
+        TMyType& operator=(TMyType&& nvmSrc)
+        {
+            if (this != &nvmSrc)
+                m_colItems = tCIDLib::ForceMove(nvmSrc.m_colItems);
+            return *this;
+        }
+
         tCIDLib::TBoolean operator==(const TNamedValMap<TVal>& nvmSrc) const
         {
-            TItemList::TCursor cursThis(&m_colItems);
-            TItemList::TCursor cursSrc(&nvmSrc.m_colItems);
+            typename TItemList::TCursor cursThis(&m_colItems);
+            typename TItemList::TCursor cursSrc(&nvmSrc.m_colItems);
 
             if (c4ElemCount() != nvmSrc.c4ElemCount())
                 return kCIDLib::False;
@@ -331,7 +341,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (pnvmiTar)
-                AlreadyExists(strKey, 0);
+                AlreadyExists(strKey, nullptr);
             m_colItems.objAdd(TNVMItem<TVal>(strKey));
         }
 
@@ -341,7 +351,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
             if (!pnvmiTar->bAddValue(strSubKey, objToSet))
                 AlreadyExists(strKey, &strSubKey);
@@ -365,9 +375,12 @@ template <class TVal> class TNamedValMap : public TObject
         tCIDLib::TBoolean bItemIsEmpty(const TString& strKey) const
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
-            if (!pnvmiTar)
-                NotFound(strKey, 0);
-            return pnvmiTar->bIsEmpty();
+            if (pnvmiTar)
+                return pnvmiTar->bIsEmpty();
+
+            // Make the compiler happy, this will actually throw
+            NotFound(strKey, nullptr);
+            return kCIDLib::False;
         }
 
         tCIDLib::TBoolean bQueryValue(  const   TString&    strKey
@@ -398,7 +411,9 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
+
+            CIDLib_Suppress(6011)  // We null checked above
             pnvmiTar->Clear();
         }
 
@@ -411,7 +426,9 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
+
+            CIDLib_Suppress(6011)  // We null checked above
             return TValCursor(&pnvmiTar->colPairs());
         }
 
@@ -419,7 +436,9 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
+
+            CIDLib_Suppress(6011)  // We null checked above
             return TNCValCursor(&pnvmiTar->colPairs());
         }
 
@@ -437,10 +456,12 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
+            CIDLib_Suppress(6011)  // We null checked above
             const TVal* pvalRet = pnvmiTar->pobjValue(strSubKey);
             if (!pvalRet)
                 NotFound(strKey, &strSubKey);
+            CIDLib_Suppress(6011)  // We null checked above
             return *pvalRet;
         }
 
@@ -450,8 +471,9 @@ template <class TVal> class TNamedValMap : public TObject
         {
             const TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
 
+            CIDLib_Suppress(6011)  // We null checked above
             if (!pnvmiTar->bQueryValue(strSubKey, objToFill))
                 NotFound(strKey, &strSubKey);
         }
@@ -464,7 +486,7 @@ template <class TVal> class TNamedValMap : public TObject
         tCIDLib::TVoid RemoveKey(const TString& strKey)
         {
             if (!m_colItems.bRemoveKey(strKey))
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
         }
 
         tCIDLib::TVoid RemoveSubKey(const   TString&   strKey
@@ -472,7 +494,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
             if (!pnvmiTar->bRemoveSubKey(strSubKey))
                 NotFound(strKey, &strSubKey);
         }
@@ -483,7 +505,7 @@ template <class TVal> class TNamedValMap : public TObject
         {
             TNVMItem<TVal>* pnvmiTar = m_colItems.pobjFindByKey(strKey);
             if (!pnvmiTar)
-                NotFound(strKey, 0);
+                NotFound(strKey, nullptr);
             if (!pnvmiTar->bSetValue(strSubKey, objValToSet))
                 NotFound(strKey, &strSubKey);
         }
@@ -502,12 +524,12 @@ template <class TVal> class TNamedValMap : public TObject
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid AlreadyExists(const  TString&        strKey
-                                    , const TString* const  pstrSubKey) const
+        [[noreturn]] tCIDLib::TVoid AlreadyExists(  const   TString&        strKey
+                                                    , const TString* const  pstrSubKey) const
         {
-            tCIDLib::TErrCode errcThrow = pstrSubKey
-                                          ? kCIDErrs::errcNVM_SubKeyExists
-                                          : kCIDErrs::errcNVM_ItemExists;
+            const tCIDLib::TErrCode errcThrow = pstrSubKey
+                                                ? kCIDErrs::errcNVM_SubKeyExists
+                                                : kCIDErrs::errcNVM_ItemExists;
             const TString& strSubKey    = pstrSubKey
                                           ? *pstrSubKey
                                           : TString::Nul_TString();
@@ -524,15 +546,13 @@ template <class TVal> class TNamedValMap : public TObject
             );
         }
 
-        tCIDLib::TVoid NotFound(const   TString&        strKey
-                                , const TString* const  pstrSubKey) const
+        [[noreturn]] tCIDLib::TVoid NotFound(const  TString&        strKey
+                                            , const TString* const  pstrSubKey) const
         {
-            tCIDLib::TErrCode errcThrow = pstrSubKey
-                                          ? kCIDErrs::errcNVM_SubKeyNotFound
-                                          : kCIDErrs::errcNVM_ItemNotFound;
-            const TString& strSubKey    = pstrSubKey
-                                          ? *pstrSubKey
-                                          : TString::Nul_TString();
+            const tCIDLib::TErrCode errcThrow = pstrSubKey
+                                                ? kCIDErrs::errcNVM_SubKeyNotFound
+                                                : kCIDErrs::errcNVM_ItemNotFound;
+            const TString& strSubKey    = pstrSubKey ? *pstrSubKey : TString::Nul_TString();
 
             facCIDLib().ThrowErr
             (
@@ -562,7 +582,7 @@ template <class TVal> class TNamedValMap : public TObject
 //  We don't want to force the value type in the map to support streaming,
 //  so we do separate global streaming operators for it.
 // ---------------------------------------------------------------------------
-template <class TVal> TBinInStream&
+template <typename TVal> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TNamedValMap<TVal>& nvmToFill)
 {
     // Flush the map first
@@ -633,7 +653,7 @@ operator>>(TBinInStream& strmToReadFrom, TNamedValMap<TVal>& nvmToFill)
 }
 
 
-template <class TVal> TBinOutStream&
+template <typename TVal> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TNamedValMap<TVal>& nvmToWrite)
 {
     const tCIDLib::TCard4 c4Count = nvmToWrite.c4ElemCount();
@@ -645,15 +665,15 @@ operator<<(TBinOutStream& strmToWriteTo, const TNamedValMap<TVal>& nvmToWrite)
                     << tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard);
 
     // Iterate through the items and write them out
-    TNamedValMap<TVal>::TItemList::TCursor cursItems(&nvmToWrite.colItems());
+    typename TNamedValMap<TVal>::TItemList::TCursor cursItems(&nvmToWrite.colItems());
     while (cursItems.bIsValid())
     {
         // Each one should start with a start object
         strmToWriteTo << tCIDLib::EStreamMarkers::StartObject;
 
         // Get the current item and get a cursor over it's pairs
-        const TNamedValMap<TVal>::TNVMItem<TVal>& nvmiCur = cursItems.objRCur();
-        TNamedValMap<TVal>::TNVMItem<TVal>::TPairList::TCursor cursSubs(&nvmiCur.colPairs());
+        const TNamedValMap<TVal>::TElem& nvmiCur = cursItems.objRCur();
+        typename TNamedValMap<TVal>::TElem::TPairList::TCursor cursSubs(&nvmiCur.colPairs());
 
         // Write out the key and the count of sub-keys
         strmToWriteTo   << nvmiCur.strKey()

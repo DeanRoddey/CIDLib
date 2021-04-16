@@ -1,0 +1,149 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestJSONParser3;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.FileInStream;
+    MEng.System.Runtime.MemBuf;
+    MEng.System.Runtime.JSONParser;
+    MEng.System.Runtime.JSONAnchor;
+EndImports;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    Int4                m_RetVal;
+    JSONParser          m_Parser;
+EndMembers;
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+
+    //
+    //  Just invokes all the local tests
+    //
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            FileInStream    SrcStream;
+            JSONAnchor      Root;
+            JSONAnchor      UnInit;
+            JSONAnchor      Child;
+            Boolean         BoolVal;
+            Card4           CardVal;
+            Float8          FloatVal;
+            Int4            IntVal;
+        EndLocals;
+
+        // For our purposes, we'll use a file with a canned response
+        SrcStream.Open("\\JSON\\JSONSrc3.Txt");
+        m_Parser.ParseResponse(SrcStream);
+
+        // Get the root anchor
+        m_Parser.GetRootAnchor(Root);
+
+        Try
+            BoolVal := m_Parser.FindBoolValue(Root, "FalseVal", True, True);
+            If (BoolVal != False)
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindBoolValue returned the wrong value", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindBoolValue threw an exception", m_Output, $CurLine);
+        EndCatch;
+
+
+        Try
+            BoolVal := m_Parser.FindBoolValue(Root, "TrueVal", True, False);
+            If (BoolVal != True)
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindBoolValue should have returned True", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindBoolValue threw an exception", m_Output, $CurLine);
+        EndCatch;
+
+
+        Try
+            CardVal := m_Parser.FindCardValue(Root, "CardVal", True, 10);
+            If (CardVal != 2)
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindCardValue should have returned 2", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindCardValue threw an exception", m_Output, $CurLine);
+        EndCatch;
+
+
+        Try
+            FloatVal := m_Parser.FindFloatValue(Root, "FloatVal", True, 10.2);
+            If (FloatVal != 3.5)
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindFloatValue should have returned 3.5", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindFloatValue threw an exception", m_Output, $CurLine);
+        EndCatch;
+
+
+        Try
+            IntVal := m_Parser.FindIntValue(Root, "IntVal", True, 88);
+            If (IntVal != -2)
+                m_RetVal := -1;
+                m_Helper.PrintErr("FindIntValue should have returned -2", m_Output, $CurLine);
+            EndIf;
+        EndTry;
+
+        Catch
+            m_RetVal := -1;
+            m_Helper.PrintErr("FindIntValue threw an exception", m_Output, $CurLine);
+        EndCatch;
+
+
+        // They all should return the default value if pointed at a null node
+        If (m_Parser.FindBoolValue(Root, "NullVal", True, True) != True)
+            m_RetVal := -1;
+            m_Helper.PrintErr("Didn't get default True on null bool value", m_Output, $CurLine);
+        EndIf;        
+        If (m_Parser.FindBoolValue(Root, "NullVal", True, False) != False)
+            m_RetVal := -1;
+            m_Helper.PrintErr("Didn't get default False on null bool value", m_Output, $CurLine);
+        EndIf;        
+        If (m_Parser.FindCardValue(Root, "NullVal", True, 999) != 999)
+            m_RetVal := -1;
+            m_Helper.PrintErr("Didn't get default on null Card value", m_Output, $CurLine);
+        EndIf;        
+        If (m_Parser.FindFloatValue(Root, "NullVal", True, 10.5) != 10.5)
+            m_RetVal := -1;
+            m_Helper.PrintErr("Didn't get default on null float value", m_Output, $CurLine);
+        EndIf;        
+        If (m_Parser.FindIntValue(Root, "NullVal", True, -55) != -55)
+            m_RetVal := -1;
+            m_Helper.PrintErr("Didn't get default on null Int value", m_Output, $CurLine);
+        EndIf;        
+
+        Return m_RetVal;
+
+    EndMethod;
+
+EndMethods;

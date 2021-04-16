@@ -37,53 +37,60 @@
 //  Global variables
 // ---------------------------------------------------------------------------
 
-//
-// These are used to pick off argc and argv as they go by. That way I don't have
-// to try to reproduce the array provided by the startup code. The proc file
-// system only provides the full command line, and using these global variables
-// saves me a lot of possible errors involving parsing inconsistencies between
-// me and Linux.
-//
-int CIDKernel_SystemInfo_Linux_argc = -1;
-char** CIDKernel_SystemInfo_Linux_argv = 0;
-
-namespace
+namespace CIDKernel_SystemInfo_Linux
 {
+    //
+    // These are used to pick off argc and argv as they go by. That way I don't have
+    // to try to reproduce the array provided by the startup code. The proc file
+    // system only provides the full command line, and using these global variables
+    // saves me a lot of possible errors involving parsing inconsistencies between
+    // me and Linux.
+    //
+    int argc = -1;
+    char** argv = 0;
+
+
     // ---------------------------------------------------------------------------
     //  Local types
     //
     //  This structure is used to hold the system info data that we cache during
     //  init and keep around.
     //
-    //  __apszArgList
+    //  apszArgList
     //      This is storage for the command line parameters.
     //
-    //  __c4ArgCnt
+    //  c4ArgCnt
     //      This is the number of command line arguments that show to to the
     //      outside world (we strip out the standard ones.)
     //
-    //  __c4CPUCount
+    //  c4CPUCount
     //      The number of CPUs in the system, from the OS's perspective. If the
     //      hardware allows some to be taken off line, then I would assume you
     //      would only see the active ones here.
     //
-    //  __c4OSBuildNum
-    //  __c4OSMajVersion
-    //  __c4OSMinVersion
+    //  c4MemPageSize
+    //      The size in bytes of a page of memory
+    //
+    //  c4OSBuildNum
+    //  c4OSMajVersion
+    //  c4OSMinVersion
     //      These are all about the version of the OS that we find ourselves
     //      running on.
     //
-    //  __c4TotalPhysicalMem
+    //  c4SSELevel
+    //      The SSE FPU level supported on this machine (0=none, 1=SSE, 2=SSE2, etc..)
+    //
+    //  c8TotalPhysicalMem
     //      The amount of memory installed in the machine.
     //
-    //  __eCPUType
-    //      The type of CPUs in this machine.
+    //  szMachineId
+    //      The unique machine id for this machine (from /etc/machine-id)
     //
-    //  __szNodeName
+    //  szNodeName
     //      The name assigned to this machine in the system setup. This size
     //      should be grotesquely overkill for any node name.
     //
-    //  __szProcessName
+    //  szProcessName
     //      The name of the process that this DLL is running in the context of.
     // ---------------------------------------------------------------------------
     struct TCachedInfo
@@ -91,12 +98,14 @@ namespace
         tCIDLib::TCh*           apszArgList[kCIDLib::c4MaxCmdLineParms];
         tCIDLib::TCard4         c4ArgCnt;
         tCIDLib::TCard4         c4CPUCount;
+        tCIDLib::TCard4         c4MemPageSize;        
         tCIDLib::TCard4         c4OSBuildNum;
         tCIDLib::TCard4         c4OSMajVersion;
         tCIDLib::TCard4         c4OSMinVersion;
         tCIDLib::TCard4         c4OSRev;
-        tCIDLib::TCard4         c4TotalPhysicalMem;
-        tCIDLib::ECPUTypes      eCPUType;
+        tCIDLib::TCard4         c4SSELevel;
+        tCIDLib::TCard8         c8TotalPhysicalMem;
+        tCIDLib::TZStr64        szMachineId;
         tCIDLib::TZStr64        szNodeName;
         tCIDLib::TZStr128       szProcessName;
     };
@@ -105,16 +114,16 @@ namespace
     // ---------------------------------------------------------------------------
     //  Local data
     //
-    //  __CachedInfo
+    //  CIDKernel_SystemInfo_Linux::CachedInfo
     //      The cached system info that we cache up init and hang onto.
     // ---------------------------------------------------------------------------
-    TCachedInfo      __CachedInfo;
+    TCachedInfo      CachedInfo;
 
 
     // ---------------------------------------------------------------------------
     //  Intra-facility methods
     // ---------------------------------------------------------------------------
-    tCIDLib::TBoolean __bQueryVersionInfo(const struct utsname& UtsName)
+    tCIDLib::TBoolean bQueryVersionInfo(const struct utsname& UtsName)
     {
         tCIDLib::TSCh* pszBegin = const_cast<tCIDLib::TSCh*>(UtsName.release);
         tCIDLib::TSCh* pszEnd;
@@ -124,7 +133,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSMajVersion = c4Tmp;
+        CachedInfo.c4OSMajVersion = c4Tmp;
 
         pszBegin = ++pszEnd;
         c4Tmp = ::strtoul(pszBegin, &pszEnd, 10);
@@ -133,7 +142,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSMinVersion = c4Tmp;
+        CachedInfo.c4OSMinVersion = c4Tmp;
 
         pszBegin = ++pszEnd;
         c4Tmp = ::strtoul(pszBegin, &pszEnd, 10);
@@ -142,7 +151,7 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSRev = c4Tmp;
+        CachedInfo.c4OSRev = c4Tmp;
 
         tCIDLib::TSCh szVerCopy[SYS_NMLN];
         ::strcpy(szVerCopy, &UtsName.version[1]);
@@ -153,30 +162,41 @@ namespace
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
             return kCIDLib::False;
         }
-        __CachedInfo.c4OSBuildNum = c4Tmp;
+        CachedInfo.c4OSBuildNum = c4Tmp;
 
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryCPUInfo(const struct utsname& UtsName)
+    [[nodiscard]] const tCIDLib::TSCh*
+    pszFindInfoVal(const tCIDLib::TSCh* const pszLine, const tCIDLib::TCard4 c4PrefixLen)
     {
-        if (!::strcmp(UtsName.machine, "i386"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::386DX;
-        }
-        else if (!::strcmp(UtsName.machine, "i486"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::486DX;
-        }
-        else if (!::strcmp(UtsName.machine, "i586")
-             ||  !::strcmp(UtsName.machine, "i686"))
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::Pentium;
-        }
-        else
-        {
-            __CachedInfo.eCPUType = tCIDLib::ECPUTypes::Unknown;
-        }
+        const tCIDLib::TSCh* pszFind = pszLine + c4PrefixLen;
+
+        // First find the colon
+        while (*pszFind && (*pszFind != ':'))
+            pszFind++;
+
+        // If not found, then we failed
+        if (!pszFind)
+            return nullptr;
+
+        // Not find the next non-space
+        while (*pszFind && !TRawStr::bIsSpace(*pszFind))
+            pszFind++;
+
+        // If not found, then we failed
+        if (!pszFind)
+            return nullptr;            
+
+        return pszFind;
+    }
+
+
+    tCIDLib::TBoolean bQueryCPUInfo(const struct utsname& UtsName)
+    {
+        // Set defaults for any bits we can't find
+        CachedInfo.c4CPUCount = 1;
+        CachedInfo.c4SSELevel = 0;
 
         FILE* CPUFile = ::fopen("/proc/cpuinfo", "r");
         if (!CPUFile)
@@ -185,59 +205,111 @@ namespace
             return kCIDLib::False;
         }
 
-        tCIDLib::TCard4 c4ProcessorCount = 0;
-        tCIDLib::TSCh szLine[128];
-
         const tCIDLib::TSCh szProcLine[] = "processor";
         const tCIDLib::TCard4 c4ProcLineLen = sizeof(szProcLine) - 1;
 
+        const tCIDLib::TSCh szFlagsLine[] = "flas";
+        const tCIDLib::TCard4 c4FlagsLineLen = sizeof(szFlagsLine) - 1;        
+
+        tCIDLib::TSCh szLine[128];
+        const tCIDLib::TSCh* pszVal;
+        tCIDLib::TSCh* pszEnd;
         while (::fgets(szLine, sizeof(szLine), CPUFile))
         {
             if (!::strncmp(szLine, szProcLine, c4ProcLineLen))
-                c4ProcessorCount++;
+            {
+                pszVal = pszFindInfoVal(szLine, c4ProcLineLen);
+                if (pszVal)
+                {
+                    tCIDLib::TCard4 c4Val = ::strtoul(pszVal, &pszEnd, 10);
+                    if (pszEnd != pszVal)
+                        CachedInfo.c4CPUCount = c4Val;
+                }
+            }
+             else if (!::strncmp(szLine, szFlagsLine, c4ProcLineLen))            
+            {
+                pszVal = pszFindInfoVal(szLine, c4FlagsLineLen);
+                if (pszVal)
+                {
+                    tCIDLib::TCh* pszWVal = TRawStr::pszConvert(pszVal);
+                    TArrayJanitor<tCIDLib::TCh> janWVal(pszWVal);
+
+                    // Search for sse4, sse3, then sse2, then sse
+                    tCIDLib::TCh* pszFind = TRawStr::pszFindChars(pszWVal, L"sse4");
+                    if (pszFind)
+                    {
+                        CachedInfo.c4SSELevel = 4;
+                    }                    
+                     else
+                    {
+                        pszFind = TRawStr::pszFindChars(pszWVal, L"sse3");
+                        if (pszFind)
+                        {
+                            CachedInfo.c4SSELevel = 3;
+                        }
+                         else 
+                        {
+                            pszFind = TRawStr::pszFindChars(pszWVal, L"sse2");
+                            if (pszFind)
+                            {
+                                CachedInfo.c4SSELevel = 2;
+                            }
+                             else 
+                            {
+                                pszFind = TRawStr::pszFindChars(pszWVal, L"sse");
+                                if (pszFind)
+                                    CachedInfo.c4SSELevel = 1;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         ::fclose(CPUFile);
-
-        __CachedInfo.c4CPUCount = c4ProcessorCount;
-
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryProcMemInfo()
+    tCIDLib::TBoolean bQueryMachineId()
     {
-        FILE* MemFile = ::fopen("/proc/meminfo", "r");
-        if (!MemFile)
+        FILE* IdFile = ::fopen("/etc/machine-id", "r");
+        if (!IdFile)
         {
             TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
 
-        tCIDLib::TSCh szLine[128];
-        if (!::fgets(szLine, sizeof(szLine), MemFile))
+        tCIDLib::TSCh szLine[64];
+        if (!::fgets(szLine, sizeof(szLine), IdFile))
         {
-            ::fclose(MemFile);
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
+            ::fclose(IdFile);            
+            TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
 
-        tCIDLib::TCard4 c4Tmp;
-        tCIDLib::TSInt iRc = ::fscanf(MemFile, "%*s %lu", &c4Tmp);
+        ::fclose(IdFile);
 
-        ::fclose(MemFile);
-
-        if (iRc != 1)
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
-            return kCIDLib::False;
-        }
-
-        __CachedInfo.c4TotalPhysicalMem = c4Tmp;
-
+        TRawStr::pszConvert
+        (
+            szLine
+            , CIDKernel_SystemInfo_Linux::CachedInfo.szMachineId 
+            , tCIDLib::c4ArrayElems(CIDKernel_SystemInfo_Linux::CachedInfo.szMachineId)
+        );
         return kCIDLib::True;
     }
 
-    tCIDLib::TBoolean __bQueryNameFromPID(pid_t pid)
+
+    tCIDLib::TBoolean bQueryProcMemInfo()
+    {
+       const long lPageCnt = sysconf(_SC_PHYS_PAGES);
+       CachedInfo.c4MemPageSize = tCIDLib::TCard4(sysconf(_SC_PAGE_SIZE));
+
+        CachedInfo.c8TotalPhysicalMem = tCIDLib::TCard8(lPageCnt) * CachedInfo.c4MemPageSize;
+        return kCIDLib::True;
+    }
+
+
+    tCIDLib::TBoolean bQueryNameFromPID(pid_t pid)
     {
         tCIDLib::TSCh szProcPid[128];
         ::sprintf(szProcPid, "/proc/%i/stat", pid);
@@ -269,37 +341,37 @@ namespace
 
         szParenName[c4Len - 1] = '\000';
 
-        TRawStr::pszConvert(&szParenName[1]
-                            , __CachedInfo.szProcessName
-                            , c4MaxBufChars(__CachedInfo.szProcessName));
-
+        TRawStr::pszConvert
+        (
+            &szParenName[1], CachedInfo.szProcessName, c4MaxBufChars(CachedInfo.szProcessName)
+        );
         return kCIDLib::True;
     }
 
-    tCIDLib::TVoid __InitArgArray()
+    tCIDLib::TVoid InitArgArray()
     {
-        __CachedInfo.c4ArgCnt = CIDKernel_SystemInfo_Linux_argc;
-        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < __CachedInfo.c4ArgCnt; c4Idx++)
+        CachedInfo.c4ArgCnt = CIDKernel_SystemInfo_Linux::argc;
+        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < CachedInfo.c4ArgCnt; c4Idx++)
         {
-            __CachedInfo.apszArgList[c4Idx] =
-                TRawStr::pszConvert(CIDKernel_SystemInfo_Linux_argv[c4Idx]);
+            CachedInfo.apszArgList[c4Idx] =
+                TRawStr::pszConvert(CIDKernel_SystemInfo_Linux::argv[c4Idx]);
         }
-        CIDKernel_SystemInfo_Linux_argc = -1;
+        CIDKernel_SystemInfo_Linux::argc = -1;
     }
 }
 
 
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
 {
     // We only have pre-constructor init
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
-        if (!__bQueryProcMemInfo())
+        if (!CIDKernel_SystemInfo_Linux::bQueryProcMemInfo())
             return kCIDLib::False;
 
         tCIDLib::TProcessId pidThis = ::getpid();
-        if (!__bQueryNameFromPID(pidThis))
+        if (!CIDKernel_SystemInfo_Linux::bQueryNameFromPID(pidThis))
             return kCIDLib::False;
 
         if (::getpagesize() != kCIDLib::c4MemPageSize)
@@ -315,14 +387,21 @@ TCIDKrnlModule::__bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
             TKrnlError::SetLastHostError(errno);
             return kCIDLib::False;
         }
-        TRawStr::pszConvert(UtsName.nodename
-                            , __CachedInfo.szNodeName
-                            , c4MaxBufChars(__CachedInfo.szNodeName));
+        TRawStr::pszConvert
+        (
+            UtsName.nodename
+            , CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName
+            , c4MaxBufChars(CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName)
+        );
 
-        if (!__bQueryVersionInfo(UtsName))
+        if (!CIDKernel_SystemInfo_Linux::bQueryVersionInfo(UtsName))
             return kCIDLib::False;
 
-        if (!__bQueryCPUInfo(UtsName))
+        if (!CIDKernel_SystemInfo_Linux::bQueryCPUInfo(UtsName))
+            return kCIDLib::False;
+
+        // Get the unique machine id
+        if (!CIDKernel_SystemInfo_Linux::bQueryMachineId())
             return kCIDLib::False;
     }
 
@@ -336,34 +415,59 @@ TCIDKrnlModule::__bInitTermSysInfo(const tCIDLib::EInitTerm eInitTerm)
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
 TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh*&  pszToFill)
+                            ,       TKrnlString&    kstrToFill)
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    if (c4Index >= __CachedInfo.c4ArgCnt)
+    if (c4Index >= CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
-    pszToFill = __CachedInfo.apszArgList[c4Index];
+    kstrToFill = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
     return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean
-TKrnlSysInfo::bLoadOSMsg(const  tCIDLib::TOSErrCode  errcId
-                         ,       tCIDLib::TCh* const pszBuffer
-                         , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlSysInfo::bIsHostAdmin()
 {
-    TRawStr::pszConvert(::strerror(errcId), pszBuffer, c4MaxChars);
-    return kCIDLib::True;
+    // <TBD> Figure out what this is on Linux
+    return kCIDLib::False;
 }
 
 
 tCIDLib::TBoolean
-TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
-                            , const tCIDLib::TCard4     c4MaxChars)
+TKrnlSysInfo::bQueryAvailPhysicalMem(tCIDLib::TCard8& c8ToFill)
+{
+    const tCIDLib::TCard8 c8Pages = tCIDLib::TCard8(sysconf(_SC_PHYS_PAGES));
+    return c8Pages * CIDKernel_SystemInfo_Linux::CachedInfo.c4MemPageSize;
+    
+}
+
+
+tCIDLib::TBoolean
+TKrnlSysInfo::bQueryMachineID(          tCIDLib::TCh* const pchBuffer
+                                , const tCIDLib::TCard4     c4MaxChars)
+{
+    TRawStr::CopyStr(pchBuffer, CIDKernel_SystemInfo_Linux::CachedInfo.szMachineId, c4MaxChars);
+    return kCIDLib::True;
+}                                
+
+
+tCIDLib::TBoolean
+TKrnlSysInfo::bQuerySpecialPath(        TKrnlString&            kstrToFill
+                                , const tCIDLib::ESpecialPaths  ePath)
+{
+    // <TBD> Figure this out
+
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;    
+}
+
+
+tCIDLib::TBoolean
+TKrnlSysInfo::bQueryUserName(TKrnlString& kstrToFill)
 {
     struct passwd* pwd = ::getpwuid(::getuid());
 
@@ -373,14 +477,7 @@ TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
         return kCIDLib::False;
     }
 
-    if (c4MaxChars < ::strlen(pwd->pw_name))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InsufficientBuffer);
-        return kCIDLib::False;
-    }
-
-    TRawStr::pszConvert(pwd->pw_name, pszBuffer, c4MaxChars);
-
+    kstrToFill.SetFromShort(pwd->pw_name);
     return kCIDLib::True;
 }
 
@@ -388,77 +485,86 @@ TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
 tCIDLib::TBoolean
 TKrnlSysInfo::bRemoveCmdLineArg(const tCIDLib::TCard4 c4Index)
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    if (!c4Index || (c4Index >= __CachedInfo.c4ArgCnt))
+    if (!c4Index || (c4Index >= CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt))
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
 
     // Delete the string in this element
-    delete [] __CachedInfo.apszArgList[c4Index];
+    delete [] CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4Index];
 
     // If this is the only element, then we are done
-    if (__CachedInfo.c4ArgCnt == 1)
+    if (CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt == 1)
     {
-        __CachedInfo.c4ArgCnt = 0;
+        CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt = 0;
         return kCIDLib::True;
     }
 
     // If this is the last element, we are done
-    if (c4Index == __CachedInfo.c4ArgCnt-1)
+    if (c4Index == CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt-1)
     {
-        __CachedInfo.c4ArgCnt--;
+        CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt--;
         return kCIDLib::True;
     }
 
     // Move the elements down
-    for (tCIDLib::TCard4 c4MoveIndex = c4Index; c4MoveIndex < __CachedInfo.c4ArgCnt-1; c4MoveIndex++)
-        __CachedInfo.apszArgList[c4MoveIndex] = __CachedInfo.apszArgList[c4MoveIndex+1];
+    for (tCIDLib::TCard4 c4MoveIndex = c4Index; c4MoveIndex < CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt-1; c4MoveIndex++)
+        CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4MoveIndex] = CIDKernel_SystemInfo_Linux::CachedInfo.apszArgList[c4MoveIndex+1];
 
-    __CachedInfo.c4ArgCnt--;
+    CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt--;
     return kCIDLib::True;
+}
+
+
+tCIDLib::TCard4
+TKrnlSysInfo::c4CheckSysChange(const TSysId& sidFirst, const TSysId& sidSec)
+{
+    // <TBD> Figure this out
+    return 0;
 }
 
 
 tCIDLib::TCard4 TKrnlSysInfo::c4CPUCount()
 {
-    return __CachedInfo.c4CPUCount;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c4CPUCount;
 }
 
 
 tCIDLib::TCard4 TKrnlSysInfo::c4CmdLineArgCount()
 {
-    if (CIDKernel_SystemInfo_Linux_argc != -1)
-        __InitArgArray();
+    if (CIDKernel_SystemInfo_Linux::argc != -1)
+        CIDKernel_SystemInfo_Linux::InitArgArray();
 
-    return __CachedInfo.c4ArgCnt;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c4ArgCnt;
 }
 
 
-tCIDLib::TCard4 TKrnlSysInfo::c4TotalPhysicalMem()
+// Return the SSE level flag
+tCIDLib::TCard4 TKrnlSysInfo::c4SSELevel()
 {
-    return __CachedInfo.c4TotalPhysicalMem;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c4SSELevel;
 }
 
 
-tCIDLib::ECPUTypes TKrnlSysInfo::eCPUType()
+tCIDLib::TCard8 TKrnlSysInfo::c8TotalPhysicalMem()
 {
-    return __CachedInfo.eCPUType;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.c8TotalPhysicalMem;
 }
 
 
 const tCIDLib::TCh* TKrnlSysInfo::pszNodeName()
 {
-    return __CachedInfo.szNodeName;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.szNodeName;
 }
 
 
 const tCIDLib::TCh* TKrnlSysInfo::pszProcessName()
 {
-    return __CachedInfo.szProcessName;
+    return CIDKernel_SystemInfo_Linux::CachedInfo.szProcessName;
 }
 
 
@@ -468,8 +574,28 @@ TKrnlSysInfo::QueryOSInfo(  tCIDLib::TCard4&    c4OSMajVersion
                             , tCIDLib::TCard4&  c4OSRev
                             , tCIDLib::TCard4&  c4OSBuildNum)
 {
-    c4OSBuildNum    = __CachedInfo.c4OSBuildNum;
-    c4OSMajVersion  = __CachedInfo.c4OSMajVersion;
-    c4OSMinVersion  = __CachedInfo.c4OSMinVersion;
-    c4OSRev         = __CachedInfo.c4OSRev;
+    c4OSBuildNum    = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSBuildNum;
+    c4OSMajVersion  = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSMajVersion;
+    c4OSMinVersion  = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSMinVersion;
+    c4OSRev         = CIDKernel_SystemInfo_Linux::CachedInfo.c4OSRev;
+}
+
+
+tCIDLib::TVoid
+TKrnlSysInfo::OverrideCmdLine(  const   tCIDLib::TCard4 c4Count
+                                ,       tCIDLib::TCh**  apszParms)
+{
+    // <TBD> Figure this out
+}
+
+
+tCIDLib::TVoid TKrnlSysInfo::QuerySysId(TSysId& sidToFill)
+{
+    // <TBD> Move this up to platform independent code
+}
+
+
+tCIDLib::TVoid TKrnlSysInfo::QueryVirtualScrRectl(tCIDLib::THostRectl& rectVS)
+{
+    // <TBD> figure this out
 }

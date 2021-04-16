@@ -56,29 +56,8 @@ TSBChangeInfo::TSBChangeInfo(const  tCIDLib::TCard4 c4Position
 {
 }
 
-TSBChangeInfo::TSBChangeInfo(const TSBChangeInfo& wnotSrc) :
-
-    TCtrlNotify(wnotSrc)
-    , m_c4Position(wnotSrc.m_c4Position)
-{
-}
-
 TSBChangeInfo::~TSBChangeInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TSBChangeInfo: Public operators
-// ---------------------------------------------------------------------------
-TSBChangeInfo& TSBChangeInfo::operator=(const TSBChangeInfo& wnotSrc)
-{
-    if (this != &wnotSrc)
-    {
-        TParent::operator=(wnotSrc);
-        m_c4Position = wnotSrc.m_c4Position;
-    }
-    return *this;
 }
 
 

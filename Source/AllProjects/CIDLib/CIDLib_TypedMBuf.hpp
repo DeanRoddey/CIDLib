@@ -55,6 +55,9 @@ class CIDLIBEXP TTypedMBufBase : public TObject, public MDuplicable, public MStr
         // -------------------------------------------------------------------
         TTypedMBufBase(const TTypedMBufBase&) = delete;
 
+        // Can't actually delete it since it can cause problems
+        // TTypedMBufBase(TTypedMBufBase&&) = delete;
+
         ~TTypedMBufBase();
 
 
@@ -62,6 +65,9 @@ class CIDLIBEXP TTypedMBufBase : public TObject, public MDuplicable, public MStr
         //  Public operators
         // -------------------------------------------------------------------
         TTypedMBufBase& operator=(const TTypedMBufBase&) = delete;
+
+        // Can't actually delete it since it can cause problems
+        // TTypedMBufBase& operator=(TTypedMBufBase&&) = delete;
 
 
     protected :
@@ -128,10 +134,19 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
             );
         }
 
-        TTypedMBuf(const TTypedMBuf<T>& tmbufSrc) : m_pmbufData(nullptr)
+        TTypedMBuf(const TTypedMBuf<T>& tmbufSrc)
+
+            : m_pmbufData(nullptr)
         {
             // Duplicate the memory buffer object
             m_pmbufData = ::pDupObject<TMemBuf>(tmbufSrc.m_pmbufData);
+        }
+
+        TTypedMBuf(TTypedMBuf<T>&& tmbufSrc) :
+
+            m_pmbufData(nullptr)
+        {
+            operator=(tCIDLib::ForceMove(tmbufSrc));
         }
 
         ~TTypedMBuf()
@@ -145,6 +160,14 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
         // -------------------------------------------------------------------
         TTypedMBuf<T>& operator=(const TTypedMBuf<T>&) = delete;
 
+        TTypedMBuf<T>& operator=(TTypedMBuf<T>&& tmbufSrc)
+        {
+            if (&tmbufSrc != this)
+            {
+                tCIDLib::Swap(m_pmbufData, tmbufSrc.m_pmbufData);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -245,7 +268,7 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom)
+        tCIDLib::TVoid StreamFrom(TBinInStream& strmToReadFrom) final
         {
             // Destroy the existing buffer and read in the new one
             delete m_pmbufData;
@@ -253,7 +276,7 @@ template <typename T> class TTypedMBuf : public TTypedMBufBase
             ::PolymorphicRead(m_pmbufData, strmToReadFrom);
         }
 
-        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const
+        tCIDLib::TVoid StreamTo(TBinOutStream& strmToWriteTo) const final
         {
             if (!m_pmbufData)
                 ThrowNotReady(CID_LINE);

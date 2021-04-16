@@ -71,60 +71,63 @@ struct TNibbleBufInfo
 
 namespace CIDImage_BitmapImage
 {
-    // -----------------------------------------------------------------------
-    //  Local, const data
-    //
-    //  bhiDefault
-    //      The default value for a bitmap header info structure.
-    //
-    //  c2BA
-    //      This is the 'BA' header stamp that is on OS/2 multiple image
-    //      bitmap files.
-    //
-    //  c2BM
-    //      This is the 'BM' header stamp that is on single image bitmap
-    //      files.
-    //
-    //  c4SizeXXX
-    //      These are some magic numbers for bitmap info header sizes of
-    //      various verions of bitmaps.
-    //
-    //  c4LinePadding
-    //      This is the number of bytes of padding required for a bitmap's
-    //      pixel data.
-    // -----------------------------------------------------------------------
-    const TBitmapImage::TBmpHdrInfo   bhiDefault =
+    namespace
     {
-        tCIDImage::EBmpTypes::Win_1x
-        , tCIDImage::EBmpComp::None
-        , tCIDImage::ERowOrders::TopDown
-        , tCIDLib::c4EnumOrd(tCIDImage::EBitDepths::One)
-        , 0
-    };
-    const tCIDLib::TCard2   c2BA  = 0x4142;
-    const tCIDLib::TCard2   c2BM  = 0x4D42;
-    const tCIDLib::TCard4   c4Size1xHeader = 10;
-    const tCIDLib::TCard4   c4SizeBasicHeader = 12;
-    const tCIDLib::TCard4   c4Size3xHeader = 40;
-    const tCIDLib::TCard4   c4Size4xHeader = 108;
-    const tCIDLib::TCard4   c4SizeOS2Max = 64;
-    const tCIDLib::TCard4   c4SizeFileHeader = 14;
-    const tCIDLib::TCard4   c4LinePadding = 4;
+        // -----------------------------------------------------------------------
+        //  Local, const data
+        //
+        //  bhiDefault
+        //      The default value for a bitmap header info structure.
+        //
+        //  c2BA
+        //      This is the 'BA' header stamp that is on OS/2 multiple image
+        //      bitmap files.
+        //
+        //  c2BM
+        //      This is the 'BM' header stamp that is on single image bitmap
+        //      files.
+        //
+        //  c4SizeXXX
+        //      These are some magic numbers for bitmap info header sizes of
+        //      various verions of bitmaps.
+        //
+        //  c4LinePadding
+        //      This is the number of bytes of padding required for a bitmap's
+        //      pixel data.
+        // -----------------------------------------------------------------------
+        const TBitmapImage::TBmpHdrInfo   bhiDefault =
+        {
+            tCIDImage::EBmpTypes::Win_1x
+            , tCIDImage::EBmpComp::None
+            , tCIDImage::ERowOrders::TopDown
+            , tCIDLib::c4EnumOrd(tCIDImage::EBitDepths::One)
+            , 0
+        };
+        constexpr tCIDLib::TCard2   c2BA  = 0x4142;
+        constexpr tCIDLib::TCard2   c2BM  = 0x4D42;
+        constexpr tCIDLib::TCard4   c4Size1xHeader = 10;
+        constexpr tCIDLib::TCard4   c4SizeBasicHeader = 12;
+        constexpr tCIDLib::TCard4   c4Size3xHeader = 40;
+        constexpr tCIDLib::TCard4   c4Size4xHeader = 108;
+        constexpr tCIDLib::TCard4   c4SizeOS2Max = 64;
+        constexpr tCIDLib::TCard4   c4SizeFileHeader = 14;
+        constexpr tCIDLib::TCard4   c4LinePadding = 4;
 
 
-    // -----------------------------------------------------------------------
-    //  The file header format
-    // -----------------------------------------------------------------------
-    #pragma CIDLIB_PACK(1)
-    struct TBMPFlHdr
-    {
-        tCIDLib::TCard2     c2Sig;
-        tCIDLib::TCard4     c4FlSize;
-        tCIDLib::TCard2     c2Res1;
-        tCIDLib::TCard2     c2Res2;
-        tCIDLib::TCard4     c4PixOfs;
-    };
-    #pragma CIDLIB_POPPACK
+        // -----------------------------------------------------------------------
+        //  The file header format
+        // -----------------------------------------------------------------------
+        #pragma CIDLIB_PACK(1)
+        struct TBMPFlHdr
+        {
+            tCIDLib::TCard2     c2Sig;
+            tCIDLib::TCard4     c4FlSize;
+            tCIDLib::TCard2     c2Res1;
+            tCIDLib::TCard2     c2Res2;
+            tCIDLib::TCard4     c4PixOfs;
+        };
+        #pragma CIDLIB_POPPACK
+    }
 }
 
 
@@ -773,7 +776,7 @@ tCIDLib::TVoid TBitmapImage::StreamTo(TBinOutStream& strmToWriteTo) const
                             << rgbCur.c1Red();
 
             if (c4PalEntryBytes == 4)
-                strmToWriteTo << tCIDLib::TCard1(0);
+                strmToWriteTo << kCIDLib::c1MinCard;
         }
     }
     strmToWriteTo.c4WriteRawBuffer(pixaSrc.pc1Buffer(), c4ImageSz());

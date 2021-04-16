@@ -34,6 +34,7 @@
 // ---------------------------------------------------------------------------
 //  Include some system headers
 // ---------------------------------------------------------------------------
+
 #include    <math.h>
 
 
@@ -168,14 +169,14 @@ TMathLib::f8Power(  const   tCIDLib::TFloat8& f8Value
 
 tCIDLib::TFloat4
 TMathLib::f4Split(  const   tCIDLib::TFloat4    f4Value
-                    ,       tCIDLib::TFloat4&   f4Integral)
+                    , COP   tCIDLib::TFloat4&   f4Integral)
 {
     return modff(f4Value, &f4Integral);
 }
 
 tCIDLib::TFloat8
 TMathLib::f8Split(  const   tCIDLib::TFloat8& f8Value
-                    ,       tCIDLib::TFloat8& f8Integral)
+                    , COP   tCIDLib::TFloat8& f8Integral)
 {
     return modf(f8Value, &f8Integral);
 }
@@ -232,13 +233,13 @@ tCIDLib::TInt4 TMathLib::i4Round(const tCIDLib::TFloat8 f8ToRound)
     return i4Ret;
 }
 
-tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat4&       f4ToRound
+tCIDLib::TVoid TMathLib::Round( CIOP    tCIDLib::TFloat4&       f4ToRound
                                 , const tCIDLib::ERoundTypes    eType)
 {
     // Split it out into integral and fractional parts
     tCIDLib::TFloat4 f4Int;
     tCIDLib::TFloat4 f4Frac;
-    f4Frac = modff(f4ToRound, &f4Int);
+    f4Frac = static_cast<tCIDLib::TFloat4>(fabs(modff(f4ToRound, &f4Int)));
 
     if (eType == tCIDLib::ERoundTypes::Closest)
     {
@@ -260,13 +261,13 @@ tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat4&       f4ToRound
     }
 }
 
-tCIDLib::TVoid TMathLib::Round(         tCIDLib::TFloat8&       f8ToRound
+tCIDLib::TVoid TMathLib::Round( CIOP    tCIDLib::TFloat8&       f8ToRound
                                 , const tCIDLib::ERoundTypes    eType)
 {
     // Split it out into integral and fractional parts
     tCIDLib::TFloat8 f8Int;
     tCIDLib::TFloat8 f8Frac;
-    f8Frac = modf(f8ToRound, &f8Int);
+    f8Frac = fabs(modf(f8ToRound, &f8Int));
 
     if (eType == tCIDLib::ERoundTypes::Closest)
     {

@@ -38,14 +38,6 @@
 RTTIDecls(TFacCIDImgFact,TFacility)
 
 
-// ---------------------------------------------------------------------------
-//  Local data
-// ---------------------------------------------------------------------------
-namespace CIDPNG_ThisFacility
-{
-}
-
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TFacCIDImgFact
@@ -60,7 +52,7 @@ TFacCIDImgFact::TFacCIDImgFact() :
     TFacility
     (
         L"CIDImgFact"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

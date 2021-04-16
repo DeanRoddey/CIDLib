@@ -66,6 +66,11 @@ class CIDJPEGEXP TJPEGImage : public TCIDImage
             const   TJPEGImage&             imgSrc
         );
 
+        TJPEGImage
+        (
+                    TJPEGImage&&            imgSrc
+        );
+
         ~TJPEGImage();
 
 
@@ -75,6 +80,11 @@ class CIDJPEGEXP TJPEGImage : public TCIDImage
         TJPEGImage& operator=
         (
             const   TJPEGImage&             imgSrc
+        );
+
+        TJPEGImage& operator=
+        (
+                    TJPEGImage&&            imgSrc
         );
 
 

@@ -73,8 +73,23 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         TMemBufEntitySrc
         (
             const   TString&                strSystemId
+            ,       THeapBuf&&              mbufToTake
+            , const tCIDLib::TCard4         c4SrcBytes
+        );
+
+        TMemBufEntitySrc
+        (
+            const   TString&                strSystemId
             , const TString&                strPublicId
             , const TMemBuf&                mbufToCopy
+            , const tCIDLib::TCard4         c4SrcBytes
+        );
+
+        TMemBufEntitySrc
+        (
+            const   TString&                strSystemId
+            , const TString&                strPublicId
+            ,       THeapBuf&&              mbufToTake
             , const tCIDLib::TCard4         c4SrcBytes
         );
 
@@ -120,10 +135,8 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
             , const tCIDLib::TCard4         c4SrcBytes
         );
 
-        TMemBufEntitySrc
-        (
-            const   TMemBufEntitySrc&       xsrcSrc
-        );
+        TMemBufEntitySrc(const TMemBufEntitySrc&) = default;
+        TMemBufEntitySrc(TMemBufEntitySrc&&) = default;
 
         ~TMemBufEntitySrc();
 
@@ -131,16 +144,14 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TMemBufEntitySrc& operator=
-        (
-            const   TMemBufEntitySrc&       xsrcSrc
-        );
+        TMemBufEntitySrc& operator=(const TMemBufEntitySrc&) = default;
+        TMemBufEntitySrc& operator=(TMemBufEntitySrc&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        [[nodiscard]] TBinInStream* pstrmMakeNew() const;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const final;
 
 
         // -------------------------------------------------------------------
@@ -167,10 +178,7 @@ class CIDXMLEXP TMemBufEntitySrc : public TXMLEntitySrc
         //      memory buffer. Since many copies of an entity source might be
         //      returned from a cache or catalog, we cannot afford to copy it
         //      every time. Since the data is never changed, just read, it
-        //      makes imminent sense to reference count a single buffer.
-        //
-        //      We never modify the original contents, so its a counted pointer
-        //      to a const memory buffer pointer.
+        //      makes sense to reference count a single buffer.
         // -------------------------------------------------------------------
         tCIDLib::TCard4         m_c4SrcBytes;
         TCntPtr<const TMemBuf>  m_cptrBuffer;

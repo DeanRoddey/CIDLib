@@ -49,6 +49,7 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         );
 
         TOrbReply(const TOrbReply&) = delete;
+        TOrbReply(TOrbReply&&) = delete;
 
         ~TOrbReply();
 
@@ -57,6 +58,7 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TOrbReply& operator=(const TOrbReply&) = delete;
+        TOrbReply& operator=(TOrbReply&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -71,18 +73,18 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bRetStatus() const;
+        [[nodiscard]] tCIDLib::TBoolean bRetStatus() const;
 
         tCIDLib::TBoolean bRetStatus
         (
             const   tCIDLib::TBoolean       bNew
         );
 
-        tCIDLib::TCard4 c4BufSize() const;
+        [[nodiscard]] tCIDLib::TCard4 c4BufSize() const;
 
-        tCIDLib::TCard4 c4PayloadBytes();
+        [[nodiscard]] tCIDLib::TCard4 c4PayloadBytes();
 
-        tCIDLib::TCard4 c4SequenceId() const;
+        [[nodiscard]] tCIDLib::TCard4 c4SequenceId() const;
 
         tCIDLib::TCard4 c4SequenceId
         (
@@ -101,12 +103,12 @@ class CIDORBEXP TOrbReply : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private :

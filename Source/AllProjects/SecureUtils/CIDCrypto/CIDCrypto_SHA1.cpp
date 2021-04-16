@@ -345,17 +345,18 @@ tCIDLib::TVoid TSHA1Hasher::PadMsg()
 tCIDLib::TVoid
 TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
 {
-    static const tCIDLib::TCard4 ac4K[] =
+    constexpr tCIDLib::TCard4 ac4K[] =
     {
         0x5A827999, 0x6ED9EBA1, 0x8F1BBCDC, 0xCA62C1D6
     };
+
+    // Suppress buffer not init warning since we are filling it below
+    CIDLib_Suppress(26494)
     tCIDLib::TCard4 ac4WSeq[80];
-    tCIDLib::TCard4 c4Index;
-    tCIDLib::TCard4 c4Temp;
-    tCIDLib::TCard4 c4A, c4B, c4C, c4D, c4E;
+    tCIDLib::TCard4 c4Temp = 0;
 
     // Initialize the first 16 words in the array word seq array
-    for (c4Index = 0; c4Index < 16; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
     {
         ac4WSeq[c4Index] = ((tCIDLib::TCard4) pc1Block[c4Index * 4]) << 24;
         ac4WSeq[c4Index] |= ((tCIDLib::TCard4) pc1Block[c4Index * 4 + 1]) << 16;
@@ -363,7 +364,7 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
         ac4WSeq[c4Index] |= ((tCIDLib::TCard4) pc1Block[c4Index * 4 + 3]);
     }
 
-    for(c4Index = 16; c4Index < 80; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 16; c4Index < 80; c4Index++)
     {
         ac4WSeq[c4Index] = c4CircularShift
         (
@@ -373,13 +374,13 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
         );
     }
 
-    c4A = m_ac4H[0];
-    c4B = m_ac4H[1];
-    c4C = m_ac4H[2];
-    c4D = m_ac4H[3];
-    c4E = m_ac4H[4];
+    tCIDLib::TCard4 c4A = m_ac4H[0];
+    tCIDLib::TCard4 c4B = m_ac4H[1];
+    tCIDLib::TCard4 c4C = m_ac4H[2];
+    tCIDLib::TCard4 c4D = m_ac4H[3];
+    tCIDLib::TCard4 c4E = m_ac4H[4];
 
-    for (c4Index = 0; c4Index < 20; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 20; c4Index++)
     {
         c4Temp = c4CircularShift(5, c4A) + ((c4B & c4C) | ((~c4B) & c4D)) + c4E + ac4WSeq[c4Index] + ac4K[0];
         c4Temp &= 0xFFFFFFFF;
@@ -390,7 +391,7 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
         c4A = c4Temp;
     }
 
-    for (c4Index = 20; c4Index < 40; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 20; c4Index < 40; c4Index++)
     {
         c4Temp = c4CircularShift(5, c4A) + (c4B ^ c4C ^ c4D) + c4E + ac4WSeq[c4Index] + ac4K[1];
         c4Temp &= 0xFFFFFFFF;
@@ -401,7 +402,7 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
         c4A = c4Temp;
     }
 
-    for (c4Index = 40; c4Index < 60; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 40; c4Index < 60; c4Index++)
     {
         c4Temp = c4CircularShift(5 , c4A)
                + ((c4B & c4C) | (c4B & c4D) | (c4C & c4D)) + c4E + ac4WSeq[c4Index] + ac4K[2];
@@ -413,7 +414,7 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
         c4A = c4Temp;
     }
 
-    for (c4Index = 60; c4Index < 80; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 60; c4Index < 80; c4Index++)
     {
         c4Temp = c4CircularShift(5, c4A) + (c4B ^ c4C ^ c4D) + c4E + ac4WSeq[c4Index] + ac4K[3];
         c4Temp &= 0xFFFFFFFF;
@@ -436,5 +437,5 @@ TSHA1Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
 tCIDLib::TVoid TSHA1Hasher::ScrubContext()
 {
     for (tCIDLib::TCard4 c4Index = 0; c4Index < tCIDLib::c4ArrayElems(m_ac4H); c4Index++)
-        m_ac4H[c4BufCnt] = 0;
+        m_ac4H[c4Index] = 0;
 }

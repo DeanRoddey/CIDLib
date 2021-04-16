@@ -241,8 +241,9 @@ tCIDLib::TVoid TXMLAttrDef::SetEnumValues(const TString& strValueList)
 TXMLAttrDef::TXMLAttrDef() :
 
     m_bProvided(kCIDLib::False)
-    , m_eType(tCIDXML::EAttrTypes::CData)
+    , m_c4Id(kCIDLib::c4MaxCard)
     , m_eDefType(tCIDXML::EDefAttrTypes::Implied)
+    , m_eType(tCIDXML::EAttrTypes::CData)
     , m_pcolEnumValues(nullptr)
 {
 }
@@ -252,8 +253,9 @@ TXMLAttrDef::TXMLAttrDef(const  tCIDLib::TCh* const     pszValue
                         , const tCIDXML::EDefAttrTypes  eDefaultType) :
 
     m_bProvided(kCIDLib::False)
-    , m_eType(eType)
+    , m_c4Id(kCIDLib::c4MaxCard)
     , m_eDefType(eDefaultType)
+    , m_eType(eType)
     , m_pcolEnumValues(nullptr)
     , m_strValue(pszValue)
 {
@@ -264,52 +266,78 @@ TXMLAttrDef::TXMLAttrDef(const  TString&                strValue
                         , const tCIDXML::EDefAttrTypes  eDefaultType) :
 
     m_bProvided(kCIDLib::False)
-    , m_eType(eType)
+    , m_c4Id(kCIDLib::c4MaxCard)
     , m_eDefType(eDefaultType)
+    , m_eType(eType)
     , m_pcolEnumValues(nullptr)
     , m_strValue(strValue)
 {
 }
 
-TXMLAttrDef::TXMLAttrDef(const TXMLAttrDef& xadToCopy) :
+TXMLAttrDef::TXMLAttrDef(const TXMLAttrDef& xadSrc) :
 
     m_bProvided(kCIDLib::False)
-    , m_eType(xadToCopy.m_eType)
-    , m_eDefType(xadToCopy.m_eDefType)
+    , m_c4Id(kCIDLib::c4MaxCard)
+    , m_eDefType(xadSrc.m_eDefType)
+    , m_eType(xadSrc.m_eType)
     , m_pcolEnumValues(nullptr)
-    , m_strValue(xadToCopy.m_strValue)
+    , m_strValue(xadSrc.m_strValue)
 {
     // If the source has enumerated values, then copy them
-    if (xadToCopy.m_pcolEnumValues)
-        m_pcolEnumValues = new TBag<TString>(*xadToCopy.m_pcolEnumValues);
+    if (xadSrc.m_pcolEnumValues)
+        m_pcolEnumValues = new TBag<TString>(*xadSrc.m_pcolEnumValues);
 }
 
-TXMLAttrDef& TXMLAttrDef::operator=(const TXMLAttrDef& xadToAssign)
+TXMLAttrDef::TXMLAttrDef(TXMLAttrDef&& xadSrc) :
+
+    TXMLAttrDef()
 {
-    if (this != &xadToAssign)
+    *this = operator=(tCIDLib::ForceMove(xadSrc));
+}
+
+TXMLAttrDef& TXMLAttrDef::operator=(const TXMLAttrDef& xadSrc)
+{
+    if (this != &xadSrc)
     {
-        m_bProvided = xadToAssign.m_bProvided;
-        m_eType     = xadToAssign.m_eType;
-        m_eDefType  = xadToAssign.m_eDefType;
-        m_strValue  = xadToAssign.m_strValue;
+        m_bProvided = xadSrc.m_bProvided;
+        m_eDefType  = xadSrc.m_eDefType;
+        m_eType     = xadSrc.m_eType;
+        m_strValue  = xadSrc.m_strValue;
+
+        // The id is assigned by the container, so reset it on copy or assign
+        m_c4Id = kCIDLib::c4MaxCard;
 
         //
         //  If the source has enumerated values, then copy them. We may have to
         //  fault in our collection. If it does not, and we have one, then flush
         //  it.
         //
-        if (xadToAssign.m_pcolEnumValues)
+        if (xadSrc.m_pcolEnumValues)
         {
             if (!m_pcolEnumValues)
-                m_pcolEnumValues = new TBag<TString>(*xadToAssign.m_pcolEnumValues);
+                m_pcolEnumValues = new TBag<TString>(*xadSrc.m_pcolEnumValues);
             else
-                *m_pcolEnumValues = *xadToAssign.m_pcolEnumValues;
+                *m_pcolEnumValues = *xadSrc.m_pcolEnumValues;
         }
          else
         {
             if (m_pcolEnumValues)
                 m_pcolEnumValues->RemoveAll();
         }
+    }
+    return *this;
+}
+
+TXMLAttrDef& TXMLAttrDef::operator=(TXMLAttrDef&& xadSrc)
+{
+    if (this != &xadSrc)
+    {
+        tCIDLib::Swap(m_bProvided, xadSrc.m_bProvided);
+        tCIDLib::Swap(m_c4Id, xadSrc.m_c4Id);
+        tCIDLib::Swap(m_eDefType, xadSrc.m_eDefType);
+        tCIDLib::Swap(m_eType, xadSrc.m_eType);
+        tCIDLib::Swap(m_pcolEnumValues, xadSrc.m_pcolEnumValues);
+        m_strValue = tCIDLib::ForceMove(xadSrc.m_strValue);
     }
     return *this;
 }

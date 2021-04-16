@@ -214,17 +214,17 @@ class TFundVector : public TFundColBase, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             return (m_c4CurIndex == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             return m_c4CurIndex;
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
             m_c4CurIndex = 0;
             this->PublishClear();
@@ -439,21 +439,21 @@ class TFundVector : public TFundColBase, public MDuplicable
 
 
         // Call back for each elements
-        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
-        {
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
-            {
-                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
-                    return kCIDLib::False;
-            }
-            return kCIDLib::True;
-        }
-
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
             {
                 if (!iterCB(m_ptElements[c4Index]))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
                     return kCIDLib::False;
             }
             return kCIDLib::True;
@@ -469,7 +469,15 @@ class TFundVector : public TFundColBase, public MDuplicable
             return kCIDLib::True;
         }
 
-
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurIndex; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], TIndex(c4Index)))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
 
 
         tCIDLib::TVoid Insert(const TElem tToInsert, const TIndex tAt)

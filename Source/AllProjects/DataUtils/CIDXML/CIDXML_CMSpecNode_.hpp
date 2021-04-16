@@ -41,61 +41,99 @@ class CIDXMLEXP TXMLCMSpecNode
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TXMLCMSpecNode
-        (
-            const   tCIDXML::ECMNodeTypes   eNodeType
-            ,       TXMLCMSpecNode* const   pxcsnLeft = 0
-            ,       TXMLCMSpecNode* const   pxcsnRight = 0
-        );
+        TXMLCMSpecNode() = delete;
 
-        TXMLCMSpecNode
-        (
-            const   tCIDLib::TCard4         c4ElemLeafId
-        );
+        TXMLCMSpecNode( const   tCIDXML::ECMNodeTypes   eNodeType
+                        ,       TXMLCMSpecNode* const   pxcsnLeft = nullptr
+                        ,       TXMLCMSpecNode* const   pxcsnRight = nullptr) :
 
-        ~TXMLCMSpecNode();
+            m_c4ElemId(kCIDXML::c4InvalidElemId)
+            , m_eNodeType(eNodeType)
+            , m_pxcsnLeft(pxcsnLeft)
+            , m_pxcsnRight(pxcsnRight)
+        {
+        }
+
+        TXMLCMSpecNode(const tCIDLib::TCard4 c4ElemLeafId) :
+
+            m_c4ElemId(c4ElemLeafId)
+            , m_eNodeType(tCIDXML::ECMNodeTypes::Leaf)
+            , m_pxcsnLeft(nullptr)
+            , m_pxcsnRight(nullptr)
+        {
+        }
+
+        TXMLCMSpecNode(const TXMLCMSpecNode&) = delete;
+        TXMLCMSpecNode(TXMLCMSpecNode&&) = delete;
+
+        virtual ~TXMLCMSpecNode()
+        {
+            // Clean up our children, which clean up their children, etc...
+            delete m_pxcsnLeft;
+            delete m_pxcsnRight;
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLCMSpecNode& operator=(const TXMLCMSpecNode&) = delete;
+        TXMLCMSpecNode& operator=(TXMLCMSpecNode&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4ElemId() const;
+        tCIDLib::TCard4 c4ElemId() const
+        {
+            return m_c4ElemId;
+        }
 
-        tCIDLib::TCard4 c4ElemId
-        (
-            const   tCIDLib::TCard4         c4ElemId
-        );
+        tCIDLib::TCard4 c4ElemId(const tCIDLib::TCard4 c4ElemId)
+        {
+            m_c4ElemId = c4ElemId;
+            return m_c4ElemId;
+        }
 
-        tCIDXML::ECMNodeTypes eNodeType() const;
+        tCIDXML::ECMNodeTypes eNodeType() const
+        {
+            return m_eNodeType;
+        }
 
-        TXMLCMSpecNode* pxcsnLeft();
+        TXMLCMSpecNode* pxcsnLeft()
+        {
+            return m_pxcsnLeft;
+        }
 
-        TXMLCMSpecNode* pxcsnLeft
-        (
-                    TXMLCMSpecNode* const   pxcsnToSet
-        );
+        TXMLCMSpecNode* pxcsnLeft(TXMLCMSpecNode* const   pxcsnToSet)
+        {
+            m_pxcsnLeft = pxcsnToSet;
+            return m_pxcsnLeft;
+        }
 
-        const TXMLCMSpecNode* pxcsnLeft() const;
+        const TXMLCMSpecNode* pxcsnLeft() const
+        {
+            return m_pxcsnLeft;
+        }
 
-        TXMLCMSpecNode* pxcsnRight();
+        TXMLCMSpecNode* pxcsnRight()
+        {
+            return m_pxcsnRight;
+        }
 
-        TXMLCMSpecNode* pxcsnRight
-        (
-                    TXMLCMSpecNode* const   pxcsnToSet
-        );
+        TXMLCMSpecNode* pxcsnRight(TXMLCMSpecNode* const pxcsnToSet)
+        {
+            m_pxcsnRight = pxcsnToSet;
+            return m_pxcsnRight;
+        }
 
-        const TXMLCMSpecNode* pxcsnRight() const;
+        const TXMLCMSpecNode* pxcsnRight() const
+        {
+            return m_pxcsnRight;
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLCMSpecNode();
-        TXMLCMSpecNode(const TXMLCMSpecNode&);
-        tCIDLib::TVoid operator=(const TXMLCMSpecNode&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -120,87 +158,3 @@ class CIDXMLEXP TXMLCMSpecNode
 #pragma CIDLIB_POPPACK
 
 
-// ---------------------------------------------------------------------------
-//  TXMLCMSpecNode: Destructor
-// ---------------------------------------------------------------------------
-inline
-TXMLCMSpecNode::TXMLCMSpecNode( const   tCIDXML::ECMNodeTypes   eNodeType
-                                ,       TXMLCMSpecNode* const   pxcsnLeft
-                                ,       TXMLCMSpecNode* const   pxcsnRight) :
-
-    m_c4ElemId(kCIDXML::c4InvalidElemId)
-    , m_eNodeType(eNodeType)
-    , m_pxcsnLeft(pxcsnLeft)
-    , m_pxcsnRight(pxcsnRight)
-{
-}
-
-inline TXMLCMSpecNode::TXMLCMSpecNode(const tCIDLib::TCard4 c4ElemLeafId) :
-
-    m_c4ElemId(c4ElemLeafId)
-    , m_eNodeType(tCIDXML::ECMNodeTypes::Leaf)
-    , m_pxcsnLeft(0)
-    , m_pxcsnRight(0)
-{
-}
-
-inline TXMLCMSpecNode::~TXMLCMSpecNode()
-{
-    // Clean up our children, which clean up their children, etc...
-    delete m_pxcsnLeft;
-    delete m_pxcsnRight;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCMSpecNode: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TXMLCMSpecNode::c4ElemId() const
-{
-    return m_c4ElemId;
-}
-
-inline tCIDLib::TCard4 TXMLCMSpecNode::c4ElemId(const tCIDLib::TCard4 c4ElemId)
-{
-    m_c4ElemId = c4ElemId;
-    return m_c4ElemId;
-}
-
-inline tCIDXML::ECMNodeTypes TXMLCMSpecNode::eNodeType() const
-{
-    return m_eNodeType;
-}
-
-inline TXMLCMSpecNode* TXMLCMSpecNode::pxcsnLeft()
-{
-    return m_pxcsnLeft;
-}
-
-inline TXMLCMSpecNode*
-TXMLCMSpecNode::pxcsnLeft(TXMLCMSpecNode* const pxcsnToSet)
-{
-    m_pxcsnLeft = pxcsnToSet;
-    return m_pxcsnLeft;
-}
-
-inline const TXMLCMSpecNode* TXMLCMSpecNode::pxcsnLeft() const
-{
-    return m_pxcsnLeft;
-}
-
-inline TXMLCMSpecNode* TXMLCMSpecNode::pxcsnRight()
-{
-    return m_pxcsnRight;
-}
-
-inline TXMLCMSpecNode*
-TXMLCMSpecNode::pxcsnRight(TXMLCMSpecNode* const pxcsnToSet)
-{
-    m_pxcsnRight = pxcsnToSet;
-    return m_pxcsnRight;
-}
-
-inline const TXMLCMSpecNode* TXMLCMSpecNode::pxcsnRight() const
-{
-    return m_pxcsnRight;
-}

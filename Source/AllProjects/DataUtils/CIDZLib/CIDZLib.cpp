@@ -35,13 +35,7 @@
 //
 TFacCIDZLib& facCIDZLib()
 {
-    static TFacCIDZLib* pfacCIDZLib = nullptr;
-    if (!pfacCIDZLib)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDZLib)
-            pfacCIDZLib = new TFacCIDZLib;
-    }
-    return *pfacCIDZLib;
+    static TFacCIDZLib* pfacThis = new TFacCIDZLib();
+    return *pfacThis;
 }
 

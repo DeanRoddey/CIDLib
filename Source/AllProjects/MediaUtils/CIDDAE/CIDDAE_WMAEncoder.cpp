@@ -24,6 +24,11 @@
 //  $_CIDLib_Log_$
 //
 
+// ---------------------------------------------------------------------------
+//  Facility specific includes
+// ---------------------------------------------------------------------------
+#include    "CIDDAE_.hpp"
+
 
 // ---------------------------------------------------------------------------
 //  Force inclusion of system libraries we need
@@ -32,19 +37,16 @@
 #pragma     comment(lib, "Wmvcore.lib")
 
 
-// ---------------------------------------------------------------------------
-//  Facility specific includes
-// ---------------------------------------------------------------------------
-#include    "CIDDAE_.hpp"
-
-
 
 // ---------------------------------------------------------------------------
 //  We need some windows stuff and some of our platform helpers
 // ---------------------------------------------------------------------------
+#pragma warning(push)
+#pragma warning(disable : 26461 26473 26812)
 #include    <windows.h>
 #include    <wmsdk.h>
 #include    <vfw.h>
+#pragma warning(pop)
 #include    "CIDKernel_InternalHelpers_.hpp"
 
 
@@ -60,37 +62,40 @@ RTTIDecls(TCIDDAEWMAEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_WMAEncoder
 {
-    // -----------------------------------------------------------------------
-    //  We use an internal structure to hold the WMA specific info for the
-    //  encoding process, so that we don't expose the Windows headers to the
-    //  world. WE also have one for the decoding process.
-    // -----------------------------------------------------------------------
-    struct TWMAWInfo
+    namespace
     {
-        WM_MEDIA_TYPE   MediaType;
-        WAVEFORMATEX    WaveFmt;
-        IWMWriter*      pWriter;
-        IWMProfile*     pProfile;
-        tCIDLib::TCard8 c8CurTime;
-    };
+        // -----------------------------------------------------------------------
+        //  We use an internal structure to hold the WMA specific info for the
+        //  encoding process, so that we don't expose the Windows headers to the
+        //  world. WE also have one for the decoding process.
+        // -----------------------------------------------------------------------
+        struct TWMAWInfo
+        {
+            WM_MEDIA_TYPE   MediaType;
+            WAVEFORMATEX    WaveFmt;
+            IWMWriter*      pWriter;
+            IWMProfile*     pProfile;
+            tCIDLib::TCard8 c8CurTime;
+        };
 
-    struct TWMARInfo
-    {
-        IWMSyncReader*  pReader;
-        tCIDLib::TCard2 c2StreamNum;
-    };
+        struct TWMARInfo
+        {
+            IWMSyncReader*  pReader;
+            tCIDLib::TCard2 c2StreamNum;
+        };
 
 
-    // -----------------------------------------------------------------------
-    //  We fault in a single profile manager and just keep using it
-    // -----------------------------------------------------------------------
-    IWMProfileManager*  pProfMgr = 0;
+        // -----------------------------------------------------------------------
+        //  We fault in a single profile manager and just keep using it
+        // -----------------------------------------------------------------------
+        IWMProfileManager*  pProfMgr = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Our coded name
-    // -----------------------------------------------------------------------
-    const TString strCodecName(L"MS-WMA");
+        // -----------------------------------------------------------------------
+        //  Our coded name
+        // -----------------------------------------------------------------------
+        const TString strCodecName(L"MS-WMA");
+    }
 }
 
 
@@ -104,7 +109,7 @@ static tCIDLib::TVoid CIDDAE_XlatSysErr(tCIDLib::TCard4 c4Err, TString& strToFil
     tCIDLib::TCh achBuf[c4BufSz + 1];
 
     achBuf[0] = kCIDLib::chNull;
-    ::FormatMessage
+    ::FormatMessageW
     (
         FORMAT_MESSAGE_FROM_SYSTEM
         , NULL
@@ -189,13 +194,11 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
                     , const TCIDDAEWMAEnc::TCodecInfo&      cdeciCodec
                     , const TCIDDAEWMAEnc::TCodecInfo&      cdeciFmt)
 {
-    HRESULT hRes;
-
     // Get a codec info object
-    IWMCodecInfo3* pCodecInfo = 0;
-    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
+    IWMCodecInfo3* pCodecInfo = nullptr;
+    HRESULT hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
     (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
+        IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo)
     );
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
@@ -232,7 +235,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     }
 
     // Get the indicated codec and format
-    IWMStreamConfig* pStreamCfg = 0;
+    IWMStreamConfig* pStreamCfg = nullptr;
     hRes = pCodecInfo->GetCodecFormat
     (
         WMMEDIATYPE_Audio, cdeciCodec.m_c4Index, cdeciFmt.m_c4Index, &pStreamCfg
@@ -242,7 +245,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     TCOMJanitor<IWMStreamConfig> janConfig(&pStreamCfg);
 
     // Create an empty profile object that we can start setting up
-    IWMProfile* pProfile = 0;
+    IWMProfile* pProfile = nullptr;
     hRes = CIDDAE_WMAEncoder::pProfMgr->CreateEmptyProfile(WMT_VER_9_0, &pProfile);
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_CreateProfile, hRes, CID_LINE);
@@ -253,7 +256,7 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     //  use the one we already have, and just set the stream number on it.
     //
     {
-        IWMStreamConfig* pStreamCfg2 = 0;
+        IWMStreamConfig* pStreamCfg2 = nullptr;
         hRes = pProfile->CreateNewStream(WMMEDIATYPE_Audio, &pStreamCfg2);
         if (FAILED(hRes))
             CIDDAE_ThrowEncError(kDAEErrs::errcWMA_CreateStream, hRes, CID_LINE);
@@ -273,8 +276,8 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_SetConnectionName, hRes, CID_LINE);
 
     // Get the media properties interface of the original format
-    IWMMediaProps* pProps = 0;
-    hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, (void**)&pProps);
+    IWMMediaProps* pProps = nullptr;
+    hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, tCIDLib::pToVoidPP(&pProps));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_GetMediaProps, hRes, CID_LINE);
     TCOMJanitor<IWMMediaProps> janProps(&pProps);
@@ -301,8 +304,8 @@ CIDDAE_BuildProfile(        CIDDAE_WMAEncoder::TWMAWInfo&    Info
     //  things. Note that we only do unconstrained VBR. We don't use any
     //  multi-pass VBR modes
     //
-    IWMPropertyVault* pVault = 0;
-    hRes = pStreamCfg->QueryInterface(IID_IWMPropertyVault, (void**)&pVault);
+    IWMPropertyVault* pVault = nullptr;
+    hRes = pStreamCfg->QueryInterface(IID_IWMPropertyVault, tCIDLib::pToVoidPP(&pVault));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryPropVault, hRes, CID_LINE);
 
@@ -337,11 +340,9 @@ CIDDAE_EnumCodecFmts(       IWMCodecInfo3*                          pCodecInfo
                     , const tCIDLib::TBoolean                       bVBR
                     , const tCIDLib::TCard4                         c4Passes)
 {
-    HRESULT hRes;
-
     // Set the passed VBR setting
     BOOL bFlag = bVBR ? TRUE : FALSE;
-    hRes = pCodecInfo->SetCodecEnumerationSetting
+    HRESULT hRes = pCodecInfo->SetCodecEnumerationSetting
     (
         WMMEDIATYPE_Audio
         , c4CodecInd
@@ -383,7 +384,7 @@ CIDDAE_EnumCodecFmts(       IWMCodecInfo3*                          pCodecInfo
         tCIDLib::TCard4 c4Size = 0;
 
         // Get the description of this format
-        IWMStreamConfig* pStreamCfg = 0;
+        IWMStreamConfig* pStreamCfg = nullptr;
         hRes = pCodecInfo->GetCodecFormatDesc
         (
             WMMEDIATYPE_Audio, c4CodecInd, c4FmtIndex, 0, 0, &c4Size
@@ -417,8 +418,8 @@ CIDDAE_EnumCodecFmts(       IWMCodecInfo3*                          pCodecInfo
                 continue;
 
             // Get the media properties interface
-            IWMMediaProps* pProps = 0;
-            hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, (void**)&pProps);
+            IWMMediaProps* pProps = nullptr;
+            hRes = pStreamCfg->QueryInterface(IID_IWMMediaProps, tCIDLib::pToVoidPP(&pProps));
             if (FAILED(hRes))
                 CIDDAE_ThrowEncError(kDAEErrs::errcWMA_GetMediaProps, hRes, CID_LINE);
             TCOMJanitor<IWMMediaProps> janProps(&pProps);
@@ -480,13 +481,13 @@ const TString& TCIDDAEWMADec::strCodecName()
 TCIDDAEWMADec::TCIDDAEWMADec() :
 
     TCIDDAEDecoder(CIDDAE_WMAEncoder::strCodecName)
-    , m_pc1Data(0)
+    , m_pc1Data(nullptr)
 {
     // Allocate and initialize our internal data structure
     CIDDAE_WMAEncoder::TWMARInfo* pWMAInfo = new CIDDAE_WMAEncoder::TWMARInfo;
     TRawMem::SetMemBuf
     (
-        pWMAInfo, tCIDLib::TCard1(0), sizeof(CIDDAE_WMAEncoder::TWMARInfo)
+        pWMAInfo, kCIDLib::c1MinCard, sizeof(CIDDAE_WMAEncoder::TWMARInfo)
     );
     m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pWMAInfo);
 }
@@ -503,7 +504,7 @@ TCIDDAEWMADec::~TCIDDAEWMADec()
     if (m_pc1Data)
     {
         delete [] m_pc1Data;
-        m_pc1Data = 0;
+        m_pc1Data = nullptr;
     }
 }
 
@@ -520,14 +521,13 @@ TCIDDAEWMADec::c4LoadChunkImpl(         TMemBuf&        mbufToFill
     CIDDAE_WMAEncoder::TWMARInfo* pWMAInfo
                 = reinterpret_cast<CIDDAE_WMAEncoder::TWMARInfo*>(m_pc1Data);
 
-    INSSBuffer* pSample;
-    HRESULT hRes;
+    INSSBuffer* pSample = nullptr;
 
     tCIDLib::TCard8 c8SampleLen;
     tCIDLib::TCard8 c8SampleTime;
     tCIDLib::TCard4 c4Flags;
 
-    hRes = pWMAInfo->pReader->GetNextSample
+    HRESULT hRes = pWMAInfo->pReader->GetNextSample
     (
         pWMAInfo->c2StreamNum
         , &pSample
@@ -548,8 +548,8 @@ TCIDDAEWMADec::c4LoadChunkImpl(         TMemBuf&        mbufToFill
 
     // Get the buffer and length and copy to the caller's buffer
     TCOMJanitor<INSSBuffer> janBuf(&pSample);
-    tCIDLib::TCard4 c4Len;
-    tCIDLib::TCard1* pc1BufPtr;
+    tCIDLib::TCard4 c4Len = 0;
+    tCIDLib::TCard1* pc1BufPtr = nullptr;
     hRes = pSample->GetBufferAndLength(&pc1BufPtr, &c4Len);
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_GetBufferInfo, hRes, CID_LINE);
@@ -680,10 +680,9 @@ TCIDDAEWMAEnc::bFindCodecInfo(  const   TString&    strCodecDescr
 //
 //  Queries all the names of the available WMA codecs.
 //
-tCIDLib::TCard4
-TCIDDAEWMAEnc::c4EnumAudioCodecs(TCollection<TCodecInfo>& colToFill)
+tCIDLib::TCard4 TCIDDAEWMAEnc::c4EnumAudioCodecs(TCollection<TCodecInfo>& colToFill)
 {
-    HRESULT hRes;
+    HRESULT hRes = S_OK;
 
     // Empty the passed collection in preperation for reloading
     colToFill.RemoveAll();
@@ -697,11 +696,8 @@ TCIDDAEWMAEnc::c4EnumAudioCodecs(TCollection<TCodecInfo>& colToFill)
     }
 
     // Use that to get a codec info object
-    IWMCodecInfo3* pCodecInfo = 0;
-    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
-    (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
-    );
+    IWMCodecInfo3* pCodecInfo = nullptr;
+    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface(IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
     TCOMJanitor<IWMCodecInfo3> janCodecInfo(&pCodecInfo);
@@ -741,7 +737,7 @@ TCIDDAEWMAEnc::c4EnumAudioCodecs(TCollection<TCodecInfo>& colToFill)
             //  If this guy starts with "Windows Media Audio", then add it
             //  to the list. Also skip anything with Voice in it
             //
-            tCIDLib::TCard4 c4Pos;
+            tCIDLib::TCard4 c4Pos = 0;
             strName = pszBuf;
             if (strName.bStartsWith(L"Windows Media Audio")
             &&  !strName.bFirstOccurrence(L"Voice", c4Pos))
@@ -763,7 +759,7 @@ tCIDLib::TCard4
 TCIDDAEWMAEnc::c4EnumCodecFmts( const   TCodecInfo&                 cdeciSrc
                                 ,       TCollection<TCodecInfo>&    colToFill)
 {
-    HRESULT hRes;
+    HRESULT hRes = S_OK;
 
     // Empty the passed collection in preperation for reloading
     colToFill.RemoveAll();
@@ -777,11 +773,8 @@ TCIDDAEWMAEnc::c4EnumCodecFmts( const   TCodecInfo&                 cdeciSrc
     }
 
     // Use that to get a codec info object
-    IWMCodecInfo3* pCodecInfo = 0;
-    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface
-    (
-        IID_IWMCodecInfo3, (void**)&pCodecInfo
-    );
+    IWMCodecInfo3* pCodecInfo = nullptr;
+    hRes = CIDDAE_WMAEncoder::pProfMgr->QueryInterface(IID_IWMCodecInfo3, tCIDLib::pToVoidPP(&pCodecInfo));
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_QueryCodecInfo, hRes, CID_LINE);
     TCOMJanitor<IWMCodecInfo3> janCodecInfo(&pCodecInfo);
@@ -817,10 +810,7 @@ TCIDDAEWMAEnc::TCIDDAEWMAEnc() :
 {
     // Allocate and initialize our internal data structure
     CIDDAE_WMAEncoder::TWMAWInfo* pWMAInfo = new CIDDAE_WMAEncoder::TWMAWInfo;
-    TRawMem::SetMemBuf
-    (
-        pWMAInfo, tCIDLib::TCard1(0), sizeof(CIDDAE_WMAEncoder::TWMAWInfo)
-    );
+    TRawMem::SetMemBuf(pWMAInfo, kCIDLib::c1MinCard, sizeof(CIDDAE_WMAEncoder::TWMAWInfo));
     m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pWMAInfo);
 
     //
@@ -1084,7 +1074,7 @@ TCIDDAEWMAEnc::StartEncodeImpl( const   TString&                strTargetFile
 
     // Apply any metadata we got
     IWMHeaderInfo3* pHdrInfo = nullptr;
-    hRes = pWMAInfo->pWriter->QueryInterface(IID_IWMHeaderInfo3, (void**)&pHdrInfo);
+    hRes = pWMAInfo->pWriter->QueryInterface(IID_IWMHeaderInfo3, tCIDLib::pToVoidPP(&pHdrInfo));
     TCOMJanitor<IWMHeaderInfo3> janHdrInfo(&pHdrInfo);
     AddStringTag(pHdrInfo, g_wszWMAlbumTitle, strAlbumTitle);
     AddStringTag(pHdrInfo, g_wszWMAuthor, strArtist);
@@ -1121,15 +1111,15 @@ TCIDDAEWMAEnc::StoreChunkImpl( const    tCIDLib::TCard1* const  pc1Data
     //  We need to write the samples to the writer. We have to allocate
     //  a new buffer from the writer every time.
     //
-    INSSBuffer* pBuf = 0;
+    INSSBuffer* pBuf = nullptr;
     HRESULT hRes = pWMAInfo->pWriter->AllocateSample(c4Bytes, &pBuf);
     if (FAILED(hRes))
         CIDDAE_ThrowEncError(kDAEErrs::errcWMA_AllocSampBuf, hRes, CID_LINE);
     TCOMJanitor<INSSBuffer> janBuf(&pBuf);
 
     // Get the raw buffer and buffer size
-    tCIDLib::TCard4 c4BufSz;
-    tCIDLib::TCard1* pc1RawBuf;
+    tCIDLib::TCard4 c4BufSz = 0;
+    tCIDLib::TCard1* pc1RawBuf = nullptr;
     hRes = pBuf->GetBufferAndLength(&pc1RawBuf, &c4BufSz);
 
     // Sanity check it so we don't overwrite a buffer

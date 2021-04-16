@@ -105,24 +105,6 @@ TDLinkedList::~TDLinkedList()
 //  TDLinkedList: Public operators
 // ---------------------------------------------------------------------------
 
-// We cannot compare the elements here. The using class must do that
-tCIDLib::TBoolean
-TDLinkedList::operator==(const TDLinkedList& llstToTest) const
-{
-    if (this != &llstToTest)
-    {
-        if (m_c4ElemCount != llstToTest.m_c4ElemCount)
-            return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-tCIDLib::TBoolean
-TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
-{
-    return !operator==(llstToTest);
-}
-
 TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
 {
     if (&llstSrc != this)
@@ -132,6 +114,23 @@ TDLinkedList& TDLinkedList::operator=(TDLinkedList&& llstSrc)
         tCIDLib::Swap(m_pnodeTail, llstSrc.m_pnodeTail);
     }
     return *this;
+}
+
+
+// We cannot compare the elements here. The using class must do that
+tCIDLib::TBoolean TDLinkedList::operator==(const TDLinkedList& llstToTest) const
+{
+    if (this != &llstToTest)
+    {
+        if (m_c4ElemCount != llstToTest.m_c4ElemCount)
+            return kCIDLib::False;
+    }
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean TDLinkedList::operator!=(const TDLinkedList& llstToTest) const
+{
+    return !operator==(llstToTest);
 }
 
 
@@ -243,8 +242,6 @@ TDLinkedList::ExchangeNodes(TDLstNode* const pnode1, TDLstNode* const pnode2)
     }
     #endif
 
-    tCIDLib::TCard4 c4Ind;
-
     // Handle freakout scenario of the 2 nodes being the same
     if (pnode1 == pnode2)
     {
@@ -256,7 +253,6 @@ TDLinkedList::ExchangeNodes(TDLstNode* const pnode1, TDLstNode* const pnode2)
             , tCIDLib::ESeverities::Warn
             , tCIDLib::EErrClasses::BadParms
         );
-        return;
     }
 
     //
@@ -276,7 +272,6 @@ TDLinkedList::ExchangeNodes(TDLstNode* const pnode1, TDLstNode* const pnode2)
     }
 
     // If the head pointer is nul, then an internal error
-    #if CID_DEBUG_ON
     if (!m_pnodeHead)
     {
         facCIDLib().ThrowErr
@@ -288,121 +283,123 @@ TDLinkedList::ExchangeNodes(TDLstNode* const pnode1, TDLstNode* const pnode2)
             , tCIDLib::EErrClasses::Internal
         );
     }
-    #endif
-
-    //
-    //  We need to make sure that node 1 is before node 2, otherwise we need
-    //  to flip them.
-    //
-    TDLstNode* pnodeTmp = m_pnodeHead;
-    TDLstNode* pnodeTmp1 = pnode1;
-    TDLstNode* pnodeTmp2 = pnode2;
-    for (c4Ind = 0; c4Ind < m_c4ElemCount; c4Ind++)
-    {
-        //
-        //  If we find the 1st node first, then just break out. If we find the
-        //  second node first, then flip them.
-        //
-        if (pnodeTmp == pnodeTmp1)
-        {
-            break;
-        }
-         else if (pnodeTmp == pnode2)
-        {
-            pnodeTmp = pnodeTmp1;
-            pnodeTmp1 = pnode2;
-            pnodeTmp2 = pnodeTmp;
-            break;
-        }
-
-        pnodeTmp = pnodeTmp->m_pnodeNext;
-    }
-
-    if (c4Ind == m_c4ElemCount)
-    {
-        // If we got here, then a node is missing
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcCol_NotMemberNode
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-        );
-    }
-
-    //
-    //  Get local copies of the next/prev pointers of each node so that we
-    //  won't have to worry about changing the original and still needing
-    //  the old value.
-    //
-    TDLstNode* pnode1Prev  = pnodeTmp1->m_pnodePrev;
-    TDLstNode* pnode2Prev  = pnodeTmp2->m_pnodePrev;
-    TDLstNode* pnode1Next  = pnodeTmp1->m_pnodeNext;
-    TDLstNode* pnode2Next  = pnodeTmp2->m_pnodeNext;
-
-    //
-    //  Handle the next node pointer of the node before pnode1. It should now
-    //  point to pnode2, unless pnode1 is the 1st node.
-    //
-    if (pnode1Prev)
-       pnodeTmp1->m_pnodePrev->m_pnodeNext = pnodeTmp2;
-
-    //
-    //  Handle the previous node pointer of the node after pnode2. It should
-    //  now point to pnode1, unless pnode2 is the last node
-    //
-    if (pnode2Next)
-       pnodeTmp2->m_pnodeNext->m_pnodePrev = pnodeTmp1;
-
-    //
-    //  Handle the previous node pointer of pnode2. It should point to the
-    //  previous node of pnode1. If this guy is nul, then pnode2 is now the
-    //  1st node, so point the list head at him.
-    //
-    pnodeTmp2->m_pnodePrev = pnode1Prev;
-
-    if (!pnodeTmp2->m_pnodePrev)
-        m_pnodeHead = pnodeTmp2;
-
-    //
-    //  Handle the next node pointer of pnode1 and make it point to pnode2's
-    //  next node, which could be nul if pnode2 was last. This would now make
-    //  pnode1 last.
-    //
-    pnodeTmp1->m_pnodeNext = pnode2Next;
-
-    //
-    //  Handle the next node pointer to pnode2 and make it point to pnode1's
-    //  next node.
-    //
-    //  We also have a potential special case here if the nodes being
-    //  exchanged are side by side, in which case pnode2's next node should
-    //  point at pnode1. Otherwise pnode2 would end up pointing at itself.
-    //
-    if (pnode1Next == pnodeTmp2)
-    {
-        pnodeTmp2->m_pnodeNext = pnodeTmp1;
-    }
      else
     {
-        pnodeTmp2->m_pnodeNext = pnode1Next;
-        pnode2Prev->m_pnodeNext = pnodeTmp1;
-    }
+        //
+        //  We need to make sure that node 1 is before node 2, otherwise we need
+        //  to flip them.
+        //
+        TDLstNode* pnodeTmp = m_pnodeHead;
+        TDLstNode* pnodeTmp1 = pnode1;
+        TDLstNode* pnodeTmp2 = pnode2;
+        tCIDLib::TCard4 c4Ind = 0;
+        for (; c4Ind < m_c4ElemCount; c4Ind++)
+        {
+            //
+            //  If we find the 1st node first, then just break out. If we find the
+            //  second node first, then flip them.
+            //
+            if (pnodeTmp == pnodeTmp1)
+            {
+                break;
+            }
+            else if (pnodeTmp == pnode2)
+            {
+                pnodeTmp = pnodeTmp1;
+                pnodeTmp1 = pnode2;
+                pnodeTmp2 = pnodeTmp;
+                break;
+            }
 
-    //
-    //  The same problem exists for the previous node of pnode1. If they are
-    //  side by side, then just point it at pnode1; else, point it at the
-    //  previous node of pnode2.
-    //
-    if (pnode2Prev == pnodeTmp1)
-    {
-       pnodeTmp1->m_pnodePrev = pnodeTmp2;
-    }
-     else
-    {
-       pnodeTmp1->m_pnodePrev = pnode2Prev;
-       pnode1Next->m_pnodePrev = pnodeTmp2;
+            pnodeTmp = pnodeTmp->m_pnodeNext;
+        }
+
+        if (c4Ind == m_c4ElemCount)
+        {
+            // If we got here, then a node is missing
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcCol_NotMemberNode
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::BadParms
+            );
+        }
+
+        //
+        //  Get local copies of the next/prev pointers of each node so that we
+        //  won't have to worry about changing the original and still needing
+        //  the old value.
+        //
+        TDLstNode* pnode1Prev  = pnodeTmp1->m_pnodePrev;
+        TDLstNode* pnode2Prev  = pnodeTmp2->m_pnodePrev;
+        TDLstNode* pnode1Next  = pnodeTmp1->m_pnodeNext;
+        TDLstNode* pnode2Next  = pnodeTmp2->m_pnodeNext;
+
+        //
+        //  Handle the next node pointer of the node before pnode1. It should now
+        //  point to pnode2, unless pnode1 is the 1st node.
+        //
+        if (pnode1Prev)
+        pnodeTmp1->m_pnodePrev->m_pnodeNext = pnodeTmp2;
+
+        //
+        //  Handle the previous node pointer of the node after pnode2. It should
+        //  now point to pnode1, unless pnode2 is the last node
+        //
+        if (pnode2Next)
+        pnodeTmp2->m_pnodeNext->m_pnodePrev = pnodeTmp1;
+
+        //
+        //  Handle the previous node pointer of pnode2. It should point to the
+        //  previous node of pnode1. If this guy is nul, then pnode2 is now the
+        //  1st node, so point the list head at him.
+        //
+        pnodeTmp2->m_pnodePrev = pnode1Prev;
+
+        if (!pnodeTmp2->m_pnodePrev)
+            m_pnodeHead = pnodeTmp2;
+
+        //
+        //  Handle the next node pointer of pnode1 and make it point to pnode2's
+        //  next node, which could be nul if pnode2 was last. This would now make
+        //  pnode1 last.
+        //
+        pnodeTmp1->m_pnodeNext = pnode2Next;
+
+        //
+        //  Handle the next node pointer to pnode2 and make it point to pnode1's
+        //  next node.
+        //
+        //  We also have a potential special case here if the nodes being
+        //  exchanged are side by side, in which case pnode2's next node should
+        //  point at pnode1. Otherwise pnode2 would end up pointing at itself.
+        //
+        if (pnode1Next == pnodeTmp2)
+        {
+            pnodeTmp2->m_pnodeNext = pnodeTmp1;
+        }
+         else
+        {
+            pnodeTmp2->m_pnodeNext = pnode1Next;
+            pnode2Prev->m_pnodeNext = pnodeTmp1;
+        }
+
+        //
+        //  The same problem exists for the previous node of pnode1. If they are
+        //  side by side, then just point it at pnode1; else, point it at the
+        //  previous node of pnode2.
+        //
+        if (pnode2Prev == pnodeTmp1)
+        {
+            pnodeTmp1->m_pnodePrev = pnodeTmp2;
+        }
+         else
+        {
+            pnodeTmp1->m_pnodePrev = pnode2Prev;
+            pnode1Next->m_pnodePrev = pnodeTmp2;
+        }
     }
 }
 

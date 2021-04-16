@@ -92,8 +92,9 @@ TUndoCmdSep::~TUndoCmdSep()
 // ---------------------------------------------------------------------------
 //  TUndoCmdSep: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TUndoCmdSep::bIsSame(const TUndoCmdSep&) const
+tCIDLib::TBoolean TUndoCmdSep::bIsSame(const TUndoCmd&) const
 {
+    // Nothing to compare at this level
     return kCIDLib::True;
 }
 

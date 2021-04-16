@@ -41,6 +41,7 @@ class TCppGenerator : public TCodeGenerator
         TCppGenerator();
 
         TCppGenerator(const TCppGenerator&) = delete;
+        TCppGenerator(TCppGenerator&&) = delete;
 
         ~TCppGenerator();
 
@@ -49,6 +50,7 @@ class TCppGenerator : public TCodeGenerator
         //  Public operators
         // -------------------------------------------------------------------
         tCIDLib::TVoid operator=(const TCppGenerator&) = delete;
+        tCIDLib::TVoid operator=(TCppGenerator&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -117,7 +119,7 @@ class TCppGenerator : public TCodeGenerator
         tCIDLib::TVoid GenConstant
         (
             const   TString&                strName
-            , const TString&                strType
+            , const tCIDIDL::ETypes         Type
             , const TString&                strValue
             , const TString&                strDocs
         );
@@ -144,7 +146,7 @@ class TCppGenerator : public TCodeGenerator
         // -------------------------------------------------------------------
         //  Private class types
         // -------------------------------------------------------------------
-        typedef tCIDLib::TStrHashSet        TMethNameList;
+        using TMethNameList = tCIDLib::TStrHashSet;
 
 
         // -------------------------------------------------------------------
@@ -161,6 +163,7 @@ class TCppGenerator : public TCodeGenerator
             const   TCGenMethodParm&        mparmFmt
             ,       TString&                strToFill
             , const tCIDLib::TBoolean       bHeader
+            , const tCIDLib::TBoolean       bPollMethod
         );
 
         tCIDLib::TVoid FormatType

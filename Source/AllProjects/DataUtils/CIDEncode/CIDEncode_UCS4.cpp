@@ -66,34 +66,6 @@ TUCS4Converter::TUCS4Converter(const tCIDLib::EEndianModes eMode) :
     #endif
 }
 
-TUCS4Converter::TUCS4Converter(const TUCS4Converter& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-    , m_bSwapped(tcvtToCopy.m_bSwapped)
-    , m_eMode(tcvtToCopy.m_eMode)
-{
-}
-
-TUCS4Converter::~TUCS4Converter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4Converter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TUCS4Converter&
-TUCS4Converter::operator=(const TUCS4Converter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    m_bSwapped = tcvtToAssign.m_bSwapped;
-    m_eMode = tcvtToAssign.m_eMode;
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TUCS4Converter: Public, inherited methods
@@ -118,7 +90,7 @@ TUCS4Converter::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
                             ,       tCIDLib::TBoolean&      bStop)
 {
     const tCIDLib::TCh          chRep = chRepChar();
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs    eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -163,14 +135,14 @@ TUCS4Converter::c4BlockFrom(const   tCIDLib::TCard1* const  pc1Src
         }
          else
         {
-            if ((eAct == tCIDLib::ETCvtActions::StopThenThrow)
+            if ((eAct == tCIDLib::ETCvtActs::StopThenThrow)
             &&  (pchOut != pszToFill))
             {
                 bStop = kCIDLib::True;
                 break;
             }
 
-            if (eAct == tCIDLib::ETCvtActions::Replace)
+            if (eAct == tCIDLib::ETCvtActs::Replace)
             {
                 *pchOut++ = chRep;
             }
@@ -206,7 +178,7 @@ TUCS4Converter::c4BlockTo(  const   tCIDLib::TCh* const     pszSrc
                             ,       tCIDLib::TCard4&        c4OutBytes
                             ,       tCIDLib::TBoolean&      bStop)
 {
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -241,7 +213,7 @@ TUCS4Converter::c4BlockTo(  const   tCIDLib::TCh* const     pszSrc
             // See if its a valid trailing surrogate
             if ((chCur < 0xDC00) && (chCur > 0xDFFF))
             {
-                if ((eAct == tCIDLib::ETCvtActions::StopThenThrow)
+                if ((eAct == tCIDLib::ETCvtActs::StopThenThrow)
                 &&  (pchSrc != pszSrc))
                 {
                     bStop = kCIDLib::True;
@@ -307,32 +279,6 @@ TUCS4BEConverter::TUCS4BEConverter() :
 {
 }
 
-TUCS4BEConverter::TUCS4BEConverter(const TUCS4BEConverter& tcvtToCopy) :
-
-    TUCS4Converter(tcvtToCopy)
-{
-}
-
-TUCS4BEConverter::~TUCS4BEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4BEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUCS4BEConverter&
-TUCS4BEConverter::operator=(const TUCS4BEConverter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
-}
-
-
-
 // ---------------------------------------------------------------------------
 //  TUCS4LEConverter: Constructors and Destructor
 // ---------------------------------------------------------------------------
@@ -341,29 +287,4 @@ TUCS4LEConverter::TUCS4LEConverter() :
     TUCS4Converter(tCIDLib::EEndianModes::Little)
 {
 }
-
-TUCS4LEConverter::TUCS4LEConverter(const TUCS4LEConverter& tcvtToCopy) :
-
-    TUCS4Converter(tcvtToCopy)
-{
-}
-
-TUCS4LEConverter::~TUCS4LEConverter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TUCS4LEConverter: Public operators
-// ---------------------------------------------------------------------------
-TUCS4LEConverter&
-TUCS4LEConverter::operator=(const TUCS4LEConverter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
-}
-
 

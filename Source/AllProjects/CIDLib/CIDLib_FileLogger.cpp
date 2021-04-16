@@ -100,7 +100,7 @@ tCIDLib::TVoid TFileLogger::LogEvent(const TLogEvent& logevToLog)
 
     if (m_pmtxSync)
     {
-        TMtxLocker lockSync(m_pmtxSync);
+        TLocker lockrSync(m_pmtxSync);
         m_flTarget.c4WriteBuffer
         (
             strmFormat.mbufData().pData()

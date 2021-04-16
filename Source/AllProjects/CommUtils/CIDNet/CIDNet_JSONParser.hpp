@@ -134,6 +134,7 @@ class CIDNETEXP TJSONValue
         TJSONValue() = delete;
 
         TJSONValue(const TJSONValue&) = delete;
+        TJSONValue(TJSONValue&&) = delete;
 
         virtual ~TJSONValue();
 
@@ -142,6 +143,7 @@ class CIDNETEXP TJSONValue
         //  Public operators
         // -------------------------------------------------------------------
         TJSONValue& operator=(const TJSONValue&) = delete;
+        TJSONValue& operator=(TJSONValue&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -295,6 +297,7 @@ class CIDNETEXP TJSONSimpleVal : public TJSONValue
         );
 
         TJSONSimpleVal(const TJSONSimpleVal&) = delete;
+        TJSONSimpleVal(TJSONSimpleVal&&) = delete;
 
         ~TJSONSimpleVal();
 
@@ -303,6 +306,7 @@ class CIDNETEXP TJSONSimpleVal : public TJSONValue
         //  Public operators
         // -------------------------------------------------------------------
         TJSONSimpleVal& operator=(const TJSONSimpleVal&) = delete;
+        TJSONSimpleVal& operator=(TJSONSimpleVal&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -313,11 +317,11 @@ class CIDNETEXP TJSONSimpleVal : public TJSONValue
                     TTextOutStream&         strmTar
             , const tCIDLib::TCard4         c4Level
             , const tCIDLib::TCard4         c4IndentSz
-        )   const override;
+        )   const final;
 
-        tCIDLib::TVoid Reset() override;
+        tCIDLib::TVoid Reset() final;
 
-        const TString& strValue() const override;
+        const TString& strValue() const final;
 
 
         // -------------------------------------------------------------------
@@ -380,6 +384,7 @@ class CIDNETEXP TJSONCont : public TJSONValue
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TJSONCont(const TJSONCont&) = delete;
+        TJSONCont(TJSONCont&&) = delete;
 
         ~TJSONCont();
 
@@ -388,6 +393,7 @@ class CIDNETEXP TJSONCont : public TJSONValue
         //  Public operators
         // -------------------------------------------------------------------
         TJSONCont& operator=(const TJSONCont&) = delete;
+        TJSONCont& operator=(TJSONCont&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -705,6 +711,7 @@ class CIDNETEXP TJSONArray : public TJSONCont
         );
 
         TJSONArray(const TJSONArray&) = delete;
+        TJSONArray(TJSONArray&&) = delete;
 
         ~TJSONArray();
 
@@ -713,6 +720,7 @@ class CIDNETEXP TJSONArray : public TJSONCont
         //  Public constructors
         // -------------------------------------------------------------------
         TJSONArray& operator=(const TJSONArray&) = delete;
+        TJSONArray& operator=(TJSONArray&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -741,6 +749,7 @@ class CIDNETEXP TJSONObject : public TJSONCont
         );
 
         TJSONObject(const TJSONObject&) = delete;
+        TJSONObject(TJSONObject&&) = delete;
 
         ~TJSONObject();
 
@@ -749,12 +758,13 @@ class CIDNETEXP TJSONObject : public TJSONCont
         //  Public operators
         // -------------------------------------------------------------------
         TJSONObject& operator=(const TJSONObject&) = delete;
+        TJSONObject& operator=(TJSONObject&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Reset() override;
+        tCIDLib::TVoid Reset() final;
 };
 
 

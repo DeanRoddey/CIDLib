@@ -51,6 +51,7 @@ TMEngNamedItem::~TMEngNamedItem()
 {
     // Delete any name we allocated
     delete m_pstrName;
+    m_pstrName = nullptr;
 }
 
 
@@ -106,14 +107,14 @@ const TString& TMEngNamedItem::strName() const
 TMEngNamedItem::TMEngNamedItem() :
 
     m_c2Id(0)
-    , m_pstrName(0)
+    , m_pstrName(nullptr)
 {
 }
 
 TMEngNamedItem::TMEngNamedItem(const TString& strName) :
 
     m_c2Id(0)
-    , m_pstrName(0)
+    , m_pstrName(nullptr)
 {
     // If the passed string is empty, don't allocate
     if (!strName.bIsEmpty())
@@ -123,7 +124,7 @@ TMEngNamedItem::TMEngNamedItem(const TString& strName) :
 TMEngNamedItem::TMEngNamedItem( const   TString&        strName
                                 , const tCIDLib::TCard2 c2Id) :
     m_c2Id(c2Id)
-    , m_pstrName(0)
+    , m_pstrName(nullptr)
 {
     // If the passed string is empty, don't allocate
     if (!strName.bIsEmpty())
@@ -133,35 +134,36 @@ TMEngNamedItem::TMEngNamedItem( const   TString&        strName
 TMEngNamedItem::TMEngNamedItem(const tCIDLib::TCard2 c2Id) :
 
     m_c2Id(c2Id)
-    , m_pstrName(0)
+    , m_pstrName(nullptr)
 {
 }
 
-TMEngNamedItem::TMEngNamedItem(const TMEngNamedItem& meniToCopy) :
+TMEngNamedItem::TMEngNamedItem(const TMEngNamedItem& meniSrc) :
 
-    m_c2Id(meniToCopy.m_c2Id)
-    , m_pstrName(0)
+    m_c2Id(meniSrc.m_c2Id)
+    , m_pstrName(nullptr)
 {
     // We the source has a string allocated, then we have to copy it
-    if (meniToCopy.m_pstrName)
-        m_pstrName = new TString(*meniToCopy.m_pstrName);
+    if (meniSrc.m_pstrName)
+        m_pstrName = new TString(*meniSrc.m_pstrName);
 }
 
-tCIDLib::TVoid TMEngNamedItem::operator=(const TMEngNamedItem& meniToAssign)
+TMEngNamedItem& TMEngNamedItem::operator=(const TMEngNamedItem& meniSrc)
 {
-    if (this != &meniToAssign)
+    if (this != &meniSrc)
     {
-        m_c2Id = meniToAssign.m_c2Id;
+        m_c2Id = meniSrc.m_c2Id;
 
         // If the source has a string, either assign or allocate as required
-        if (meniToAssign.m_pstrName)
+        if (meniSrc.m_pstrName)
         {
             if (m_pstrName)
-                *m_pstrName = *meniToAssign.m_pstrName;
+                *m_pstrName = *meniSrc.m_pstrName;
             else
-                m_pstrName = new TString(*meniToAssign.m_pstrName);
+                m_pstrName = new TString(*meniSrc.m_pstrName);
         }
     }
+    return *this;
 }
 
 

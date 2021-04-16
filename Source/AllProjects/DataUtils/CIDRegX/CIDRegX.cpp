@@ -15,7 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This is the main file of the facility.
+//  This is the main file of the facility. All we need to do in this case is
+//  provide the lazy faulting in method for the facility object.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -35,12 +36,6 @@
 //
 TFacCIDRegX& facCIDRegX()
 {
-    static TFacCIDRegX* pfacCIDRegX = nullptr;
-    if (!pfacCIDRegX)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDRegX)
-            pfacCIDRegX = new TFacCIDRegX;
-    }
-    return *pfacCIDRegX;
+    static TFacCIDRegX* pfacThis = new TFacCIDRegX();
+    return *pfacThis;
 }

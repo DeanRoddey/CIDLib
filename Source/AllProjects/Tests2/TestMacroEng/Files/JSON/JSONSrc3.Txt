@@ -1,0 +1,8 @@
+{
+   "FalseVal" : false,
+   "TrueVal" : true,
+   "NullVal" : null,
+   "CardVal" : 2,
+   "FloatVal" : 3.5,
+   "IntVal" : -2
+}

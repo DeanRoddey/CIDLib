@@ -69,24 +69,28 @@ TTest_ColAlgo1::~TTest_ColAlgo1()
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
 TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
-                            , tCIDLib::TBoolean&    bWarning)
+                        , tCIDLib::TBoolean&    bWarning)
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
     // Load up a couple types of collections for testing
     using TPntList = TVector<TPoint>;
     using TCardList = TBag<TCardinal>;
+    using TPairList = TVector<TKeyValuePair>;
     TPntList colPoints(16);
     TCardList colCards;
     tCIDLib::TStrList colStrs;
+    TPairList colPairs;
     TString strTmp;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
     {
-        colPoints.objAdd(TPoint(c4Index, c4Index));
+        colPoints.objPlace(c4Index, c4Index);
         colCards.objAdd(TCardinal(c4Index));
 
         strTmp.SetFormatted(c4Index);
         colStrs.objAdd(strTmp);
+
+        colPairs.objPlace(strTmp, strTmp);
     }
 
     // Set up a reverse direction one as well
@@ -94,7 +98,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 16; c4Index++)
         colRevCards.objAdd(TCardinal(15 - c4Index));
 
-    // Test the element finder algorithm
+    // Test the element finder algorithms, first the one that finds whole objects
     {
         // Search for one we know is there
         TPntList::TCursor cursFind = tCIDColAlgo::cursFind(colPoints, TPoint(1, 1));
@@ -129,6 +133,38 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
                 strmOut << TFWCurLn << L"Failed to find one or more elements\n\n";
                 break;
             }
+        }
+    }
+
+    // And now test the finder variation that looks for a key
+    {
+        // Search for one we know is there
+        TString strKey(L"8");
+        TPairList::TCursor cursFind = tCIDColAlgo::cursFindByKey
+        (
+            colPairs, strKey, [](const TKeyValuePair& kvalCur, const TString& strKey)
+            {
+                return kvalCur.strKey() == strKey;
+            }
+        );
+        if (!cursFind.bIsValid() || (cursFind->strValue() != strKey))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Find element by key algorithm failed\n\n";
+        }
+
+        // And do the not exists test
+        cursFind = tCIDColAlgo::cursFindNotByKey
+        (
+            colPairs, L"0", [](const TKeyValuePair& kvalCur, const TString& strKey)
+            {
+                return kvalCur.strKey() == strKey;
+            }
+        );
+        if (!cursFind.bIsValid() || (cursFind->strValue() != L"1"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Find not element by key algorithm failed \n\n";
         }
     }
 
@@ -243,7 +279,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
-    // Test the removal of consequtive dups
+    // Test the removal of consequetive dups
     {
         tCIDLib::TStrList colDups(8UL);
         colDups.objAdd(L"First");
@@ -308,5 +344,163 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
+    //
+    //  Test element add/remove. Not something always needed, since most will have their
+    //  own removal method. But it's there for any that don't, or for generic removal.
+    //
+    {
+        tCIDLib::TStrList colRemove(8UL);
+        colRemove.objAdd(L"Third");
+        colRemove.objAdd(L"First");
+        colRemove.objAdd(L"Second");
+        colRemove.objAdd(L"Third");
+        colRemove.objAdd(L"Fourth");
+        colRemove.objAdd(L"Fifth");
+        colRemove.objAdd(L"Third");
+
+        //
+        //  Do a single element removal first. It should remove the 0th element,
+        //  and leave First as the 0th.
+        //
+        if (!tCIDColAlgo::bRemoveMatches(colRemove, L"Third", kCIDLib::False)
+        ||  (colRemove[0] != L"First"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Single element removal failed\n\n";
+        }
+
+        // Then remove all remaining
+        if (!tCIDColAlgo::bRemoveMatches(colRemove, L"Third", kCIDLib::True)
+        ||  (colRemove.c4ElemCount() != 4))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Multiple element removal failed\n\n";
+        }
+
+        // Do add of somethng that's already there, which should be rejected
+        if (tCIDColAlgo::bAddIfNew(colRemove, L"Second"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Duplicate element was not rejected\n\n";
+        }
+
+        // Now one that should be taken
+        if (!tCIDColAlgo::bAddIfNew(colRemove, L"Sixth"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"New unique element was rejected\n\n";
+        }
+
+        // Do a remove if which should remove the one we just added
+        if (!tCIDColAlgo::bRemoveIf
+        (
+            colRemove, [](const TString& strCheck) { return strCheck.bCompare(L"Sixth"); }))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Failed to remove new element via bRemoveIf\n\n";
+        }
+
+        //
+        //  Use a case insensitive comparison, which should reject even though
+        //  it's a different case.
+        //
+        if (tCIDColAlgo::bAddIfNew(colRemove, L"second", TString::bCompI))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Case insentive compare was not rejected\n\n";
+        }
+
+        // Add with a different case and case snsitive compare, which should be taken
+        if (!tCIDColAlgo::bAddIfNew(colRemove, L"second"))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Different case element was rejected\n\n";
+        }
+    }
+
+    // Test the map and map/reduce stuff
+    {
+        TVector<TCardinal> colSrcVals(1000UL);
+        for (tCIDLib::TCard4 c4Index = 1; c4Index < 1001; c4Index++)
+            colSrcVals.objAdd(TCardinal(c4Index));
+
+        //
+        //  Now reduce to even values. It returns references to elements in the source colelction
+        //  in a non-adopting ref vector. We know there will be 500 results, so give it that hint
+        //  as to the needed initial allocation of the return vector.
+        //
+        TRefVector<TCardinal> colMapped = tCIDColAlgo::colMapNC
+        (
+            colSrcVals
+            , [](TCardinal& cVal) -> tCIDLib::TBoolean { return (cVal.c4Val() & 0x1U) == 0; }
+            , 500
+        );
+
+        if (colMapped.c4ElemCount() != 500)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Expected 500 mapped values\n\n";
+        }
+
+        // Make sure they are all even
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < colMapped.c4ElemCount(); c4Index++)
+        {
+            if ((colMapped[c4Index]->c4Val() & 0x1) != 0)
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"Expected only event values to be mapped\n\n";
+                break;
+            }
+        }
+
+        // Test the const version
+        if (!bTestConstMap(colSrcVals))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Const map algorithm failed\n\n";
+        }
+
+
+        // Test the map/reduce. We accumulate the odd values starting with 10
+        const tCIDLib::TCard4 c4Reduced = tCIDColAlgo::tMapReduce
+        (
+            colSrcVals
+            , [](const TCardinal& cVal) -> tCIDLib::TBoolean { return (cVal.c4Val() & 0x1U) == 0; }
+            , [](TCardinal& cAccum, const TCardinal& cVal) -> tCIDLib::TVoid { cAccum += cVal; }
+            , TCardinal(10UL)
+            , 500
+        );
+
+        if (c4Reduced != 250510)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Map/Reduce failed\n\n";
+        }
+    }
+
     return eRes;
+}
+
+
+// A helper so we can get a const collection to test the mapping algorithm on
+tCIDLib::TBoolean TTest_ColAlgo1::bTestConstMap(const TVector<TCardinal>& colSrcVals)
+{
+    // We have to take const elements in this case and our lambda has to take a const param
+    TRefVector<const TCardinal> colMapped = tCIDColAlgo::colMap
+    (
+        colSrcVals
+        , [](const TCardinal& cVal) { return (cVal.c4Val() & 1) == 0; }
+        , 500
+    );
+
+    if (colMapped.c4ElemCount() != 500)
+        return kCIDLib::False;
+
+    // Make sure they are all even
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < colMapped.c4ElemCount(); c4Index++)
+    {
+        if ((colMapped[c4Index]->c4Val() & 0x1) != 0)
+            return kCIDLib::False;
+    }
+    return kCIDLib::True;
 }

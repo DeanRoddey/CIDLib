@@ -42,25 +42,28 @@ AdvRTTIDecls(TFindBuf,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_FindBuf
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c2FmtVersion
-    //      A current format version, so that we can auto upgrade our
-    //      persistence format later if needed.
-    //
-    //      V2 - Added the creation time
-    //
-    //  pszDateFmt
-    //  pszDefFmt
-    //  pszTimeFmt
-    //      These are the default formats used if there is not one set for a
-    //      particular instance.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2     c2FmtVersion = 2;
-    const tCIDLib::TCh* const pszDateFmt = L"%(M,2,0)/%(D,2,0)/%(Y)";
-    const tCIDLib::TCh* const pszDefFmt = L"%(m) %(M) %(S,10) %(N)";
-    const tCIDLib::TCh* const pszTimeFmt = L"%(h,2,0):%(u,2,0)%(p)";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c2FmtVersion
+        //      A current format version, so that we can auto upgrade our
+        //      persistence format later if needed.
+        //
+        //      V2 - Added the creation time
+        //
+        //  pszDateFmt
+        //  pszDefFmt
+        //  pszTimeFmt
+        //      These are the default formats used if there is not one set for a
+        //      particular instance.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2     c2FmtVersion = 2;
+        constexpr const tCIDLib::TCh* const pszDateFmt = L"%(M,2,0)/%(D,2,0)/%(Y)";
+        constexpr const tCIDLib::TCh* const pszDefFmt = L"%(m) %(M) %(S,10) %(N)";
+        constexpr const tCIDLib::TCh* const pszTimeFmt = L"%(h,2,0):%(u,2,0)%(p)";
+    }
 }
 
 
@@ -99,19 +102,8 @@ TFindBuf::eCompByLastMod(const TFindBuf& fndb1, const TFindBuf& fndb2)
 
 const TString& TFindBuf::strFull()
 {
-    static const TString* pstrFull = nullptr;
-    if (!pstrFull)
-    {
-        TBaseLock lockInit;
-        if (!pstrFull)
-        {
-            TRawMem::pExchangePtr<const TString>
-            (
-                &pstrFull, new TString(CIDLib_FindBuf::pszDefFmt)
-            );
-        }
-    }
-    return *pstrFull;
+    static const TString strFull(CIDLib_FindBuf::pszDefFmt);
+    return strFull;
 }
 
 
@@ -123,19 +115,8 @@ const TString& TFindBuf::strGetKey(const TFindBuf& fndbSrc)
 
 const TString& TFindBuf::strNameAndSize()
 {
-    static const TString* pstrNameAndSize = nullptr;
-    if (!pstrNameAndSize)
-    {
-        TBaseLock lockInit;
-        if (!pstrNameAndSize)
-        {
-            TRawMem::pExchangePtr<const TString>
-            (
-                &pstrNameAndSize, new TString(L"%(S,10) %(P)")
-            );
-        }
-    }
-    return *pstrNameAndSize;
+    static const TString strNameAndSize(L"%(S,10) %(P)");
+    return strNameAndSize;
 }
 
 
@@ -430,12 +411,6 @@ tCIDLib::TBoolean TFindBuf::bIsFile() const
 tCIDLib::TBoolean TFindBuf::bIsNormal() const
 {
     return tCIDLib::bAllBitsOn(m_eFlags, tCIDLib::EFileInfoFlags::IsNormal);
-}
-
-
-tCIDLib::TBoolean TFindBuf::bIsNormalDir() const
-{
-    return bIsNormal() && bIsDirectory();
 }
 
 
@@ -744,7 +719,7 @@ tCIDLib::TVoid TFindBuf::StreamFrom(TBinInStream& strmToReadFrom)
     //  Stream in the formating strings. There is a leading boolean that
     //  indicates whether each one was streamed or not.
     //
-    tCIDLib::TBoolean bLoad;
+    tCIDLib::TBoolean bLoad = kCIDLib::False;
 
     delete m_pstrDateFormat;
     m_pstrDateFormat = nullptr;

@@ -63,6 +63,7 @@ class CIDLIBEXP TConsoleInImpl : public TInStreamImpl
         );
 
         TConsoleInImpl(const TConsoleInImpl&) = delete;
+        TConsoleInImpl(TConsoleInImpl&&) = delete;
 
         ~TConsoleInImpl();
 
@@ -71,27 +72,28 @@ class CIDLIBEXP TConsoleInImpl : public TInStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TConsoleInImpl& operator=(const TConsoleInImpl&) = delete;
+        TConsoleInImpl& operator=(TConsoleInImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override;
+        tCIDLib::TBoolean bIsOpen() const final;
 
         tCIDLib::TCard4 c4ReadBytes
         (
                     tCIDLib::TVoid* const   pToFill
             , const tCIDLib::TCard4         c4BytesToRead
-        ) override;
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const override;
+        tCIDLib::TCard8 c8CurPos() const final;
 
-        tCIDLib::TVoid Reset() override;
+        tCIDLib::TVoid Reset() final;
 
         tCIDLib::TVoid SkipForwardBy
         (
             const   tCIDLib::TCard4         c4SkipBy
-        ) override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -153,6 +155,7 @@ class CIDLIBEXP TConsoleOutImpl : public TOutStreamImpl
         TConsoleOutImpl();
 
         TConsoleOutImpl(const TConsoleOutImpl&) = delete;
+        TConsoleOutImpl(TConsoleOutImpl&&) = delete;
 
         ~TConsoleOutImpl();
 
@@ -161,31 +164,32 @@ class CIDLIBEXP TConsoleOutImpl : public TOutStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TConsoleOutImpl& operator=(const TConsoleOutImpl&) = delete;
+        TConsoleOutImpl& operator=(TConsoleOutImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bBackspace();
-
-        tCIDLib::TBoolean bIsOpen() const;
+        tCIDLib::TBoolean bIsOpen() const final;
 
         tCIDLib::TCard4 c4WriteBytes
         (
             const   tCIDLib::TVoid* const   pToWrite
             , const tCIDLib::TCard4         c4BytesToWrite
-        );
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const;
+        tCIDLib::TCard8 c8CurPos() const final;
 
-        tCIDLib::TVoid Reset();
+        tCIDLib::TVoid Reset() final;
 
-        tCIDLib::TVoid SeekToEnd();
+        tCIDLib::TVoid SeekToEnd() final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bBackspace();
+
         tCIDLib::TCard4 c4QueryVerticalLines() const;
 
         tCIDLib::TVoid ClearScr();
@@ -233,6 +237,7 @@ class CIDLIBEXP TInConsole : public TTextInStream
         );
 
         TInConsole(const TInConsole&) = delete;
+        TInConsole(TInConsole&&) = delete;
 
         ~TInConsole();
 
@@ -241,6 +246,7 @@ class CIDLIBEXP TInConsole : public TTextInStream
         //  Public operators
         // -------------------------------------------------------------------
         TInConsole& operator=(const TInConsole&) = delete;
+        TInConsole& operator=(TInConsole&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -298,6 +304,7 @@ class CIDLIBEXP TOutConsole : public TTextOutStream
         TOutConsole();
 
         TOutConsole(const TOutConsole&) = delete;
+        TOutConsole(TOutConsole&&) = delete;
 
         ~TOutConsole();
 
@@ -306,6 +313,7 @@ class CIDLIBEXP TOutConsole : public TTextOutStream
         //  Public operators
         // -------------------------------------------------------------------
         TOutConsole& operator=(const TOutConsole&) = delete;
+        TOutConsole& operator=(TOutConsole&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -357,6 +365,7 @@ class CIDLIBEXP TConPager : public TObject
         );
 
         TConPager(const TOutConsole&) = delete;
+        TConPager(TOutConsole&&) = delete;
 
         ~TConPager();
 
@@ -367,6 +376,7 @@ class CIDLIBEXP TConPager : public TObject
         tCIDLib::TCard4 operator++(int);
 
         TConPager& operator=(const TConPager&) = delete;
+        TConPager& operator=(TConPager&&) = delete;
 
 
         // -------------------------------------------------------------------

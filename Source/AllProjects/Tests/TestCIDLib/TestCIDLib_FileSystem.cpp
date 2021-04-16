@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -116,14 +115,6 @@ static tCIDLib::TVoid TestBasicFileSystem(TTextOutStream& strmOut)
         strmOut << CUR_LN
                 << L"Directory " << pathRoot << L" not found." << kCIDLib::EndLn;
     }
-
-    // Try to find one of the special directory entries
-    if (!TFileSys::bExists(L"..", tCIDLib::EDirSearchFlags::AllDirs))
-    {
-        strmOut << CUR_LN
-                << L"Failed to find a non-normal directory that should exist"
-                << kCIDLib::EndLn;
-    }
 }
 
 
@@ -158,7 +149,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  Read in the data again, but zero out the buffer first to make sure we
     //  really read it.
     //
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBuffer(ac4Test, sizeof(ac4Test));
 
     // Test the contents
@@ -189,7 +180,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  Read in the data again, but zero out the buffer first to make sure we
     //  really read it.
     //
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBuffer(ac4Test, sizeof(ac4Test));
 
     // Test the contents
@@ -236,7 +227,7 @@ tCIDLib::TVoid TestBinaryFiles(TTextOutStream& strmOut)
     //  really read it.
     //
     TEvent evWait;
-    TRawMem::SetMemBuf(ac4Test, tCIDLib::TCard1(0), sizeof(ac4Test));
+    TRawMem::SetMemBuf(ac4Test, kCIDLib::c1MinCard, sizeof(ac4Test));
     bflTest.c4ReadBufferTO(ac4Test, sizeof(ac4Test), 100, evWait, kCIDLib::True);
 
     // Test the contents
@@ -304,7 +295,7 @@ static tCIDLib::TVoid TestBinStreamIO(TTextOutStream& strmOut)
     ::PolymorphicWrite(&strTest, strmTestOut);
 
     // And do another object, this time an area object
-    TArea   areaTest(10, 10, 100, 100);
+    TArea   areaTest(10, 10, 100UL, 100UL);
     ::PolymorphicWrite(&areaTest, strmTestOut);
 
     // And now a date object

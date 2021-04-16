@@ -65,12 +65,31 @@ TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
 }
 
 TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
+                                    ,       THeapBuf&&      mbufToTake
+                                    , const tCIDLib::TCard4 c4SrcBytes) :
+    TXMLEntitySrc(strSysId)
+    , m_c4SrcBytes(c4SrcBytes)
+    , m_cptrBuffer(new THeapBuf(tCIDLib::ForceMove(mbufToTake)))
+{
+}
+
+TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
                                     , const TString&        strPubId
                                     , const TMemBuf&        mbufToCopy
                                     , const tCIDLib::TCard4 c4SrcBytes) :
     TXMLEntitySrc(strSysId, strPubId)
     , m_c4SrcBytes(c4SrcBytes)
     , m_cptrBuffer(new THeapBuf(mbufToCopy.pc1Data(), c4SrcBytes, c4SrcBytes))
+{
+}
+
+TMemBufEntitySrc::TMemBufEntitySrc( const   TString&        strSysId
+                                    , const TString&        strPubId
+                                    ,       THeapBuf&&      mbufToTake
+                                    , const tCIDLib::TCard4 c4SrcBytes) :
+    TXMLEntitySrc(strSysId, strPubId)
+    , m_c4SrcBytes(c4SrcBytes)
+    , m_cptrBuffer(new THeapBuf(tCIDLib::ForceMove(mbufToTake)))
 {
 }
 
@@ -109,7 +128,7 @@ TMemBufEntitySrc::TMemBufEntitySrc( const   TString&                strSysId
       (
         new THeapBuf
         (
-            reinterpret_cast<const tCIDLib::TCard1*>(pDataToCopy)
+            static_cast<const tCIDLib::TCard1*>(pDataToCopy)
             , c4SrcBytes
             , c4SrcBytes
         )
@@ -152,37 +171,12 @@ TMemBufEntitySrc::TMemBufEntitySrc( const   TString&                strSysId
 {
 }
 
-TMemBufEntitySrc::TMemBufEntitySrc(const TMemBufEntitySrc& xsrcSrc) :
-
-    TXMLEntitySrc(xsrcSrc)
-    , m_c4SrcBytes(xsrcSrc.m_c4SrcBytes)
-    , m_cptrBuffer(xsrcSrc.m_cptrBuffer)
-{
-}
-
 TMemBufEntitySrc::~TMemBufEntitySrc()
 {
     //
     //  If our counted pointer  is the last one referencing the buffer, it
     //  will be destroyed at this point.
     //
-}
-
-
-// ---------------------------------------------------------------------------
-//  TMemBufEntitySrc: Public operators
-// ---------------------------------------------------------------------------
-TMemBufEntitySrc&
-TMemBufEntitySrc::operator=(const TMemBufEntitySrc& xsrcSrc)
-{
-    if (this == &xsrcSrc)
-        return *this;
-
-    TParent::operator=(xsrcSrc);
-    m_c4SrcBytes    = xsrcSrc.m_c4SrcBytes;
-    m_cptrBuffer    = xsrcSrc.m_cptrBuffer;
-
-    return *this;
 }
 
 

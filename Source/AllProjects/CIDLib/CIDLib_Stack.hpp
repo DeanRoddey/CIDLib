@@ -35,7 +35,7 @@
 //   CLASS: TStack
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -47,18 +47,8 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TStack(const TStack& colSrc) :
-
-            TBasicDLinkedCol<TElem>(colSrc)
-        {
-        }
-
-        TStack(TStack&& colSrc) :
-
-            TStack(colSrc.eMTState())
-        {
-            *this = tCIDLib::ForceMove(colSrc);
-        }
+        TStack(const TStack&) = default;
+        TStack(TStack&&)  = default;
 
         ~TStack()
         {
@@ -68,18 +58,8 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TStack& operator=(const TStack& colSrc)
-        {
-            if (this != &colSrc)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TStack& operator=(TStack&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TStack& operator=(const TStack&) = default;
+        TStack& operator=(TStack&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -94,6 +74,11 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        TElem& objAddMove(TElem&& objNew)
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objNew));
+        }
+
         const TElem& objPeek() const
         {
             return this->objPeekAtBottom();
@@ -104,6 +89,11 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
             return this->objPeekAtBottom();
         }
 
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            return this->objPlaceAtBottom(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
         TElem objPop()
         {
             return this->objGetFromBottom();
@@ -112,6 +102,11 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
         TElem& objPush(const TElem& objToPush)
         {
             return this->objAddAtBottom(objToPush);
+        }
+
+        TElem& objPush(TElem&& objToPush)
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objToPush));
         }
 
         tCIDLib::TVoid SwapTop()
@@ -136,11 +131,12 @@ template <class TElem> class TStack : public TBasicDLinkedCol<TElem>
 };
 
 
+
 // ---------------------------------------------------------------------------
 //   CLASS: TStackJan
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class TElem> class TStackJan
+template <typename TElem> class TStackJan
 {
     public  :
         // -------------------------------------------------------------------
@@ -155,7 +151,15 @@ template <class TElem> class TStackJan
             m_pcolTarget->objPush(objToPush);
         }
 
+        TStackJan(TStack<TElem>* const pcolTarget, TElem&& objToPush) :
+
+            m_pcolTarget(pcolTarget)
+        {
+            m_pcolTarget->objPush(tCIDLib::ForceMove(objToPush));
+        }
+
         TStackJan(const TStackJan&) = delete;
+        TStackJan(TStackJan&&) = delete;
 
         ~TStackJan()
         {
@@ -169,6 +173,7 @@ template <class TElem> class TStackJan
         //  Public operators
         // -------------------------------------------------------------------
         TStackJan& operator=(const TStackJan&) = delete;
+        TStackJan& operator=(TStackJan&&) = delete;
 
 
         // -------------------------------------------------------------------

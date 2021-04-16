@@ -170,11 +170,14 @@ L"            CIDIDL:ElemType CDATA #REQUIRED>\n"
 
 //
 //  The value is an object of a particular type. The Type field indicates
-//  the class type of the object.
+//  the class type of the object. You can mark it as movable, in which case
+//  the server side generated code will do a move into the server side call
+//  and there won't be a size value since the buffer will be the size that
+//  was sent.
 //
 L"<!ELEMENT   CIDIDL:Object EMPTY>\n"
 L"<!ATTLIST   CIDIDL:Object\n"
-L"            CIDIDL:Type NMTOKEN #REQUIRED>\n"
+L"            CIDIDL:Type NMTOKEN #REQUIRED\n>\n"
 
 //
 //  Some special cases of object, which handle memory buffers. It's common to
@@ -185,6 +188,10 @@ L"            CIDIDL:Type NMTOKEN #REQUIRED>\n"
 //  case for memory buffers that includes the buffer itself and the number of
 //  bytes to stream. These will cause another parm, an In TCard4 to be placed
 //  before them, which must indicate the bytes to be streamed.
+//
+//  You can mark heap buffers as movable. In that case, the server side call
+//  will do a move from the temp to the target, and there won't be a separate
+//  size parameter since the buffer will be the size that was sent.
 //
 //  TMemBuf is an abstract class, but is OK for Out parameters and convenient to
 //  have for those.
@@ -200,7 +207,7 @@ L"<!ELEMENT   CIDIDL:TMemBuf EMPTY>\n"
 L"<!ELEMENT   CIDIDL:TVoid EMPTY>\n"
 
 //
-//  The types we support for parameters
+//  The types we support for parameters. These map to the EParmTypes enum.
 //
 L"<!ENTITY %  IDLPTypes   'CIDIDL:TInt4"
 L"                        | CIDIDL:TInt8"
@@ -275,7 +282,8 @@ L"<!ELEMENT   CIDIDL:Param (%IDLPTypes;)>\n"
 L"<!ATTLIST   CIDIDL:Param\n"
 L"            CIDIDL:Name NMTOKEN #REQUIRED\n"
 L"            CIDIDL:Dir (In|Out|InOut) #REQUIRED\n"
-L"            CIDIDL:DefVal CDATA #IMPLIED>\n"
+L"            CIDIDL:DefVal CDATA #IMPLIED\n"
+L"            CIDIDL:Moveable (Yes|No) 'No'>\n"
 
 //
 //  Each method has a return type. It must be provided explicitly, which

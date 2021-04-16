@@ -69,7 +69,7 @@ MESSAGES=
     midMenu_Debug_Compile         13241   Compile\tF7
     midMenu_Debug_Go              13242   Go\tCtrl-Alt-G
     midMenu_Debug_StepInto        13243   Step Into\tF11
-    midMenu_Debug_StepOver        13244   Step Over\tF12
+    midMenu_Debug_StepOver        13244   Step Over\tF10
     midMenu_Debug_Stop            13245   Stop\tCtrl-Alt-T
     midMenu_Edit                  13260   Edit
     midMenu_Edit_Copy             13280   Copy\tCtrl-C

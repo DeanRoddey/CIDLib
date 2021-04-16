@@ -61,8 +61,8 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-// Forward ref some local stuff
-template <class TElem> class TTreeNodeNT;
+// Forward ref some stuff
+template <typename TElem> class TTreeNodeNT;
 
 
 // ---------------------------------------------------------------------------
@@ -76,6 +76,7 @@ class CIDLIBEXP TBaseTreeNode : public TObject
         //  Destructor
         // -------------------------------------------------------------------
         TBaseTreeNode(const TBaseTreeNode&) = delete;
+        TBaseTreeNode(TBaseTreeNode&&) = delete;
 
         ~TBaseTreeNode();
 
@@ -84,6 +85,7 @@ class CIDLIBEXP TBaseTreeNode : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TBaseTreeNode& operator=(const TBaseTreeNode&) = delete;
+        TBaseTreeNode& operator=(TBaseTreeNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -184,6 +186,13 @@ namespace TBasicTreeHelpers
         , const tCIDLib::TCard4         c4Line
     );
 
+    CIDLIBEXP tCIDLib::TVoid BadStoredNodeType
+    (
+        const   tCIDLib::TCh* const     pszFile
+        , const tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCard1         c1Value
+    );
+
     CIDLIBEXP tCIDLib::TVoid CheckNodeType
     (
         const   TBaseTreeNode* const    pnodeToCheck
@@ -212,6 +221,16 @@ namespace TBasicTreeHelpers
         , const TString&                strNameToCheck
         , const tCIDLib::TCh* const     pszFile
         , const tCIDLib::TCard4         c4Line
+    );
+
+    CIDLIBEXP tCIDLib::TVoid CheckStoredCounts
+    (
+        const   tCIDLib::TCh* const     pszFile
+        , const tCIDLib::TCard4         c4Line
+        , const tCIDLib::TCard4         c4NTCount
+        , const tCIDLib::TCard4         c4NTCount2
+        , const tCIDLib::TCard4         c4TCount
+        , const tCIDLib::TCard4         c4TCount2
     );
 
     CIDLIBEXP tCIDLib::TVoid DepthUnderflow
@@ -260,23 +279,23 @@ namespace TBasicTreeHelpers
 //   CLASS: TBasicTreeNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicTreeNode : public TBaseTreeNode
+template <typename TElem> class TBasicTreeNode : public TBaseTreeNode
 {
     public :
         // -------------------------------------------------------------------
         //  Destructor
         // -------------------------------------------------------------------
         TBasicTreeNode(const TBasicTreeNode<TElem>&) = delete;
+        TBasicTreeNode(TBasicTreeNode<TElem>&&) = delete;
 
-        ~TBasicTreeNode()
-        {
-        }
+        ~TBasicTreeNode() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TBasicTreeNode<TElem>& operator=(const TBasicTreeNode<TElem>&) = delete;
+        TBasicTreeNode<TElem>& operator=(TBasicTreeNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -373,7 +392,6 @@ template <class TElem> class TBasicTreeNode : public TBaseTreeNode
         }
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
@@ -406,13 +424,14 @@ template <class TElem> class TBasicTreeNode : public TBaseTreeNode
 //   CLASS: TTreeNodeT
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
+template <typename TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TTreeNodeT(const TTreeNodeT<TElem>&) = delete;
+        TTreeNodeT(TTreeNodeT<TElem>&&) = delete;
 
         TTreeNodeT( const   TElem&                      objToCopy
                     , const TString&                    strName
@@ -439,6 +458,7 @@ template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TTreeNodeT<TElem>& operator=(const TTreeNodeT<TElem>&) = delete;
+        TTreeNodeT<TElem>& operator=(TTreeNodeT<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -481,13 +501,14 @@ template <class TElem> class TTreeNodeT : public TBasicTreeNode<TElem>
 //   CLASS: TTreeNodeNT
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
+template <typename TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TTreeNodeNT(const TTreeNodeNT<TElem>&) = delete;
+        TTreeNodeNT(TTreeNodeNT<TElem>&&) = delete;
 
         TTreeNodeNT(const   TString&                    strName
                     , const TString&                    strDescription
@@ -533,6 +554,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
         //  Public operators
         // -------------------------------------------------------------------
         TTreeNodeNT<TElem>& operator=(const TTreeNodeNT<TElem>&) = delete;
+        TTreeNodeNT<TElem>& operator=(TTreeNodeNT<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -781,7 +803,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
                 //  then we have to do case insensitive compares for both
                 //  dups and insert comparisons.
                 //
-                tCIDLib::ESortComps eComp;
+                tCIDLib::ESortComps eComp = tCIDLib::ESortComps::Equal;
                 if (bCaseSensitive)
                 {
                     while (pnodeCur)
@@ -869,7 +891,7 @@ template <class TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
 //   CLASS: TBasicTreeCol
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicTreeCol : public TCollection<TElem>
+template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 {
     public :
         // -------------------------------------------------------------------
@@ -885,7 +907,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -908,10 +930,16 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor()
@@ -926,16 +954,23 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_c4Depth       = cursSrc.m_c4Depth;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur      = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_c4Depth, cursSrc.m_c4Depth);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -984,7 +1019,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -996,7 +1031,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur  = m_pcolCursoring->m_pnodeRoot->pnodeFirstChild();
                     m_c4Depth   = 0;
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
@@ -1007,10 +1042,10 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
-                    return static_cast<TNode*>(m_pnodeCur)->objData();
+                    return m_pnodeCur->objData();
                 }
 
                 // -----------------------------------------------------------
@@ -1021,7 +1056,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock, check the serial number and node validity
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->eType();
@@ -1036,7 +1071,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -1045,7 +1080,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -1054,7 +1089,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->strDescription();
@@ -1064,7 +1099,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->strName();
@@ -1109,7 +1144,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 )
         };
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1128,10 +1163,16 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor()
@@ -1146,37 +1187,37 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
                     return *this;
                 }
 
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
+
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>
-                    (
-                        static_cast<const TNode*>(this->pnodeCur())->objData()
-                    );
+                    return const_cast<TElem&>(this->pnodeCur()->objData());
                 }
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return &const_cast<TElem&>
-                    (
-                        static_cast<const TNode*>(this->pnodeCur())->objData()
-                    );
+                    return &const_cast<TElem&>(this->pnodeCur()->objData());
                 }
 
                 TNonConstCursor& operator++()
@@ -1201,13 +1242,11 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock, check the serial number and node validity
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
-                    return const_cast<TElem&>
-                    (
-                        static_cast<const TNode*>(this->pnodeCur())->objData()
-                    );
+
+                    return const_cast<TElem&>(this->pnodeCur()->objData());
                 }
 
 
@@ -1232,7 +1271,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TConstScopeCursor : public TColCursor<TElem>
+        template <typename TElem> class TConstScopeCursor : public TColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1247,6 +1286,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
+                CIDLib_Suppress(26429) // the parent will check for null
                 TConstScopeCursor(  const   TMyType* const  pcolToCursor
                                     , const TString&        strStartNode) :
 
@@ -1276,10 +1316,16 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     m_pnodeCur = m_pnodeParent->pnodeFirstChild();
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstScopeCursor(const TConstScopeCursor& cursSrc)
                 {
                     TConstScopeCursor::operator=(cursSrc);
+                }
+
+                TConstScopeCursor(TConstScopeCursor&& cursSrc) :
+
+                    TConstScopeCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstScopeCursor()
@@ -1294,10 +1340,10 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
+                        TLocker lockrCol
                         (
                             cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
+                            ? cursSrc.m_pcolCursoring : nullptr
                         );
 
                         TParent::operator=(cursSrc);
@@ -1305,6 +1351,19 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur      = cursSrc.m_pnodeCur;
                         m_pnodeParent   = cursSrc.m_pnodeParent;
+                    }
+                    return *this;
+                }
+
+                TConstScopeCursor& operator=(TConstScopeCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_c4Depth, cursSrc.m_c4Depth);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
+                        tCIDLib::Swap(m_pnodeParent, cursSrc.m_pnodeParent);
                     }
                     return *this;
                 }
@@ -1341,7 +1400,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur = m_pnodeCur->pnodeNext();
                     return (m_pnodeCur != nullptr);
                 }
@@ -1350,7 +1409,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur  = m_pnodeParent->pnodeFirstChild();
 
                     // Get our serial num back in sync with the collection
@@ -1363,17 +1422,17 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock, check the serial number, and node validity
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
 
-                    return static_cast<TNode*>(m_pnodeCur)->objData();
+                    return m_pnodeCur->objData();
                 }
 
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
                 // -----------------------------------------------------------
-                tCIDLib::TCard4 c4Depth() const
+                [[nodiscard]] tCIDLib::TCard4 c4Depth() const
                 {
                     return m_c4Depth;
                 }
@@ -1383,7 +1442,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock, check the serial number and node validity
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->eType();
@@ -1393,7 +1452,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -1402,7 +1461,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -1411,7 +1470,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->strDescription();
@@ -1421,7 +1480,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->strName();
@@ -1461,7 +1520,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TNonConstScopeCursor : public TConstScopeCursor<TElem>
+        template <typename TElem> class TNonConstScopeCursor : public TConstScopeCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -1481,15 +1540,19 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstScopeCursor(const TNonConstScopeCursor<TElem>& cursSrc)
                 {
                     TNonConstScopeCursor::operator=(cursSrc);
                 }
 
-                ~TNonConstScopeCursor()
+                TNonConstScopeCursor(TNonConstScopeCursor<TElem>&& cursSrc) :
+
+                    TNonConstScopeCursor()
                 {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
+
+                ~TNonConstScopeCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -1499,10 +1562,10 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
+                        TLocker lockrCol
                         (
                             cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
+                            ? cursSrc.m_pcolNCCursoring : nullptr
                         );
 
                         TParent::operator=(cursSrc);
@@ -1511,6 +1574,15 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     return *this;
                 }
 
+                TNonConstScopeCursor& operator=(TNonConstScopeCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
 
                 // -----------------------------------------------------------
                 //  Public, non-virtual methods
@@ -1520,11 +1592,11 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock, check the serial number, and node validity
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->pnodeCur(), CID_FILE, CID_LINE);
 
-                    return static_cast<TNode*>(this->pnodeCur())->objData();
+                    return this->pnodeCur()->objData();
 
                 }
 
@@ -1557,6 +1629,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         using TNCCursor         = TNonConstCursor<TElem>;
         using TScopeCursor      = TConstScopeCursor<TElem>;
         using TNCScopeCursor    = TNonConstScopeCursor<TElem>;
+        using TParType          = TCollection<TElem>;
 
 
         // -------------------------------------------------------------------
@@ -1566,38 +1639,33 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                         , const tCIDLib::TBoolean   bCasePaths = kCIDLib::True
                         , const tCIDLib::TBoolean   bSorted = kCIDLib::True) :
 
-            TCollection<TElem>(eMTSafe)
+            TParType(eMTSafe)
             , m_bCasePath(bCasePaths)
             , m_bSorted(bSorted)
             , m_c4NTCount(0)
             , m_c4TCount(0)
-            , m_pnodeRoot
-              (
-                new TNodeNT
-                (
-                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
-                )
-              )
+            , m_pnodeRoot(new TNodeNT(TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr))
         {
         }
 
         TBasicTreeCol(const TBasicTreeCol<TElem>& colSrc) :
 
-            TCollection<TElem>(colSrc)
+            TParType(colSrc)
             , m_bCasePath(colSrc.m_bCasePath)
             , m_bSorted(colSrc.m_bSorted)
             , m_c4TCount(colSrc.m_c4TCount)
             , m_c4NTCount(colSrc.m_c4NTCount)
-            , m_pnodeRoot
-              (
-                new TNodeNT
-                (
-                    TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
-                )
-              )
+            , m_pnodeRoot(new TNodeNT(TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr))
         {
             // Do a recursive replication of the tree
             ReplicateNodes(colSrc.m_pnodeRoot, m_pnodeRoot);
+        }
+
+        TBasicTreeCol(TBasicTreeCol<TElem>&& colSrc) :
+
+            TBasicTreeCol()
+        {
+            *this = tCIDLib::ForceMove(colSrc);
         }
 
         ~TBasicTreeCol()
@@ -1624,8 +1692,8 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         {
             if (this != &colSrc)
             {
-                TMtxLocker lockThis(this->pmtxLock());
-                TMtxLocker lockSource(colSrc.pmtxLock());
+                TLocker lockrThis(this);
+                TLocker lockrSource(&colSrc);
                 TParent::operator=(colSrc);
 
                 // Flush our current root node
@@ -1642,19 +1710,36 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             return *this;
         }
 
+        TBasicTreeCol<TElem>& operator=(TBasicTreeCol<TElem>&& colSrc)
+        {
+            if (this != &colSrc)
+            {
+                TLocker lockrThis(this);
+                TLocker lockrSource(&colSrc);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_bCasePath, colSrc.m_bCasePath);
+                tCIDLib::Swap(m_bSorted, colSrc.m_bSorted);
+                tCIDLib::Swap(m_c4TCount, colSrc.m_c4TCount);
+                tCIDLib::Swap(m_c4NTCount, colSrc.m_c4NTCount);
+                tCIDLib::Swap(m_pnodeRoot, colSrc.m_pnodeRoot);
+            }
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bIsEmpty() const override
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return ((m_c4TCount + m_c4NTCount) == 0);
         }
 
         tCIDLib::TCard4 c4ElemCount() const override
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Return cum of terminal and non-terminal nodes
             return m_c4TCount + m_c4NTCount;
@@ -1662,7 +1747,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
 
         tCIDLib::TVoid RemoveAll() override
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             if (m_c4TCount + m_c4NTCount == 0)
                 return;
 
@@ -1675,7 +1760,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             this->c4IncSerialNum();
         }
 
-        TElem& objAdd(const TElem&) override
+        TElem& objAdd(const TElem&) final
         {
             //
             //  This type of collection really doesn't fit too well into the
@@ -1683,7 +1768,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             //  supportable. We don't know where to put it or what its name
             //  should be.
             //
-            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd");
+            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(copy)");
 
             // Make the compiler happy. It will never get called
             static TElem* pobjTmp = nullptr;
@@ -1692,7 +1777,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
 
         [[nodiscard]] TCursor* pcursNew() const override
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return new TCursor(this);
         }
 
@@ -1700,13 +1785,19 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bCasePath() const
+        {
+            TLocker lockrThis(this);
+            return m_bCasePath;
+        }
+
         tCIDLib::TBoolean bNodeExists(const TString& strToCheck) const
         {
             // Validate the passed path
             TBasicTreeHelpers::CheckPath(strToCheck, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock and try to find it
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             tCIDLib::TCard4 c4Dummy;
             return (pnodeFindNode(strToCheck, c4Dummy) != nullptr);
         }
@@ -1718,7 +1809,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strToCheck, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock and try to find it
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeTmp = pnodeFindNode(strToCheck, c4Dummy);
             if (pnodeTmp)
@@ -1726,9 +1817,15 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             return (pnodeTmp != nullptr);
         }
 
+        tCIDLib::TBoolean bSorted() const
+        {
+            TLocker lockrThis(this);
+            return m_bSorted;
+        }
+
         tCIDLib::TCard4 c4NonTerminalCount() const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return m_c4NTCount;
         }
 
@@ -1738,7 +1835,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strScopePath, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock the collection and start working
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node and make sure it's a scope, casting it to the right type
             tCIDLib::TCard4 c4Dummy;
@@ -1754,8 +1851,23 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
 
         tCIDLib::TCard4 c4TerminalCount() const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return m_c4TCount;
+        }
+
+        template <typename T = TElem> T& objAddMove(T&&)
+        {
+            //
+            //  This type of collection really doesn't fit too well into the
+            //  generic collection scheme, so this operation isn't really
+            //  supportable. We don't know where to put it or what its name
+            //  should be.
+            //
+            TBasicTreeHelpers::NotSupported(CID_FILE, CID_LINE, L"objAdd(move)");
+
+            // Make the compiler happy. It will never get called
+            static T* pobjTmp = nullptr;
+            return *pobjTmp;
         }
 
         TNodeNT* pnodeCreateNTPath( const   TString&    strScopePath
@@ -1765,7 +1877,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strScopePath, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock the collection and start working
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Use a string tokenizer to break out the path chunks
             TStringTokenizer stokPath(&strScopePath, kCIDLib::pszTreeSepChar);
@@ -1836,7 +1948,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         TNodeNT* pnodeCreateNTPath(const TCollection<TKeyValuePair>& colPairs)
         {
             // Lock the collection and start working
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Get a cursor for this collection. If empty, then do nothing
             TColCursor<TKeyValuePair>* pcursPairs = colPairs.pcursNew();
@@ -1902,14 +2014,14 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             tCIDLib::TCard4 c4Dummy;
             return pnodeFindNode(strPath, c4Dummy, kCIDLib::True)->eType();
         }
 
         tCIDLib::TVoid FormatTree(TTextOutStream& strmTarget)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Just call the private recursive helper
             FormatLevel(strmTarget, m_pnodeRoot, 0);
@@ -1928,7 +2040,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPathAndName(strPath, strToAdd, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock and try the add
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node that we are to add under and check the type
             tCIDLib::TCard4 c4Dummy;
@@ -1959,7 +2071,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckName(strToAdd, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock the collection and try to add
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node that we are to add under and check the type
             TNode* pnodeAt = cursAt.pnodeCur();
@@ -1985,11 +2097,11 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
-            return static_cast<TNode*>(pnodeAt)->objData();
+            return pnodeAt->objData();
         }
 
         const TElem& objAt(const TString& strPath) const
@@ -1998,11 +2110,11 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             const TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
-            return static_cast<const TNode*>(pnodeAt)->objData();
+            return pnodeAt->objData();
         }
 
         const TElem& objAt( const   TString&    strPath
@@ -2010,7 +2122,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                             ,       TString&    strDescToFill)
         {
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
@@ -2035,14 +2147,14 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::False);
             if (!pnodeAt)
                 return nullptr;
 
-            return &(static_cast<TNode*>(pnodeAt)->objData());
+            return &pnodeAt->objData();
         }
 
         const TElem* pobjAt(const TString& strPath) const
@@ -2051,14 +2163,14 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             const TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::False);
             if (!pnodeAt)
                 return nullptr;
 
-            return &(static_cast<const TNode*>(pnodeAt)->objData());
+            return &pnodeAt->objData();
         }
 
         TNode* pnodeAt(const TString& strPath)
@@ -2067,7 +2179,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             return pnodeFindNode(strPath, c4Dummy, kCIDLib::False);
@@ -2079,7 +2191,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             return pnodeFindNode(strPath, c4Dummy, kCIDLib::False);
@@ -2093,7 +2205,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
@@ -2110,7 +2222,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPathAndName(strPath, strToAdd, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock and try the add
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node that we are to add under
             tCIDLib::TCard4 c4Dummy;
@@ -2142,7 +2254,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckName(strToAdd, CID_FILE, CID_LINE);
 
             // Looks ok, so lets lock the collection and try to add
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node that we are to add under and check the type
             TNode* pnodeAt = cursAt.pnodeCur();
@@ -2166,14 +2278,14 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         TNodeNT* pnodeRoot()
         {
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return m_pnodeRoot;
         }
 
         const TNodeNT* pnodeRoot() const
         {
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             return m_pnodeRoot;
         }
 
@@ -2183,7 +2295,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                         , const TString&    strDescription = TString::Nul_TString())
         {
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
@@ -2201,7 +2313,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
 
         tCIDLib::TVoid RemoveNode(const TString& strToRemove)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Find the node indicated
             tCIDLib::TCard4 c4Dummy;
@@ -2220,7 +2332,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             tCIDLib::TCard4 c4Dummy;
             return pnodeFindNode(strPath, c4Dummy, kCIDLib::True)->strDescription();
         }
@@ -2231,7 +2343,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             TBasicTreeHelpers::CheckPath(strPath, CID_FILE, CID_LINE);
 
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             tCIDLib::TCard4 c4Dummy;
             return pnodeFindNode(strPath, c4Dummy, kCIDLib::True)->strName();
         }
@@ -2240,11 +2352,36 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                                         , const TString&    strDescription)
         {
             // Looks ok, so lock the collection
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
             pnodeToFind->strDescription(strDescription);
+        }
+
+
+        // For use by our streaming in helper below, don't carll directly
+        tCIDLib::TVoid Reset(const  tCIDLib::TBoolean           bCasePath
+                            , const tCIDLib::TBoolean           bSorted
+                            , const tCIDLib::TCard4             c4NTCount
+                            , const tCIDLib::TCard4             c4TCount
+                            ,       TTreeNodeNT<TElem>* const   pnodeNewRoot)
+        {
+            // Remove all current contents
+            RemoveAll();
+
+            // And now delete the root since we are going to replace it
+            delete m_pnodeRoot;
+            m_pnodeRoot = nullptr;
+
+            m_bCasePath = bCasePath;
+            m_bSorted = bSorted;
+            m_c4NTCount = c4NTCount;
+            m_c4TCount = c4TCount;
+            m_pnodeRoot = pnodeNewRoot;
+
+            // Bump our serial number of course
+            this->c4IncSerialNum();
         }
 
 
@@ -2256,6 +2393,9 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         friend class TNonConstCursor<TElem>;
         friend class TConstScopeCursor<TElem>;
         friend class TNonConstScopeCursor<TElem>;
+
+//        friend tCIDLib::TVoid StreamOutBasicTree<TElem>(const TMyType& colSrc, TBinOutStream& strmTar);
+//        friend tCIDLib::TVoid StreamInBasicTree<TElem>(TMyType& colSrc, TBinInStream& strmTar);
 
 
     private :
@@ -2276,6 +2416,8 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             //
             tCIDLib::TCard4 c4RemovedT = 0;
             tCIDLib::TCard4 c4RemovedNT = 0;
+
+            CIDLib_Suppress(6011)  // We null checked above
             pnodeToRemove->ContainedNodes(c4RemovedT, c4RemovedNT);
 
             //
@@ -2350,12 +2492,14 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         TNode* pnodeFindNext(TNode* const       pnodeStart
                             , tCIDLib::TCard4&  c4Depth) const
         {
+            CIDAssert(pnodeStart != nullptr, L"Start node is null");
+
             //
             //  If the current node is a non-terminal, then the first thing
             //  we do is iterate down into its children. So, if it has any
             //  children, its first child becomes the next node.
             //
-            TNodeNT* pnodeCurParent;
+            TNodeNT* pnodeCurParent = nullptr;
             if (pnodeStart->eType() == tCIDLib::ETreeNodes::NonTerminal)
             {
                 pnodeCurParent = static_cast<TNodeNT*>(pnodeStart);
@@ -2382,7 +2526,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             //
             pnodeCurParent = pnodeStart->pnodeParent();
             TNode* pnodeCur = nullptr;
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // The current parent becomes the current node
@@ -2495,6 +2639,9 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         ReplicateNodes( const   TNodeNT* const  pnodeSrcParent
                         ,       TNodeNT* const  pnodeTargetParent)
         {
+            CIDAssert(pnodeSrcParent != nullptr, L"the source parent node is null");
+            CIDAssert(pnodeTargetParent != nullptr, L"the target parent node is null");
+
             //
             //  Go through the children of the source parent node and replicate
             //  each one. If its a non-terminal node, then recurse as we see
@@ -2505,8 +2652,8 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
             {
                 if (pnodeSrc->eType() == tCIDLib::ETreeNodes::Terminal)
                 {
-                    const TNodeT* pnodeNewSrc
-                        = static_cast<const TNodeT*>(pnodeSrc);
+                    CIDLib_Suppress(26429) // We just checked above, so can't be null
+                    const TNodeT* pnodeNewSrc = static_cast<const TNodeT*>(pnodeSrc);
 
                     // Add a new non-terminal, with the same data and name
                     if (pnodeNewSrc->bHasDescription())
@@ -2538,7 +2685,7 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
                     //  Add a new non-terminal with the same name as the
                     //  source, and then recurse on it.
                     //
-                    TNodeNT* pnodeNewNT;
+                    TNodeNT* pnodeNewNT = nullptr;
                     if (pnodeSrc->bHasDescription())
                     {
                         pnodeNewNT = pnodeTargetParent->pnodeAddNonTerminal
@@ -2610,7 +2757,218 @@ template <class TElem> class TBasicTreeCol : public TCollection<TElem>
         TemplateRTTIDefs(TMyType,TCollection<TElem>)
 };
 
+//
+//  A couple helpers to support binary streaming of tree collection content. This one is
+//  more complicated than most since we have to flatten the tree structure.
+//
+//  We have a recursive helper for each.
+//
+template <typename TElem>
+tCIDLib::TVoid StreamOutNT(const TTreeNodeNT<TElem>& nodePar, TBinOutStream& strmTar)
+{
+    // Count the number of nodes under this one
+    TBasicTreeNode<TElem>* pnodeCur = nodePar.pnodeFirstChild();
+    tCIDLib::TCard4 c4ChildCnt = 0;
+    while (pnodeCur)
+    {
+        c4ChildCnt++;
+        pnodeCur = pnodeCur->pnodeNext();
+    }
+
+    //
+    //  Now write out a frame marker and count of children and again XOR'd for sanity's
+    //  sake.
+    //
+    strmTar << tCIDLib::EStreamMarkers::Frame << c4ChildCnt << (c4ChildCnt ^ kCIDLib::c4MaxCard);
+
+    // And now we can write out the child objects
+    pnodeCur = nodePar.pnodeFirstChild();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCnt; c4Index++)
+    {
+        //
+        //  Stream out the type, then regardless of type, the basic info. Descriptions are
+        //  faulted in if used, so don't make it fault in just for this.
+        //
+        if (pnodeCur->eType() == tCIDLib::ETreeNodes::NonTerminal)
+            strmTar << tCIDLib::TCard1(0x73);
+        else
+            strmTar << tCIDLib::TCard1(0xB5);
+        strmTar << pnodeCur->strName();
+        if (pnodeCur->bHasDescription())
+            strmTar << tCIDLib::TCard1(0xAE) << pnodeCur->strDescription();
+        else
+            strmTar << tCIDLib::TCard1(0xB9);
+
+        if (pnodeCur->eType() == tCIDLib::ETreeNodes::NonTerminal)
+        {
+            // For this, we just need to recurse
+            const TTreeNodeNT<TElem>& nodeChild = *static_cast<TTreeNodeNT<TElem>*>(pnodeCur);
+            StreamOutNT(nodeChild, strmTar);
+        }
+         else
+        {
+            // For terminals, we need to write out the user data
+            const TTreeNodeT<TElem>& nodeChild = *static_cast<TTreeNodeT<TElem>*>(pnodeCur);
+            strmTar << nodeChild.objData();
+        }
+        strmTar << tCIDLib::EStreamMarkers::Frame;
+
+        pnodeCur = pnodeCur->pnodeNext();
+    }
+}
+
+
+// For depencey reasons this method is in the poly stream header
+//template <typename TElem>
+//tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
+
+
+template <typename TElem>
+tCIDLib::TVoid StreamInNT(  TTreeNodeNT<TElem>&         nodePar
+                            , TBinInStream&             strmSrc
+                            , tCIDLib::TCard4&          c4NTCount
+                            , tCIDLib::TCard4&          c4TCount
+                            , TString&                  strName
+                            , TString&                  strDesc
+                            , TElem&                    objTmp
+                            , const tCIDLib::TBoolean   bCaseSensitive
+                            , const tCIDLib::TBoolean   bSorted)
+{
+    // We should get a frame marker then the child count and the count XOR'd
+    strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+    tCIDLib::TCard4 c4ChildCnt, c4ChildCntXOR;
+    strmSrc >> c4ChildCnt >> c4ChildCntXOR;
+
+    // Sanity check the count and throw if bad
+    if ((c4ChildCnt ^ kCIDLib::c4MaxCard) != c4ChildCntXOR)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcCol_BadStoredCount
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Format
+            , TString(L"TBasicTree")
+        );
+    }
+
+    // Let's read in this many objects and add child nodes for them
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCnt; c4Index++)
+    {
+        // Read in the type, and then the basic info
+        tCIDLib::TCard1 c1HasDescr, c1Type;
+        strmSrc >> c1Type >> strName >> c1HasDescr;
+        if (c1HasDescr == 0xAE)
+            strmSrc >> strDesc;
+
+        if (c1Type == 0x73)
+        {
+            // Add the new non-terminal and recurse on it
+            c4NTCount++;
+            TTreeNodeNT<TElem>* pnodeNew = nodePar.pnodeAddNonTerminal
+            (
+                strName, strDesc, bCaseSensitive, bSorted
+            );
+            StreamInNT
+            (
+                *pnodeNew
+                , strmSrc
+                , c4NTCount
+                , c4TCount
+                , strName
+                , strDesc
+                , objTmp
+                , bCaseSensitive
+                , bSorted
+            );
+        }
+         else if (c1Type == 0xB5)
+        {
+            // Stream in the user data then create the node
+            c4TCount++;
+            strmSrc >> objTmp;
+            nodePar.objAddTerminal(objTmp, strName, strDesc, bCaseSensitive, bSorted);
+        }
+        else
+        {
+            TBasicTreeHelpers::BadStoredNodeType(CID_FILE, CID_LINE, c1Type);
+        }
+
+        strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+    }
+}
+
+template <typename TElem>
+tCIDLib::TVoid StreamInBasicTree(TBasicTreeCol<TElem>& colTar, TBinInStream& strmSrc)
+{
+    strmSrc.CheckForStartMarker(CID_FILE, CID_LINE);
+    tCIDLib::TBoolean bCasePath;
+    tCIDLib::TBoolean bSorted;
+    tCIDLib::TCard4 c4NewNTCount;
+    tCIDLib::TCard4 c4NewTCount;
+    strmSrc >> bCasePath >> bSorted >> c4NewNTCount >> c4NewTCount;
+    strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
+
+    // Allocate a temporary root node and start parsing. Put a janitor on it till we store it
+    TTreeNodeNT<TElem>* pnodeRoot = new TTreeNodeNT<TElem>
+    (
+        TBasicTreeHelpers::strRootName, TBasicTreeHelpers::strRootDesc, nullptr
+    );
+    TJanitor<TTreeNodeNT<TElem>> janRoot(pnodeRoot);
+
+    //
+    //  This guy will count nodes so that we can compare with what we read in above as a sanity
+    //  check.
+    //
+    tCIDLib::TCard4 c4NewNTCount2 = 0;
+    tCIDLib::TCard4 c4NewTCount2 = 0;
+    TString strName;
+    TString strDesc;
+    TElem objTmp;
+    StreamInNT
+    (
+        *pnodeRoot
+        , strmSrc
+        , c4NewNTCount2
+        , c4NewTCount2
+        , strName
+        , strDesc
+        , objTmp
+        , bCasePath
+        , bSorted
+    );
+
+    strmSrc.CheckForEndMarker(CID_FILE, CID_LINE);
+
+    // Check the counts we got both ways and if not in agreement this throws
+    TBasicTreeHelpers::CheckStoredCounts
+    (
+        CID_FILE, CID_LINE, c4NewNTCount, c4NewNTCount2, c4NewTCount, c4NewTCount2
+    );
+
+    // Looks ok, so reset the collection with the info we have
+    colTar.Reset(bCasePath, bSorted, c4NewNTCount, c4NewTCount, janRoot.pobjOrphan());
+}
+
+
+//
+//  Some helpers for some of the collection classes which cannot be in their headers due to
+//  cicular dependencies on this poly streamer.
+//
+template <typename TElem>
+tCIDLib::TVoid StreamOutBasicTree(const TBasicTreeCol<TElem>& colSrc, TBinOutStream& strmTar)
+{
+    // Stream out a start object marker, then the overall settings
+    strmTar << tCIDLib::EStreamMarkers::StartObject
+            << colSrc.bCasePath()
+            << colSrc.bSorted()
+            << colSrc.c4NonTerminalCount()
+            << colSrc.c4TerminalCount()
+            << tCIDLib::EStreamMarkers::Frame;
+    if (colSrc.pnodeRoot())
+        StreamOutNT(*colSrc.pnodeRoot(), strmTar);
+    strmTar << tCIDLib::EStreamMarkers::EndObject;
+}
 
 #pragma CIDLIB_POPPACK
-
-

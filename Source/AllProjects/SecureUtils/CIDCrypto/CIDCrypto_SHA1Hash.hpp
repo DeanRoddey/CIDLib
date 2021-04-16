@@ -56,11 +56,7 @@ class CIDCRYPTEXP TSHA1Hash : public TMsgHash
         );
 
         TSHA1Hash(const TSHA1Hash&) = default;
-
-        TSHA1Hash
-        (
-                    TSHA1Hash&&             mhashSrc
-        );
+        TSHA1Hash(TSHA1Hash&&) = default;
 
         ~TSHA1Hash();
 
@@ -69,6 +65,7 @@ class CIDCRYPTEXP TSHA1Hash : public TMsgHash
         //  Public operators
         // -------------------------------------------------------------------
         TSHA1Hash& operator=(const TSHA1Hash&) = default;
+        TSHA1Hash& operator=(TSHA1Hash&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -80,11 +77,6 @@ class CIDCRYPTEXP TSHA1Hash : public TMsgHash
             const   TSHA1Hash&              mhashSrc
         )   const;
 
-        TSHA1Hash& operator=
-        (
-                    TSHA1Hash&&             mhashrRc
-        );
-
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -93,7 +85,7 @@ class CIDCRYPTEXP TSHA1Hash : public TMsgHash
         (
                     TString&                strToFill
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -112,7 +104,7 @@ class CIDCRYPTEXP TSHA1Hash : public TMsgHash
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
     private :

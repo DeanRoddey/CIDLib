@@ -33,18 +33,280 @@
 
 
 // ---------------------------------------------------------------------------
-//  Do our RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TSysInfo,TObject)
-
-
-// ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
 namespace CIDLib_SystemInfo
 {
-    volatile tCIDLib::TBoolean bInitDone = kCIDLib::False;
+    namespace
+    {
+        // An atomic flag to support faulting in system info pub first use
+        TAtomicFlag atomInitDone;
+    }
 }
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TCmdLine
+// PREFIX: cmdl
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TCmdLine: Constructors and destructor
+// ---------------------------------------------------------------------------
+TCmdLine::TCmdLine(const tCIDLib::TCh chOptionChar) :
+
+    m_bRemoveConsumed(kCIDLib::False)
+{
+    TString strCurParm;
+    TString strVal;
+    TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
+    for (; cursParms; ++cursParms)
+    {
+        strCurParm = *cursParms;
+
+        if (strCurParm[0] == chOptionChar)
+        {
+            // Cut the slash off
+            strCurParm.Cut(0, 1);
+
+            //
+            //  Split it on an equal sign if it has one. If so, it's an option with a
+            //  value, else an option without one.
+            //
+            if (strCurParm.bSplit(strVal, kCIDLib::chEquals))
+            {
+                // An option with a value
+                m_colList.objPlace(strCurParm, strVal);
+            }
+             else
+            {
+                // An option but no value
+                m_colList.objPlace(strCurParm, kCIDLib::True);
+            }
+        }
+         else
+        {
+            // Not an option type
+            m_colList.objPlace(strCurParm, kCIDLib::False);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  TCmdLine: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+
+// Some helpers to find specific types of parameters by name
+tCIDLib::TBoolean TCmdLine::bFindOption(const TString& strName)
+{
+    const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::Option)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            if (m_bRemoveConsumed)
+                m_colList.RemoveAt(c4Index);
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  For these, return is found or not found, and bad value or out of range
+//  cause an exception.
+//
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TCard4&    c4Val
+                        , const tCIDLib::TCard4     c4MinVal
+                        , const tCIDLib::TCard4     c4MaxVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+        return kCIDLib::False;
+
+    if (!strVal.bToCard4(c4Val, eRadix))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TString(L"unsigned integer")
+        );
+    }
+
+    if ((c4Val < c4MinVal) || (c4Val > c4MaxVal))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TCardinal(c4MinVal)
+            , TCardinal(c4MaxVal)
+        );
+    }
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TInt4&     i4Val
+                        , const tCIDLib::TInt4      i4MinVal
+                        , const tCIDLib::TInt4      i4MaxVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+        return kCIDLib::False;
+
+    if (!strVal.bToInt4(i4Val, eRadix))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TString(L"signed integer")
+        );
+    }
+
+    if ((i4Val < i4MinVal) || (i4Val > i4MaxVal))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcSysI_ConvertArg
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , strName
+            , TInteger(i4MinVal)
+            , TInteger(i4MaxVal)
+        );
+    }
+    return kCIDLib::True;
+}
+
+
+// False here means a bad value, else we get found value/default value and return true
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TCard4&    c4Val
+                        , const tCIDLib::TCard4     c4DefVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+    {
+        c4Val = c4DefVal;
+        return kCIDLib::True;
+    }
+    return strVal.bToCard4(c4Val, eRadix);
+}
+
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const  TString&            strName
+                        ,       tCIDLib::TInt4&     i4Val
+                        , const tCIDLib::TInt4      i4DefVal
+                        , const tCIDLib::ERadices   eRadix)
+{
+    // Call the other version to see if have the option value
+    TString strVal;
+    if (!bFindOptionVal(strName, strVal))
+    {
+        i4Val = i4DefVal;
+        return kCIDLib::True;
+    }
+
+    return strVal.bToInt4(i4Val, eRadix);
+}
+
+
+//
+//  Find an option with a string value. Here we return found or not found status.
+//  A lot of the others above call this one, so we handle the 'remove if consumed'
+//  option for them, else they would try to do it again.
+//
+tCIDLib::TBoolean
+TCmdLine::bFindOptionVal(const TString& strName, TString& strValue)
+{
+    const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            strValue = cmdlpCur.strValue();
+
+            // DO THIS AFTER we get the value out above of course
+            if (m_bRemoveConsumed)
+                m_colList.RemoveAt(c4Index);
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  This one DOES NOT remove the parameter if the 'remove if consumed' flag is set
+//  since it doesn't consume the parameter. So we can't call bFindOptionVal() above,
+//  we have to do our own search.
+//
+tCIDLib::TBoolean TCmdLine::bOptionExists(const TString& strName) const
+{
+        const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+    {
+        const TCmdLineParm& cmdlpCur = m_colList[c4Index];
+        if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
+        &&  cmdlpCur.strName().bCompareI(strName))
+        {
+            return kCIDLib::True;
+        }
+    }
+    return kCIDLib::False;
+}
+
+
+// The one at the indicated index must be a value type
+tCIDLib::TBoolean TCmdLine::bValueAt(const tCIDLib::TCard4 c4At, TString& strValue)
+{
+    const TCmdLineParm& cmdlpAt = m_colList[c4At];
+    if (cmdlpAt.eType() != tCIDLib::ECmdLnPTypes::Value)
+        return kCIDLib::False;
+
+    strValue = cmdlpAt.strValue();
+
+    // DO THIS AFTER we get the value out above of course
+    if (m_bRemoveConsumed)
+        m_colList.RemoveAt(c4At);
+
+    return kCIDLib::True;
+}
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -82,7 +344,7 @@ tCIDLib::TBoolean
 TSysInfo::bFindCmdLineParm( const   TString&            strFind
                             , const tCIDLib::TBoolean   bCase)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
 
     const tCIDLib::TCard4 c4Count = s_pcolCmdLineParms->c4ElemCount();
@@ -90,7 +352,7 @@ TSysInfo::bFindCmdLineParm( const   TString&            strFind
     {
         const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
 
-        tCIDLib::TBoolean bMatch;
+        tCIDLib::TBoolean bMatch = kCIDLib::False;
         if (bCase)
             bMatch = strCur.bCompare(strFind);
         else
@@ -112,7 +374,7 @@ TSysInfo::bFindCmdLinePref( const   TString&            strPref
                             ,       TString&            strToFill
                             , const tCIDLib::TBoolean   bCase)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
 
     const tCIDLib::TCard4 c4Count = s_pcolCmdLineParms->c4ElemCount();
@@ -120,7 +382,7 @@ TSysInfo::bFindCmdLinePref( const   TString&            strPref
     {
         const TString& strCur = s_pcolCmdLineParms->objAt(c4Index);
 
-        tCIDLib::TBoolean bMatch;
+        tCIDLib::TBoolean bMatch = kCIDLib::False;
         if (bCase)
             bMatch = strCur.bStartsWith(strPref);
         else
@@ -146,7 +408,7 @@ tCIDLib::TBoolean TSysInfo::bIsHostAdmin()
 // Return the install mode flag from the command line
 tCIDLib::TBoolean TSysInfo::bInstallMode()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return s_bInstallMode;
 }
@@ -171,7 +433,7 @@ tCIDLib::TBoolean TSysInfo::bQueryLatLong(  tCIDLib::TFloat8&   f8Lat
 
         if (pszLat && pszLong)
         {
-            tCIDLib::TBoolean bLatGood, bLongGood;
+            tCIDLib::TBoolean bLatGood = kCIDLib::False, bLongGood = kCIDLib::False;
             f8Lat = TRawStr::f8AsBinary(pszLat, bLatGood);
             f8Long = TRawStr::f8AsBinary(pszLong, bLongGood);
 
@@ -190,14 +452,14 @@ tCIDLib::TBoolean TSysInfo::bQueryLatLong(  tCIDLib::TFloat8&   f8Lat
 // Get/set the test mode flag
 tCIDLib::TBoolean TSysInfo::bTestMode()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return s_bTestMode;
 }
 
 tCIDLib::TBoolean TSysInfo::bTestMode(const tCIDLib::TBoolean bNewState)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     s_bTestMode = bNewState;
     return s_bTestMode;
@@ -207,7 +469,7 @@ tCIDLib::TBoolean TSysInfo::bTestMode(const tCIDLib::TBoolean bNewState)
 // Return the number of (non-magic) command line parms
 tCIDLib::TCard4 TSysInfo::c4CmdLineParmCount()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return s_pcolCmdLineParms->c4ElemCount();
 }
@@ -227,13 +489,6 @@ tCIDLib::TCard8 TSysInfo::c8TotalPhysicalMem()
 }
 
 
-// Return the CPU type
-tCIDLib::ECPUTypes TSysInfo::eCPUType()
-{
-    return TKrnlSysInfo::eCPUType();
-}
-
-
 //
 //  This provides access to the info in the /MODULELOG= parameter, or the
 //  CID_MODULELOG environment variable, which is used to allow the user to
@@ -241,7 +496,7 @@ tCIDLib::ECPUTypes TSysInfo::eCPUType()
 //
 tCIDLib::ESeverities TSysInfo::eDefModuleLog(const TString& strTarModule)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
 
     //
@@ -351,16 +606,25 @@ tCIDLib::TCard8 TSysInfo::c8AvailPhysicalMem()
 //
 const tCIDLib::TStrList& TSysInfo::colCmdLineParms()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_pcolCmdLineParms;
 }
 
 tCIDLib::TStrList::TCursor TSysInfo::cursCmdLineParms()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return tCIDLib::TStrList::TCursor(s_pcolCmdLineParms);
+}
+
+
+// Mostly for internal use by TModule
+const tCIDLib::TCh* TSysInfo::pszLogInfo()
+{
+    if (!CIDLib_SystemInfo::atomInitDone)
+        DoInit();
+    return s_pszLogInfo;
 }
 
 
@@ -384,27 +648,13 @@ TSysInfo::QueryOSInfo(  tCIDLib::TCard4&    c4OSMajVersion
 // REturn the OS info formatted into a string
 tCIDLib::TVoid TSysInfo::QueryOSInfoStr(TString& strToFill)
 {
-    tCIDLib::TCard4 c4OSMajVersion;
-    tCIDLib::TCard4 c4OSMinVersion;
+    tCIDLib::TCard4 c4OSMajVer;
+    tCIDLib::TCard4 c4OSMinVer;
     tCIDLib::TCard4 c4OSRev;
     tCIDLib::TCard4 c4OSBuildNum;
 
-    TKrnlSysInfo::QueryOSInfo
-    (
-        c4OSMajVersion
-        , c4OSMinVersion
-        , c4OSRev
-        , c4OSBuildNum
-    );
-
-    strToFill.SetFormatted(c4OSMajVersion);
-    strToFill.Append(kCIDLib::chPeriod);
-    strToFill.AppendFormatted(c4OSMinVersion);
-    strToFill.Append(kCIDLib::chPeriod);
-    strToFill.AppendFormatted(c4OSRev);
-    strToFill.Append(L" [");
-    strToFill.AppendFormatted(c4OSBuildNum);
-    strToFill.Append(kCIDLib::chCloseBracket);
+    TKrnlSysInfo::QueryOSInfo(c4OSMajVer, c4OSMinVer, c4OSRev, c4OSBuildNum);
+    strToFill.Format(L"%(1).%(2).%(3) [%(4)]", c4OSMajVer, c4OSMinVer, c4OSRev, c4OSBuildNum);
 }
 
 
@@ -419,7 +669,7 @@ tCIDLib::TVoid TSysInfo::QueryOSInfoStr(TString& strToFill)
 tCIDLib::TVoid TSysInfo::RemoveCmdLineParm(TCmdLineCursor& cursAt)
 {
     // This has to have been done in order for them to have a cursor
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
     {
         CIDAssert2(L"System info init not done, at remove command line parm");
     }
@@ -429,58 +679,43 @@ tCIDLib::TVoid TSysInfo::RemoveCmdLineParm(TCmdLineCursor& cursAt)
 }
 
 
-// Provie access to the standard error stream, faulting it in if needed
+// Provide access to the standard error stream, faulting it in if needed
 TTextOutStream& TSysInfo::strmErr()
 {
-    if (!s_pstrmErr)
+    if (!TAtomic::pFencedGet(&s_pstrmErr))
     {
         TBaseLock lockInit;
-        if (!s_pstrmErr)
+        if (!TAtomic::pFencedGet(&s_pstrmErr))
         {
+            // If not redirected, use the output stream
+            TTextOutStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdErr))
-            {
-                TRawMem::pExchangePtr<TTextOutStream>
-                (
-                    &s_pstrmErr, new TTextFileOutStream(tCIDLib::EStdFiles::StdErr)
-                );
-            }
-             else
-            {
-                //
-                //  If its not redirected, it should be the same console object
-                //  as std out. So create the standard output if we haven't
-                //  already and set the error stream to the same thing.
-                //
-                if (!s_pstrmOut)
-                    TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmOut, new TOutConsole);
+                pstrmSet = new TTextFileOutStream(tCIDLib::EStdFiles::StdErr);
+            else
+                pstrmSet = &strmOut();
 
-                TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmErr, s_pstrmOut);
-            }
+            TAtomic::FencedSet(&s_pstrmErr, pstrmSet);
         }
     }
-    return *s_pstrmOut;
+    return *s_pstrmErr;
 }
 
 
 // Provie access to the standard input stream, faulting it in if needed
 TTextInStream& TSysInfo::strmIn()
 {
-    if (!s_pstrmIn)
+    if (!TAtomic::pFencedGet(&s_pstrmIn))
     {
         TBaseLock lockInit;
-        if (!s_pstrmIn)
+        if (!TAtomic::pFencedGet(&s_pstrmIn))
         {
+            TTextInStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdIn))
-            {
-                TRawMem::pExchangePtr<TTextInStream>
-                (
-                    &s_pstrmIn, new TTextFileInStream(tCIDLib::EStdFiles::StdIn)
-                );
-            }
-             else
-            {
-                TRawMem::pExchangePtr<TTextInStream>(&s_pstrmIn, new TInConsole);
-            }
+                pstrmSet =  new TTextFileInStream(tCIDLib::EStdFiles::StdIn);
+            else
+                pstrmSet = new TInConsole;
+
+            TAtomic::FencedSet(&s_pstrmIn, pstrmSet);
         }
     }
     return *s_pstrmIn;
@@ -490,24 +725,21 @@ TTextInStream& TSysInfo::strmIn()
 // Provie access to the standard output stream, faulting it in if needed
 TTextOutStream& TSysInfo::strmOut()
 {
-    if (!s_pstrmOut)
+    if (!TAtomic::pFencedGet(&s_pstrmOut))
     {
         TBaseLock lockInit;
-        if (!s_pstrmOut)
+        if (!TAtomic::pFencedGet(&s_pstrmOut))
         {
+            TTextOutStream* pstrmSet = nullptr;
             if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdOut))
-            {
-                TRawMem::pExchangePtr<TTextOutStream>
-                (
-                    &s_pstrmOut, new TTextFileOutStream(tCIDLib::EStdFiles::StdOut)
-                );
-            }
-             else
-            {
-                TRawMem::pExchangePtr<TTextOutStream>(&s_pstrmOut, new TOutConsole);
-            }
+                pstrmSet = new TTextFileOutStream(tCIDLib::EStdFiles::StdOut);
+            else
+                pstrmSet = new TOutConsole;
+
+            TAtomic::FencedSet(&s_pstrmOut, pstrmSet);
         }
     }
+
     return *s_pstrmOut;
 }
 
@@ -515,7 +747,7 @@ TTextOutStream& TSysInfo::strmOut()
 // Return a specific (non-magic) command line parameter
 const TString& TSysInfo::strCmdLineParmAt(const tCIDLib::TCard4 c4At)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return s_pcolCmdLineParms->objAt(c4At);
 }
@@ -524,7 +756,7 @@ const TString& TSysInfo::strCmdLineParmAt(const tCIDLib::TCard4 c4At)
 // Return the OS level host name
 const TString& TSysInfo::strOSHostName()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_pstrOSHostName;
 }
@@ -533,7 +765,7 @@ const TString& TSysInfo::strOSHostName()
 // Return the IP (DNS) host name, which may be different from the regular host name
 const TString& TSysInfo::strIPHostName()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_pstrIPHostName;
 }
@@ -541,7 +773,7 @@ const TString& TSysInfo::strIPHostName()
 // Return the name server address from the command in, if any
 const TString& TSysInfo::strNSAddr()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_pstrNSAddr;
 }
@@ -550,7 +782,7 @@ const TString& TSysInfo::strNSAddr()
 // REturn the value of the indicated special path
 const TString& TSysInfo::strSpecialPath(const tCIDLib::ESpecialPaths ePath)
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_apstrSpecPaths[ePath];
 }
@@ -559,7 +791,7 @@ const TString& TSysInfo::strSpecialPath(const tCIDLib::ESpecialPaths ePath)
 // Return the current OS level user name
 const TString& TSysInfo::strUserName()
 {
-    if (!CIDLib_SystemInfo::bInitDone)
+    if (!CIDLib_SystemInfo::atomInitDone)
         DoInit();
     return *s_pstrUserName;
 }
@@ -569,13 +801,13 @@ const TString& TSysInfo::strUserName()
 tCIDLib::TVoid TSysInfo::SetNSAddr( const   TString&            strDNSAddr
                                     , const tCIDLib::TIPPortNum ippnToUse)
 {
-    // Make sure this is all atomic
     TBaseLock lockInit;
 
     s_pstrNSAddr = new TString(strDNSAddr);
     s_pstrNSAddr->Append(kCIDLib::chColon);
     s_pstrNSAddr->AppendFormatted(ippnToUse);
 }
+
 
 
 // ---------------------------------------------------------------------------
@@ -591,17 +823,6 @@ TSysInfo::~TSysInfo()
 
 
 // ---------------------------------------------------------------------------
-//  TSysInfo: Protected, static methods
-// ---------------------------------------------------------------------------
-const tCIDLib::TCh* TSysInfo::pszLogInfo()
-{
-    if (!CIDLib_SystemInfo::bInitDone)
-        DoInit();
-    return s_pszLogInfo;
-}
-
-
-// ---------------------------------------------------------------------------
 //  TSysInfo: Private, static methods
 // ---------------------------------------------------------------------------
 
@@ -610,35 +831,120 @@ const tCIDLib::TCh* TSysInfo::pszLogInfo()
 //  creating any objects here (at least derived from TObject), since it could
 //  cause some circular freakouts!
 //
+//  The caller will already have done one check of the atomic flag, so we just
+//  go ahead and lock and do the second check.
+//
 tCIDLib::TVoid TSysInfo::DoInit()
 {
-    // If init is already done, then just return
-    if (CIDLib_SystemInfo::bInitDone)
-        return;
-
-    // Make sure this is all atomic
     TBaseLock lockInit;
-
-    // Check again in case we were beat to it
-    if (CIDLib_SystemInfo::bInitDone)
-        return;
-
-    //
-    //  Create the command line arguments collection. Make it big enough for all
-    //  of the arguments even though we may not end up exposing all of them.
-    //
-    //  We take a bit of risk here creating such a 'high level' object but to
-    //  have the parms exposed in such a convenient way is well worth it.
-    //
-    tCIDLib::TCard4 c4ArgCount = TKrnlSysInfo::c4CmdLineArgCount();
-    s_pcolCmdLineParms = new tCIDLib::TStrList(c4ArgCount);
-
-    // Start after the magic 0th parameter
-    for (tCIDLib::TCard4 c4Index = 1; c4Index < c4ArgCount; c4Index++)
+    if (!CIDLib_SystemInfo::atomInitDone)
     {
-        // Get a pointer to this param's text
-        const tCIDLib::TCh* pszVal;
-        if (!TKrnlSysInfo::bCmdLineArg(c4Index, pszVal))
+        //
+        //  Create the command line arguments collection. Make it big enough for all
+        //  of the arguments even though we may not end up exposing all of them.
+        //
+        //  We take a bit of risk here creating such a 'high level' object but to
+        //  have the parms exposed in such a convenient way is well worth it.
+        //
+        tCIDLib::TCard4 c4ArgCount = TKrnlSysInfo::c4CmdLineArgCount();
+        s_pcolCmdLineParms = new tCIDLib::TStrList(c4ArgCount);
+
+        // Start after the magic 0th parameter
+        TKrnlString kstrVal;
+        for (tCIDLib::TCard4 c4Index = 1; c4Index < c4ArgCount; c4Index++)
+        {
+            if (!TKrnlSysInfo::bCmdLineArg(c4Index, kstrVal))
+            {
+                TKrnlPopup::Show
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , L"CIDLib System Info Subsystem"
+                    , 0
+                    , kCIDErrs::errcSysI_GetCmdLineParm
+                    , 0
+                    , 0
+                    , L"Could not get command line parameters"
+                );
+                return;
+            }
+
+            //
+            //  Check to see if its a special parm. If so, then we set the
+            //  appropriate flag and remove it from the list.
+            //
+            if (kstrVal.bCompareNI(L"/ModuleLog=", 11))
+            {
+                s_pstrDefModuleLog = new TString(kstrVal.pszValueAt(11));
+            }
+             else if (kstrVal.bCompareI(L"/TestMode"))
+            {
+                s_bTestMode = kCIDLib::True;
+            }
+             else if (kstrVal.bCompareI(L"/InstallMode"))
+            {
+                s_bInstallMode = kCIDLib::True;
+            }
+             else if (kstrVal.bCompareNI(L"/LocalLog=", 10))
+            {
+                s_pszLogInfo = kstrVal.pszReplicateAt(10);
+            }
+             else if (kstrVal.bCompareNI(L"/NSAddr=", 8))
+            {
+                s_pstrNSAddr = new TString(kstrVal.pszValueAt(8));
+            }
+             else if (kstrVal.bCompareNI(L"/GlobalLogMode=", 15))
+            {
+                //
+                //  We need to set the global logging mode, which is set
+                //  statically on the TFacility class.
+                //
+                tCIDLib::ESeverities eToSet = tCIDLib::ESeverities::Status;
+                if (kstrVal.bCompareI(L"/GlobalLogMode=Info"))
+                {
+                    eToSet = tCIDLib::ESeverities::Info;
+                }
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=Warn"))
+                {
+                    eToSet = tCIDLib::ESeverities::Warn;
+                }
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=Failed"))
+                {
+                    eToSet = tCIDLib::ESeverities::Failed;
+                }
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=ProcFatal"))
+                {
+                    eToSet = tCIDLib::ESeverities::ProcFatal;
+                }
+                 else if (kstrVal.bCompareI(L"/GlobalLogMode=SysFatal"))
+                {
+                    eToSet = tCIDLib::ESeverities::SysFatal;
+                }
+                TFacility::eGlobalLogMode(eToSet);
+            }
+            else
+            {
+                // Wasn't a magic parameter so store it
+                s_pcolCmdLineParms->objPlace(kstrVal);
+            }
+        }
+
+        TKrnlString kstrTmp(kCIDLib::c4MaxPathLen + 1);
+
+        //
+        //  If there wasn't an explicit entry for the Name Server address, then
+        //  see if its in the environment.
+        //
+        if (!s_pstrNSAddr)
+        {
+            if (TKrnlEnvironment::bFind(L"CID_NSADDR", kstrTmp))
+                s_pstrNSAddr = new TString(kstrTmp);
+            else
+                s_pstrNSAddr = new TString;
+        }
+
+        // Try to get the user name
+        if (!TKrnlSysInfo::bQueryUserName(kstrTmp))
         {
             TKrnlPopup::Show
             (
@@ -646,153 +952,58 @@ tCIDLib::TVoid TSysInfo::DoInit()
                 , CID_LINE
                 , L"CIDLib System Info Subsystem"
                 , 0
-                , kCIDErrs::errcSysI_GetCmdLineParm
+                , kCIDErrs::errcSysI_QueryUserName
                 , 0
                 , 0
-                , L"Could not get command line parameters"
+                , L"Could not obtain user name from system"
             );
-            return;
+        }
+        s_pstrUserName = new TString(kstrTmp);
+
+        // If the CID_MODULELOG env variable is set, then store the info
+        if (TKrnlEnvironment::bFind(L"CID_MODULELOG", kstrTmp))
+        {
+            // Only do this if we didn't get anything on the command line
+            if (!s_pstrDefModuleLog)
+                s_pstrDefModuleLog = new TString(kstrTmp);
         }
 
-        //
-        //  Check to see if its a special parm. If so, then we set the
-        //  appropriate flag and remove it from the list.
-        //
-        if (TRawStr::bCompareStrNI(pszVal, L"/ModuleLog=", 11))
-        {
-            s_pstrDefModuleLog = new TString(pszVal + 11);
-        }
-         else if (TRawStr::bCompareStrI(pszVal, L"/TestMode"))
-        {
-            s_bTestMode = kCIDLib::True;
-        }
-         else if (TRawStr::bCompareStrI(pszVal, L"/InstallMode"))
-        {
-            s_bInstallMode = kCIDLib::True;
-        }
-         else if (TRawStr::bCompareStrNI(pszVal, L"/LocalLog=", 10))
-        {
-            s_pszLogInfo = TRawStr::pszReplicate(pszVal + 10);
-        }
-         else if (TRawStr::bCompareStrNI(pszVal, L"/NSAddr=", 8))
-        {
-            s_pstrNSAddr = new TString(pszVal + 8);
-        }
-         else if (TRawStr::bCompareStrNI(pszVal, L"/GlobalLogMode=", 15))
-        {
-            //
-            //  We need to set the global logging mode, which is set
-            //  statically on the TFacility class.
-            //
-            tCIDLib::ESeverities eToSet;
-            pszVal += 15;
-            if (TRawStr::bCompareStrI(pszVal, L"Info"))
-            {
-                eToSet = tCIDLib::ESeverities::Info;
-            }
-             else if (TRawStr::bCompareStrI(pszVal, L"Warn"))
-            {
-                eToSet = tCIDLib::ESeverities::Warn;
-            }
-             else if (TRawStr::bCompareStrI(pszVal, L"Failed"))
-            {
-                eToSet = tCIDLib::ESeverities::Failed;
-            }
-             else if (TRawStr::bCompareStrI(pszVal, L"ProcFatal"))
-            {
-                eToSet = tCIDLib::ESeverities::ProcFatal;
-            }
-             else if (TRawStr::bCompareStrI(pszVal, L"SysFatal"))
-            {
-                eToSet = tCIDLib::ESeverities::SysFatal;
-            }
-             else
-            {
-                eToSet = tCIDLib::ESeverities::Status;
-            }
-            TFacility::eGlobalLogMode(eToSet);
-        }
-         else
-        {
-            // Wasn't a magic parameter so store it
-            s_pcolCmdLineParms->objAdd(TString(pszVal));
-        }
-    }
-
-    // Use a local buffer plenty long enough for the strings we'll load
-    tCIDLib::TCh szTmp[kCIDLib::c4MaxPathLen];
-
-    //
-    //  If there wasn't an explicit entry for the Name Server address, then
-    //  see if its in the environment.
-    //
-    if (!s_pstrNSAddr)
-    {
-        if (TKrnlEnvironment::bFind(L"CID_NSADDR", szTmp, kCIDLib::c4MaxPathLen))
-            s_pstrNSAddr = new TString(szTmp);
-        else
-            s_pstrNSAddr = new TString;
-    }
-
-    // Try to get the user name
-    if (!TKrnlSysInfo::bQueryUserName(szTmp, kCIDLib::c4MaxPathLen))
-    {
-        TKrnlPopup::Show
+        // Do all the special paths
+        tCIDLib::ForEachE<tCIDLib::ESpecialPaths>
         (
-            CID_FILE
-            , CID_LINE
-            , L"CIDLib System Info Subsystem"
-            , 0
-            , kCIDErrs::errcSysI_QueryUserName
-            , 0
-            , 0
-            , L"Could not obtain user name from system"
+            [&kstrVal](const tCIDLib::ESpecialPaths ePath)
+            {
+                if (TKrnlSysInfo::bQuerySpecialPath(kstrVal, ePath))
+                    s_apstrSpecPaths[ePath] = new TString(kstrVal);
+                else
+                    s_apstrSpecPaths[ePath] = new TString(L"Special Path Not Found");
+            }
         );
-    }
-    s_pstrUserName = new TString(szTmp);
 
-    // If the CID_MODULELOG env variable is set, then store the info
-    if (TKrnlEnvironment::bFind(L"CID_MODULELOG", szTmp, kCIDLib::c4MaxPathLen))
-    {
-        // Only do this if we didn't get anything on the command line
-        if (!s_pstrDefModuleLog)
-            s_pstrDefModuleLog = new TString(szTmp);
-    }
+        // And finally the host names, the regular and IP oriented ones
+        s_pstrOSHostName = new TString(TKrnlSysInfo::pszNodeName());
 
-    // Do all the special paths
-    tCIDLib::ForEachE<tCIDLib::ESpecialPaths>
-    (
-        [&szTmp](const tCIDLib::ESpecialPaths ePath)
+        TKrnlString kstrHost;
+        if (!TKrnlIP::bQueryLocalName(kstrHost))
         {
-            if (TKrnlSysInfo::bQuerySpecialPath(szTmp, kCIDLib::c4MaxPathLen, ePath))
-                s_apstrSpecPaths[ePath] = new TString(szTmp);
-            else
-                s_apstrSpecPaths[ePath] = new TString(L"Special Path Not Found");
+            TKrnlPopup::Show
+            (
+                CID_FILE
+                , CID_LINE
+                , L"CIDLib System Info Subsystem"
+                , 0
+                , kCIDErrs::errcSysI_QueryUserName
+                , 0
+                , 0
+                , L"Could not obtain IP host name from system"
+            );
         }
-    );
+        s_pstrIPHostName = new TString(kstrHost.pszValue());
 
-    // And finally the host names, the regular and IP oriented ones
-    s_pstrOSHostName = new TString(TKrnlSysInfo::pszNodeName());
 
-    TKrnlString kstrHost;
-    if (!TKrnlIP::bQueryLocalName(kstrHost))
-    {
-        TKrnlPopup::Show
-        (
-            CID_FILE
-            , CID_LINE
-            , L"CIDLib System Info Subsystem"
-            , 0
-            , kCIDErrs::errcSysI_QueryUserName
-            , 0
-            , 0
-            , L"Could not obtain IP host name from system"
-        );
+        // And last of all do an atomic set of the done flag
+        CIDLib_SystemInfo::atomInitDone.Set();
     }
-    s_pstrIPHostName = new TString(kstrHost.pszValue());
-
-    // Mark the init done now. MUST be done last!
-    CIDLib_SystemInfo::bInitDone = kCIDLib::True;
 }
 
 

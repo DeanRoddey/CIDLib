@@ -39,15 +39,6 @@ RTTIDecls(TFacCIDZLib,TFacility)
 
 
 // ---------------------------------------------------------------------------
-//  Local data
-// ---------------------------------------------------------------------------
-namespace CIDZLib_ThisFacility
-{
-}
-
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TFacCIDZLib
 //  PREFIX: fac
 // ---------------------------------------------------------------------------
@@ -60,7 +51,7 @@ TFacCIDZLib::TFacCIDZLib() :
     TFacility
     (
         L"CIDZLib"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision

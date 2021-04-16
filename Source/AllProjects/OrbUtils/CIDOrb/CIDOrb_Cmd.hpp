@@ -51,6 +51,7 @@ class CIDORBEXP TOrbCmd : public TOrbReply
         );
 
         TOrbCmd(const TOrbCmd&) = delete;
+        TOrbCmd(TOrbCmd&&) = delete;
 
         ~TOrbCmd();
 
@@ -59,6 +60,7 @@ class CIDORBEXP TOrbCmd : public TOrbReply
         //  Public operators
         // -------------------------------------------------------------------
         TOrbCmd& operator=(const TOrbCmd&) = delete;
+        TOrbCmd& operator=(TOrbCmd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -67,7 +69,7 @@ class CIDORBEXP TOrbCmd : public TOrbReply
         tCIDLib::TVoid Reset
         (
             const   tCIDLib::TCard4         c4Size
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -92,12 +94,12 @@ class CIDORBEXP TOrbCmd : public TOrbReply
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :

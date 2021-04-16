@@ -22,6 +22,9 @@
 //
 // CAVEATS/GOTCHAS:
 //
+//  1)  We have to use some special out of line helpers here since we are one
+//      of the first headers and some stuff isn't available to us inline.
+//
 // LOG:
 //
 //  $_CIDLib_Log_$
@@ -31,20 +34,20 @@
 // ---------------------------------------------------------------------------
 //  Forward references
 // ---------------------------------------------------------------------------
-template <class T> class TListCursor;
+template <typename T> class TListCursor;
 
 
 // ---------------------------------------------------------------------------
 //   CLASS: TList
 //  PREFIX: list
 // ---------------------------------------------------------------------------
-template <class T> class TList
+template <typename T> class TList
 {
     public :
         // -------------------------------------------------------------------
         //  Nested cursor type
         // -------------------------------------------------------------------
-        typedef class TListCursor<T>    TCursor;
+        using TCursor = TListCursor<T>;
 
 
         // -------------------------------------------------------------------
@@ -58,10 +61,18 @@ template <class T> class TList
         {
         }
 
+        TList(const TList&) = delete;
+
         ~TList()
         {
             RemoveAll();
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TList& operator=(const TList&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -148,8 +159,7 @@ template <class T> class TList
 
             if (!pnodeCur)
             {
-                stdOut  << L"Element to remove was not in the list"
-                        << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"Element to remove was not in the list");
                 throw tCIDBuild::EErrors::NotFound;
             }
 
@@ -200,13 +210,6 @@ template <class T> class TList
 
 
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TList(const TList&);
-        tCIDLib::TVoid operator=(const TList&);
-
-
-        // -------------------------------------------------------------------
         //  Private data members
         //
         //  m_eAdopt
@@ -225,7 +228,7 @@ template <class T> class TList
 };
 
 
-template <class T> class TListCursor
+template <typename T> class TListCursor
 {
     public :
         // -------------------------------------------------------------------
@@ -289,7 +292,7 @@ template <class T> class TListCursor
         {
             if (!m_pnodeCur)
             {
-                stdOut << L"List cursor is invalid" << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"List cursor is invalid");
                 throw tCIDBuild::EErrors::Internal;
             }
             return *m_pnodeCur->ptElement;
@@ -299,7 +302,7 @@ template <class T> class TListCursor
         {
             if (!m_pnodeCur)
             {
-                stdOut << L"List cursor is invalid" << kCIDBuild::EndLn;
+                tCIDBuild::LogMsg(L"List cursor is invalid");
                 throw tCIDBuild::EErrors::Internal;
             }
             return *m_pnodeCur->ptElement;

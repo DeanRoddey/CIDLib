@@ -15,7 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This file contains tests related to the fundamental vector classes.
+//  This file contains tests related to the fundamental vector class.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -50,7 +50,7 @@ TTest_FundVectorLambda::TTest_FundVectorLambda() :
 
     TTestFWTest
     (
-        L"FundVector Lambda", L"FundVector lambda callback tests", 3
+        L"FundVector Lambda", L"Fundamental vector lambda callback tests", 3
     )
 {
 }
@@ -69,7 +69,6 @@ TTest_FundVectorLambda::eRunTest(TTextStringOutStream&  strmOut
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-    // Load up a ref fector with some values
     TFundVector<tCIDLib::TCard4> fcolTest(8);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < 8; c4Index++)
         fcolTest.c4AddElement(c4Index);

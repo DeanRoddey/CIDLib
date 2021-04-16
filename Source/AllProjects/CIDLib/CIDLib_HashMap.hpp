@@ -41,7 +41,7 @@
 //  Forward reference some internal structures and classes
 // ---------------------------------------------------------------------------
 struct  THashMapList;
-template <class TElem,class TKey,class TKeyOps> class THashMap;
+template <typename TElem,class TKey,class TKeyOps> class THashMap;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -50,7 +50,7 @@ template <class TElem,class TKey,class TKeyOps> class THashMap;
 //   CLASS: THashMapNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TKey, class TValue> class THashMapNode
+template <typename TKey, class TValue> class THashMapNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -70,6 +70,14 @@ template <class TKey, class TValue> class THashMapNode
         {
         }
 
+        THashMapNode(TPair&&                            kobjData
+                    , THashMapNode<TKey,TValue>*        pnodeNext) :
+
+            m_kobjPair(tCIDLib::ForceMove(kobjData))
+            , m_pnodeNext(pnodeNext)
+        {
+        }
+
         THashMapNode(const  TKey&                       objKey
                     , const TValue&                     objValue
                     ,       THashMapNode<TKey,TValue>*  pnodeNext) :
@@ -80,6 +88,7 @@ template <class TKey, class TValue> class THashMapNode
         }
 
         THashMapNode(const THashMapNode<TKey,TValue>&) = delete;
+        THashMapNode(THashMapNode<TKey,TValue>&&) = delete;
 
         ~THashMapNode() {}
 
@@ -88,6 +97,7 @@ template <class TKey, class TValue> class THashMapNode
         //  Public operators
         // -------------------------------------------------------------------
         THashMapNode<TKey,TValue>& operator=(const THashMapNode<TKey,TValue>&) = delete;
+        THashMapNode<TKey,TValue>& operator=(THashMapNode<TKey,TValue>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -105,7 +115,7 @@ template <class TKey, class TValue> class THashMapNode
 
         TPair& kobjPair(const TPair& kobjToSet)
         {
-            m_kobjPair = objToSet;
+            m_kobjPair = kobjToSet;
             return m_kobjPair;
         }
 
@@ -140,8 +150,7 @@ template <class TKey, class TValue> class THashMapNode
             return m_pnodeNext;
         }
 
-        THashMapNode<TKey,TValue>*
-        pnodeNext(THashMapNode<TKey,TValue>* const pnodeToSet)
+        THashMapNode<TKey,TValue>* pnodeNext(THashMapNode<TKey,TValue>* const pnodeToSet)
         {
             m_pnodeNext = pnodeToSet;
             return m_pnodeNext;
@@ -169,7 +178,7 @@ template <class TKey, class TValue> class THashMapNode
 //   CLASS: THashMap
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey, class TKeyOps> class THashMap
+template <typename TElem, class TKey, class TKeyOps> class THashMap
 
     : public TMapCollection<TElem, TKey>
 {
@@ -179,19 +188,13 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         static const TClass& clsThis()
         {
-            static const TClass* pclsThis = nullptr;
-            if (!pclsThis)
-            {
-                TBaseLock lockInit;
-                if (!pclsThis)
-                    pclsThis = new TClass(L"THashMap<TElem,TKey,TKeyOps>");
-            }
-            return *pclsThis;
+            static const TClass clsRet(L"THashMap<TElem,TKey,TKeyOps>");
+            return clsRet;
         }
 
 
         // -------------------------------------------------------------------
-        //  Nested aliases s for the node and key ops types used by a keyed
+        //  Nested aliases for the node and key ops types used by a keyed
         //  hash map.
         // -------------------------------------------------------------------
         using TMyElemType = TElem;
@@ -203,7 +206,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem, class TKey, class TKeyOps> class TConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TConstCursor :
 
             public TBiColCursor<TPair>
         {
@@ -250,10 +253,16 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     m_pnodeCur = m_pcolCursoring->pnodeFindFirst(m_hshCurBucket);
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor() {}
@@ -266,15 +275,23 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_hshCurBucket = cursSrc.m_hshCurBucket;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pnodeCur = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_hshCurBucket, cursSrc.m_hshCurBucket);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -329,7 +346,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -341,7 +358,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -353,7 +370,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur = m_pcolCursoring->pnodeFindFirst(m_hshCurBucket);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     return (m_pnodeCur != nullptr);
@@ -363,7 +380,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur = m_pcolCursoring->pnodeFindLast(m_hshCurBucket);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     return (m_pnodeCur != nullptr);
@@ -383,7 +400,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->objPair();
@@ -398,7 +415,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_hshCurBucket;
@@ -409,7 +426,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -419,7 +436,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     return m_pnodeCur;
                 }
@@ -456,7 +473,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         };
 
 
-        template <class TElem, class TKey, class TKeyOps> class TNonConstCursor :
+        template <typename TElem, class TKey, class TKeyOps> class TNonConstCursor :
 
             public TConstCursor<TElem, TKey, TKeyOps>
         {
@@ -498,10 +515,16 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TNonConstCursor() {}
@@ -514,11 +537,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
 
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
@@ -526,9 +545,19 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     return *this;
                 }
 
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
+
                 TMyType::TPair& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TMyType::TPair&>(this->pnodeCur()->objPair());
@@ -536,7 +565,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
                 TMyType::TPair* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return &const_cast<TMyType::TPair&>(this->pnodeCur()->objPair());
@@ -583,7 +612,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection and check the serial number
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TMyType::TPair&>(this->pnodeCur()->objPair());
@@ -624,6 +653,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             , m_c4HashModulus(c4Modulus)
             , m_kopsToUse(kopsToUse)
         {
+            CIDAssert(c4Modulus != 0, L"The hash modulus cannot be zero")
             try
             {
                 // Allocate and initialize the bucket array
@@ -631,7 +661,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * c4Modulus
                 );
             }
@@ -658,12 +688,12 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
 
                 // Lock the source, so it won't change during this operation
-                TMtxLocker lockToDup(colSrc.pmtxLock());
+                TLocker lockrToDup(&colSrc);
 
                 // If there are any source nodes, then replicate them
                 if (colSrc.c4ElemCount())
@@ -678,6 +708,20 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 delete [] m_apBuckets;
                 throw;
             }
+        }
+
+        // Do a minimial setup and then call the move operator
+        THashMap(TMyType&& colSrc) :
+
+            TMapCollection<TElem, TKey>(colSrc.eMTSafe())
+            , m_apBuckets(nullptr)
+            , m_c4CurElements(0)
+            , m_c4HashModulus(3)
+            , m_kopsToUse(colSrc.m_kopsToUse)
+        {
+            m_apBuckets = new TNode*[m_c4HashModulus];
+            TRawMem::SetMemBuf(m_apBuckets, kCIDLib::c1MinCard, sizeof(tCIDLib::TVoid*) * m_c4HashModulus);
+            *this = tCIDLib::ForceMove(colSrc);
         }
 
         ~THashMap()
@@ -697,8 +741,8 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         {
             if (this != &colSrc)
             {
-                TMtxLocker lockUs(this->pmtxLock());
-                TMtxLocker lockSrc(colSrc.pmtxLock());
+                TLocker lockrUs(this);
+                TLocker lockrSrc(&colSrc);
 
                 // Call our parent first
                 TMapCollection<TElem,TKey>::operator=(colSrc);
@@ -715,7 +759,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                     TRawMem::SetMemBuf
                     (
                         m_apBuckets
-                        , tCIDLib::TCard1(0)
+                        , kCIDLib::c1MinCard
                         , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                     );
                 }
@@ -730,6 +774,32 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
                 // Invalidate any cursors
                 this->c4IncSerialNum();
+            }
+            return *this;
+        }
+
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TMapCollection<TElem,TKey>::operator=(tCIDLib::ForceMove(colSrc));
+
+                //
+                //  We swap the element content. This has to include the modulus
+                //  and key ops since they affect the buckets and which elements
+                //  are in which.
+                //
+                tCIDLib::Swap(m_apBuckets, colSrc.m_apBuckets);
+                tCIDLib::Swap(m_c4CurElements, colSrc.m_c4CurElements);
+                tCIDLib::Swap(m_c4HashModulus, colSrc.m_c4HashModulus);
+                tCIDLib::Swap(m_kopsToUse, colSrc.m_kopsToUse);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
             }
             return *this;
         }
@@ -757,15 +827,15 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return TMapCollection<TElem,TKey>::bIsDescendantOf(clsTarget);
         }
 
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             return (m_c4CurElements == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
              return m_c4CurElements;
         }
 
@@ -779,9 +849,9 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return TMapCollection<TElem,TKey>::clsThis();
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             if (!m_c4CurElements)
                 return;
 
@@ -808,9 +878,9 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
              m_c4CurElements = 0;
         }
 
-        TPair& objAdd(const TPair& kobjToAdd) override
+        TPair& objAdd(const TPair& kobjToAdd) final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if this element is already in the collection
             tCIDLib::THashVal hshKey;
@@ -820,29 +890,23 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             if (pnodeCheck)
                 this->DuplicateKey(kobjToAdd.objKey(), CID_FILE, CID_LINE);
 
-            //  Add it to the appropriate bucket. We just put it at the head
-            //  since the order does not matter. We just construct the
-            //  node and pass it the current head, which it will make its
-            //  next node.
-            //
+            // Add this guy at the head of his bucket
             m_apBuckets[hshKey] = new TNode(kobjToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
 
             // Bump the serial number to invalidate cursors
             this->c4IncSerialNum();
 
-            // Bump up the element count
-            m_c4CurElements++;
-
             return m_apBuckets[hshKey]->objPair();
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             return new TCursor(this);
         }
 
-        TObject* pobjDuplicate() const override
+        [[nodiscard]] TObject* pobjDuplicate() const final
         {
             return new TMyType(*this);
         }
@@ -853,7 +917,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bFindByKey(const TKey& keyToFind, TElem& objToFill) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshKey;
@@ -868,7 +932,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         tCIDLib::TBoolean bKeyExists(const TKey& keyToFind) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshKey;
@@ -879,7 +943,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         tCIDLib::TBoolean bRemoveIfExists(const TKey& objKeyToRemove)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // Get the hash of the element
             const tCIDLib::THashVal hshKey = m_kopsToUse.hshKey
@@ -916,30 +980,56 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
                 // So we can now toast the found node and reduce the element count
                 delete pnodeToRem;
+                pnodeToRem = nullptr;
                 m_c4CurElements--;
+
+                // And return that we found it and remove it
+                return kCIDLib::True;
             }
 
-            // Return a boolean to indicate whether we removed it or not
-            return (pnodeToRem != nullptr);
+            // We never removed it
+            return kCIDLib::False;
         }
 
         tCIDLib::TCard4 c4HashModulus() const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
             return m_c4HashModulus;
         }
 
 
+        //
+        //  Add object/key separately, which is more efficient than creating
+        //  the pair and then copying it in. A number of other methods call
+        //  this so it's worth some duplication relative to objAdd.
+        //
         TPair& kobjAdd(const TKey& objKey, const TElem& objToAdd)
         {
-            return objAdd(TPair(objKey, objToAdd));
+            TLocker lockrSync(this);
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshKey;
+            TNode* pnodeCheck = pnodeFind(objKey, hshKey);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(objKey, CID_FILE, CID_LINE);
+
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjAddIfNew(const   TKey&               objKey
                             , const TElem&              objToAdd
                             ,       tCIDLib::TBoolean&  bAdded)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshKey;
@@ -951,15 +1041,22 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeRet->objPair();
             }
 
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
             bAdded = kCIDLib::True;
-            return kobjAdd(objKey, objToAdd);
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjAddOrUpdate( const   TKey&               objKey
                                 , const TElem&              objToAdd
                                 ,       tCIDLib::TBoolean&  bAdded)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if the element exists
             tCIDLib::THashVal hshKey;
@@ -972,13 +1069,20 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeCheck->objPair();
             }
 
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(objKey, objToAdd, m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
             bAdded = kCIDLib::True;
-            return kobjAdd(objKey, objToAdd);
+            return m_apBuckets[hshKey]->objPair();
         }
 
         TPair& kobjFindByKey(const TKey& objKeyToFind)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -993,7 +1097,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         const TPair& kobjFindByKey(const TKey& objKeyToFind) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1010,7 +1114,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                             , const TElem&              objToFindOrAdd
                             ,       tCIDLib::TBoolean&  bAdded)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKey, hshKey);
@@ -1029,19 +1133,40 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 //
                 pnodeRet = new TNode(objKey, objToFindOrAdd, m_apBuckets[hshKey]);
                 m_apBuckets[hshKey] = pnodeRet;
+                m_c4CurElements++;
 
                 // Bump the serial number to invalidate cursors
                 this->c4IncSerialNum();
-
-                // Bump up the element count
-                m_c4CurElements++;
             }
             return pnodeRet->objPair();
         }
 
+        template <typename T = TPair> T& objAddMove(T&& kobjToAdd)
+        {
+            TLocker lockrSync(this);
+
+            // See if this element is already in the collection
+            tCIDLib::THashVal hshKey;
+            TNode* pnodeCheck = pnodeFind(kobjToAdd.objKey(), hshKey);
+
+            // If so, we cannot allow it
+            if (pnodeCheck)
+                this->DuplicateKey(kobjToAdd.objKey(), CID_FILE, CID_LINE);
+
+            // Add this guy at the head of his bucket
+            m_apBuckets[hshKey] = new TNode(tCIDLib::ForceMove(kobjToAdd), m_apBuckets[hshKey]);
+            m_c4CurElements++;
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            return m_apBuckets[hshKey]->objPair();
+        }
+
+
         const TPair* pkobjFindByKey(const TKey& objKeyToFind) const
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1056,7 +1181,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         TPair* pkobjFindByKey(const TKey& objKeyToFind)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             tCIDLib::THashVal hshKey;
             TNode* pnodeRet = pnodeFind(objKeyToFind, hshKey);
@@ -1071,7 +1196,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -1080,6 +1205,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
             // Get the node to flush
             TNode* pnodeToRemove = cursAt.pnodeCur();
+            CIDAssert(pnodeToRemove != nullptr, L"The node to remove is null");
 
             //
             //  We have to get the bucket for the current element and find the
@@ -1118,16 +1244,16 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 this->KeyNotFound(CID_FILE, CID_LINE);
         }
 
-        tCIDLib::TVoid Set( const   tCIDLib::EMTStates  eToSet
+        tCIDLib::TVoid Reset(const  tCIDLib::EMTStates  eMTSafe
                             , const tCIDLib::TCard4     c4HashModulus)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // First we have to remove all elements from the collection
             RemoveAll();
 
-            // Call our parent to set the thread safety state
-            this->eMTState(eToSet);
+            // Set the thread safe state
+            this->SetMTState(eMTSafe);
 
             // If the hash modulus changed we have to re-do our buckets
             if (c4HashModulus != m_c4HashModulus)
@@ -1138,7 +1264,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 TRawMem::SetMemBuf
                 (
                     m_apBuckets
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(tCIDLib::TVoid*) * m_c4HashModulus
                 );
             }
@@ -1146,7 +1272,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 
         tCIDLib::TVoid Update(const TKey& objKey, const TElem& objNewValue)
         {
-            TMtxLocker lockSync(this->pmtxLock());
+            TLocker lockrSync(this);
 
             // See if this element is in the collection
             tCIDLib::THashVal hshKey;
@@ -1189,13 +1315,14 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
         {
             // Start at the last bucket and work back
             tCIDLib::TCard4 c4BucketInd = m_c4HashModulus - 1;
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we find a non-empty bucket, find its last node
                 if (m_apBuckets[c4BucketInd])
                 {
                     TNode* pnodeCur = m_apBuckets[c4BucketInd];
+                    CIDAssert(pnodeCur != nullptr, L"The current node is null");
                     while (pnodeCur->pnodeNext())
                         pnodeCur = pnodeCur->pnodeNext();
                     hshToUpdate = c4BucketInd;
@@ -1210,15 +1337,18 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return nullptr;
         }
 
-        TNode* pnodeFindNext(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
+        CIDLib_Suppress(26461) // Can't make last node const
+        TNode* pnodeFindNext(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
+            CIDAssert(pnodeLast != nullptr, L"Last node parameter is null");
+
             // Move up to the next node
             TNode* pnodeCur = pnodeLast->pnodeNext();
             if (pnodeCur)
                 return pnodeCur;
 
             // Search subsequent bucket for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the end of buckets, then we are done
@@ -1233,7 +1363,8 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
             return nullptr;
         }
 
-        TNode* pnodeFindPrevious(TNode* pnodeLast, tCIDLib::THashVal& hshToUpdate) const
+        CIDLib_Suppress(26461) // Can't make last node const
+        TNode* pnodeFindPrevious(TNode* const pnodeLast, tCIDLib::THashVal& hshToUpdate) const
         {
             //
             //  Move back to the previous node. If its a legal node, then we
@@ -1244,7 +1375,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 return pnodeCur;
 
             // Search previous buckets for non-empty one
-            tCIDLib::TBoolean bDone = kCIDLib::False;
+            constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
             {
                 // If we hit the start of buckets, then we are done
@@ -1342,7 +1473,7 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
                 while (pnodeSrc)
                 {
                     // Replicate this bucket's nodes
-                    pnodeCur = new TNode(pnodeSrc->objPair(), 0);
+                    pnodeCur = new TNode(pnodeSrc->objPair(), nullptr);
 
                     //
                     //  Set last node's next to this one, if there was a
@@ -1399,12 +1530,12 @@ template <class TElem, class TKey, class TKeyOps> class THashMap
 //  operator for those folks who want to use it. This means that collections
 //  cannot be streamed polymorphically via the base classes.
 //
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                             , const THashMap<TElem, TKey, TKeyOps>& colToStream)
 {
     // Don't let it change during this
-    TMtxLocker lockThis(colToStream.pmtxLock());
+    TLocker lockrThis(&colToStream);
 
     //
     //  Stream out a leading stream marker, then the element counts, the
@@ -1418,11 +1549,11 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
                 <<  c4Count
                 <<  tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard)
                 <<  tCIDLib::TCard4(0)
-                <<  colToStream.eMTState()
+                <<  colToStream.eMTSafe()
                 <<  colToStream.c4HashModulus();
 
     // If there were any elements, then stream them
-    THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
+    typename THashMap<TElem, TKey, TKeyOps>::TCursor cursOut(&colToStream);
     while (cursOut.bIsValid())
     {
         const THashMap<TElem, TKey, TKeyOps>::TPair& kobjCur = cursOut.objRCur();
@@ -1435,7 +1566,7 @@ TBinOutStream& operator<<(          TBinOutStream&                  strmOut
 
 
 // We cannot lock the collection, since we might delete the mutex!
-template <class TElem, class TKey, class TKeyOps>
+template <typename TElem, class TKey, class TKeyOps>
 TBinInStream& operator>>(TBinInStream&                      strmIn
                         , THashMap<TElem, TKey, TKeyOps>& colToStream)
 {
@@ -1450,8 +1581,8 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
     tCIDLib::TCard4     c4XORCount;
     tCIDLib::TCard4     c4HashModulus;
     tCIDLib::TCard4     c4OldMax;
-    tCIDLib::EMTStates  eMTState;
-    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTState >> c4HashModulus;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn >> c4Count >> c4XORCount >> c4OldMax >> eMTSafe >> c4HashModulus;
 
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
@@ -1460,7 +1591,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
     //  Set these new attributes on the collection, except for the current
     //  count, which will get set implicitly by our loading the stored elements.
     //
-    colToStream.Set(eMTState, c4HashModulus);
+    colToStream.Reset(eMTSafe, c4HashModulus);
 
     // If there were any elements, then stream them in
     if (c4Count)
@@ -1471,10 +1602,7 @@ TBinInStream& operator>>(TBinInStream&                      strmIn
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             strmIn >> objKey >> objValue;
-            colToStream.objAdd
-            (
-                THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue)
-            );
+            colToStream.objAdd(typename THashMap<TElem, TKey, TKeyOps>::TPair(objKey, objValue));
         }
     }
 

@@ -41,22 +41,20 @@ class CIDAUDSTREAMEXP TFacCIDAudStream : public TFacility
         // -------------------------------------------------------------------
         TFacCIDAudStream();
 
+        TFacCIDAudStream(const TFacCIDAudStream&) = delete;
+        TFacCIDAudStream(TFacCIDAudStream&&) = delete;
+
         ~TFacCIDAudStream();
 
 
         // -------------------------------------------------------------------
-        //  Public, non-virtual methods
+        //  Public operators
         // -------------------------------------------------------------------
-
+        TFacCIDAudStream& operator=(const TFacCIDAudStream&) = delete;
+        TFacCIDAudStream& operator=(TFacCIDAudStream&&) = delete;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Private data members
-
-        // -------------------------------------------------------------------
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

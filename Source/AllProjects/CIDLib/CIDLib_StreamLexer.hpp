@@ -67,6 +67,7 @@ class CIDLIBEXP TStreamLexer : public TObject
         );
 
         TStreamLexer(const TStreamLexer&) = delete;
+        TStreamLexer(TStreamLexer&&) = delete;
 
         ~TStreamLexer();
 
@@ -75,6 +76,7 @@ class CIDLIBEXP TStreamLexer : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TStreamLexer& operator=(const TStreamLexer&) = delete;
+        TStreamLexer& operator=(TStreamLexer&&) = delete;
 
 
         // -------------------------------------------------------------------

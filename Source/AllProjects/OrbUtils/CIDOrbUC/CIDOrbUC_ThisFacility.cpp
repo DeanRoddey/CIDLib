@@ -50,13 +50,12 @@ TFacCIDOrbUC::TFacCIDOrbUC() :
     TFacility
     (
         L"CIDOrbUC"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::HasMsgFile
     )
-    , m_bInitialized(kCIDLib::False)
     , m_c8LastNSCookie(0)
     , m_enctLastNSCheck(0)
     , m_ippnNS(0)
@@ -96,7 +95,7 @@ TFacCIDOrbUC::~TFacCIDOrbUC()
         if (facCIDOrbUC().bShouldLog(errToCatch))
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -346,6 +345,7 @@ TFacCIDOrbUC::bNSScopeExists(tCIDOrbUC::TNSrvProxy& orbcNS, const TString& strTo
     return bRet;
 }
 
+
 tCIDLib::TIPPortNum TFacCIDOrbUC::ippnNS() const
 {
     return m_ippnNS;
@@ -363,7 +363,8 @@ tCIDLib::TVoid TFacCIDOrbUC::IncFailedRebinds()
 //  This will initialize the client side support that is required to
 //  access the name server, which almost any ORB based client will need
 //  to do. If this isn't called explicitly, then it will be called the
-//  first time the client tries to create a name server client proxy.
+//  first time the client tries to create a name server client proxy, so we
+//  have to be atomic.
 //
 tCIDLib::TVoid TFacCIDOrbUC::Initialize()
 {
@@ -372,93 +373,93 @@ tCIDLib::TVoid TFacCIDOrbUC::Initialize()
     //  If still not initialized, then we are the guy, so do it.
     //
     TBaseLock lockInit;
-    if (m_bInitialized)
-        return;
-
-    //
-    //  The name server end point address can be set via the
-    //  CID_NSADDR environment var or /NSAddr= parameter. This
-    //  info is handled for us automatically by the TSysInfo class,
-    //  which checks for these and removes the /NSAddr parameter
-    //  after processing it.
-    //
-    TString strNSAddr = TSysInfo::strNSAddr();
-    m_strNSHost.Clear();
-    m_ippnNS = kCIDOrbUC::ippnNameSrvDefPort;
-
-    try
+    if (!m_atomInitDone)
     {
         //
-        //  If it's not been set, assume the local host and default
-        //  port. If it has, then parse that info out and store it.
+        //  The name server end point address can be set via the
+        //  CID_NSADDR environment var or /NSAddr= parameter. This
+        //  info is handled for us automatically by the TSysInfo class,
+        //  which checks for these and removes the /NSAddr parameter
+        //  after processing it.
         //
-        if (strNSAddr.bIsEmpty())
+        TString strNSAddr = TSysInfo::strNSAddr();
+        m_strNSHost.Clear();
+        m_ippnNS = kCIDOrbUC::ippnNameSrvDefPort;
+
+        try
         {
-            m_strNSHost = facCIDSock().strIPHostName();
+            //
+            //  If it's not been set, assume the local host and default
+            //  port. If it has, then parse that info out and store it.
+            //
+            if (strNSAddr.bIsEmpty())
+            {
+                m_strNSHost = facCIDSock().strIPHostName();
+            }
+            else
+            {
+                // Break it into host/port if both were provided
+                tCIDLib::TCard4 c4Ofs;
+                if (!strNSAddr.bLastOccurrence(kCIDLib::chColon, c4Ofs))
+                {
+                    //
+                    //  No colon, so no port, use the default port and
+                    //  take the host as is.
+                    //
+                    m_strNSHost = strNSAddr;
+                }
+                else if (c4Ofs == strNSAddr.c4Length() - 1)
+                {
+                    //
+                    //  There's a colon, but it's the last character. Use
+                    //  the default port, and remove the colon.
+                    //
+                    m_strNSHost = strNSAddr;
+                    m_strNSHost.DeleteLast();
+                }
+                else
+                {
+                    // There's a port so break them out
+                    m_strNSHost = strNSAddr;
+                    m_strNSHost.bSplit(strNSAddr, kCIDLib::chColon);
+                    m_ippnNS = strNSAddr.c4Val();
+                }
+            }
         }
-         else
+
+        catch(TError& errToCatch)
         {
-            // Break it into host/port if both were provided
-            tCIDLib::TCard4 c4Ofs;
-            if (!strNSAddr.bLastOccurrence(kCIDLib::chColon, c4Ofs))
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            LogEventObj(errToCatch);
+
+            if (strNSAddr.bIsEmpty())
             {
-                //
-                //  No colon, so no port, use the default port and
-                //  take the host as is.
-                //
-                m_strNSHost = strNSAddr;
+                facCIDOrbUC().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kOrbUCErrs::errcNS_CantSetLocalNS
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::Format
+                );
             }
-             else if (c4Ofs == strNSAddr.c4Length() - 1)
+            else
             {
-                //
-                //  There's a colon, but it's the last character. Use
-                //  the default port, and remove the colon.
-                //
-                m_strNSHost = strNSAddr;
-                m_strNSHost.DeleteLast();
-            }
-             else
-            {
-                // There's a port so break them out
-                m_strNSHost = strNSAddr;
-                m_strNSHost.bSplit(strNSAddr, kCIDLib::chColon);
-                m_ippnNS = strNSAddr.c4Val();
+                facCIDOrbUC().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kOrbUCErrs::errcNS_BadNSEndPoint
+                    , tCIDLib::ESeverities::Failed
+                    , tCIDLib::EErrClasses::Format
+                    , strNSAddr
+                );
             }
         }
+
+        // Ok we can mark us initialized now
+        m_atomInitDone.Set();
     }
-
-    catch(TError& errToCatch)
-    {
-        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-        LogEventObj(errToCatch);
-
-        if (strNSAddr.bIsEmpty())
-        {
-            facCIDOrbUC().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kOrbUCErrs::errcNS_CantSetLocalNS
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::Format
-            );
-        }
-         else
-        {
-            facCIDOrbUC().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kOrbUCErrs::errcNS_BadNSEndPoint
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::Format
-                , strNSAddr
-            );
-        }
-    }
-
-    // Ok we can mark us initialized now
-    m_bInitialized = kCIDLib::True;
 }
 
 
@@ -587,7 +588,7 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
     //  If the NS end point hasn't been set explicitly by the client app
     //  (not usually done), or faulted in yet, we need to fault it in.
     //
-    if (!m_bInitialized)
+    if (!m_atomInitDone)
         Initialize();
 
     //
@@ -610,7 +611,7 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
             if (facCIDOrbUC().bLogInfo() && !errToCatch.bLogged())
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                TModule::LogEventObj(errToCatch);
+                TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
             }
 
             // It failed, so flush this guy from the cache
@@ -627,14 +628,21 @@ TFacCIDOrbUC::porbcMakeNSProxy(const tCIDLib::TCard4 c4WaitUpTo)
     //  Not available in the cache or bad, so let's create the special
     //  object id for the name server.
     //
-    ooidServer = TOrbObjId
-    (
-        TCIDNameSrvClientProxy::strInterfaceId
-        , kCIDOrbUC::pszNSInstanceId
-        , m_strNSHost
-        , m_ippnNS
-        , L"TCIDNameSrvClientProxy"
-    );
+    //  NOTE: Have to create a temp and then assign it, or the compiler
+    //  will insist on using a move operator even though there's an
+    //  assignment operator available!
+    //
+    {
+        TOrbObjId ooidTmp
+        (
+            TCIDNameSrvClientProxy::strInterfaceId
+            , kCIDOrbUC::pszNSInstanceId
+            , m_strNSHost
+            , m_ippnNS
+            , L"TCIDNameSrvClientProxy"
+        );
+        ooidServer = ooidTmp;
+    }
 
     //
     //  Calc the end time where we'll give up trying to connect. If they
@@ -808,14 +816,14 @@ TFacCIDOrbUC::SetNSEndPoint(const   TString&            strHost
     //  initialized. This will prevent any subsequent faulting in above
     //  in the name server proxy creation method.
     //
-    if (!m_bInitialized)
+    if (!m_atomInitDone)
     {
         TBaseLock lockInit;
-        if (!m_bInitialized)
+        if (!m_atomInitDone)
         {
             m_strNSHost = strHost;
             m_ippnNS = ippnPort;
-            m_bInitialized = kCIDLib::True;
+            m_atomInitDone.Set();
         }
         return;
     }
@@ -829,7 +837,7 @@ TFacCIDOrbUC::SetNSEndPoint(const   TString&            strHost
 // Checks that the passed name server scope is basically well formed
 tCIDLib::TVoid TFacCIDOrbUC::ValidateNSScopePath(const TString& strToVal)
 {
-    tCIDLib::TCard4 c4Ofs;
+    tCIDLib::TCard4 c4Ofs = 0;
     if (strToVal.bIsEmpty()
     || (strToVal.chLast() == kCIDLib::chForwardSlash)
     || !strToVal.bLastOccurrence(kCIDLib::chForwardSlash, c4Ofs)

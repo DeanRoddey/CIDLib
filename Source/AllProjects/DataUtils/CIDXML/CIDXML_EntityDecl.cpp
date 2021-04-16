@@ -234,33 +234,3 @@ TXMLEntityDecl::TXMLEntityDecl( const   tCIDLib::TCh* const pszEntityName
 {
 }
 
-TXMLEntityDecl::TXMLEntityDecl(const TXMLEntityDecl& xdeclToCopy) :
-
-    m_bSpecial(kCIDLib::False)
-    , m_c4Id(xdeclToCopy.m_c4Id)
-    , m_c4ValueLen(xdeclToCopy.m_c4ValueLen)
-    , m_strName(xdeclToCopy.m_strName)
-    , m_strValue(xdeclToCopy.m_strValue)
-    , m_strNotationName(xdeclToCopy.m_strNotationName)
-    , m_strPublicId(xdeclToCopy.m_strPublicId)
-    , m_strSystemId(xdeclToCopy.m_strSystemId)
-{
-}
-
-TXMLEntityDecl& TXMLEntityDecl::operator=(const TXMLEntityDecl& xdeclToAssign)
-{
-    if (this == &xdeclToAssign)
-        return *this;
-
-    m_bSpecial          = xdeclToAssign.m_bSpecial;
-    m_c4Id              = xdeclToAssign.m_c4Id;
-    m_c4ValueLen        = xdeclToAssign.m_c4ValueLen;
-    m_strName           = xdeclToAssign.m_strName;
-    m_strValue          = xdeclToAssign.m_strValue;
-    m_strNotationName   = xdeclToAssign.m_strNotationName;
-    m_strPublicId       = xdeclToAssign.m_strPublicId;
-    m_strSystemId       = xdeclToAssign.m_strSystemId;
-
-    return *this;
-}
-

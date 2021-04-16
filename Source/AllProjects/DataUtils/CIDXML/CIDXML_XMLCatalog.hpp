@@ -88,16 +88,14 @@ class CIDXMLEXP TXMLCatalog : public TObject
         //  Hidden Constructors and operators
         // -------------------------------------------------------------------
         TXMLCatalog();
+        TXMLCatalog(const TXMLCatalog&) = default;
+        TXMLCatalog(TXMLCatalog&&) = default;
+
+        TXMLCatalog& operator=(const TXMLCatalog&) = default;
+        TXMLCatalog& operator=(TXMLCatalog&&) = default;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TXMLCatalog(const TXMLCatalog&);
-        TXMLCatalog& operator=(const TXMLCatalog&);
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

@@ -47,7 +47,7 @@
 // ---------------------------------------------------------------------------
 //  Forward reference the queue and queue cursor classes
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueue;
+template <typename TElem> class TQueue;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -56,7 +56,7 @@ template <class TElem> class TQueue;
 //   CLASS: TQueueNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueueNode : public TDLstNode
+template <typename TElem> class TQueueNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -65,24 +65,44 @@ template <class TElem> class TQueueNode : public TDLstNode
         TQueueNode() = delete;
 
         TQueueNode( const   TElem&              objData
-                    ,       tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
+                    , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
 
             m_ePriority(ePriority)
             , m_objData(objData)
         {
         }
 
-        TQueueNode(const TQueueNode<TElem>&) = delete;
+        TQueueNode(         TElem&&             objData
+                    , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0) :
 
-        ~TQueueNode()
+            m_ePriority(ePriority)
+            , m_objData(tCIDLib::ForceMove(objData))
         {
         }
+
+        //
+        //  A special one for in place elements. We can't figure out the next
+        //  node until after this object is built and the element constructed.
+        //
+        template <typename... TArgs>
+        TQueueNode(const tCIDLib::EQPrios ePriority, TArgs&&... Args) :
+
+            m_ePriority(ePriority)
+            , m_objData(tCIDLib::Forward<TArgs>(Args)...)
+        {
+        }
+
+        TQueueNode(const TQueueNode<TElem>&) = delete;
+        TQueueNode(TQueueNode<TElem>&&) = delete;
+
+        ~TQueueNode() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TQueueNode<TElem>& operator=(const TQueueNode<TElem>&) = delete;
+        TQueueNode<TElem>& operator=(TQueueNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -130,7 +150,7 @@ template <class TElem> class TQueueNode : public TDLstNode
 //   CLASS: TQueue
 //  PREFIX: que
 // ---------------------------------------------------------------------------
-template <class TElem> class TQueue : public TCollection<TElem>
+template <typename TElem> class TQueue : public TCollection<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -144,7 +164,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Our nested cursor classes
         // -------------------------------------------------------------------
-        template <class TElem> class TConstCursor : public TBiColCursor<TElem>
+        template <typename TElem> class TConstCursor : public TBiColCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -158,6 +178,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 {
                 }
 
+                CIDLib_Suppress(26429) // The base class will check for null
                 explicit TConstCursor(const TMyType* const pcolToCursor) :
 
                     TParent(pcolToCursor)
@@ -171,10 +192,16 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     );
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor()
@@ -189,16 +216,23 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
                         m_pllstCursoring = cursSrc.m_pllstCursoring;
                         m_pnodeCur = cursSrc.m_pnodeCur;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
+                        tCIDLib::Swap(m_pllstCursoring, cursSrc.m_pllstCursoring);
+                        tCIDLib::Swap(m_pnodeCur, cursSrc.m_pnodeCur);
                     }
                     return *this;
                 }
@@ -232,18 +266,18 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -251,11 +285,11 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (!m_pnodeCur)
                         return kCIDLib::False;
@@ -266,11 +300,11 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     m_pnodeCur = static_cast<TQueueNode<TElem>*>
                     (
@@ -279,11 +313,11 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     m_pnodeCur = static_cast<TQueueNode<TElem>*>
                     (
                         m_pllstCursoring->pnodeHead()
@@ -292,11 +326,11 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     return (m_pnodeCur != nullptr);
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(m_pnodeCur, CID_FILE, CID_LINE);
                     return m_pnodeCur->objData();
@@ -357,7 +391,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         };
 
 
-        template <class TElem> class TNonConstCursor : public TConstCursor<TElem>
+        template <typename TElem> class TNonConstCursor : public TConstCursor<TElem>
         {
             public  :
                 // -----------------------------------------------------------
@@ -376,11 +410,20 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
+
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                // Can't actually delete it since that causes problems
+                // TNonConstCursor(TNonConstCursor&&) = delete;
 
                 ~TNonConstCursor()
                 {
@@ -394,20 +437,26 @@ template <class TElem> class TQueue : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
                     return *this;
                 }
 
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (&cursSrc != this)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
+
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -415,7 +464,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return &const_cast<TElem&>(this->pnodeCur()->objData());
@@ -443,7 +492,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
                     // Lock the collection
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return const_cast<TElem&>(this->pnodeCur()->objData());
@@ -494,7 +543,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
             TCollection<TElem>(colSrc)
         {
             // Lock the source collection so it won't change during this
-            TMtxLocker lockSrc(colSrc.pmtxLock());
+            TLocker lockrSrc(&colSrc);
 
             // And copy any source info now that it's locked
             if (colSrc.c4ElemCount())
@@ -504,6 +553,8 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     m_llstQueue.AppendNode(new TNode(cursSrc.objRCur()));
             }
         }
+
+        TQueue(TMyType&&) = delete;
 
         ~TQueue() {}
 
@@ -517,8 +568,8 @@ template <class TElem> class TQueue : public TCollection<TElem>
             if (this == &colSrc)
                 return *this;
 
-            TMtxLocker lockUs(this->pmtxLock());
-            TMtxLocker lockSrc(colSrc.pmtxLock());
+            TLocker lockrUs(this);
+            TLocker lockrSrc(&colSrc);
 
             // Call our parent first
             TParent::operator=(colSrc);
@@ -551,39 +602,41 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return *this;
         }
 
+        TMyType& operator=(TMyType&& colSrc) = delete;
+
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return m_llstQueue.bIsEmpty();
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return m_llstQueue.c4ElemCount();
         }
 
-        TElem& objAdd(const TElem& objNew) override
+        TElem& objAdd(const TElem& objNew) final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             TElem& objRet = objPut(objNew);
             this->c4IncSerialNum();
             return objRet;
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
             if (m_llstQueue.bIsEmpty())
                 return;
             m_llstQueue.RemoveAll();
@@ -592,7 +645,6 @@ template <class TElem> class TQueue : public TCollection<TElem>
             // Wake up all threads waiting for space
             m_twlWaiters.bReleaseAll(kCIDLib::c4TWLReason_WaitSpace);
         }
-
 
 
         // -------------------------------------------------------------------
@@ -611,7 +663,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     ,       TCompFunc           pfnComp
                     , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             //
             //  See if this element is already in the queue. If so, update
@@ -641,7 +693,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                             ,       TCompFunc           pnfComp
                             , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             //
             //  Get the tail node, if any. If there is one, and it matches
@@ -661,21 +713,38 @@ template <class TElem> class TQueue : public TCollection<TElem>
         }
 
 
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
+        {
+            TLocker lockrThis(this);
+            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
+            (
+                m_llstQueue.pnodeHead()
+            );
+            while (pnodeCur)
+            {
+                if (!iterCB(pnodeCur->objData()))
+                    return kCIDLib::False;
+                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
+            }
+            return kCIDLib::True;
+        }
+
+
         //
-        //  Get the next available object, waiting up to the indicated
-        //  amount of time for it to show up.
+        //  Get the next available object, waiting up to the indicated amount of time
+        //  for it to show up. We have one that copies and one that moves out.
         //
         tCIDLib::TBoolean bGetNext(         TElem&              objToFill
                                     , const tCIDLib::TCard4     c4Millis = kCIDLib::c4MaxWait
                                     , const tCIDLib::TBoolean   bThrowIfTimeout = kCIDLib::False)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
             tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
-                lockQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
+                lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
             );
 
             if (bGotOne)
@@ -696,6 +765,38 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return bGotOne;
         }
 
+        tCIDLib::TBoolean bGetNextMv(       TElem&              objToFill
+                                    , const tCIDLib::TCard4     c4Millis = kCIDLib::c4MaxWait
+                                    , const tCIDLib::TBoolean   bThrowIfTimeout = kCIDLib::False)
+        {
+            // Lock the queue
+            TLocker lockrQueue(this);
+
+            // Call a helper to wait for something to show up
+            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            (
+                lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
+            );
+
+            if (bGotOne)
+            {
+                // Get the head node
+                TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
+
+                // Get the object out of it and then flush the node
+                objToFill = tCIDLib::ForceMove(pnodeHead->objData());
+                m_llstQueue.RemoveNode(pnodeHead);
+
+                // Bump the serial number to invalidate cursors
+                this->c4IncSerialNum();
+
+                // Wake up one thread waiting for space
+                m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitSpace);
+            }
+            return bGotOne;
+        }
+
+
         //
         //  This method just looks at the next available element, and sees if
         //  it matches the passed value (using the passed comparator.) If
@@ -712,7 +813,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                             ,       TCompFunc       pfnComp)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Get the head node. If none, return false
             TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
@@ -755,12 +856,12 @@ template <class TElem> class TQueue : public TCollection<TElem>
                         , const tCIDLib::TBoolean   bThrowIfTimeout = kCIDLib::False)
         {
             // Lock the queue
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
             tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
-                lockQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
+                lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
             );
 
             if (bGotOne)
@@ -810,7 +911,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
                     ,       TCompFunc           pfnComp
                     , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // See if this element is already in the queue. If so, return false
             if (pnodeFindObj(objToPut, pfnComp, kCIDLib::True))
@@ -833,7 +934,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         tCIDLib::TBoolean
         bWaitForSpace(const tCIDLib::TCard4 c4Millis, const tCIDLib::TCard4 c4Limit)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             if (m_llstQueue.c4ElemCount() < c4Limit)
                 return kCIDLib::True;
@@ -844,34 +945,49 @@ template <class TElem> class TQueue : public TCollection<TElem>
             //
             return m_twlWaiters.bWaitOnList
             (
-                lockQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
+                lockrQueue, kCIDLib::c4TWLReason_WaitSpace, c4Millis
             );
         }
 
-
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
+        template <typename T = TElem> T& objAddMove(T&& objNew)
         {
-            TMtxLocker lockThis(this->pmtxLock());
-            TQueueNode<TElem>* pnodeCur = static_cast<TQueueNode<TElem>*>
-            (
-                m_llstQueue.pnodeHead()
-            );
-            while (pnodeCur)
-            {
-                if (!iterCB(pnodeCur->objData()))
-                    return kCIDLib::False;
-                pnodeCur = static_cast<TQueueNode<TElem>*>(pnodeCur->pnodeNext());
-            }
-            return kCIDLib::True;
+            TLocker lockrQueue(this);
+            TElem& objRet = objPut(tCIDLib::ForceMove(objNew));
+            this->c4IncSerialNum();
+            return objRet;
         }
 
+
+        // Construct an element in place
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            // Get control of the queue before we modify it
+            TLocker lockrQueue(this);
+
+            // Add the new node to the list
+            TNode* pnodeNew = new TNode
+            (
+                tCIDLib::EQPrios::P0, tCIDLib::Forward<TArgs>(Args)...
+            );
+            m_llstQueue.AppendNode(pnodeNew);
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            //
+            //  And wake up one waiting thread to handle this new element.
+            //  Don't care if any are actually waiting.
+            //
+            m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitData);
+            return pnodeNew->objData();
+        }
 
         TElem&
         objPut( const   TElem&              objToPut
                 , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
         {
             // Get control of the queue before we modify it
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Add the new node to the list
             TNode* pnodeNew = new TNode(objToPut, ePriority);
@@ -888,9 +1004,32 @@ template <class TElem> class TQueue : public TCollection<TElem>
             return pnodeNew->objData();
         }
 
+        TElem&
+        objPut(         TElem&&             objToPut
+                , const tCIDLib::EQPrios    ePriority = tCIDLib::EQPrios::P0)
+        {
+            // Get control of the queue before we modify it
+            TLocker lockrQueue(this);
+
+            // Add the new node to the list
+            TNode* pnodeNew = new TNode(tCIDLib::ForceMove(objToPut), ePriority);
+            m_llstQueue.AppendNode(pnodeNew);
+
+            // Bump the serial number to invalidate cursors
+            this->c4IncSerialNum();
+
+            //
+            //  And wake up one waiting thread to handle this new element.
+            //  Don't care if any are actually waiting.
+            //
+            m_twlWaiters.bReleaseOne(kCIDLib::c4TWLReason_WaitData);
+            return pnodeNew->objData();
+        }
+
+
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockQueue(this->pmtxLock());
+            TLocker lockrQueue(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -990,6 +1129,7 @@ template <class TElem> class TQueue : public TCollection<TElem>
         DefPolyDup(TMyType)
         TemplateRTTIDefs(TMyType,TCollection<TElem>)
 };
+
 
 #pragma CIDLIB_POPPACK
 

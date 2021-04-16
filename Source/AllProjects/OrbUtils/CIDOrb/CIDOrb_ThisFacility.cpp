@@ -36,43 +36,46 @@
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  The timeout period for the name server object id cache. We set it
-    //  pretty low, to 50 seconds. For the most important, high traffic
-    //  object ids, we just continue to update the object's timeout stamp each
-    //  time the object id is successfully used.
-    //
-    //  This way, it will time out pretty fast when not used often, so that
-    //  there's little danger of a bad one hanging around in the cache, but
-    //  the often used ones will remain cached as long as they are still
-    //  working.
-    //
-    //  The auto-rebinder regularly hits the name server at least once every
-    //  enctForcedNSTO seconds if no one else is hitting it for other reasons,
-    //  so as long as we keep this time not too large, but enough larger than
-    //  the forced NS ping timeout, that will insure that the name server
-    //  itself doesn't time out of the object id cache ever as long as it
-    //  is being successfully accessed.
-    //
-    //  That will avoid lots of name resolutions since the name server is
-    //  accessed a lot.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TEncodedTime enctCacheTO = kCIDLib::enctOneSecond * 50;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The timeout period for the name server object id cache. We set it
+        //  pretty low, to 50 seconds. For the most important, high traffic
+        //  object ids, we just continue to update the object's timeout stamp each
+        //  time the object id is successfully used.
+        //
+        //  This way, it will time out pretty fast when not used often, so that
+        //  there's little danger of a bad one hanging around in the cache, but
+        //  the often used ones will remain cached as long as they are still
+        //  working.
+        //
+        //  The auto-rebinder regularly hits the name server at least once every
+        //  enctForcedNSTO seconds if no one else is hitting it for other reasons,
+        //  so as long as we keep this time not too large, but enough larger than
+        //  the forced NS ping timeout, that will insure that the name server
+        //  itself doesn't time out of the object id cache ever as long as it
+        //  is being successfully accessed.
+        //
+        //  That will avoid lots of name resolutions since the name server is
+        //  accessed a lot.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TEncodedTime enctCacheTO = kCIDLib::enctOneSecond * 50;
 
 
-    // -----------------------------------------------------------------------
-    //  If we've not accessed the name server for some reason within this
-    //  length of time, next time someone does an object lookup, we'll force
-    //  a trip to the name server, even if the object being accessed is in
-    //  the cache and good.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TEncodedTime enctForcedNSTO = (kCIDLib::enctOneSecond * 30);
+        // -----------------------------------------------------------------------
+        //  If we've not accessed the name server for some reason within this
+        //  length of time, next time someone does an object lookup, we'll force
+        //  a trip to the name server, even if the object being accessed is in
+        //  the cache and good.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TEncodedTime enctForcedNSTO = (kCIDLib::enctOneSecond * 30);
 
 
-    // -----------------------------------------------------------------------
-    //  Max entries we'll keep in the name server cache
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxNSQSize = 2048;
+        // -----------------------------------------------------------------------
+        //  Max entries we'll keep in the name server cache
+        // -----------------------------------------------------------------------
+        constexpr  tCIDLib::TCard4 c4MaxNSQSize = 2048;
+    }
 }
 
 
@@ -89,7 +92,7 @@ namespace CIDOrb_ThisFacility
 //
 //  Note that the name server exists really at the CIDOrbUC facility level,
 //  but we have a special requirement to watch for it being accessed for
-//  object id caching reasons. So it's defined down here.
+//  object id caching reasons. So its binding is defined down here.
 // ---------------------------------------------------------------------------
 const TString TFacCIDOrb::strCmd_Ping(L"$$$IntOrbCmd_Ping");
 const TString TFacCIDOrb::strFauxNSBinding(L"/CIDLib/FakeNSBinding");
@@ -103,14 +106,12 @@ TFacCIDOrb::TFacCIDOrb() :
     TFacility
     (
         L"CIDOrb"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::HasMsgFile
     )
-    , m_bClientInit(kCIDLib::False)
-    , m_bServerInit(kCIDLib::False)
     , m_c4CmdOverhead(0)
     , m_c4ReplyOverhead(0)
     , m_c4TimeoutAdjust(0)
@@ -120,6 +121,11 @@ TFacCIDOrb::TFacCIDOrb() :
     , m_enctTimeoutAdjust(0)
     , m_poccmSrv(nullptr)
     , m_pcrypSecure(nullptr)
+    , m_thrMonitor
+      (
+        L"CIDOrbMonitorThread"
+        , TMemberFunc<TFacCIDOrb>(this, &TFacCIDOrb::eMonThread)
+      )
 {
     // See if the timeout adjustment is set
     TString strVal;
@@ -139,6 +145,20 @@ TFacCIDOrb::TFacCIDOrb() :
     }
 
     // Set up any of the stats cache items we support
+    TStatsCache::RegisterItem
+    (
+        kCIDOrb::pszStat_Srv_ActiveCmds
+        , tCIDLib::EStatItemTypes::Counter
+        , m_sciActiveCmds
+    );
+
+    TStatsCache::RegisterItem
+    (
+        kCIDOrb::pszStat_Srv_QueuedCmds
+        , tCIDLib::EStatItemTypes::Counter
+        , m_sciQueuedCmds
+    );
+
     TStatsCache::RegisterItem
     (
         kCIDOrb::pszStat_Srv_RegisteredObjs
@@ -172,6 +192,9 @@ TFacCIDOrb::TFacCIDOrb() :
     ocmdTmp.SetReplyMode();
     strmOut << ocmdTmp << kCIDLib::FlushIt;
     m_c4ReplyOverhead = strmOut.c4CurPos() + 8;
+
+    // Start the monitor thread
+    m_thrMonitor.Start();
 }
 
 
@@ -206,40 +229,62 @@ tCIDLib::TBoolean
 TFacCIDOrb::bCheckOOIDCache(const   TString&    strBindingName
                             ,       TOrbObjId&  ooidToFill)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
-    //
-    //  If we have gone beyond the next scheduled forced name server trip
-    //  time, then say we didn't find it. Reset the timer for the next
-    //  time around before we return.
-    //
-    const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
-    if (m_enctNextForcedNS < enctNow)
+    try
     {
-        if (strBindingName != strFauxNSBinding)
+        //
+        //  If we have gone beyond the next scheduled forced name server trip
+        //  time, then say we didn't find it. Reset the timer for the next
+        //  time around before we return.
+        //
+        const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
+        if (m_enctNextForcedNS < enctNow)
         {
-            m_enctNextForcedNS = enctNow + CIDOrb_ThisFacility::enctForcedNSTO;
+            if (strBindingName != strFauxNSBinding)
+            {
+                m_enctNextForcedNS = enctNow + CIDOrb_ThisFacility::enctForcedNSTO;
+                return kCIDLib::False;
+            }
+        }
+
+        // See if this guy is in the cache
+        TObjIdCache::TPair* pkobjBinding = m_colNSCache.pkobjFindByKey(strBindingName);
+        if (!pkobjBinding)
+            return kCIDLib::False;
+
+        // If it's timed out, remove it and force them to go back the name server
+        if (pkobjBinding->objValue().enctCache() < enctNow)
+        {
+            m_colNSCache.RemoveKey(strBindingName);
             return kCIDLib::False;
         }
+
+        ooidToFill = pkobjBinding->objValue();
     }
 
-    // See if this guy is in the cache
-    TObjIdCache::TPair* pkobjBinding = m_colNSCache.pkobjFindByKey(strBindingName);
-    if (!pkobjBinding)
-        return kCIDLib::False;
-
-    // If it's timed out, remove it and force them to go back the name server
-    if (pkobjBinding->objValue().enctCache() < enctNow)
+    catch(TError& errToCatch)
     {
-        m_colNSCache.RemoveKey(strBindingName);
-        return kCIDLib::False;
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        throw;
     }
-
-    ooidToFill = pkobjBinding->objValue();
     return kCIDLib::True;
 }
 
 
+//
+//  Sometimes programs don't immediately initialize the ORB on startup, and they may need
+//  to know when to do it. Of course it may become initialized or uninitialized after this
+//  call, so it's up the caller to coordinate such things if multiple threads could do it.
+//
+tCIDLib::TBoolean TFacCIDOrb::bIsInitialized(const tCIDLib::ECSSides eSide) const
+{
+    if (eSide == tCIDLib::ECSSides::Client)
+    {
+        return TOrbClientBase::bIsInitialized();
+    }
+    return TOrbServerBase::bIsInitialized();
+}
 
 
 // Return true if we have the indicated server side object interface
@@ -271,9 +316,9 @@ tCIDLib::TCard4 TFacCIDOrb::c4TimeoutAdjust() const
 //
 tCIDLib::TCard8 TFacCIDOrb::c8LastNSCookie() const
 {
-    volatile tCIDLib::TCard8 c8Ret;
+    tCIDLib::TCard8 c8Ret;
     {
-        TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+        TLocker lockrCache(&m_colNSCache);
         c8Ret = m_c8LastNSCookie;
     }
     return c8Ret;
@@ -289,7 +334,7 @@ tCIDLib::TCard8 TFacCIDOrb::c8LastNSCookie() const
 //
 tCIDLib::TVoid TFacCIDOrb::CheckNSCookie(const tCIDLib::TCard8 c8NSCookie)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     if (c8NSCookie != m_c8LastNSCookie)
     {
@@ -324,10 +369,10 @@ tCIDLib::TVoid TFacCIDOrb::ClearOnlyAcceptFrom()
 //  A server calls this to de-register one of his objects from the server side
 //  ORB.
 //
-tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
+tCIDLib::TVoid TFacCIDOrb::DeregisterObject(const TOrbServerBase* const porbsToDereg)
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -338,6 +383,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::EErrClasses::NotReady
         );
     }
+    #endif
 
     if (!porbsToDereg)
     {
@@ -349,8 +395,10 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
-    #endif
 
     //
     //  Lock the object list while we do this and orphan this object out of
@@ -358,10 +406,11 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
     //  the list, we can release the list again and let other business
     //  continue. No other threads will see this as an available object.
     //
+    tCIDLib::EAdoptOpts eAdopt;
     TOrbServerBase* porbsTarget = nullptr;
     {
         TCritSecLocker lockObjList(&m_crsObjList);
-        porbsTarget = m_colObjList.porbsOrphan(porbsToDereg);
+        porbsTarget = m_colObjList.porbsOrphan(porbsToDereg, eAdopt);
     }
     TStatsCache::c8DecCounter(m_sciRegisteredObjs);
 
@@ -377,7 +426,13 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             , tCIDLib::EErrClasses::NotFound
             , porbsToDereg->ooidThis()
         );
+
+        // Won't get here but makes analyzer happy
+        return;
     }
+
+    // Put a janitor on it that will delete it if we adopted it
+    TJanitor<TOrbServerBase> janTarget(porbsTarget, eAdopt == tCIDLib::EAdoptOpts::Adopt);
 
     //
     //  Ok, now we have to wait for all threads to exit the object, since
@@ -400,7 +455,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
             //
             //  We can only assume that the remaining threads are blocked
             //  on something (which they should not be doing), so we just
-            //  have to delete the object anyway.
+            //  have to just continue.
             //
             facCIDOrb().LogMsg
             (
@@ -445,8 +500,7 @@ tCIDLib::TVoid TFacCIDOrb::DeregisterObject(TOrbServerBase* const porbsToDereg)
         );
     }
 
-    // And delete the object
-    delete porbsTarget;
+    // The janitor will clean it up if that's appropriate
 }
 
 
@@ -502,7 +556,7 @@ TFacCIDOrb::DispatchCmd(const TString& strMethod, TOrbCmd& orbcToDispatch)
     //
     //
     //  >>>> IT IS IMPORTANT that we send this particular error, because the
-    //       client side ORB will watch for it, and remove it's object id from
+    //       client side ORB will watch for it, and remove the object id from
     //       the client side object id cache. Otherwise, it would continue to
     //       be used until it timed out of the cache. This way, the client can
     //       recover quickly if a server cycles.
@@ -535,6 +589,9 @@ TFacCIDOrb::DispatchCmd(const TString& strMethod, TOrbCmd& orbcToDispatch)
 
     try
     {
+        // Bump the active server command calblacks counter while we are in here
+        TSafeCard4Janitor janCount(&m_scntActiveCmds);
+
         // Assume it will work
         orbcToDispatch.bRetStatus(kCIDLib::True);
 
@@ -597,10 +654,7 @@ TFacCIDOrb::eReadPacket(        TThread&            thrCaller
 {
     // First we call the packet reader
     tCIDOrb::TPacketHdr hdrRead;
-    tCIDOrb::EReadRes eRes = eReadPacketHdr
-    (
-        thrCaller, sockSrc, c4WaitFor, hdrRead
-    );
+    tCIDOrb::EReadRes eRes = eReadPacketHdr(thrCaller, sockSrc, c4WaitFor, hdrRead);
 
     //
     //  Return the sequence id. If we didn't really get a packet, then
@@ -612,12 +666,8 @@ TFacCIDOrb::eReadPacket(        TThread&            thrCaller
 
     // If a packet and it's non-zero, then read the packet
     if ((eRes == tCIDOrb::EReadRes::Packet) && hdrRead.c4DataBytes)
-    {
-        eRes = eReadPacketData
-        (
-            thrCaller, sockSrc, hdrRead, c4DataBytes, mbufToFill
-        );
-    }
+        eRes = eReadPacketData(thrCaller, sockSrc, hdrRead, c4DataBytes, mbufToFill);
+
     return eRes;
 }
 
@@ -676,9 +726,6 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
             return tCIDOrb::EReadRes::Lost;
         }
 
-        // Provisionally get a work item from the pool
-        TWorkQItemPtr wqipTmp(hdrRead.c4DataBytes);
-
         //
         //  If we don't allocate a stream, then the janitor just does
         //  nothing, else it will free the local buffer on the way out.
@@ -706,7 +753,7 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
         // Double check that he got what we asked for
         if (c4BytesRead != hdrRead.c4DataBytes)
         {
-            // <TBD>
+            CIDAssert2(L"Did not read the number of ORB packet bytes expected");
 
             // For now, return a lost connection as a punt
             return tCIDOrb::EReadRes::Lost;
@@ -718,12 +765,15 @@ TFacCIDOrb::eReadPacket(        TThread&                thrCaller
         //
         if (eRes == tCIDOrb::EReadRes::Packet)
         {
+            // Provisionally get a work item from the pool bit enough for the data
+            TWorkQItemPtr wqipTmp(hdrRead.c4DataBytes);
+
             pstrmToUse->Reset();
             pstrmToUse->SetEndIndex(c4BytesRead);
             *pstrmToUse >> wqipTmp->ocmdThis();
 
             // It worked so give it back to the caller
-            wqipNew = wqipTmp;
+            wqipNew = tCIDLib::ForceMove(wqipTmp);
         }
     }
     return eRes;
@@ -764,7 +814,7 @@ tCIDLib::TVoid TFacCIDOrb::FlushOIDCache()
 tCIDLib::TIPPortNum TFacCIDOrb::ippnORB() const
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -786,13 +836,16 @@ tCIDLib::TIPPortNum TFacCIDOrb::ippnORB() const
 //  lot of work. We call the orb client base's static init, and he does
 //  all the real work.
 //
+//  We assume this is done during startup when there are no threading
+//  issues.
+//
 tCIDLib::TVoid TFacCIDOrb::InitClient()
 {
     // If we aren't already initialized, then do it
-    if (!m_bClientInit)
+    if (!m_atomClientInit)
     {
         TBaseLock lockInit;
-        if (!m_bClientInit)
+        if (!m_atomClientInit)
         {
             //  Reset some client side stuff
             m_c8LastNSCookie = 0;
@@ -800,7 +853,16 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
             // Init the client support
             TOrbClientBase::InitializeOrbClient();
 
-            // If verbose logging, then log a client initialized message
+            // Indicate that client support is initialized (do this last!)
+            m_atomClientInit.Set();
+
+            //
+            //  If verbose logging, then log a client initialized message
+            //
+            //  DO THIS AFTER we set the atom, or we could come back into here
+            //  again and try to initailize again if an ORB based logger is
+            //  in use.
+            //
             if (bLogStatus())
             {
                 LogMsg
@@ -812,9 +874,6 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
                     , tCIDLib::EErrClasses::AppStatus
                 );
             }
-
-            // Indicate that client support is initialized (do this last!)
-            m_bClientInit = kCIDLib::True;
         }
     }
 }
@@ -826,18 +885,25 @@ tCIDLib::TVoid TFacCIDOrb::InitClient()
 //  start and stop the server side support and therefore some stuff may
 //  have been created already.
 //
+//  We assume this is done during startup when there are no threading
+//  issues.
+//
 tCIDLib::TVoid
 TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen
                         , const tCIDLib::TCard4     c4MaxClients)
 {
     // If we aren't initialized, then do it
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         TBaseLock lockInit;
-        if (!m_bServerInit)
+        if (!m_atomServerInit)
         {
             // Initialize some server side stuff
+            TStatsCache::SetValue(m_sciActiveCmds, 0);
+            TStatsCache::SetValue(m_sciQueuedCmds, 0);
             TStatsCache::SetValue(m_sciRegisteredObjs, 0);
+            m_scntActiveCmds.c4SetValue(0);
+
 
             // Initialize the core Orb server support
             TOrbServerBase::InitializeOrbServer();
@@ -852,7 +918,7 @@ TFacCIDOrb::InitServer( const   tCIDLib::TIPPortNum ippnListen
                 m_poccmSrv = new TOrbClientConnMgr(ippnListen, c4MaxClients);
 
             // Indicate that server support is initialized (do this last!)
-            m_bServerInit = kCIDLib::True;
+            m_atomServerInit.Set();
 
             // If verbose logging, then log a server initialized message
             if (bLogInfo())
@@ -921,7 +987,7 @@ tCIDLib::TVoid
 TFacCIDOrb::RefreshObjIDCache(  const   TString&    strBindingName
                                 , const TOrbObjId&  ooidToCheck)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     // Calculate the new timeout time
     const tCIDLib::TEncodedTime enctNewTO
@@ -960,10 +1026,12 @@ TFacCIDOrb::RefreshObjIDCache(  const   TString&    strBindingName
 //  should already have been set on it. We will call it's initialize method,
 //  and then add it to the object list.
 //
-tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
+tCIDLib::TVoid
+TFacCIDOrb::RegisterObject(         TOrbServerBase* const   porbsToReg
+                            , const tCIDLib::EAdoptOpts     eAdopt)
 {
     #if CID_DEBUG_ON
-    if (!m_bServerInit)
+    if (!m_atomServerInit)
     {
         facCIDOrb().ThrowErr
         (
@@ -975,7 +1043,7 @@ tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
         );
     }
 
-    if (!porbsToAdopt)
+    if (!porbsToReg)
     {
         facCIDOrb().ThrowErr
         (
@@ -989,15 +1057,15 @@ tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
     #endif
 
     //
-    //  Put a janitor on it, in case it throws during init. If its gets
-    //  past this init, we'll orphan it out of the janitor in our list.
+    //  If we are adopting it, make sure we get it cleaned up if it fails the
+    //  init. If not, we pass a null and just leave it alone if init throws.
     //
-    TJanitor<TOrbServerBase> janTmp(porbsToAdopt);
-    porbsToAdopt->Initialize();
+    TJanitor<TOrbServerBase> janTmp(porbsToReg, eAdopt == tCIDLib::EAdoptOpts::Adopt);
+    porbsToReg->Initialize();
 
     {
         TCritSecLocker lockObjList(&m_crsObjList);
-        m_colObjList.Add(janTmp.pobjOrphan());
+        m_colObjList.Add(janTmp.pobjOrphan(), eAdopt);
     }
     TStatsCache::c8IncCounter(m_sciRegisteredObjs);
 }
@@ -1006,7 +1074,7 @@ tCIDLib::TVoid TFacCIDOrb::RegisterObject(TOrbServerBase* const porbsToAdopt)
 // Removes the passed binding from the object id cache if it exists
 tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TString& strBindingName)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
     m_colNSCache.bRemoveIfExists(strBindingName);
 }
 
@@ -1024,7 +1092,7 @@ tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TString& strBindingName)
 //
 tCIDLib::TVoid TFacCIDOrb::RemoveFromOIDCache(const TOrbObjId& ooidToRemove)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     try
     {
@@ -1141,12 +1209,13 @@ TFacCIDOrb::SendMsg(        TStreamSocket&          sockTar
 
 //
 //  When an encrypter is set on the ORB, each packet sent out and recieved
-//  is encrypted/decrypted using this encrypter.
+//  is encrypted/decrypted using this encrypter. It can be null to disable
+//  encryption.
 //
 tCIDLib::TVoid TFacCIDOrb::SetEncrypter(TBlockEncrypter* const pcrypToAdopt)
 {
     // This can only be done before the ORB is started up
-    if (m_bServerInit || m_bClientInit)
+    if (m_atomServerInit || m_atomClientInit)
     {
         // Clean up the encrypter first, since we own it
         delete pcrypToAdopt;
@@ -1168,7 +1237,8 @@ tCIDLib::TVoid TFacCIDOrb::SetEncrypter(TBlockEncrypter* const pcrypToAdopt)
         m_pcrypSecure = nullptr;
     }
 
-    // And store the new one
+    // And store the new one. It can be null sohave to suppress warning
+    #pragma warning(suppress : 6001)
     m_pcrypSecure = pcrypToAdopt;
 }
 
@@ -1186,7 +1256,7 @@ tCIDLib::TVoid
 TFacCIDOrb::StoreObjIDCache(const   TString&    strBindingName
                             , const TOrbObjId&  ooidToStore)
 {
-    TMtxLocker mtxlCache(m_colNSCache.pmtxLock());
+    TLocker lockrCache(&m_colNSCache);
 
     const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
 
@@ -1229,12 +1299,8 @@ TFacCIDOrb::StoreObjIDCache(const   TString&    strBindingName
 
 
 //
-//  Stops, but does not fully clean up the ORB. Some server side stuff is
-//  left in place, but all shut down. This is because some apps start and
-//  stop the ORB, and we don't want to recreate it every time. To fully
-//  clean up, use the Cleanup() method. The dtor will call Cleanup() but it
-//  is best to do it proactively, so that it doesn't try to occur in the
-//  global context during app exit.
+//  Stops the ORB (both sides if they are started) and cleans up.) The application
+//  should call this proactively. If they don't we call it in our destructor.
 //
 tCIDLib::TVoid TFacCIDOrb::Terminate()
 {
@@ -1251,10 +1317,23 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
         );
     }
 
-    if (m_bClientInit)
+    // Stop the monitor thread
+    try
+    {
+        m_thrMonitor.ReqShutdownSync(5000);
+        m_thrMonitor.eWaitForDeath(4000);
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+        LogEventObj(errToCatch);
+    }
+
+    if (m_atomClientInit)
     {
         // Clear the flag first
-        m_bClientInit = kCIDLib::False;
+        m_atomClientInit.SetValue(kCIDLib::False);
 
         TOrbClientBase::TerminateOrbClient();
 
@@ -1275,10 +1354,10 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
         }
     }
 
-    if (m_bServerInit)
+    if (m_atomServerInit)
     {
         // Clear the flag first
-        m_bServerInit = kCIDLib::False;
+        m_atomServerInit.SetValue(kCIDLib::False);
 
         //
         //  Tell the client connection manager to stop accepting client
@@ -1302,11 +1381,8 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
 
                 catch(TError& errToCatch)
                 {
-                    if (bShouldLog(errToCatch))
-                    {
-                        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                        LogEventObj(errToCatch);
-                    }
+                    errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                    LogEventObj(errToCatch);
 
                     facCIDOrb().ThrowErr
                     (
@@ -1335,7 +1411,9 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
             }   while (m_colObjList.bNext());
         }
 
-        // Zero out the stats cache item for objects
+        // Zero our server side stats
+        TStatsCache::SetValue(m_sciActiveCmds, 0);
+        TStatsCache::SetValue(m_sciQueuedCmds, 0);
         TStatsCache::SetValue(m_sciRegisteredObjs, 0);
 
         //
@@ -1396,20 +1474,48 @@ tCIDLib::TVoid TFacCIDOrb::Terminate()
 }
 
 
-//
-//  The work item pool class will call us every so many times a work item gets
-//  freed, to let us update the work queue items stat.
-//
-tCIDLib::TVoid TFacCIDOrb::UpdateWorkQItemStat(const tCIDLib::TCard4 c4Count)
-{
-    TStatsCache::SetValue(m_sciWorkQItems, c4Count);
-}
-
 
 
 // ---------------------------------------------------------------------------
 //  TFacCIDOrb: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::EExitCodes TFacCIDOrb::eMonThread(TThread& thrThis, tCIDLib::TVoid*)
+{
+    thrThis.Sync();
+
+    // And now loop till asked to shut down
+    while (kCIDLib::True)
+    {
+        try
+        {
+            // Sleep a while and wait for a shutdown request as we do
+            if (!thrThis.bSleep(2000))
+                break;
+
+            // Update our various stats
+            TStatsCache::SetValue(m_sciWorkQItems, TWorkQItem::c4UsedQItems());
+
+            if (m_poccmSrv)
+                TStatsCache::SetValue(m_sciQueuedCmds, m_poccmSrv->c4QueuedCmds());
+
+            TStatsCache::SetValue(m_sciActiveCmds, m_scntActiveCmds.c4Value());
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+
+        catch(...)
+        {
+        }
+    }
+
+    return tCIDLib::EExitCodes::Normal;
+}
+
 
 //
 //  Once eReadPacketHdr() has been called to get the newly arriving

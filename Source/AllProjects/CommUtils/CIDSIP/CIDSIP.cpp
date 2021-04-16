@@ -42,13 +42,6 @@ RTTIDecls(TFacCIDSIP,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDSIP& facCIDSIP()
 {
-    static TFacCIDSIP* pfacCIDSIP = nullptr;
-    if (!pfacCIDSIP)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDSIP)
-            pfacCIDSIP = new TFacCIDSIP;
-    }
-    return *pfacCIDSIP;
+    static TFacCIDSIP* pfacThis = new TFacCIDSIP();
+    return *pfacThis;
 }
-

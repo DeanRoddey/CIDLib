@@ -118,7 +118,7 @@ class CIDDBASEEXP TODBCConnHandle
 
 namespace tCIDDBase
 {
-    typedef TCntPtr<TODBCConnHandle>    THConn;
+    using THConn = TCntPtr<TODBCConnHandle>;
 }
 
 

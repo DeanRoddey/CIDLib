@@ -50,7 +50,7 @@ TExpCharBuf::TExpCharBuf(const tCIDLib::TCard4 c4InitAlloc) :
 
     m_c4CurSize(c4InitAlloc)
     , m_c4CurOfs(0)
-    , m_pszBuffer(0)
+    , m_pszBuffer(nullptr)
 {
     // If the init size was zero, then set it to 256
     if (!m_c4CurSize)
@@ -61,9 +61,61 @@ TExpCharBuf::TExpCharBuf(const tCIDLib::TCard4 c4InitAlloc) :
 }
 
 
+TExpCharBuf::TExpCharBuf(const TExpCharBuf& expbSrc) :
+
+    m_c4CurSize(0)
+    , m_c4CurOfs(0)
+    , m_pszBuffer(nullptr)
+{
+    tCIDLib::TCh* pszNew = new tCIDLib::TCh[expbSrc.m_c4CurSize];
+    TArrayJanitor<tCIDLib::TCh> janBuffer(pszNew);
+    TRawMem::CopyMemBuf(pszNew, expbSrc.m_pszBuffer, expbSrc.m_c4CurSize * kCIDLib::c4CharBytes);
+
+    // It appears to have worked, so store the info away
+    m_c4CurSize = expbSrc.m_c4CurSize;
+    m_c4CurOfs = expbSrc.m_c4CurOfs;
+    m_pszBuffer = janBuffer.paOrphan();
+}
+
 TExpCharBuf::~TExpCharBuf()
 {
     delete [] m_pszBuffer;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TExpCharBuf: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+TExpCharBuf& TExpCharBuf::operator=(const TExpCharBuf& expbSrc)
+{
+    if (this != &expbSrc)
+    {
+        // Reallocate our buffer if not the same size
+        if (m_c4CurSize != expbSrc.m_c4CurSize)
+        {
+            // Make sure we can allocate the new buffer before we change anything
+            tCIDLib::TCh* pszNew = new tCIDLib::TCh[expbSrc.m_c4CurSize];
+
+            TArrayJanitor<tCIDLib::TCh> janOld(m_pszBuffer);
+            m_pszBuffer = pszNew;
+            m_c4CurSize = expbSrc.m_c4CurSize;
+        }
+
+        m_c4CurOfs = expbSrc.m_c4CurOfs;
+        TRawMem::CopyMemBuf(m_pszBuffer, expbSrc.m_pszBuffer, m_c4CurSize);
+    }
+    return *this;
+}
+
+TExpCharBuf& TExpCharBuf::operator=(TExpCharBuf&& expbSrc)
+{
+    if (this != &expbSrc)
+    {
+        tCIDLib::Swap(m_c4CurOfs, expbSrc.m_c4CurOfs);
+        tCIDLib::Swap(m_c4CurSize, expbSrc.m_c4CurSize);
+        tCIDLib::Swap(m_pszBuffer, expbSrc.m_pszBuffer);
+    }
+    return *this;
 }
 
 
@@ -87,9 +139,7 @@ tCIDLib::TVoid TExpCharBuf::Append(const tCIDLib::TCh chToAppend)
         //
         TRawMem::CopyMemBuf
         (
-            pszTmp
-            , m_pszBuffer
-            , m_c4CurSize * kCIDLib::c4CharBytes
+            pszTmp, m_pszBuffer, m_c4CurSize * kCIDLib::c4CharBytes
         );
         delete [] m_pszBuffer;
 

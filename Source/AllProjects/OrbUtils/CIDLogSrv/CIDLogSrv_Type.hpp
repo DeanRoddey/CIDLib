@@ -132,12 +132,12 @@ namespace tCIDLogSrv
     // -----------------------------------------------------------------------
     struct TKeyItem
     {
-        tCIDLib::TCard4         c4Ofs;
-        tCIDLib::TCard4         c4Size;
-        tCIDLib::TEncodedTime   enctLogged;
-        tCIDLib::TCard1         c1Sev;
-        tCIDLib::TCard4         c1Class;
-        tCIDLib::TCard4         c4Seq;
+        tCIDLib::TCard4         c4Ofs = 0;
+        tCIDLib::TCard4         c4Size = 0;
+        tCIDLib::TEncodedTime   enctLogged = 0;
+        tCIDLib::TCard1         c1Sev = 0;
+        tCIDLib::TCard4         c1Class = 0;
+        tCIDLib::TCard4         c4Seq = 0;
     };
 
 
@@ -159,13 +159,13 @@ namespace tCIDLogSrv
     // -----------------------------------------------------------------------
     struct TFreeItem
     {
-        tCIDLib::TCard4         c4Ofs;
-        tCIDLib::TCard4         c4Size;
+        tCIDLib::TCard4         c4Ofs = 0;
+        tCIDLib::TCard4         c4Size = 0;
     };
 
 
     // -----------------------------------------------------------------------
-    //  Typedefs for the comparator functions we'll use for passing to the
+    //  Aliases for the comparator functions we'll use for passing to the
     //  standard sort
     // -----------------------------------------------------------------------
     using TFreeComparator = tCIDLib::ESortComps (*)(const TFreeItem&, const TFreeItem&);

@@ -51,6 +51,7 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         TTestFWTest() = delete;
 
         TTestFWTest(const TTestFWTest&) = delete;
+        TTestFWTest(TTestFWTest&&) = delete;
 
         ~TTestFWTest();
 
@@ -59,6 +60,7 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         //  Public oeprators
         // -------------------------------------------------------------------
         TTestFWTest& operator=(const TTestFWTest&) = delete;
+        TTestFWTest& operator=(TTestFWTest&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -74,11 +76,25 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Level() const;
+        tCIDLib::TBoolean bLong() const
+        {
+            return m_bLong;
+        }
 
-        const TString& strDescription() const;
+        tCIDLib::TCard4 c4Level() const
+        {
+            return m_c4Level;
+        }
 
-        const TString& strSubName() const;
+        const TString& strDescription() const
+        {
+            return m_strDescr;
+        }
+
+        const TString& strSubName() const
+        {
+            return m_strSubName;
+        }
 
 
     protected :
@@ -93,9 +109,22 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         );
 
 
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid MarkAsLong()
+        {
+            m_bLong = kCIDLib::True;
+        }
+
+
     private :
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_bLong
+        //      Tests that don't run quite quickly should mark themselves as long
+        //      tests. These can be optionally skipped via test framework options.
         //
         //  m_c4Level
         //      Each test is given a level value 1 to 10, that indicates how
@@ -107,9 +136,10 @@ class TESTFWLIBEXP TTestFWTest : public TObject
         //  m_strSubName
         //      The derive class will provide these to us in the ctor.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4Level;
-        TString         m_strDescr;
-        TString         m_strSubName;
+        tCIDLib::TBoolean   m_bLong;
+        tCIDLib::TCard4     m_c4Level;
+        TString             m_strDescr;
+        TString             m_strSubName;
 
 
         // -------------------------------------------------------------------
@@ -131,6 +161,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TTestFWApp(const TTestFWApp&) = delete;
+        TTestFWApp(TTestFWApp&&) = delete;
 
         ~TTestFWApp();
 
@@ -139,6 +170,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TTestFWApp& operator=(const TTestFWApp&) = delete;
+        TTestFWApp& operator=(TTestFWApp&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -180,7 +212,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         // -------------------------------------------------------------------
         //  Class types, which the derived test app classes need to see as well
         // -------------------------------------------------------------------
-        typedef TRefVector<TTestFWTest>     TTestList;
+        using TTestList = TRefVector<TTestFWTest>;
 
 
         // -------------------------------------------------------------------
@@ -202,6 +234,9 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bNoLong
+        //      Indicates that longer running tests should be skipped.
+        //
         //  m_c4MaxLevel
         //      The maximum complexity level passed in to us by the test
         //      framework. We will only run tests of this level or lower.
@@ -216,6 +251,7 @@ class TESTFWLIBEXP TTestFWApp : public TObject
         //      This is the list of tests that the derived class (created by
         //      the test program) set up for us to run.
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bNoLong;
         tCIDLib::TCard4         m_c4MaxLevel;
         tTestFWLib::EVerbosity  m_eVerbosity;
         TTestList               m_colTests;

@@ -68,6 +68,7 @@ class CIDCTRLSEXP MCIDGestTarget
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         MCIDGestTarget(const MCIDGestTarget&) = delete;
+        MCIDGestTarget(MCIDGestTarget&&) = delete;
 
         virtual ~MCIDGestTarget();
 
@@ -76,6 +77,7 @@ class CIDCTRLSEXP MCIDGestTarget
         //  Public operators
         // -------------------------------------------------------------------
         MCIDGestTarget& operator=(const MCIDGestTarget&) = delete;
+        MCIDGestTarget& operator=(MCIDGestTarget&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -154,7 +156,17 @@ class CIDCTRLSEXP TCIDGestHandler
         // -------------------------------------------------------------------
         TCIDGestHandler() = delete;
 
+        TCIDGestHandler(const TCIDGestHandler&) = delete;
+        TCIDGestHandler(TCIDGestHandler&&) = delete;
+
         virtual ~TCIDGestHandler();
+
+
+        // -------------------------------------------------------------------
+        //  Public opreators
+        // -------------------------------------------------------------------
+        TCIDGestHandler& operator=(const TCIDGestHandler&) = delete;
+        TCIDGestHandler& operator=(TCIDGestHandler&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -376,7 +388,17 @@ class CIDCTRLSEXP TCIDWndGestHandler : public TCIDGestHandler
         // -------------------------------------------------------------------
         TCIDWndGestHandler() = delete;
 
+        TCIDWndGestHandler(const TCIDWndGestHandler&) = delete;
+        TCIDWndGestHandler(TCIDWndGestHandler&&) = delete;
+
         ~TCIDWndGestHandler();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDWndGestHandler& operator=(const TCIDWndGestHandler&) = delete;
+        TCIDWndGestHandler& operator=(TCIDWndGestHandler&&) = delete;
 
 
         // -------------------------------------------------------------------

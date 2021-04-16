@@ -42,15 +42,18 @@ RTTIDecls(TOrbObjId,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ObjId
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format version.
-    //
-    //
-    //  Note that, so far, these are never persisted, they are just streamed
-    //  around live and stored in the name server and such. So there's been
-    //  no need to bump this, though the format has changed.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format version.
+        //
+        //
+        //  Note that, so far, these are never persisted, they are just streamed
+        //  around live and stored in the name server and such. So there's been
+        //  no need to bump this, though the format has changed.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -130,6 +133,22 @@ TOrbObjId& TOrbObjId::operator=(const TOrbObjId& ooidSrc)
         m_oidKey                = ooidSrc.m_oidKey;
         m_strClientProxyClass   = ooidSrc.m_strClientProxyClass;
         m_strHostName           = ooidSrc.m_strHostName;
+    }
+    return *this;
+}
+
+TOrbObjId& TOrbObjId::operator=(TOrbObjId&& ooidSrc)
+{
+    if (this != &ooidSrc)
+    {
+        tCIDLib::Swap(m_bHasCachedAddr, ooidSrc.m_bHasCachedAddr);
+        tCIDLib::Swap(m_enctCache, ooidSrc.m_enctCache);
+        tCIDLib::Swap(m_ippnHost, ooidSrc.m_ippnHost);
+
+        m_ipaSrvCache = tCIDLib::ForceMove(ooidSrc.m_ipaSrvCache);
+        m_oidKey = tCIDLib::ForceMove(ooidSrc.m_oidKey);
+        m_strClientProxyClass = tCIDLib::ForceMove(ooidSrc.m_strClientProxyClass);
+        m_strHostName = tCIDLib::ForceMove(ooidSrc.m_strHostName);
     }
     return *this;
 }

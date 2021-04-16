@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HelpPage PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<HelpPage>
+    <Title>Sample Programs</Title>
+
+    <HelpText>
+
+        <P>This section describes the sample programs that come with CIDLib. These are layered in terms of complexity, with the basic ones trying to concentrate very much on a specific sort of feature or capability without trying to be representative of practical applications, and moving up through intermediate and advanced samples that get more and more realistic.</P>
+
+        <P>The samples are well commented. This documention is more to give broad overview information about them and perhaps help you decide which ones you want to dig into.</P>
+
+        <P>If any of the samples have any non-trivial requirements as far as how to use them, there will be an .md file in the directory of the sample that explains these issues.</P>
+
+    </HelpText>
+
+</HelpPage>

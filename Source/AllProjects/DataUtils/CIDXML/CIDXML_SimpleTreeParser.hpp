@@ -73,54 +73,32 @@ class CIDXMLEXP TXMLTreeParser :
                 {
                 }
 
-                TErrInfo(const TErrInfo& erriToCopy) :
-
-                    m_errcId(erriToCopy.m_errcId)
-                    , m_eType(erriToCopy.m_eType)
-                    , m_c4Column(erriToCopy.m_c4Column)
-                    , m_c4Line(erriToCopy.m_c4Line)
-                    , m_strSystemId(erriToCopy.m_strSystemId)
-                    , m_strText(erriToCopy.m_strText)
-                {
-                }
-
-                ~TErrInfo()
-                {
-                }
+                TErrInfo(const TErrInfo&) = default;
+                TErrInfo(TErrInfo&&) = default;
+                ~TErrInfo() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TErrInfo& operator=(const TErrInfo& erriToAssign)
-                {
-                    if (this == &erriToAssign)
-                        return *this;
-
-                    m_errcId        = erriToAssign.m_errcId;
-                    m_eType         = erriToAssign.m_eType;
-                    m_c4Column      = erriToAssign.m_c4Column;
-                    m_c4Line        = erriToAssign.m_c4Line;
-                    m_strSystemId   = erriToAssign.m_strSystemId;
-                    m_strText       = erriToAssign.m_strText;
-                    return *this;
-                }
+                TErrInfo& operator=(const TErrInfo&)  =default;
+                TErrInfo& operator=(TErrInfo&&)  =default;
 
 
                 // -----------------------------------------------------------
                 //  Public data members
                 // -----------------------------------------------------------
-                tCIDLib::TErrCode errcId() const {return m_errcId;}
+                tCIDLib::TErrCode errcId() const { return m_errcId; }
 
-                tCIDXML::EErrTypes eType() const {return m_eType;}
+                tCIDXML::EErrTypes eType() const { return m_eType; }
 
-                const TString& strText() const {return m_strText;}
+                const TString& strText() const { return m_strText; }
 
-                tCIDLib::TCard4 c4Column() const {return m_c4Column;}
+                tCIDLib::TCard4 c4Column() const { return m_c4Column; }
 
-                tCIDLib::TCard4 c4Line() const {return m_c4Line;}
+                tCIDLib::TCard4 c4Line() const { return m_c4Line; }
 
-                const TString& strSystemId() const {return m_strSystemId;}
+                const TString& strSystemId() const { return m_strSystemId; }
 
 
             private :
@@ -141,7 +119,17 @@ class CIDXMLEXP TXMLTreeParser :
         // -------------------------------------------------------------------
         TXMLTreeParser();
 
+        TXMLTreeParser(const TXMLTreeParser&) = delete;
+        TXMLTreeParser(TXMLTreeParser&&) = delete;
+
         ~TXMLTreeParser();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLTreeParser& operator=(const TXMLTreeParser&) = delete;
+        TXMLTreeParser& operator=(TXMLTreeParser&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -227,7 +215,7 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::EAdoptOpts     eAdopt
         );
 
-        TXMLTreeDocument* pxtdocOrphan();
+        [[nodiscard]] TXMLTreeDocument* pxtdocOrphan();
 
         const TXMLTreeElement* pxtnodeFindPath
         (
@@ -261,39 +249,39 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
             , const tCIDXML::ELocations     eLocation
-        );
+        )   final;
 
         tCIDLib::TVoid DocComment
         (
             const   TString&                strCommentText
             , const tCIDXML::ELocations     eLocation
-        );
+        )   final;
 
         tCIDLib::TVoid DocPI
         (
             const   TString&                strTarget
             , const TString&                strValue
             , const tCIDXML::ELocations     eLocation
-        );
+        )   final;
 
         tCIDLib::TVoid EndDocument
         (
             const   TXMLEntitySrc&          xsrcOfRoot
-        );
+        )   final;
 
         tCIDLib::TVoid EndTag
         (
             const   TXMLElemDecl&           xdeclElem
-        );
+        )   final;
 
-        tCIDLib::TVoid ResetDocument();
+        tCIDLib::TVoid ResetDocument() final;
 
-        tCIDLib::TVoid ResetErrors();
+        tCIDLib::TVoid ResetErrors() final;
 
         tCIDLib::TVoid StartDocument
         (
             const   TXMLEntitySrc&          xsrcOfRoot
-        );
+        )   final;
 
         tCIDLib::TVoid StartTag
         (
@@ -302,14 +290,14 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::TBoolean       bEmpty
             , const TVector<TXMLAttr>&      colAttrList
             , const tCIDLib::TCard4         c4AttrListSize
-        );
+        )   final;
 
         virtual tCIDLib::TVoid XMLDecl
         (
             const   TString&                strVersion
             , const TString&                strEncoding
             , const TString&                strStandalone
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -320,9 +308,9 @@ class CIDXMLEXP TXMLTreeParser :
             const   TDTDElemDecl&           xdeclRoot
             , const TString&                strPublicId
             , const TString&                strSystemId
-        );
+        )   final;
 
-        tCIDLib::TVoid ResetDocType();
+        tCIDLib::TVoid ResetDocType() final;
 
 
         // -------------------------------------------------------------------
@@ -336,7 +324,7 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::TCard4         c4CurColumn
             , const tCIDLib::TCard4         c4CurLine
             , const TString&                strSystemId
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -349,9 +337,9 @@ class CIDXMLEXP TXMLTreeParser :
             , const TString&                strEntityName
             , const TString&                strParentId
             , const tCIDXML::EResolveTypes  eResType
-        );
+        )   override;
 
-        tCIDLib::TVoid ResetResolver();
+        tCIDLib::TVoid ResetResolver() final;
 
 
 

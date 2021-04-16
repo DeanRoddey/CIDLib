@@ -43,11 +43,14 @@ RTTIDecls(TAttrData, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDMData_AttrData
 {
-    //
-    //  Version 2 -
-    //      Added the user data string member
-    //
-    const tCIDLib::TCard2   c2FmtVersion = 2;
+    namespace
+    {
+        //
+        //  Version 2 -
+        //      Added the user data string member
+        //
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 
@@ -133,46 +136,126 @@ const TString& TAttrData::strId(const TAttrData& attrSrc)
 TAttrData::TAttrData() :
 
     m_bAlwaysReport(kCIDLib::False)
-    , m_bVal(kCIDLib::False)
-    , m_c4Bytes(0)
-    , m_c4Val(0)
-    , m_c4Val2(0)
     , m_c8User(0)
-    , m_c8Val(0)
-    , m_chVal(kCIDLib::chSpace)
     , m_eEditType(tCIDMData::EAttrEdTypes::None)
-    , m_f8Val(0)
     , m_eType(tCIDMData::EAttrTypes::String)
-    , m_i4Val(0)
-    , m_i4Val2(0)
+    , m_pmbufVal(nullptr)
 {
+    // Make sure all the value fields are reset
+    ClearValue();
 }
 
-TAttrData::TAttrData(const TAttrData& attrSrc) :
+TAttrData::TAttrData( const TString&                strName
+                    , const TString&                strId
+                    , const tCIDMData::EAttrTypes   eType
+                    , const tCIDMData::EAttrEdTypes eEdType) :
 
-    m_bAlwaysReport(attrSrc.m_bAlwaysReport)
-    , m_bEnabled(attrSrc.m_bEnabled)
-    , m_c8User(attrSrc.m_c8User)
-    , m_eEditType(attrSrc.m_eEditType)
-    , m_eType(attrSrc.m_eType)
-    , m_strSpecType(attrSrc.m_strSpecType)
-    , m_strGroup(attrSrc.m_strGroup)
-    , m_strId(attrSrc.m_strId)
-    , m_strLimits(attrSrc.m_strLimits)
-    , m_strName(attrSrc.m_strName)
-    , m_strUserData(attrSrc.m_strUserData)
+    m_bAlwaysReport(kCIDLib::False)
+    , m_c8User(0)
+    , m_eType(eType)
+    , m_eEditType(eEdType)
+    , m_pmbufVal(nullptr)
+    , m_strId(strId)
+    , m_strName(strName)
 {
-    // Clear all of the value members
+    //
+    //  Make sure all the value fields are reset. This will create a default buffer
+    //  if the type is binary. Where possible call the one below that takes the
+    //  binary data up front.
+    //
     ClearValue();
 
-    // And copy the source value
-    CopyVal(attrSrc);
+    // Set an initial edit type if they don't set a specific one
+    if (m_eEditType == tCIDMData::EAttrEdTypes::Count)
+        SetEditTypes();
+}
+
+TAttrData::TAttrData( const TString&                strName
+                    , const TString&                strId
+                    , const TString&                strLimits
+                    , const tCIDMData::EAttrTypes   eType
+                    , const tCIDMData::EAttrEdTypes eEdType) :
+
+    m_bAlwaysReport(kCIDLib::False)
+    , m_c8User(0)
+    , m_eType(eType)
+    , m_eEditType(eEdType)
+    , m_pmbufVal(nullptr)
+    , m_strId(strId)
+    , m_strLimits(strLimits)
+    , m_strName(strName)
+{
+    //
+    //  Make sure all the value fields are reset. If they called this for binary
+    //  type, instead of the one below that takes the binary data, we'll get a
+    //  default buffer for now.
+    //
+    ClearValue();
+
+    // Set an initial edit type if they don't set a specific one
+    if (m_eEditType == tCIDMData::EAttrEdTypes::Count)
+        SetEditTypes();
+}
+
+TAttrData::TAttrData( const TString&                strName
+                    , const TString&                strId
+                    , const TMemBuf&                mbufBinary
+                    , const tCIDLib::TCard4         c4Bytes
+                    , const TString&                strLimits
+                    , const tCIDMData::EAttrEdTypes eEdType) :
+
+    m_bAlwaysReport(kCIDLib::False)
+    , m_c4Bytes(0)
+    , m_c8User(0)
+    , m_eType(tCIDMData::EAttrTypes::Binary)
+    , m_eEditType(eEdType)
+    , m_pmbufVal(nullptr)
+    , m_strId(strId)
+    , m_strLimits(strLimits)
+    , m_strName(strName)
+{
+    //
+    //  Create the buffer first, so that ClearValue() won't create a default. Then
+    //  make sure the other values are clear. It will reset our byte count so we have
+    //  set it below, instead of above in the initializer.
+    //
+    m_pmbufVal = new THeapBuf(c4Bytes ? c4Bytes : 1);
+    ClearValue();
+
+    // Now we can set the byte size and copy over the data
+    m_c4Bytes = c4Bytes ? c4Bytes : 1;
+    m_pmbufVal->CopyIn(mbufBinary, m_c4Bytes);
+
+    // Set an initial edit type if they don't set a specific one
+    if (m_eEditType == tCIDMData::EAttrEdTypes::Count)
+        SetEditTypes();
+}
+
+TAttrData::TAttrData(const TAttrData& adatSrc) :
+
+    m_bAlwaysReport(adatSrc.m_bAlwaysReport)
+    , m_bEnabled(adatSrc.m_bEnabled)
+    , m_c8User(adatSrc.m_c8User)
+    , m_eEditType(adatSrc.m_eEditType)
+    , m_eType(adatSrc.m_eType)
+    , m_pmbufVal(nullptr)
+    , m_strSpecType(adatSrc.m_strSpecType)
+    , m_strGroup(adatSrc.m_strGroup)
+    , m_strId(adatSrc.m_strId)
+    , m_strLimits(adatSrc.m_strLimits)
+    , m_strName(adatSrc.m_strName)
+    , m_strUserData(adatSrc.m_strUserData)
+{
+    // We use a value reset method in this case to be efficient
+    ResetValue(adatSrc);
 }
 
 TAttrData::~TAttrData()
 {
+    // If we allocated the binary data buffer, delete it
+    if (m_pmbufVal)
+        delete m_pmbufVal;
 }
-
 
 // ---------------------------------------------------------------------------
 //  TAttrData: Public operators
@@ -193,18 +276,54 @@ TAttrData& TAttrData::operator=(const TAttrData& adatSrc)
         m_strName       = adatSrc.m_strName;
         m_strUserData   = adatSrc.m_strUserData;
 
-        // If not the same type, clear the current value and store the new type
-        if (m_eType != adatSrc.m_eType)
-        {
-            ClearValue();
-            m_eType = adatSrc.m_eType;
-        }
-
-        // Now copy over the value for our type
-        CopyVal(adatSrc);
+        //
+        //  We use a reset method in this case to be efficient and handle a change
+        //  in type.
+        //
+        ResetValue(adatSrc);
     }
     return *this;
 }
+
+//
+//  Normally we wouldn't bother with this for this type of class, but we
+//  pre-instantiate a vector of these and that picks up the move oriented
+//  add method.
+//
+TAttrData& TAttrData::operator=(TAttrData&& adatSrc)
+{
+    if (&adatSrc != this)
+    {
+        tCIDLib::Swap(m_areaVal, adatSrc.m_areaVal);
+        tCIDLib::Swap(m_bAlwaysReport, adatSrc.m_bAlwaysReport);
+        tCIDLib::Swap(m_bEnabled, adatSrc.m_bEnabled);
+        tCIDLib::Swap(m_bVal, adatSrc.m_bVal);
+        tCIDLib::Swap(m_c4Bytes, adatSrc.m_c4Bytes);
+        tCIDLib::Swap(m_c4Val, adatSrc.m_c4Val);
+        tCIDLib::Swap(m_c4Val2, adatSrc.m_c4Val2);
+        tCIDLib::Swap(m_c8User, adatSrc.m_c8User);
+        tCIDLib::Swap(m_c8Val, adatSrc.m_c8Val);
+        tCIDLib::Swap(m_chVal, adatSrc.m_chVal);
+        tCIDLib::Swap(m_clrVal, adatSrc.m_clrVal);
+        tCIDLib::Swap(m_eEditType, adatSrc.m_eEditType);
+        tCIDLib::Swap(m_eType, adatSrc.m_eType);
+        tCIDLib::Swap(m_f8Val, adatSrc.m_f8Val);
+        tCIDLib::Swap(m_i4Val, adatSrc.m_i4Val);
+        tCIDLib::Swap(m_i4Val2, adatSrc.m_i4Val2);
+        tCIDLib::Swap(m_pmbufVal, adatSrc.m_pmbufVal);
+        tCIDLib::Swap(m_pntVal, adatSrc.m_pntVal);
+        tCIDLib::Swap(m_szVal, adatSrc.m_szVal);
+        m_strGroup = tCIDLib::ForceMove(adatSrc.m_strGroup);
+        m_strId = tCIDLib::ForceMove(adatSrc.m_strId);
+        m_strLimits = tCIDLib::ForceMove(adatSrc.m_strLimits);
+        m_strName = tCIDLib::ForceMove(adatSrc.m_strName);
+        m_strSpecType = tCIDLib::ForceMove(adatSrc.m_strSpecType);
+        m_strValue = tCIDLib::ForceMove(adatSrc.m_strValue);
+        m_strUserData = tCIDLib::ForceMove(adatSrc.m_strUserData);
+    }
+    return *this;
+}
+
 
 tCIDLib::TBoolean TAttrData::operator==(const TAttrData& adatSrc) const
 {
@@ -296,7 +415,10 @@ tCIDLib::TBoolean TAttrData::bSameValue(const TAttrData& adatTest) const
         case tCIDMData::EAttrTypes::Binary :
             bRet = m_c4Bytes == adatTest.m_c4Bytes;
             if (bRet)
-                bRet = m_mbufVal.eCompare(adatTest.m_mbufVal, m_c4Bytes) == tCIDLib::ESortComps::Equal;
+            {
+                bRet = m_pmbufVal->eCompare(*adatTest.m_pmbufVal, m_c4Bytes)
+                                                        == tCIDLib::ESortComps::Equal;
+            }
             break;
 
         case tCIDMData::EAttrTypes::Bool :
@@ -362,7 +484,7 @@ tCIDLib::TBoolean TAttrData::bSameValue(const TAttrData& adatTest) const
 }
 
 
-// Return the bytes in the m_mbufVal buffer
+// Return the bytes in the memory buffer
 tCIDLib::TCard4 TAttrData::c4Bytes() const
 {
     return m_c4Bytes;
@@ -415,6 +537,9 @@ const TRGBClr& TAttrData::clrVal() const
 tCIDLib::TVoid TAttrData::ChangeType(const tCIDMData::EAttrTypes eToSet)
 {
     m_eType = eToSet;
+
+    // Make sure all the values get reset
+    ClearValue();
 }
 
 
@@ -437,6 +562,22 @@ tCIDLib::TVoid TAttrData::ClearValue()
     m_pntVal.Zero();
     m_szVal.Zero();
     m_strValue.Clear();
+
+    //
+    //  If we have a buffer, but we aren't binary anymore, get rid of it. If we don't
+    //  have one and we are binary, then create one with a default size. The latter
+    //  maybe inefficient, but generally the other code tries to avoid this. We do
+    //  need to make sure something is there though worst case if that is not done.
+    //
+    if (m_pmbufVal && (m_eType != tCIDMData::EAttrTypes::Binary))
+    {
+        delete m_pmbufVal;
+        m_pmbufVal = nullptr;
+    }
+     else if (!m_pmbufVal && (m_eType == tCIDMData::EAttrTypes::Binary))
+     {
+         m_pmbufVal = new THeapBuf(1);
+     }
 }
 
 
@@ -472,10 +613,14 @@ tCIDLib::TVoid TAttrData::CopyVal(const TAttrData& adatSrc)
             break;
 
         case tCIDMData::EAttrTypes::Binary :
-            m_mbufVal.Reallocate(adatSrc.m_c4Bytes);
-            m_mbufVal.CopyIn(adatSrc.m_mbufVal, adatSrc.m_c4Bytes);
+        {
+            CIDAssert(m_pmbufVal != nullptr, L"Attribute is binary but no buffer exists");
+            CIDLib_Suppress(6011) // We just null checked it
+            m_pmbufVal->Reallocate(adatSrc.m_c4Bytes);
+            m_pmbufVal->CopyIn(*adatSrc.m_pmbufVal, adatSrc.m_c4Bytes);
             m_c4Bytes = adatSrc.m_c4Bytes;
             break;
+        }
 
         case tCIDMData::EAttrTypes::Bool :
             m_bVal = adatSrc.m_bVal;
@@ -675,7 +820,7 @@ tCIDLib::TInt4 TAttrData::i4Val2() const
 const TMemBuf& TAttrData::mbufVal() const
 {
     CheckType(tCIDMData::EAttrTypes::Binary);
-    return m_mbufVal;
+    return *m_pmbufVal;
 }
 
 
@@ -855,7 +1000,7 @@ tCIDLib::TVoid TAttrData::SetValueFromText(const TString& strToSet)
                 strLow.StripWhitespace();
                 strHigh.StripWhitespace();
 
-                tCIDLib::TCard4 c4Low, c4High;
+                tCIDLib::TCard4 c4Low = 0, c4High = 0;
                 if (strLow.bToCard4(c4Low) && strHigh.bToCard4(c4High))
                 {
                     m_c4Val = c4Low;
@@ -893,7 +1038,7 @@ tCIDLib::TVoid TAttrData::SetValueFromText(const TString& strToSet)
                 strLow.StripWhitespace();
                 strHigh.StripWhitespace();
 
-                tCIDLib::TInt4 i4Low, i4High;
+                tCIDLib::TInt4 i4Low = 0, i4High = 0;
                 if (strLow.bToInt4(i4Low) && strHigh.bToInt4(i4High))
                 {
                     m_i4Val = i4Low;
@@ -927,6 +1072,7 @@ tCIDLib::TVoid TAttrData::SetValueFromText(const TString& strToSet)
             break;
 
         default :
+            m_c4Bytes = 0;
             m_strValue.Clear();
             break;
     };
@@ -1001,7 +1147,14 @@ TAttrData::SetIntRange(const tCIDLib::TInt4  i4Min, const tCIDLib::TInt4 i4Max)
 tCIDLib::TVoid TAttrData::SetMemBuf(const TMemBuf& mbufData, const tCIDLib::TCard4 c4Bytes)
 {
     CheckType(tCIDMData::EAttrTypes::Binary);
-    m_mbufVal.CopyIn(mbufData, c4Bytes);
+    m_pmbufVal->CopyIn(mbufData, c4Bytes);
+    m_c4Bytes = c4Bytes;
+}
+
+tCIDLib::TVoid TAttrData::SetMemBuf(THeapBuf&& mbufData, const tCIDLib::TCard4 c4Bytes)
+{
+    CheckType(tCIDMData::EAttrTypes::Binary);
+    *m_pmbufVal = tCIDLib::ForceMove(mbufData);
     m_c4Bytes = c4Bytes;
 }
 
@@ -1101,6 +1254,28 @@ tCIDLib::TVoid TAttrData::CheckType(const tCIDMData::EAttrTypes eToCheck) const
 
 
 //
+//  In an assignment or copy, this is called to let us optimize some scenarios.
+//
+tCIDLib::TVoid TAttrData::ResetValue(const TAttrData& adatSrc)
+{
+    if ((adatSrc.m_eType == tCIDMData::EAttrTypes::Binary) && !m_pmbufVal)
+    {
+        //
+        //  The source is binary and we are not. So we just want to make sure our
+        //  binary buffer is created first, so that ClearValue won't create a default
+        //  one, which the copy will just have to resize.
+        //
+        m_pmbufVal = new THeapBuf(adatSrc.m_c4Bytes);
+    }
+
+    // Now take the source's type and do the usual thing
+    m_eType = adatSrc.m_eType;
+    ClearValue();
+    CopyVal(adatSrc);
+}
+
+
+//
 //  Check the type. If it's one of our build in supported types, set the type of
 //  editing that we provide for that type of value. Client code must set the edit
 //  type for its own defined types, and might override these for its own purposes.
@@ -1166,80 +1341,101 @@ tCIDLib::TVoid TAttrData::StreamFrom(TBinInStream& strmToReadFrom)
         , CID_LINE
     );
 
-    // Do a reset
-    ClearValue();
-
-    // Get the type out
+    // Get the type out first
     strmToReadFrom >> m_eType;
 
-    // Based on the type, read in the value
-    switch(m_eType)
+    if (m_eType == tCIDMData::EAttrTypes::Binary)
     {
-        case tCIDMData::EAttrTypes::AppImage :
-        case tCIDMData::EAttrTypes::File :
-        case tCIDMData::EAttrTypes::MLString :
-        case tCIDMData::EAttrTypes::String :
-            strmToReadFrom >> m_strValue;
-            break;
+        //
+        //  To avoid possibly creating a default buffer only to turn around
+        //  and have to reallocate, we handle this one specially. We create
+        //  or resize the buffer and load it up first, so that ClearValue won't
+        //  create a default one. Then we can make sure the other values are
+        //  cleared, then store the right buffer size (which will have gotten
+        //  zeroed by the clear.
+        //
+        tCIDLib::TCard4 c4Size;
+        strmToReadFrom >> c4Size;
+        if (!m_pmbufVal)
+            m_pmbufVal = new THeapBuf(c4Size);
+        else
+            m_pmbufVal->Reallocate(c4Size);
+        strmToReadFrom.c4ReadBuffer(*m_pmbufVal, c4Size);
 
-        case tCIDMData::EAttrTypes::Area :
-            strmToReadFrom >> m_areaVal;
-            break;
+        ClearValue();
+        m_c4Bytes = c4Size;
+    }
+     else
+    {
+        //
+        //  Now do a clear, with it knowing our new type. It will get rid of any
+        //  buffer if we aren't binary anymore.
+        //
+        ClearValue();
 
-        case tCIDMData::EAttrTypes::Binary :
-            strmToReadFrom >> m_c4Bytes;
-            m_mbufVal.Reallocate(m_c4Bytes);
-            strmToReadFrom.c4ReadBuffer(m_mbufVal, m_c4Bytes);
-            break;
+        // Based on the type, read in the value
+        switch(m_eType)
+        {
+            case tCIDMData::EAttrTypes::AppImage :
+            case tCIDMData::EAttrTypes::File :
+            case tCIDMData::EAttrTypes::MLString :
+            case tCIDMData::EAttrTypes::String :
+                strmToReadFrom >> m_strValue;
+                break;
 
-        case tCIDMData::EAttrTypes::Bool :
-            strmToReadFrom >> m_bVal;
-            break;
+            case tCIDMData::EAttrTypes::Area :
+                strmToReadFrom >> m_areaVal;
+                break;
 
-        case tCIDMData::EAttrTypes::Card :
-            strmToReadFrom >> m_c4Val;
-            break;
+            case tCIDMData::EAttrTypes::Bool :
+                strmToReadFrom >> m_bVal;
+                break;
 
-        case tCIDMData::EAttrTypes::CardRange :
-            strmToReadFrom >> m_c4Val >> m_c4Val2;
-            break;
+            case tCIDMData::EAttrTypes::Card :
+                strmToReadFrom >> m_c4Val;
+                break;
 
-        case tCIDMData::EAttrTypes::Card64 :
-        case tCIDMData::EAttrTypes::Time :
-            strmToReadFrom >> m_c8Val;
-            break;
+            case tCIDMData::EAttrTypes::CardRange :
+                strmToReadFrom >> m_c4Val >> m_c4Val2;
+                break;
 
-        case tCIDMData::EAttrTypes::Char :
-            strmToReadFrom >> m_chVal;
-            break;
+            case tCIDMData::EAttrTypes::Card64 :
+            case tCIDMData::EAttrTypes::Time :
+                strmToReadFrom >> m_c8Val;
+                break;
 
-        case tCIDMData::EAttrTypes::Float :
-            strmToReadFrom >> m_f8Val;
-            break;
+            case tCIDMData::EAttrTypes::Char :
+                strmToReadFrom >> m_chVal;
+                break;
 
-        case tCIDMData::EAttrTypes::Int :
-            strmToReadFrom >> m_i4Val;
-            break;
+            case tCIDMData::EAttrTypes::Float :
+                strmToReadFrom >> m_f8Val;
+                break;
 
-        case tCIDMData::EAttrTypes::IntRange :
-            strmToReadFrom >> m_i4Val >> m_i4Val2;
-            break;
+            case tCIDMData::EAttrTypes::Int :
+                strmToReadFrom >> m_i4Val;
+                break;
 
-        case tCIDMData::EAttrTypes::Point :
-            strmToReadFrom >> m_pntVal;
-            break;
+            case tCIDMData::EAttrTypes::IntRange :
+                strmToReadFrom >> m_i4Val >> m_i4Val2;
+                break;
 
-        case tCIDMData::EAttrTypes::RGBColor :
-            strmToReadFrom >> m_clrVal;
-            break;
+            case tCIDMData::EAttrTypes::Point :
+                strmToReadFrom >> m_pntVal;
+                break;
 
-        case tCIDMData::EAttrTypes::Size :
-            strmToReadFrom >> m_szVal;
-            break;
+            case tCIDMData::EAttrTypes::RGBColor :
+                strmToReadFrom >> m_clrVal;
+                break;
 
-        default :
-            break;
-    };
+            case tCIDMData::EAttrTypes::Size :
+                strmToReadFrom >> m_szVal;
+                break;
+
+            default :
+                break;
+        };
+    }
 
     // Get the other stuff
     strmToReadFrom  >> m_bAlwaysReport
@@ -1285,7 +1481,7 @@ tCIDLib::TVoid TAttrData::StreamTo(TBinOutStream& strmToWriteTo) const
 
         case tCIDMData::EAttrTypes::Binary :
             strmToWriteTo << m_c4Bytes;
-            strmToWriteTo.c4WriteBuffer(m_mbufVal, m_c4Bytes);
+            strmToWriteTo.c4WriteBuffer(*m_pmbufVal, m_c4Bytes);
             break;
 
         case tCIDMData::EAttrTypes::Bool :

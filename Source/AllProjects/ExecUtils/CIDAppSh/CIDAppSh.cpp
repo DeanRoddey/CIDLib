@@ -37,13 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDAppSh& facCIDAppSh()
 {
-    static TFacCIDAppSh* pfacCIDAppShell = nullptr;
-    if (!pfacCIDAppShell)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDAppShell)
-            pfacCIDAppShell = new TFacCIDAppSh;
-    }
-    return *pfacCIDAppShell;
+    static TFacCIDAppSh* pfacThis = new TFacCIDAppSh();
+    return *pfacThis;
 }
-

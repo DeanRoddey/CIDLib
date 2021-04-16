@@ -44,13 +44,15 @@ RTTIDecls(TBitset,TBitsetBase)
 // ---------------------------------------------------------------------------
 namespace CIDLib_BitSet
 {
-    //
-    //  Format version for the base class
-    //
-    //      Version 2 - Get rid of the big endian flag which we never used
-    //
-    const tCIDLib::TCard2   c2FmtVersion = 2;
-
+    namespace
+    {
+        //
+        //  Format version for the base class
+        //
+        //      Version 2 - Get rid of the big endian flag which we never used
+        //
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 
@@ -143,7 +145,7 @@ tCIDLib::TVoid TBitsetBase::Clear()
     CheckReady();
 
     // Zero out all of the bytes of the data array
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 }
 
 
@@ -286,7 +288,7 @@ TBitsetBase::TBitsetBase(const tCIDLib::TCard4 c4SetSize) :
 
     // And allocate and zero the storage array
     m_pc1Bits = new tCIDLib::TCard1[m_c4Bytes];
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 }
 
 TBitsetBase::TBitsetBase(const  tCIDLib::TCard4         c4SetSize
@@ -392,7 +394,7 @@ TBitsetBase& TBitsetBase::operator=(TBitsetBase&& btsSrc)
 // ---------------------------------------------------------------------------
 //  TBitsetBase: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TBitsetBase::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TBitsetBase::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     // Make sure its even been set up yet
     CheckReady();
@@ -732,7 +734,7 @@ tCIDLib::TVoid TBitsetBase::ResetBitCount(const tCIDLib::TCard4 c4NewSize)
         m_pc1Bits = new tCIDLib::TCard1[m_c4Bytes];
 
     // Zero out the bit buffer
-    TRawMem::SetMemBuf(m_pc1Bits, tCIDLib::TCard1(0), m_c4Bytes);
+    TRawMem::SetMemBuf(m_pc1Bits, kCIDLib::c1MinCard, m_c4Bytes);
 
     // Recalc the trailing byte mask
     CalcTrailingMask();

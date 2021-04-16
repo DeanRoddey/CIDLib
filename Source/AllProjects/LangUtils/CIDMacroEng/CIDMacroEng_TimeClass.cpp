@@ -45,12 +45,15 @@ RTTIDecls(TMEngTimeInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_TimeClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strTime(L"Time");
-    const TString   strTimeClassPath(L"MEng.Time");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strTime(L"Time");
+        const TString   strTimeClassPath(L"MEng.Time");
+    }
 }
 
 
@@ -185,13 +188,13 @@ TTime& TMEngTimeVal::tmValue(const TTime& tmToSet)
 
 
 tCIDLib::TVoid
-TMEngTimeVal::SetPattern(const  TTime::TCompList&   fcolToSet
+TMEngTimeVal::SetPattern(const  TTimeCompList&      fcolToSet
                         , const tCIDLib::TCh        chDateSep
                         , const tCIDLib::TCh        chTimeSep
                         , const tCIDLib::TCh        chTZSep)
 {
     if (!m_pfcolPattern)
-        m_pfcolPattern = new TTime::TCompList(fcolToSet);
+        m_pfcolPattern = new TTimeCompList(fcolToSet);
     else
         *m_pfcolPattern = fcolToSet;
 
@@ -200,10 +203,10 @@ TMEngTimeVal::SetPattern(const  TTime::TCompList&   fcolToSet
     m_chTZSep = chTZSep;
 }
 
-tCIDLib::TVoid TMEngTimeVal::SetPattern(const TTime::TCompList& fcolToSet)
+tCIDLib::TVoid TMEngTimeVal::SetPattern(const TTimeCompList& fcolToSet)
 {
     if (!m_pfcolPattern)
-        m_pfcolPattern = new TTime::TCompList(fcolToSet);
+        m_pfcolPattern = new TTimeCompList(fcolToSet);
     else
         *m_pfcolPattern = fcolToSet;
 }
@@ -243,46 +246,47 @@ TMEngTimeInfo::TMEngTimeInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2EnumId_Months(kMacroEng::c2BadId)
-    , m_c2EnumId_TimeComps(kMacroEng::c2BadId)
-    , m_c2EnumId_WeekDays(kMacroEng::c2BadId)
-    , m_c2TypeId_TimeCompsVec(kMacroEng::c2BadId)
-    , m_c2MethId_AddStamp(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurMillis(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurMillis64(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurStamp(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurStampPlusMSs(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurStampPlusSecs(kMacroEng::c2BadId)
-    , m_c2MethId_GetDateFlds(kMacroEng::c2BadId)
-    , m_c2MethId_GetJulianDate(kMacroEng::c2BadId)
-    , m_c2MethId_GetStamp(kMacroEng::c2BadId)
-    , m_c2MethId_GetTimeFlds(kMacroEng::c2BadId)
-    , m_c2MethId_GetTZOffset(kMacroEng::c2BadId)
-    , m_c2MethId_GetWeekday(kMacroEng::c2BadId)
-    , m_c2MethId_IsDiffGreater(kMacroEng::c2BadId)
-    , m_c2MethId_IsLeapYear(kMacroEng::c2BadId)
-    , m_c2MethId_LocalToUTC(kMacroEng::c2BadId)
-    , m_c2MethId_Parse8601(kMacroEng::c2BadId)
-    , m_c2MethId_ParseFromPattern(kMacroEng::c2BadId)
-    , m_c2MethId_SetDate(kMacroEng::c2BadId)
-    , m_c2MethId_SetDateTime(kMacroEng::c2BadId)
-    , m_c2MethId_SetDefFmt(kMacroEng::c2BadId)
-    , m_c2MethId_SetFromJulian(kMacroEng::c2BadId)
-    , m_c2MethId_SetFromStamp(kMacroEng::c2BadId)
-    , m_c2MethId_SetParsePattern(kMacroEng::c2BadId)
-    , m_c2MethId_SetParsePattern2(kMacroEng::c2BadId)
-    , m_c2MethId_SetSpecial(kMacroEng::c2BadId)
-    , m_c2MethId_SetToDifference(kMacroEng::c2BadId)
-    , m_c2MethId_SetToSunrise(kMacroEng::c2BadId)
-    , m_c2MethId_SetToSunset(kMacroEng::c2BadId)
-    , m_c2MethId_SetTime(kMacroEng::c2BadId)
-    , m_c2MethId_Sleep(kMacroEng::c2BadId)
-    , m_c2MethId_SpecialCtor(kMacroEng::c2BadId)
-    , m_c2MethId_SubStamp(kMacroEng::c2BadId)
-    , m_c2MethId_UTCToLocal(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_Months(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_TimeComps(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_WeekDays(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_TimeCompsVec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AddStamp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatToStr(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurMillis(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurMillis64(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurStamp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurStampPlusMSs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurStampPlusSecs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetDateFlds(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetJulianDate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetStamp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetTimeFlds(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetTZOffset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetWeekday(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsDiffGreater(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsLeapYear(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LocalToUTC(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Parse8601(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseFromPattern(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDateTime(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDefFmt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetFromJulian(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetFromStamp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetParsePattern(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetParsePattern2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetSpecial(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetToDifference(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetToSunrise(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetToSunset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetTime(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sleep(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SpecialCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SubStamp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_UTCToLocal(kCIDMacroEng::c2BadId)
     , m_c4ErrCvtFailed(kCIDLib::c4MaxCard)
     , m_c4ErrFmtFailed(kCIDLib::c4MaxCard)
     , m_c4ErrNegTime(kCIDLib::c4MaxCard)
@@ -782,6 +786,21 @@ tCIDLib::TVoid TMEngTimeInfo::Init(TCIDMacroEngine& meOwner)
         m_c2MethId_GetWeekday = c2AddMethodInfo(methiNew);
     }
 
+    // Format to string, based on provided format string
+    {
+        TMEngMethodInfo methiNew
+        (
+            L"FormatToStr"
+            , tCIDMacroEng::EIntrinsics::Void
+            , tCIDMacroEng::EVisTypes::Public
+            , tCIDMacroEng::EMethExt::Final
+            , tCIDMacroEng::EConstTypes::Const
+        );
+        methiNew.c2AddOutParm(L"OutStr", tCIDMacroEng::EIntrinsics::String);
+        methiNew.c2AddInParm(L"FormatStr", tCIDMacroEng::EIntrinsics::String);
+        m_c2MethId_FormatToStr = c2AddMethodInfo(methiNew);
+    }
+
     //
     //  Returns true if the difference between this time and the (earlier) one
     //  passed is greater than a number of seconds.
@@ -1261,6 +1280,20 @@ TMEngTimeInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         TMEngEnumVal& mecvRet = meOwner.mecvStackAtAs<TMEngEnumVal>(c4FirstInd - 1);
         mecvRet.c4Ordinal(tCIDLib::c4EnumOrd(eDay));
     }
+     else if (c2MethId == m_c2MethId_FormatToStr)
+    {
+        // Format to a string, taking an ad hoc format string, not the one set on the time object
+        try
+        {
+            TMEngStringVal& mecvTar = meOwner.mecvStackAtAs<TMEngStringVal>(c4FirstInd);
+            mecvActual.tmValue().FormatToStr(mecvTar.strValue(), meOwner.strStackValAt(c4FirstInd + 1));
+        }
+
+        catch(TError& errToCatch)
+        {
+            ThrowAnErr(meOwner, m_c4ErrFmtFailed, errToCatch);
+        }
+    }
      else if (c2MethId == m_c2MethId_IsDiffGreater)
     {
         const tCIDLib::TCard4 c4DiffLim = meOwner.c4StackValAt(c4FirstInd + 1);
@@ -1420,7 +1453,7 @@ TMEngTimeInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         try
         {
             // We have to convert the CML vector of values to a C++ version
-            TTime::TCompList fcolComps;
+            TTimeCompList fcolComps;
             const TMEngVectorVal& mecvComps = meOwner.mecvStackAtAs<TMEngVectorVal>(c4FirstInd);
             const tCIDLib::TCard4 c4Count = mecvComps .c4ElemCount();
 

@@ -288,9 +288,19 @@ class CIDMDATAEXP TChunkedFileChunk : public TObject, public MDuplicable
             const   TChunkedFileChunk&      chflchSrc
         );
 
+        TChunkedFileChunk
+        (
+                    TChunkedFileChunk&&     chflchSrc
+        );
+
         TChunkedFileChunk& operator=
         (
             const   TChunkedFileChunk&      chflchSrc
+        );
+
+        TChunkedFileChunk& operator=
+        (
+                    TChunkedFileChunk&&     chflchSrc
         );
 
 
@@ -359,6 +369,11 @@ class CIDMDATAEXP TChunkedFileData : public TChunkedFileChunk
             const   TChunkedFileData&      chflchSrc
         );
 
+        TChunkedFileData
+        (
+                    TChunkedFileData&&     chflchSrc
+        );
+
         ~TChunkedFileData();
 
 
@@ -368,6 +383,11 @@ class CIDMDATAEXP TChunkedFileData : public TChunkedFileChunk
         TChunkedFileData& operator=
         (
             const   TChunkedFileData&      chflchSrc
+        );
+
+        TChunkedFileData& operator=
+        (
+                    TChunkedFileData&&      chflchSrc
         );
 
 
@@ -412,6 +432,11 @@ class CIDMDATAEXP TChunkedFileExt : public TChunkedFileChunk
             const   TChunkedFileExt&      chflchSrc
         );
 
+        TChunkedFileExt
+        (
+                    TChunkedFileExt&&     chflchSrc
+        );
+
         ~TChunkedFileExt();
 
 
@@ -421,6 +446,11 @@ class CIDMDATAEXP TChunkedFileExt : public TChunkedFileChunk
         TChunkedFileExt& operator=
         (
             const   TChunkedFileExt&      chflchSrc
+        );
+
+        TChunkedFileExt& operator=
+        (
+                    TChunkedFileExt&&     chflchSrc
         );
 
 
@@ -456,6 +486,11 @@ class CIDMDATAEXP TChunkedFileMeta : public TChunkedFileChunk
             const   TChunkedFileMeta&      chflchSrc
         );
 
+        TChunkedFileMeta
+        (
+                    TChunkedFileMeta&&     chflchSrc
+        );
+
         ~TChunkedFileMeta();
 
 
@@ -465,6 +500,11 @@ class CIDMDATAEXP TChunkedFileMeta : public TChunkedFileChunk
         TChunkedFileMeta& operator=
         (
             const   TChunkedFileMeta&      chflchSrc
+        );
+
+        TChunkedFileMeta& operator=
+        (
+                    TChunkedFileMeta&&     chflchSrc
         );
 
 
@@ -681,6 +721,11 @@ class CIDMDATAEXP TChunkedFile : public TObject, public MStreamable
             const   TChunkedFile&           chflSrc
         );
 
+        TChunkedFile
+        (
+                    TChunkedFile&&          chflSrc
+        );
+
         ~TChunkedFile();
 
 
@@ -690,6 +735,11 @@ class CIDMDATAEXP TChunkedFile : public TObject, public MStreamable
         TChunkedFile& operator=
         (
             const   TChunkedFile&           chflSrc
+        );
+
+        TChunkedFile& operator=
+        (
+                    TChunkedFile&&          chflSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -915,12 +965,12 @@ class CIDMDATAEXP TChunkedFile : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -964,7 +1014,7 @@ class CIDMDATAEXP TChunkedFile : public TObject, public MStreamable
         static TChunkedFileChunk* pchflchStreamInChunk
         (
                     TBinInStream&           strmSrc
-            ,       tCIDLib::TCard4&        c4ChunkSz
+            , COP   tCIDLib::TCard4&        c4ChunkSz
         );
 
         static tCIDLib::TVoid StreamInHdr

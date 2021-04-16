@@ -43,134 +43,6 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-class TCollectionBase;
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TCursorBase
-//  PREFIX: curs
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TCursorBase : public TObject
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        ~TCursorBase();
-
-
-        // -------------------------------------------------------------------
-        //  Public, pure virtual methods
-        // -------------------------------------------------------------------
-        virtual tCIDLib::TBoolean bIsEmpty() const = 0;
-
-        virtual tCIDLib::TBoolean bIsValid() const = 0;
-
-        virtual tCIDLib::TBoolean bNext() = 0;
-
-        virtual tCIDLib::TBoolean bReset() = 0;
-
-        virtual tCIDLib::TCard4 c4ElemCount() const = 0;
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4SerialNum() const
-        {
-            return m_c4SerialNum;
-        }
-
-
-    protected   :
-        // -------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // -------------------------------------------------------------------
-        TCursorBase();
-
-        TCursorBase
-        (
-            const   tCIDLib::TCard4         c4SerialNum
-        );
-
-        TCursorBase
-        (
-            const   TCursorBase&            cursSrc
-        );
-
-        TCursorBase& operator=
-        (
-            const   TCursorBase&            cursSrc
-        );
-
-        tCIDLib::TBoolean operator==
-        (
-            const   TCursorBase&            cursSrc
-        )   const;
-
-        tCIDLib::TBoolean operator!=
-        (
-            const   TCursorBase&            cursSrc
-        )   const;
-
-
-        // -------------------------------------------------------------------
-        //  Protected, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TVoid CheckSerialNum
-        (
-            const   tCIDLib::TCard4         c4ToCheck
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid CheckValid
-        (
-            const   tCIDLib::TVoid* const   pcursTest
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid CheckValid
-        (
-            const   tCIDLib::TBoolean       bState
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TCard4 c4SerialNum
-        (
-            const   tCIDLib::TCard4         c4New
-        );
-
-        tCIDLib::TVoid ThrowNotInitialized
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_c4SerialNum
-        //      This is a serial number from the collection. Its stored when
-        //      this collection is first created or synced back up by a
-        //      bReset() call. This lets the derived cursor class know if
-        //      it is out of date with respect to the collection it is
-        //      cursoring.
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4SerialNum;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TCursorBase,TObject)
-};
-
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TColCursor
@@ -182,7 +54,7 @@ template <typename TElem> class TColCursor : public TCursorBase
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TColCursor() {}
+        ~TColCursor() = default;
 
 
         // -------------------------------------------------------------------
@@ -222,11 +94,6 @@ template <typename TElem> class TColCursor : public TCursorBase
             return !TColCursor::operator==(cursSrc);
         }
 
-        //
-        //  To support pre-increment polymorphically, but there has to be a
-        //  version in the derived classes as well, to avoid name masking of
-        //  the post-increment ones that can only be done there.
-        //
         TColCursor<TElem>& operator++()
         {
             this->bNext();
@@ -247,10 +114,10 @@ template <typename TElem> class TColCursor : public TCursorBase
         {
             // If not set yet...
             if (!m_pcolBaseCurs)
-                return kCIDLib::False;
+                return kCIDLib::True;
 
             // Lock the collection
-            TMtxLocker lockCol(m_pcolBaseCurs->pmtxLock());
+            TLocker lockrCol(m_pcolBaseCurs);
             return m_pcolBaseCurs->bIsEmpty();
         }
 
@@ -269,7 +136,7 @@ template <typename TElem> class TColCursor : public TCursorBase
             this->CheckInitialized(CID_FILE, CID_LINE);
 
             // Lock the collection and check the serial number
-            TMtxLocker lockCol(m_pcolBaseCurs->pmtxLock());
+            TLocker lockrCol(m_pcolBaseCurs);
             CheckSerialNum(m_pcolBaseCurs->c4SerialNum(), CID_FILE, CID_LINE);
             return m_pcolBaseCurs->c4ElemCount();
         }
@@ -297,27 +164,31 @@ template <typename TElem> class TColCursor : public TCursorBase
 
         TColCursor(const TCollectionBase* const pcolToCursor) :
 
-            TCursorBase(pcolToCursor->c4SerialNum())
+            TCursorBase(pcolToCursor)
             , m_pcolBaseCurs(pcolToCursor)
         {
         }
 
-        TColCursor(const TColCursor& cursSrc) :
+        TColCursor(const TColCursor&) = default;
+        TColCursor<TElem>& operator=(const TColCursor&) = default;
 
-            TCursorBase(cursSrc)
-            , m_pcolBaseCurs(cursSrc.m_pcolBaseCurs)
+        TColCursor(TColCursor&& cursSrc) :
+
+            m_pcolBaseCurs(nullptr)
         {
+            *this = tCIDLib::ForceMove(cursSrc);
         }
 
-        TColCursor<TElem>& operator=(const TColCursor& cursSrc)
+        TColCursor<TElem>& operator=(TColCursor&& cursSrc)
         {
             if (&cursSrc != this)
             {
-                TParent::operator=(cursSrc);
-                m_pcolBaseCurs  = cursSrc.m_pcolBaseCurs;
+                TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                tCIDLib::Swap(m_pcolBaseCurs, cursSrc.m_pcolBaseCurs);
             }
             return *this;
         }
+
 
         // -------------------------------------------------------------------
         //  Protected, non-virtual methods
@@ -355,13 +226,13 @@ template <typename TElem> class TColCursor : public TCursorBase
 //   CLASS: TBiColCursor
 //  PREFIX: curs
 // ---------------------------------------------------------------------------
-template <class TElem> class TBiColCursor : public TColCursor<TElem>
+template <typename TElem> class TBiColCursor : public TColCursor<TElem>
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TBiColCursor() {}
+        ~TBiColCursor() = default;
 
 
         // -------------------------------------------------------------------
@@ -382,7 +253,6 @@ template <class TElem> class TBiColCursor : public TColCursor<TElem>
         virtual tCIDLib::TBoolean bSeekToEnd() = 0;
 
 
-
     protected   :
         // -------------------------------------------------------------------
         //  Hidden construtors and operators
@@ -397,18 +267,10 @@ template <class TElem> class TBiColCursor : public TColCursor<TElem>
         {
         }
 
-        TBiColCursor(const TBiColCursor& cursSrc) :
-
-            TColCursor<TElem>(cursSrc)
-        {
-        }
-
-        TBiColCursor<TElem>& operator=(const TBiColCursor& cursSrc)
-        {
-            if (&cursSrc != this)
-                TParent::operator=(cursSrc);
-            return *this;
-        }
+        TBiColCursor(const TBiColCursor&) = default;
+        TBiColCursor(TBiColCursor&&) = default;
+        TBiColCursor<TElem>& operator=(const TBiColCursor&) = default;
+        TBiColCursor<TElem>& operator=(TBiColCursor&&) = default;
 
 
     private :

@@ -102,7 +102,7 @@ tCIDLib::TVoid
 TCIDObjStoreImpl::AddObject(const   TString&        strKey
                             , const TMemBuf&        mbufKey
                             , const tCIDLib::TCard4 c4KeyBytes
-                            , const TMemBuf&        mbufData
+                            , const TMemBuf&       mbufData
                             , const tCIDLib::TCard4 c4DataSize
                             , const tCIDLib::TCard4 c4Reserve)
 {
@@ -416,8 +416,45 @@ tCIDLib::TCard4 TCIDObjStoreImpl::c4ObjectsInStore() const
 
 
 //
+//  Returns all of the object keys under the passed scope. Returns true if it finds
+//  any. This only returns the base name. c4QueryObjectsInScope below returns the
+//  full paths.
+//
+tCIDLib::TCard4
+TCIDObjStoreImpl::c4QueryKeysInScope(const  TString&              strScope
+                                    ,       tCIDLib::TStrCollect& colToFill)
+{
+    //
+    //  Our scopes are stored with the trailing slash, but the passed one might
+    //  not. So we need to create one that we are sure has the slash. This way we
+    //  are sure we don't partially match a scope.
+    //
+    TString strToFind(strScope);
+    if (strToFind.chLast() != kCIDLib::chForwardSlash)
+        strToFind.Append(kCIDLib::chForwardSlash);
+
+    //
+    //  Iterate the items, and for each one in the the passed scope, add
+    //  its key to the passed collection.
+    //
+    colToFill.RemoveAll();
+    TStoreList::TCursor cursStore(&m_colStoreList);
+    for (; cursStore; ++cursStore)
+    {
+        const TOSStoreItem& osiCur = *cursStore;
+        const TString& strCurPath = osiCur.strScope();
+
+        // If this path is equal the one we are looking for, then take this guy
+        if (strToFind.bCompareI(osiCur.strScope()))
+            colToFill.objAdd(osiCur.strName());
+    }
+    return colToFill.c4ElemCount();
+}
+
+//
 //  Find all of the objects in the passed scope. We return the full paths to the
-//  objects we find. The return is the number we found.
+//  objects we find. The return is the number we found. See c4QueryKeysInScope
+//  above, which returns just the names relative to the scope, not the full paths.
 //
 tCIDLib::TCard4
 TCIDObjStoreImpl::c4QueryObjectsInScope(const   TString&              strScope
@@ -554,6 +591,7 @@ TCIDObjStoreImpl::c4UpdateObject(const  TString&        strKey
     try
     {
         // Call the common helper that actually does the work
+        CIDLib_Suppress(6011) // We null checked above
         UpdateItemData(*posiToUpdate, mbufData, c4Size);
 
         // Flush any changes to disk
@@ -629,6 +667,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::DeleteObject(const TString& strKey)
         }
 
         // Give this object's chunk back and remove it from the list
+        CIDLib_Suppress(6011) // We null checked above
         c4GiveBackChunk(posiDel->c4Offset(), posiDel->c4StorageRequired());
         m_colStoreList.bRemoveKey(strKey);
 
@@ -717,6 +756,9 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
                                 ,       tCIDLib::TCard4&    c4KeySize
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
+    c4DataSize = 0;
+    c4KeySize = 0;
+
     //
     //  Find the item with this key. Either throw or return not found, if we don't
     //  find it.
@@ -800,6 +842,7 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
     //  If the version number is the same, then its not changed, so return
     //  false with no data.
     //
+    CIDLib_Suppress(6011) // We null checked above
     if (posiCur->c4Version() == c4Version)
         return tCIDLib::ELoadRes::NoNewData;
 

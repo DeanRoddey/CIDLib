@@ -17,74 +17,7 @@
 //
 //  This is the header for the CIDLib_PubSub.Cpp file. This file implements a framework
 //  for intra-program publish and subscribe. We define some public classes which are
-//  mostly just reference counters around a matching set of internal classes. We have
-//  the following public classes:
-//
-//      1.  Messages, these encapsulate and ref count the arbitrary objects that are
-//          sent by publishers. They can be anything derived from TObject. But any
-//          given topic only supports a single class type for msgs, you can't mix
-//          types. Well, you can send anything derived from the type that the topic
-//          was set up for.
-//
-//          The object must be allocated. It is encapsulated in our msg class, and
-//          copies of that are sent to subscribers. When the last one reads and discards
-//          it, the original object is released.
-//
-//          These are not thread safe, which is fine. They are const, so subscribers can
-//          only read out contents and then discard.
-//
-//      2.  Topics. These are published topics. As long as the caller keeps the topic
-//          around (it's a ref counted internal object, so he can copy it and such, as
-//          long as one copy stays around) the topic is active. He can send msgs to all
-//          subscribers.
-//
-//          These are thread safe, though typically you'd just create the topic and then
-//          other threads can join the topic, getting their own topic object (though they
-//          all share the same internal implementation object.)
-//
-//      3.  Subcriptions. These are the subscribers to topics. Each one can subscribe to
-//          to one or more topics. The topic doesn't have to be published yet. They will be
-//          connected later if needed, or they can ask to throw if it doesn't already exist.
-//          These come in sync and async variations.
-//
-//  Sync vs. Async Subscribers
-//
-//  The basic implementation is synchronous. I.e. the topics call to the subscribers which
-//  are typically going to handle the event right there. So that means that each subscriber
-//  in turn will get called, with no overlap. When all have been called, there will be no
-//  copies of the msg but the one the topic is sending, and he will drop it and it's done.
-//
-//  Sync subscribers implement a mixin class, and they use that to register themselves for
-//  subscriptions. Our pub/sub framework interacts with them via the mixin. The dtor for
-//  the mixin (which will get called when the dtor for the mixed into object is destroyed)
-//  will unsubscribe itself from any subscribed topics. Unless things go really badly, this
-//  will prevent any dead objects from remaining subscribed (a very bad thing since we will
-//  keep calling its msg handler callback.)
-//
-//  A subscriber can subscribe to multiple topics. If so, they must check the topic path
-//  in incoming msgs to see what type of data it contains.
-//
-//  We also provide an async subscriber which is just like any other subscriber but it
-//  contains a thread safe queue and just queues up the msg for someone else to come back
-//  later and read. In this case, it's not a mixin, it implements the mixin. If you want
-//  to do async subscription, you just create an instance of the async subscriber class.
-//
-//  Since async subscribers are separate objects, you can choose to create one per topic
-//  you want to subscribe to, or subscribe one to multiple topics.
-//
-//
-//  * Just beware if you do an async that the information can be out of date by the time you
-//  get it. For instance, if subscribed to changes from a collection, by the time you process
-//  one change, another change may have happened, rendering any indices reported in the
-//  first change invalid before you can use it. Asyncs generally only make sense when they
-//  are more of the command type. Or you can have a sync handler that grabs more info right
-//  then, and turns around and publishes that to another topic that can be handled async
-//  because it's not just depending on indices.
-//
-//  Topics don't know if subscribers are sync or async, it just calls them. So there can be
-//  mixed subscriber types on a single topic.
-//
-//
+//  mostly just reference counters around a matching set of internal classes.
 //  Ids
 //
 //  Each mesage, topic, and subscriber is given a unique numerical id. The id for each
@@ -93,7 +26,7 @@
 //
 //  Msg ids are monotonic for each topic, so subscribers can know if they have somehow
 //  missed msgs if they want, by remembering the id of the last msg they read. This of
-//  course is only meaningful for async subscribers, and therefore there's a chance that
+//  course is only meaningful for async subscribers, where there's a chance that
 //  the queue may overflow.
 //
 //
@@ -126,13 +59,12 @@
 //  sources you could also throw the incoming msgs into one. As long as the queue is thread
 //  safe, then there are no issues.
 //
-//  Our internal msg class (which wraps your published objects) implements MRefCounted and
-//  we manage the reference counting internally. Each subscriber is giving a copy of this
-//  ref counted object, so they all see the same one. When the last subscriber has read
-//  it, it is dropped.
+//  Our public msg class (TPubSubMsg) wraps your published messages. It actually puts
+//  them into an internal msg implementation object, and the public class uses a pointed
+//  counter on that impl object. It hands out these msgs out, all of which are looking
+//  at the same message data. When the one is dropped the internal object and your
+//  published message is dropped.
 //
-//  To avoid potential deadlocks, we use a separate internal critical section to handle
-//  the reference counting.
 //
 //  KEEP IN MIND that anything you do in the dtor of the published objects will happen at
 //  some fairly random time, when the last subscriber of that topic has read it and let it
@@ -144,16 +76,18 @@
 //
 //  A common scenario with async subscribers is for the client code to either use a GUI
 //  timer or a separate thread to monitor the subscription object for msgs to process.
-//  In the former case it will just do a 0 timeout read to get anything already avaialble.
-//  In the latter it can do a longer blocking read to just wait for stuff to be available.
+//  In the former case it will just do a 0 timeout read to get anything already available.
+//  In the latter it can do a longer blocking read to just wait for stuff to be available,
+//  though of course still being responsive to shutdown requests.
 //
 //  But, in some cases, if some client code needed to subscribe to multiple topics, or to
 //  wait for either topic msgs or socket input or some such, then it would want to use an
 //  event driven scheme.
 //
 //  So you can request the subscription to create an event, which can either be blocked on
-//  itself (not really needed sinc you can just do a blocking read) or added to to a multi-
-//  event wait list. It will be posted when msgs are available and reset when not.
+//  itself (not really needed sinc you can just do a blocking read in that case) or more
+//  likely added to to a multi-event wait list. It will be posted when msgs are available
+//  and reset when not.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -171,9 +105,81 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 // Forward reference our internal implementation classes
-class TPSMsg;
 class TPSTopic;
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TPSMsg
+// PREFIX: psmsg
+//
+//  Our internal wrapper around msgs. The public message class creates a counted pointer
+//  around one of these, which will clean us up once the last msg object that refs this
+//  msg is released. We need this extra layer so we can store some other info that is
+//  not part of the msg object.
+// ---------------------------------------------------------------------------
+class TPSMsg
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor.
+        // -------------------------------------------------------------------
+        TPSMsg() = delete;
+
+        TPSMsg
+        (
+            const   TObject* const      pobjToAdopt
+            , const tCIDLib::TCard4     c4MsgId
+            , const TString&            strTopicPath
+        );
+
+        TPSMsg(const TPSMsg&) = delete;
+        TPSMsg(TPSMsg&&) = delete;
+
+        ~TPSMsg();
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TPSMsg& operator=(const TPSMsg&) = delete;
+        TPSMsg& operator=(TPSMsg&&) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4MsgId() const
+        {
+            return m_c4MsgId;
+        }
+
+        const TObject& objMsg() const
+        {
+            return *m_pobjMsg;
+        }
+
+        const TString& strTopicPath() const
+        {
+            return m_strTopicPath;
+        }
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_c4MsgId
+        //      Our topic assigns each msg an id from a monotonic counter.
+        //
+        //  m_pobjMsg
+        //      The actual msg object. We own it and delete it when we are deleted.
+        //
+        //  m_strTopicPath
+        //      The id of the topic that issued the msg
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4     m_c4MsgId;
+        const TObject*      m_pobjMsg;
+        TString             m_strTopicPath;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -191,10 +197,8 @@ class CIDLIBEXP TPubSubMsg : public TObject
                     TPSMsg* const       psmsgToAdopt = nullptr
         );
 
-        TPubSubMsg
-        (
-            const   TPubSubMsg&         psmsgSrc
-        );
+        TPubSubMsg(const TPubSubMsg&) = default;
+        TPubSubMsg(TPubSubMsg&&) = default;
 
         ~TPubSubMsg();
 
@@ -202,10 +206,8 @@ class CIDLIBEXP TPubSubMsg : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TPubSubMsg& operator=
-        (
-            const   TPubSubMsg&         psmsgSrc
-        );
+        TPubSubMsg& operator=(const TPubSubMsg&) = default;
+        TPubSubMsg& operator=(TPubSubMsg&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -213,13 +215,14 @@ class CIDLIBEXP TPubSubMsg : public TObject
         // -------------------------------------------------------------------
         const TObject& objMsg() const;
 
-        template <class T> const T& objMsgAs() const
+        template <typename T> const T& objMsgAs() const
         {
             CheckMsgType(T::clsThis());
             return static_cast<const T&>(objMsg());
         }
 
         const TString& strSrcTopicPath() const;
+
 
     private :
         // -------------------------------------------------------------------
@@ -278,13 +281,13 @@ class CIDLIBEXP MPubSubscription
         // -------------------------------------------------------------------
         //  Declare friends
         // -------------------------------------------------------------------
-        friend static tCIDLib::TVoid SendMsg
+        friend tCIDLib::TVoid SendMsg
         (
             const   tCIDLib::TCard4         c4SubId
             , const TPubSubMsg&             psmsgToSend
         );
 
-        friend static tCIDLib::ESortComps eCompSubId
+        friend tCIDLib::ESortComps eCompSubId
         (
             const   tCIDLib::TCard4&        c4ToComp
             , const MPubSubscription&       mpsubToComp
@@ -301,11 +304,13 @@ class CIDLIBEXP MPubSubscription
         (
             const   MPubSubscription&       mpsubSrc
         );
+        MPubSubscription(MPubSubscription&&) = delete;
 
         MPubSubscription& operator=
         (
             const   MPubSubscription&       mpsubSrc
         );
+        MPubSubscription& operator=(MPubSubscription&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -395,6 +400,9 @@ class CIDLIBEXP TPubSubTopic : public TObject
             const   TPubSubTopic&           pstopSrc
         );
 
+        // Can't actually delete it since that causes problems
+        // TPubSubTopic(TPubSubTopic&&) = delete;
+
         ~TPubSubTopic();
 
 
@@ -405,6 +413,9 @@ class CIDLIBEXP TPubSubTopic : public TObject
         (
             const   TPubSubTopic&           pstopSrc
         );
+
+        // Can't actually delete it since that causes problems
+        // TPubSubTopic& operator=(TPubSubTopic&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -437,7 +448,7 @@ class CIDLIBEXP TPubSubTopic : public TObject
         //  internally, and let the internal scavenger call have access to our
         //  our subscription object.
         // -------------------------------------------------------------------
-        friend static tCIDLib::TVoid DoScavenge();
+        friend tCIDLib::TVoid DoScavenge();
         friend class MPubSubscription;
 
 

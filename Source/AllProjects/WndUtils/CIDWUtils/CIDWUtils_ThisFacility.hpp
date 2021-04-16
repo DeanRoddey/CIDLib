@@ -40,6 +40,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         TFacCIDWUtils();
 
         TFacCIDWUtils(const TFacCIDWUtils&) = delete;
+        TFacCIDWUtils(TFacCIDWUtils&&) = delete;
 
         ~TFacCIDWUtils();
 
@@ -48,6 +49,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDWUtils& operator=(const TFacCIDWUtils&) = delete;
+        TFacCIDWUtils& operator=(TFacCIDWUtils&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -72,7 +74,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         (
             const   TWindow&                wndOwner
             , const TString&                strTitle
-            ,       tCIDLib::TEncodedTime&  enctEdit
+            , COP   tCIDLib::TEncodedTime&  enctEdit
         );
 
         tCIDLib::TBoolean bGetReplaceOpts
@@ -82,8 +84,8 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
             ,       TString&                strRepWith
             ,       tCIDLib::TStrList&      colFindRecall
             ,       tCIDLib::TStrList&      colRepRecall
-            ,       tCIDLib::TBoolean&      bFullMatchOnly
-            ,       tCIDLib::TBoolean&      bSelectionOnly
+            , COP   tCIDLib::TBoolean&      bFullMatchOnly
+            , COP   tCIDLib::TBoolean&      bSelectionOnly
             , const tCIDWUtils::EFindFlags  eFlags
         )   const;
 
@@ -92,8 +94,8 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
             const   TWindow&                wndOwner
             ,       TString&                strToFind
             ,       tCIDLib::TStrList&      colRecallList
-            ,       tCIDLib::TBoolean&      bFullMatchOnly
-            ,       tCIDLib::TBoolean&      bSelectionOnly
+            , COP   tCIDLib::TBoolean&      bFullMatchOnly
+            , COP   tCIDLib::TBoolean&      bSelectionOnly
             , const tCIDWUtils::EFindFlags  eFlags
         )   const;
 
@@ -101,7 +103,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         (
             const   TWindow&                wndOwner
             , const TString&                strTitle
-            ,       TSize&                  szToFill
+            , COP   TSize&                  szToFill
             , const TSize&                  szInit
             , const TSize&                  szMin
             , const TSize&                  szMax
@@ -113,7 +115,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         (
             const   TWindow&                wndOwner
             , const TString&                strTitle
-            ,       TSize&                  szToFill
+            , COP   TSize&                  szToFill
             , const TSize&                  szMin
             , const TSize&                  szMax
             , const tCIDLib::TBoolean       bForceAR
@@ -187,23 +189,23 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
             const   TWindow&                wndOwner
             , const TString&                strTitle
             ,       tCIDLib::TStrList&      colList
-            ,       TString&                strSelText
+            , COP   TString&                strSelText
             , const tCIDWUtils::EListValFmts eFmt
         )   const;
 
         tCIDLib::TBoolean bSelectColor
         (
             const   TWindow&                wndOwner
-            ,       TRGBClr&                rgbSelected
+            , COP   TRGBClr&                rgbSelected
         );
 
         tCIDLib::TBoolean bSelectFont
         (
             const   TWindow&                wndOwner
-            ,       TString&                strFaceName
-            ,       tCIDLib::TCard4&        c4Height
-            ,       tCIDLib::TBoolean&      bBold
-            ,       tCIDLib::TBoolean&      bItalic
+            , COP   TString&                strFaceName
+            , COP   tCIDLib::TCard4&        c4Height
+            , COP   tCIDLib::TBoolean&      bBold
+            , COP   tCIDLib::TBoolean&      bItalic
         );
 
         tCIDLib::TBoolean bSelectFontFace
@@ -220,7 +222,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
             const   TWindow&                wndOwner
             , const TRefVector<TCIDImage>&  colImgs
             , const TString&                strTitle
-            ,       tCIDLib::TCard4&        c4SelIndex
+            , COP   tCIDLib::TCard4&        c4SelIndex
         );
 
         tCIDLib::TCard4 c4ListSelect
@@ -245,7 +247,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         tCIDWUtils::EErrOpts eGetErrOpt
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strOpName
             , const tCIDLib::TBoolean       bMultiMode
             , const tCIDLib::TBoolean       bDiscardMode
@@ -254,7 +256,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         tCIDWUtils::EErrOpts eGetErrOpt2
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strTarget
             , const TString&                strErrMsg
             , const tCIDLib::TBoolean       bMultiMode
@@ -264,7 +266,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         tCIDWUtils::EOverOpts eGetOverOpt
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strTarget
             , const tCIDLib::TBoolean       bMultiMode
         )   const;
@@ -272,7 +274,7 @@ class CIDWUTILSEXP TFacCIDWUtils : public TGUIFacility
         tCIDWUtils::ESaveOpts eGetSaveOpt
         (
             const   TWindow&                wndOwner
-            ,       tCIDLib::TBoolean&      bDoAll
+            , COP   tCIDLib::TBoolean&      bDoAll
             , const TString&                strSource
             , const tCIDLib::TBoolean       bMultiMode
         )   const;

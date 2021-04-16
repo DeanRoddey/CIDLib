@@ -43,14 +43,14 @@ RTTIDecls(TTextInStream,TObject)
 // ---------------------------------------------------------------------------
 static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 {
-    static volatile tCIDLib::TBoolean   bInitDone  = kCIDLib::False;
-    static const tCIDLib::TCh*          pszFalse   = kCIDLib_::pszFalse;
-    static const tCIDLib::TCh*          pszTrue    = kCIDLib_::pszTrue;
+    static TAtomicFlag          atomInitDone;
+    static const tCIDLib::TCh*  pszFalse   = kCIDLib_::pszFalse;
+    static const tCIDLib::TCh*  pszTrue    = kCIDLib_::pszTrue;
 
-    if (!bInitDone)
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const tCIDLib::TCh* pszTmp;
             pszTmp = facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
@@ -61,7 +61,7 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
             if (pszTmp)
                 pszTrue = TRawStr::pszReplicate(pszTmp);
 
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
     if (bVal)
@@ -79,6 +79,9 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
 // ---------------------------------------------------------------------------
 //  TTextInStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextInStream::TTextInStream(TBinInStream* const        pstrmToAdopt
                             ,   TTextConverter* const   ptcvtToAdopt) :
     m_c4CacheOfs(0)
@@ -291,7 +294,7 @@ TTextInStream::c4GetLine(       TString&            strToFill
     //  stream, got as many chars as needed.
     //
     const tCIDLib::TCard4 c4BufSz = 4096;
-    tCIDLib::TCh szTmp[c4BufSz + 1];
+    tCIDLib::TCh szTmp[c4BufSz + 1] = L"";
     tCIDLib::TBoolean bGotEnd = kCIDLib::False;
     while (c4CountDown)
     {
@@ -331,6 +334,44 @@ TTextInStream::c4GetLine(       TString&            strToFill
         strToFill.StripWhitespace();
     return strToFill.c4Length();
 }
+
+
+//
+//  Reads the next token from the stream. We read until we get a non-sep char,
+//  then we collect characters until we hit a separator char (or end of stream.)
+//
+tCIDLib::TCard4
+TTextInStream::c4GetToken(TString& strToFill, const TString& strSepChars)
+{
+    strToFill.Clear();
+    while (!bEndOfStream())
+    {
+        const tCIDLib::TCh chCur = chRead();
+        if (!strSepChars.bContainsChar(chCur))
+        {
+            strToFill.Append(chCur);
+            break;
+        }
+    }
+
+    if (!strToFill.bIsEmpty())
+    {
+        //
+        //  If not empty, we got at least one character, so read until we get
+        //  a sep char or end of stream.
+        //
+        while (!bEndOfStream())
+        {
+            const tCIDLib::TCh chCur = chRead();
+            if (strSepChars.bContainsChar(chCur))
+                break;
+
+            strToFill.Append(chCur);
+        }
+    }
+    return strToFill.c4Length();
+}
+
 
 
 //
@@ -440,6 +481,29 @@ tCIDLib::TCard4 TTextInStream::c4Read(const tCIDLib::ERadices eRadix)
     }
     return strInput.c4Val(eRadix);
 }
+
+
+//
+//  Read up to the indicated number of characters. Note that here, we are just getting
+//  data, not lines. So we don't do any new line conversion and such. We return how
+//  many we read.
+//
+tCIDLib::TCard4
+TTextInStream::c4ReadChars(tCIDLib::TCh* const pszToFill, const tCIDLib::TCard4 c4MaxChars)
+{
+    // Loop until we max out or hit the end of the input
+    tCIDLib::TCard4 c4Index = 0;
+    while (c4Index < c4MaxChars)
+    {
+        // Get the next character from the cache, breaking out if we hit the end
+        const tCIDLib::TCh chCur = chNextChar(kCIDLib::False);
+        if (!chCur)
+            break;
+        pszToFill[c4Index++] = chCur;
+    }
+    return c4Index;
+}
+
 
 tCIDLib::TCard8 TTextInStream::c8Read(const tCIDLib::ERadices eRadix)
 {
@@ -659,6 +723,9 @@ const TTextConverter& TTextInStream::tcvtThis() const
 // ---------------------------------------------------------------------------
 //  TTextInStream: Hidden Constructors
 // ---------------------------------------------------------------------------
+
+// We don't initialize the arrays since that's just unneeded overhead
+#pragma warning(suppress : 26495)
 TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
 
     m_c4CacheOfs(0)
@@ -666,7 +733,7 @@ TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
     , m_c4SpareBytes(0)
     , m_chUnGet(0)
     , m_eNewLineType(tCIDLib::ENewLineTypes::CRLF)
-    , m_pstrmIn(0)
+    , m_pstrmIn(nullptr)
     , m_ptcvtThis(ptcvtToAdopt)
 {
     // The stream must be set later, before use of this stream
@@ -678,25 +745,19 @@ TTextInStream::TTextInStream(TTextConverter* const ptcvtToAdopt) :
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TTextInStream::AdoptStream(TBinInStream* const pstrmToAdopt)
 {
-    // If the stream is already set, then that's an error
-    if (m_pstrmIn)
+    //
+    //  We are responsible for the new stream, so make sure it's
+    //  cleaned up if we don't end up taking it.
+    //
+    TJanitor<TBinInStream> janAdopt(pstrmToAdopt);
+
+    // The passed stream can't be null and we can't already have a stream
+    if (bCIDPreCond(pstrmToAdopt != nullptr)
+    &&  bCIDPreCond(m_pstrmIn == nullptr))
     {
-        // Clean up passed stream since we are responsible for it
-        delete pstrmToAdopt;
-
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcTStrm_StrmAlreadySet
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::AppError
-            , clsIsA()
-        );
+        m_pstrmIn = janAdopt.pobjOrphan();
     }
-
-    // We don't already have a stream so store it away
-    m_pstrmIn = pstrmToAdopt;
+    // No ELSE clause!
 }
 
 
@@ -720,6 +781,7 @@ tCIDLib::TBoolean TTextInStream::bReloadCache() const
     //  this temp buf. So we will never read more bytes than we can get
     //  into the cache.
     //
+    #pragma warning(suppress : 26494) // We don't need to init this
     tCIDLib::TCard1 ac1Tmp[c4CacheBufChars];
 
     //

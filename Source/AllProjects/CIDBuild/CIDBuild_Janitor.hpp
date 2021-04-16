@@ -25,32 +25,34 @@
 //  $_CIDLib_Log_$
 //
 
-template <class T> class TJanitor
+template <typename T> class TJanitor
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TJanitor() = delete;
+
         TJanitor(T* const pToDelete) :
 
             m_pToDelete(pToDelete)
         {
         }
 
+        TJanitor(const TJanitor&) = delete;
+
         ~TJanitor()
         {
             delete m_pToDelete;
         }
 
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TJanitor& operator=(const TJanitor&) = delete;
+
+
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TJanitor();
-        TJanitor(const TJanitor&);
-        tCIDLib::TVoid operator=(const TJanitor&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -61,31 +63,33 @@ template <class T> class TJanitor
 };
 
 
-template <class T> class TArrayJanitor
+template <typename T> class TArrayJanitor
 {
     public :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TArrayJanitor() = delete;
+
         TArrayJanitor(T* const pToDelete) :
             m_pToDelete(pToDelete)
         {
         }
+
+        TArrayJanitor(const TArrayJanitor&) = delete;
 
         ~TArrayJanitor()
         {
             delete [] m_pToDelete;
         }
 
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TArrayJanitor& operator=(const TArrayJanitor&) = delete;
+
+
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TArrayJanitor();
-        TArrayJanitor(const TArrayJanitor&);
-        tCIDLib::TVoid operator=(const TArrayJanitor&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //

@@ -28,16 +28,17 @@
 
 
 // ---------------------------------------------------------------------------
-//  Include the Windows and DirectX headers for internal use.
-// ---------------------------------------------------------------------------
-#include    <windows.h>
-
-
-
-// ---------------------------------------------------------------------------
 //  Include our own public header
 // ---------------------------------------------------------------------------
 #include    "CIDAdvGraph.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  Include the Windows and DirectX headers for internal use. Has to be after the
+//  main header which brings in platform headers that have defines that drive bits
+//  in here.
+// ---------------------------------------------------------------------------
+#include    <windows.h>
 
 
 // ---------------------------------------------------------------------------

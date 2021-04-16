@@ -12,6 +12,17 @@
         <!-- Global types -->
         <CIDIDL:Types>
 
+            <CIDIDL:Enum    CIDIDL:Name="EExpOpts" CIDIDL:XlatMap="BaseName"
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName">
+                <CIDIDL:DocText>
+                    URL encoding/expansion flags
+                </CIDIDL:DocText>
+                <CIDIDL:EnumVal CIDIDL:Name="None"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Encode"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Expand"/>
+            </CIDIDL:Enum>
+
+
             <CIDIDL:Enum    CIDIDL:Name="EProtos" CIDIDL:XlatMap="Text"
                             CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="Text"
                              CIDIDL:AltTextSrc="Inline"
@@ -35,8 +46,7 @@
 
 
             <CIDIDL:Enum    CIDIDL:Name="EQualified" CIDIDL:XlatMap="BaseName"
-                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
-                            >
+                            CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName">
                 <CIDIDL:DocText>
                     Flags for URL qualification
                 </CIDIDL:DocText>
@@ -46,15 +56,16 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum    CIDIDL:Name="EExpOpts" CIDIDL:XlatMap="BaseName"
+            <CIDIDL:Enum    CIDIDL:Name="ESecureOpts" CIDIDL:XlatMap="BaseName"
                             CIDIDL:BinStream="Yes" CIDIDL:TextStreamMap="BaseName"
-                            >
+                            CIDIDL:BaseType="TCard4" CIDIDL:Type="Bmp">
                 <CIDIDL:DocText>
-                    URL encoding/expansion flags
+                    For servers that accept either secure or insecure or both types of connections
+                    this is a convenient way to store those options.
                 </CIDIDL:DocText>
-                <CIDIDL:EnumVal CIDIDL:Name="None"/>
-                <CIDIDL:EnumVal CIDIDL:Name="Encode"/>
-                <CIDIDL:EnumVal CIDIDL:Name="Expand"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Insecure"  CIDIDL:Value="0x00000001"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Secure"  CIDIDL:Value="0x00000002"/>
+                <CIDIDL:EnumVal CIDIDL:Name="Both"  CIDIDL:Value="0x00000003"/>
             </CIDIDL:Enum>
 
         </CIDIDL:Types>

@@ -22,13 +22,11 @@
 //  basis, which is very useful, and put it back to the original when it destructs.
 //  And we implement one that saves the current general output format and restores it.
 //
-//  We also implement a very useful helper that takes a pointer to a text out stream
-//  and to a mutex. It will keep the mutex locked until it goes out of scope, and it
-//  provides a deref operator to access the stream. This lets it act like a thread safe
-//  stream on a scoped basis.
-//
 //  And we also add some stuff to the kCIDLib namespace, related to special values
 //  that can be sent to a text output stream, like end line, new line, etc...
+//
+//  Streams are NOT thread safe so synchronize all operations if a single stream is
+//  being used by multiple threads.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -47,6 +45,110 @@
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
+
+class TTextOutStream;
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamJanitor
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TStreamJanitor
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TStreamJanitor() = delete;
+
+        CIDLib_Suppress(26429) // It can legally be null
+        TStreamJanitor
+        (
+                    TTextOutStream* const   pstrmToSanitize
+        );
+
+        TStreamJanitor(const TStreamJanitor&) = delete;
+        TStreamJanitor(TStreamJanitor&&) = delete;
+
+        ~TStreamJanitor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
+        TStreamJanitor& operator=(TStreamJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TStreamFmt& strmfSaved() const;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_pstrmToSanitize
+        //      This is the pointer to the text out stream we are providing
+        //      janitorial services for.
+        //
+        //  m_strmfSave
+        //      This is the saved stream format state to be restored.
+        // -------------------------------------------------------------------
+        TTextOutStream* m_pstrmToSanitize;
+        TStreamFmt      m_strmfSave;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TStreamIndentJan
+//  PREFIX: jan
+// ---------------------------------------------------------------------------
+class CIDLIBEXP TStreamIndentJan
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TStreamIndentJan() = delete;
+
+        TStreamIndentJan
+        (
+                    TTextOutStream* const   pstrmToSanitize
+            , const tCIDLib::TCard4         c4Adjust
+        );
+
+        TStreamIndentJan(const TStreamIndentJan&) = delete;
+        TStreamIndentJan(TStreamIndentJan&&) = delete;
+
+        ~TStreamIndentJan();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
+        TStreamIndentJan& operator=(TStreamIndentJan&&) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_c4OldIndent
+        //      This is the saved indent that we will put back
+        //
+        //  m_pstrmToSanitize
+        //      This is the pointer to the text out stream we are providing
+        //      janitorial services for.
+        // -------------------------------------------------------------------
+        tCIDLib::TCard4 m_c4OldIndent;
+        TTextOutStream* m_pstrmToSanitize;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -80,8 +182,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Spaces
         {
             public :
-                Spaces(const tCIDLib::TCard4 c4Count)
-                    : c4Count(c4Count)
+                explicit constexpr Spaces(const tCIDLib::TCard4 c4Count) : c4Count(c4Count)
                 {
                 }
                 tCIDLib::TCard4 c4Count;
@@ -90,8 +191,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Fill
         {
             public :
-                Fill(const tCIDLib::TCh chNewFill)
-                    : chFill(chNewFill)
+                explicit constexpr Fill(const tCIDLib::TCh chNewFill) : chFill(chNewFill)
                 {
                 }
                 tCIDLib::TCh chFill;
@@ -100,7 +200,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Justify
         {
             public :
-                Justify(const tCIDLib::EHJustify  eNewJustification)
+                explicit constexpr Justify(const tCIDLib::EHJustify  eNewJustification)
                     : eJustification(eNewJustification)
                 {
                 }
@@ -110,7 +210,8 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Precision
         {
             public :
-                Precision(const tCIDLib::TCard4 c4NewPrecision)
+                explicit constexpr Precision(const tCIDLib::TCard4 c4NewPrecision)
+
                     : c4Precision(c4NewPrecision)
                 {
                 }
@@ -120,8 +221,9 @@ class CIDLIBEXP TTextOutStream : public TObject
         class RepChars
         {
             public :
-                RepChars(   const   tCIDLib::TCh    chOutChar
-                            , const tCIDLib::TCard4 c4OutCount)
+                constexpr RepChars( const   tCIDLib::TCh    chOutChar
+                                    , const tCIDLib::TCard4 c4OutCount)
+
                     : chOut(chOutChar), c4Count(c4OutCount)
                 {
                 }
@@ -132,8 +234,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Radix
         {
             public :
-                Radix(const tCIDLib::ERadices eNewRadix)
-                    : eRadix(eNewRadix)
+                explicit constexpr Radix(const tCIDLib::ERadices eNewRadix) : eRadix(eNewRadix)
                 {
                 }
                 tCIDLib::ERadices eRadix;
@@ -142,8 +243,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         class Width
         {
             public :
-                Width(const tCIDLib::TCard4 c4NewWidth)
-                    : c4Width(c4NewWidth)
+                explicit constexpr Width(const tCIDLib::TCard4 c4NewWidth) : c4Width(c4NewWidth)
                 {
                 }
                 tCIDLib::TCard4 c4Width;
@@ -157,17 +257,18 @@ class CIDLIBEXP TTextOutStream : public TObject
         TTextOutStream
         (
                     TBinOutStream* const    pstrmToAdopt
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream
         (
                     TBinOutStream* const    pstrmToAdopt
             , const TStreamFmt&             strmfToUse
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream(const TTextOutStream&) = delete;
+        TTextOutStream(TTextOutStream&&) = delete;
 
         ~TTextOutStream();
 
@@ -175,6 +276,9 @@ class CIDLIBEXP TTextOutStream : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TTextOutStream& operator=(const TTextOutStream&) = delete;
+        TTextOutStream& operator=(TTextOutStream&&) = delete;
+
         TTextOutStream& operator<<
         (
             const   tCIDLib::TBoolean       bToWrite
@@ -300,8 +404,6 @@ class CIDLIBEXP TTextOutStream : public TObject
             const   TStreamFmt&             strmfNewFmt
         );
 
-        TTextOutStream& operator=(const TTextOutStream&) = delete;
-
 
 
         // -------------------------------------------------------------------
@@ -372,6 +474,33 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         tCIDLib::TVoid Flush();
 
+        //
+        //  Just call the recursive helper with the start of the format buffer. We
+        //  have another that flushes at the end.
+        //
+        template <typename... TArgs>
+        tCIDLib::TVoid Format(const TString& strFmt, const TArgs... Args)
+        {
+            // Save any stream format stuff then call our recursive helper
+            TStreamJanitor janFormat(this);
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), Args...) == strFmt.pszBuffer())
+                PutLine(strFmt);
+        }
+
+        template <typename... TArgs>
+        tCIDLib::TVoid FormatF(const TString& strFmt, const TArgs... Args)
+        {
+            // Save any stream format stuff then call our recursive helper
+            TStreamJanitor janFormat(this);
+
+            // If we get back the buffer, then no parms, just write out fmt text
+            if (pszFmtHelper(strFmt.pszBuffer(), Args...) == strFmt.pszBuffer())
+                PutLine(strFmt);
+            Flush();
+        }
+
         tCIDLib::TVoid PutLine
         (
             const   TString&                strToWrite
@@ -397,6 +526,11 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         const TTextConverter& tcvtThis() const;
 
+        tCIDLib::TVoid WriteChars
+        (
+            const   tCIDLib::TCh* const     pszToWrite
+            , const tCIDLib::TCard4         c4Len = 0
+        );
 
 
     protected :
@@ -412,7 +546,7 @@ class CIDLIBEXP TTextOutStream : public TObject
         TTextOutStream
         (
             const   TStreamFmt&             strmfToUse
-            ,       TTextConverter* const   ptcvtToAdopt = 0
+            ,       TTextConverter* const   ptcvtToAdopt = nullptr
         );
 
         TTextOutStream
@@ -444,11 +578,58 @@ class CIDLIBEXP TTextOutStream : public TObject
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid WriteChars
-        (
-            const   tCIDLib::TCh* const     pszToWrite
-            , const tCIDLib::TCard4         c4Len = 0
-        );
+
+        //
+        //  Helpers for Format() which needs to process a list of variadic
+        //  parameters.
+        //
+        template <typename TOne, typename... TOthers>
+        const tCIDLib::TCh* pszFmtHelper(const  tCIDLib::TCh* const pszFmt
+                                        , const TOne                tOne
+                                        , const TOthers...          tOthers)
+        {
+            //
+            //  We have to loop until we get a token, since we could have text bits
+            //  which we just copy straight out as text.
+            //
+            const tCIDLib::TCh* pszStart = pszFmt;
+            const tCIDLib::TCh* pszEnd = nullptr;
+            while (kCIDLib::True)
+            {
+                tCIDLib::TCh chToken;
+                const TString::ETokenFind eFindRes = TString::eFindToken
+                (
+                    pszStart, chToken, m_eJustification, m_c4Width, m_chFill, m_c4Precision, pszEnd
+                );
+
+                // If it fails, then give up and stop recursing
+                if ((eFindRes == TString::ETokenFind::BadFormat)
+                ||  (eFindRes == TString::ETokenFind::End))
+                {
+                    return nullptr;
+                }
+                 else if (eFindRes == TString::ETokenFind::Token)
+                {
+                    // OK, we got one, so format it out and we need to recurse
+                    *this << tOne;
+                    pszEnd = pszFmtHelper(pszEnd, tOthers...);
+                }
+                 else if (eFindRes == TString::ETokenFind::TextRun)
+                {
+                    // It's a text run, so just write those character out
+                    WriteChars(pszStart, (pszEnd - pszStart));
+                }
+
+                // Move forward
+                pszStart = pszEnd;
+            }
+            return pszEnd;
+        }
+
+        const tCIDLib::TCh* pszFmtHelper(const tCIDLib::TCh* pszFmt)
+        {
+            return pszFmt;
+        }
 
 
         // -------------------------------------------------------------------
@@ -552,179 +733,6 @@ class CIDLIBEXP TTextOutStream : public TObject
 };
 
 
-
-// ---------------------------------------------------------------------------
-//   CLASS: TStreamJanitor
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamJanitor
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TStreamJanitor() = delete;
-
-        TStreamJanitor(TTextOutStream* const pstrmToSanitize) :
-
-            m_pstrmToSanitize(pstrmToSanitize)
-            , m_strmfSave(*pstrmToSanitize)
-        {
-        }
-
-        TStreamJanitor(const TStreamJanitor&) = delete;
-
-        ~TStreamJanitor()
-        {
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->SetFormat(m_strmfSave);
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStreamJanitor& operator=(const TStreamJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        const TStreamFmt& strmfSaved() const
-        {
-            return m_strmfSave;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pstrmToSanitize
-        //      This is the pointer to the text out stream we are providing
-        //      janitorial services for.
-        //
-        //  m_strmfSave
-        //      This is the saved stream format state to be restored.
-        // -------------------------------------------------------------------
-        TTextOutStream* m_pstrmToSanitize;
-        TStreamFmt      m_strmfSave;
-};
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TStreamIndentJan
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStreamIndentJan
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TStreamIndentJan() = delete;
-
-        TStreamIndentJan(       TTextOutStream* const   pstrmToSanitize
-                        , const tCIDLib::TCard4         c4Adjust) :
-
-            m_c4OldIndent(pstrmToSanitize->c4Indent())
-            , m_pstrmToSanitize(pstrmToSanitize)
-        {
-            // Set the new indent as the old plus the adjustment
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->c4Indent(m_c4OldIndent + c4Adjust);
-        }
-
-        TStreamIndentJan(const TStreamIndentJan&) = delete;
-
-        ~TStreamIndentJan()
-        {
-            if (m_pstrmToSanitize)
-                m_pstrmToSanitize->c4Indent(m_c4OldIndent);
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStreamIndentJan& operator=(const TStreamIndentJan&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_c4OldIndent
-        //      This is the saved indent that we will put back
-        //
-        //  m_pstrmToSanitize
-        //      This is the pointer to the text out stream we are providing
-        //      janitorial services for.
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4OldIndent;
-        TTextOutStream* m_pstrmToSanitize;
-};
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TSafeTStrmJan
-//  PREFIX: jan
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TSafeTStrmJan
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        TSafeTStrmJan() = delete;
-
-        TSafeTStrmJan(  TTextOutStream* const   pstrmToLock
-                        , TMutex* const         pmtxLock
-                        , const tCIDLib::TCard4 c4Wait = kCIDLib::c4MaxCard) :
-
-            m_pmtxLock(pmtxLock)
-            , m_pstrmToLock(pstrmToLock)
-        {
-            // Lock the mutex
-            m_pmtxLock->Lock(c4Wait);
-        }
-
-        TSafeTStrmJan(const TSafeTStrmJan&) = delete;
-
-        ~TSafeTStrmJan()
-        {
-            // We just unlock the mutex now
-            m_pmtxLock->Unlock();
-        }
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TSafeTStrmJan& operator=(const TSafeTStrmJan&) = delete;
-        tCIDLib::TVoid* operator new(const size_t) = delete;
-
-        TTextOutStream& operator*()
-        {
-            return *m_pstrmToLock;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_pmtxLock
-        //      This is the mutex that we lock until we destruct
-        //
-        //  m_pstrmToLock
-        //      This is the pointer to the text out stream that we are protected.
-        // -------------------------------------------------------------------
-        TMutex*         m_pmtxLock;
-        TTextOutStream* m_pstrmToLock;
-};
 
 
 #pragma CIDLIB_POPPACK

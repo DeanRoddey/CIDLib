@@ -60,6 +60,7 @@ class CIDLIBEXP TTextInStream : public TObject
         );
 
         TTextInStream(const TTextInStream&) = delete;
+        TTextInStream(TTextInStream&&) = delete;
 
         ~TTextInStream();
 
@@ -67,6 +68,9 @@ class CIDLIBEXP TTextInStream : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TTextInStream& operator=(const TTextInStream&) = delete;
+        TTextInStream& operator=(TTextInStream&&) = delete;
+
         TTextInStream& operator>>
         (
                     tCIDLib::TBoolean&      bToFill
@@ -142,8 +146,6 @@ class CIDLIBEXP TTextInStream : public TObject
                     TString&                strToFill
         );
 
-        TTextInStream& operator==(const TTextInStream&) = delete;
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -159,6 +161,12 @@ class CIDLIBEXP TTextInStream : public TObject
                     TString&                strToFill
             , const tCIDLib::TCard4         c4MaxChars = 0
             , const tCIDLib::TBoolean       bStripWhitespace = kCIDLib::False
+        );
+
+        tCIDLib::TCard4 c4GetToken
+        (
+                    TString&                strToFill
+            , const TString&                strSepChars
         );
 
         tCIDLib::TCh chPeek
@@ -181,6 +189,12 @@ class CIDLIBEXP TTextInStream : public TObject
         tCIDLib::TCard4 c4Read
         (
             const   tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
+        );
+
+        tCIDLib::TCard4 c4ReadChars
+        (
+                    tCIDLib::TCh* const     pszToFill
+            , const tCIDLib::TCard4         c4MaxChars
         );
 
         tCIDLib::TCard8 c8Read

@@ -45,20 +45,32 @@
 //  CLASS: TAttrDefCursor
 // PREFIX: adc
 // ---------------------------------------------------------------------------
-class CIDXMLEXP TAttrDefCursor : public TObject
+class CIDXMLEXP TAttrDefCursor
 {
     public :
         // -------------------------------------------------------------------
         //  Public Destructor
         // -------------------------------------------------------------------
-        ~TAttrDefCursor();
+        TAttrDefCursor(const TAttrDefCursor&) = delete;
+        TAttrDefCursor(TAttrDefCursor&&) = delete;
+
+        virtual ~TAttrDefCursor() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TAttrDefCursor& operator=(const TAttrDefCursor&) = delete;
+        TAttrDefCursor& operator=(TAttrDefCursor&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, pure virtual methods
         // -------------------------------------------------------------------
         virtual tCIDLib::TBoolean bNext() = 0;
+
         virtual tCIDLib::TBoolean bReset() = 0;
+
         virtual const TXMLAttrDef& xadCur() const = 0;
 
 
@@ -66,15 +78,7 @@ class CIDXMLEXP TAttrDefCursor : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TAttrDefCursor();
-        TAttrDefCursor(const TAttrDefCursor&);
-        tCIDLib::TVoid operator=(const TAttrDefCursor&);
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TAttrDefCursor,TObject)
+        TAttrDefCursor() {}
 };
 
 
@@ -82,13 +86,23 @@ class CIDXMLEXP TAttrDefCursor : public TObject
 //  CLASS: TXMLElemDecl
 // PREFIX: xdecl
 // ---------------------------------------------------------------------------
-class CIDXMLEXP TXMLElemDecl : public TObject
+class CIDXMLEXP TXMLElemDecl
 {
     public  :
         // -------------------------------------------------------------------
         //  Public Destructor
         // -------------------------------------------------------------------
-        ~TXMLElemDecl();
+        TXMLElemDecl(const TXMLElemDecl&) = delete;
+        TXMLElemDecl(TXMLElemDecl&&) = delete;
+
+        virtual ~TXMLElemDecl() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLElemDecl& operator=(const TXMLElemDecl&) = delete;
+        TXMLElemDecl& operator=(TXMLElemDecl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -131,40 +145,45 @@ class CIDXMLEXP TXMLElemDecl : public TObject
         virtual const TString& strFullName() const = 0;
 
 
-
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Id() const;
+        tCIDLib::TCard4 c4Id() const
+        {
+            return m_c4Id;
+        }
 
-        tCIDLib::TCard4 c4Id
-        (
-            const   tCIDLib::TCard4         c4NewId
-        );
+        tCIDLib::TCard4 c4Id(const tCIDLib::TCard4 c4NewId)
+        {
+            m_c4Id = c4NewId;
+            return m_c4Id;
+        }
 
-        tCIDXML::EElemReasons eCreateReason() const;
+        tCIDXML::EElemReasons eCreateReason() const
+        {
+            return m_eCreateReason;
+        }
 
-        tCIDXML::EElemReasons eCreateReason
-        (
-            const   tCIDXML::EElemReasons   eReason
-        );
+        tCIDXML::EElemReasons eCreateReason(const tCIDXML::EElemReasons eReason)
+        {
+            m_eCreateReason = eReason;
+            return m_eCreateReason;
+        }
 
 
     protected :
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TXMLElemDecl();
+        TXMLElemDecl()  :
+
+            m_c4Id(kCIDLib::c4MaxCard)
+            , m_eCreateReason(tCIDXML::EElemReasons::Count)
+        {
+        }
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLElemDecl(const TXMLElemDecl&);
-        tCIDLib::TVoid operator=(const TXMLElemDecl&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -178,81 +197,6 @@ class CIDXMLEXP TXMLElemDecl : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TCard4         m_c4Id;
         tCIDXML::EElemReasons   m_eCreateReason;
-
-
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TXMLElemDecl,TObject)
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TAttrDefCursor: Public Destructor
-// ---------------------------------------------------------------------------
-inline TAttrDefCursor::~TAttrDefCursor()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TAttrDefCursor: Hidden constructors and operators
-// ---------------------------------------------------------------------------
-inline TAttrDefCursor::TAttrDefCursor()
-{
-}
-
-inline TAttrDefCursor::TAttrDefCursor(const TAttrDefCursor&)
-{
-}
-
-inline tCIDLib::TVoid TAttrDefCursor::operator=(const TAttrDefCursor&)
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLElemDecl: Public Destructor
-// ---------------------------------------------------------------------------
-inline TXMLElemDecl::~TXMLElemDecl()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLElemDecl: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard4 TXMLElemDecl::c4Id() const
-{
-    return m_c4Id;
-}
-
-inline tCIDLib::TCard4 TXMLElemDecl::c4Id(const tCIDLib::TCard4 c4NewId)
-{
-    m_c4Id = c4NewId;
-    return m_c4Id;
-}
-
-inline tCIDXML::EElemReasons TXMLElemDecl::eCreateReason() const
-{
-    return m_eCreateReason;
-}
-
-inline tCIDXML::EElemReasons
-TXMLElemDecl::eCreateReason(const tCIDXML::EElemReasons eReason)
-{
-    m_eCreateReason = eReason;
-    return m_eCreateReason;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLElemDecl: Hidden constructors
-// ---------------------------------------------------------------------------
-inline TXMLElemDecl::TXMLElemDecl() :
-
-    m_c4Id(kCIDLib::c4MaxCard)
-{
-}

@@ -149,6 +149,16 @@ class TProjectList
             const   TBldStr&                strToFind
         );
 
+        tCIDLib::TVoid ParseInitProjLine
+        (
+            const   TBldStr&                strLine
+            , const tCIDLib::TCard4         c4Line
+            ,       TBldStr&                strName
+            ,       tCIDBuild::TStrList&    listProjIncl
+            ,       tCIDBuild::TStrList&    listProjExcl
+        );
+
+
 
         // -------------------------------------------------------------------
         //  Private data members
@@ -211,13 +221,13 @@ class TProjIterator
 //   CLASS: TMethProjIterator
 //  PREFIX: piter
 // ---------------------------------------------------------------------------
-template <class T> class TMethProjIterator : public TProjIterator
+template <typename T> class TMethProjIterator : public TProjIterator
 {
     public :
         // -------------------------------------------------------------------
         //  The prototype for the callback methods
         // -------------------------------------------------------------------
-        typedef tCIDLib::TBoolean (T::*TIterMethod)(const TBldStr&, const tCIDLib::TCard4);
+        using TIterMethod = tCIDLib::TBoolean (T::*)(const TBldStr&, const tCIDLib::TCard4);
 
 
         // -------------------------------------------------------------------

@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: 2015..2015, Charmed Quark Systems, Ltd
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -59,6 +59,7 @@ class TCIDListSelDlg : public TDlgBox
         TCIDListSelDlg();
 
         TCIDListSelDlg(const TCIDListSelDlg&) = delete;
+        TCIDListSelDlg(TCIDListSelDlg&&) = delete;
 
         ~TCIDListSelDlg();
 
@@ -67,6 +68,7 @@ class TCIDListSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDListSelDlg& operator=(const TCIDListSelDlg&) = delete;
+        TCIDListSelDlg& operator=(TCIDListSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -156,6 +158,7 @@ class TCIDListSelDlg2 : public TDlgBox
         TCIDListSelDlg2();
 
         TCIDListSelDlg2(const TCIDListSelDlg2&) = delete;
+        TCIDListSelDlg2(TCIDListSelDlg2&&) = delete;
 
         ~TCIDListSelDlg2();
 
@@ -164,6 +167,7 @@ class TCIDListSelDlg2 : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDListSelDlg2& operator=(const TCIDListSelDlg2&) = delete;
+        TCIDListSelDlg2& operator=(TCIDListSelDlg2&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -249,6 +253,7 @@ class TCIDListSelDlg3 : public TDlgBox
         TCIDListSelDlg3();
 
         TCIDListSelDlg3(const TCIDListSelDlg3&) = delete;
+        TCIDListSelDlg3(TCIDListSelDlg3&&) = delete;
 
         ~TCIDListSelDlg3();
 
@@ -257,6 +262,7 @@ class TCIDListSelDlg3 : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDListSelDlg3& operator=(const TCIDListSelDlg3&) = delete;
+        TCIDListSelDlg3& operator=(TCIDListSelDlg3&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -350,6 +356,7 @@ class TCIDKVPListSelDlg : public TDlgBox
         TCIDKVPListSelDlg();
 
         TCIDKVPListSelDlg(const TCIDKVPListSelDlg&) = delete;
+        TCIDKVPListSelDlg(TCIDKVPListSelDlg&&) = delete;
 
         ~TCIDKVPListSelDlg();
 
@@ -358,6 +365,7 @@ class TCIDKVPListSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDKVPListSelDlg& operator=(const TCIDKVPListSelDlg&) = delete;
+        TCIDKVPListSelDlg& operator=(TCIDKVPListSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -453,6 +461,7 @@ class TCIDMListSelDlg : public TDlgBox
         TCIDMListSelDlg();
 
         TCIDMListSelDlg(const TCIDMListSelDlg&) = delete;
+        TCIDMListSelDlg(TCIDMListSelDlg&&) = delete;
 
         ~TCIDMListSelDlg();
 
@@ -461,6 +470,7 @@ class TCIDMListSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDMListSelDlg& operator=(const TCIDMListSelDlg&) = delete;
+        TCIDMListSelDlg& operator=(TCIDMListSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -549,6 +559,7 @@ class TCIDKVPMListSelDlg : public TDlgBox
         TCIDKVPMListSelDlg();
 
         TCIDKVPMListSelDlg(const TCIDKVPMListSelDlg&) = delete;
+        TCIDKVPMListSelDlg(TCIDKVPMListSelDlg&&) = delete;
 
         ~TCIDKVPMListSelDlg();
 
@@ -557,6 +568,7 @@ class TCIDKVPMListSelDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCIDKVPMListSelDlg& operator=(const TCIDKVPMListSelDlg&) = delete;
+        TCIDKVPMListSelDlg& operator=(TCIDKVPMListSelDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

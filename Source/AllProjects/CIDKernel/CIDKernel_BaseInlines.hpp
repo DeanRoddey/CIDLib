@@ -29,6 +29,15 @@
 
 namespace tCIDLib
 {
+    // Used in various metaprogramming templates below
+    struct FalseType { static constexpr tCIDLib::TBoolean bState = false; };
+    struct TrueType { static constexpr tCIDLib::TBoolean bState = true; };
+
+    // See if two types are the same
+    template <class T, class U> struct IsSameType : FalseType {};
+    template <class T> struct IsSameType<T,T> : TrueType {};
+
+
     //
     //  Some helper sfor dealing with safe enums and the problems with converting them
     //  to numeric values.
@@ -55,28 +64,49 @@ namespace tCIDLib
         return tCIDLib::TInt4(tVal) + i4Plus;
     }
 
-    // For condition stuff based on const'ness
-    struct FalseType { static constexpr bool State = false; };
-    struct TrueType { static constexpr bool State = true; };
+
+    // Some testing for types
+    template <typename T> struct IsTCardX : FalseType {};
+    template <> struct IsTCardX<tCIDLib::TCard1> : TrueType {};
+    template <> struct IsTCardX<tCIDLib::TCard2> : TrueType {};
+    template <> struct IsTCardX<tCIDLib::TCard4> : TrueType {};
+
+    template <typename T> struct IsTFloatX : FalseType {};
+    template <> struct IsTFloatX<tCIDLib::TFloat4> : TrueType {};
+    template <> struct IsTFloatX<tCIDLib::TFloat8> : TrueType {};
+
+    template <typename T> struct IsTIntX : FalseType {};
+    template <> struct IsTIntX<tCIDLib::TInt1> : TrueType {};
+    template <> struct IsTIntX<tCIDLib::TInt2> : TrueType {};
+    template <> struct IsTIntX<tCIDLib::TInt4> : TrueType {};
+
+    template <typename T> struct IsNumeric
+    {
+        static constexpr tCIDLib::TBoolean bState =
+        (
+            IsTCardX<T>::bState || IsTFloatX<T>::bState || IsTIntX<T>::bState
+        );
+    };
+
+    template <typename T> struct IsArray : FalseType {};
+    template <typename T> struct IsArray<T[]> : TrueType {};
+    template <typename T, tCIDLib::TCard4 N> struct IsArray<T[N]> : TrueType {};
+
+    // For conditional stuff based on const'ness
     template <typename T> struct IsConst : FalseType {};
     template <typename T> struct IsConst<const T> : TrueType {};
 
-
     // For conditional inclusion
-    template<bool C, typename T, typename F> struct Conditional
-    {
-        typedef T Type;
-    };
-
-    template<typename T, typename F> struct Conditional<false, T, F>
-    {
-        typedef F Type;
-    };
+    template<bool C, typename T = tCIDLib::TVoid> struct EnableIf { };
+    template<typename T> struct EnableIf<kCIDLib::True, T> { typedef T Type; };
 
 
     // Remove constness
     template <typename T> struct RemoveConst { typedef T Type; };
     template <typename T> struct RemoveConst<const T> { typedef T Type; };
+
+    template <typename T> struct AddConst { typedef const T Type; };
+    template <typename T> struct AddConst<const T> { typedef T Type; };
 
 
     //  To force move semantics
@@ -85,21 +115,69 @@ namespace tCIDLib
     template<class T> struct RemoveRef    <T&&> {typedef T Type;};
 
     template <typename T>
-    typename RemoveRef<T>::Type&& ForceMove(T&& src)
+    typename RemoveRef<T>::Type&& ForceMove(T&& src) noexcept
     {
         return static_cast<typename RemoveRef<T>::Type&&>(src);
     }
+
+
+    // Is it a pointer to a type or not
+    template <typename T> struct IsPointerBase : FalseType{};
+    template <typename T> struct IsPointerBase<T*> : TrueType{};
+    template <typename T> struct IsPointer : IsPointerBase<typename RemoveConst<T>::Type> {};
+
+    // Is it a ref to a type or not
+    template <typename T> struct IsRefBase : FalseType{};
+    template <typename T> struct IsRefBase<T&> : TrueType{};
+    template <typename T> struct IsRef : IsRefBase<typename RemoveConst<T>::Type> {};
+
+
+    // -----------------------------------------------------------------------
+    //  Return a const ref to the passed ref, effectively add const to it if it
+    //  is not already.
+    // -----------------------------------------------------------------------
+    template <typename T>
+    constexpr AddConst<T>& tAsConst(T& tRet) noexcept
+    {
+        return tRet;
+    }
+
+    template <typename T> constexpr AddConst<T>& tAsConst(const T&&) = delete;
+
+
+    // -----------------------------------------------------------------------
+    //  Implements forwarding so that we can support in place construction for
+    //  collections and other things. It removes any pointer/reference from the
+    //  type and casts it to a universal reference type. We need one for regular
+    //  references and one for r-value refs.
+    // -----------------------------------------------------------------------
+    template <typename T>
+    constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
+    {
+        // Often causes an unneeded cast warning, but we can never know when so suppress
+        CIDLib_Suppress(26473)
+        return static_cast<T&&>(t);
+    }
+
+    template <typename T>
+    constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
+    {
+        // Often causes an unneeded cast warning, but we can never know when so suppress
+        CIDLib_Suppress(26473)
+        return static_cast<T&&>(t);
+    }
+
 
     // -----------------------------------------------------------------------
     //  These are just simple templates to return the smaller or larger of two
     //  quantities (with 'quantity' meaning anything with a < and > operator.)
     // -----------------------------------------------------------------------
-    template <typename T> constexpr T MaxVal(const T& v1, const T& v2)
+    template <typename T> constexpr T MaxVal(const T& v1, const T& v2) noexcept
     {
         return (v1 > v2) ? v1 : v2;
     }
 
-    template <typename T> constexpr T MinVal(const T& v1, const T& v2)
+    template <typename T> constexpr T MinVal(const T& v1, const T& v2) noexcept
     {
         return (v1 < v2) ? v1 : v2;
     }
@@ -115,7 +193,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Return the absolute value different
     // -----------------------------------------------------------------------
-    template <typename T> constexpr T AbsDiff(const T& v1, const T& v2)
+    template <typename T> constexpr T AbsDiff(const T& v1, const T& v2) noexcept
     {
         if (v1 > v2)
             return v1 - v2;
@@ -126,8 +204,8 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  Tests whether the value is within the min/max values passed, inclusive
     // -----------------------------------------------------------------------
-    template <typename T>
-    constexpr tCIDLib::TBoolean bInRange(const T& val, const T& min, const T& max)
+    template <typename T> constexpr tCIDLib::TBoolean
+    bInRange(const T& val, const T& min, const T& max) noexcept
     {
         if ((val < min) || (val > max))
             return kCIDLib::False;
@@ -150,37 +228,37 @@ namespace tCIDLib
     //  This template offsets a pointer by an integral value and casts the
     //  return back to the original type.
     // -----------------------------------------------------------------------
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const tCIDLib::TInt4 i4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+i4Ofs);
     }
 
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const tCIDLib::TCard4 c4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+c4Ofs);
     }
 
-    template <typename T> const T*
+    template <typename T> constexpr const T*
     pOffsetPtr(const T* pToOffset, const unsigned int uiOfs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+uiOfs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const tCIDLib::TInt4 i4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+i4Ofs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const tCIDLib::TCard4 c4Ofs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+c4Ofs);
     }
 
-    template <typename T> T*
+    template <typename T> constexpr T*
     pOffsetNCPtr(T* pToOffset, const unsigned int uiOfs)
     {
         return (T*) (((tCIDLib::TCard1*)pToOffset)+uiOfs);
@@ -198,8 +276,8 @@ namespace tCIDLib
     template <typename T> constexpr tCIDLib::TBoolean
     bAnyBitsOn(const T tCurrent, const T tToCheck)
     {
-        tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
+        const tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
+        const tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
         return (emtCur & emtToCheck) != 0;
     }
 
@@ -207,7 +285,7 @@ namespace tCIDLib
     bAllBitsOn(const T tCurrent, const T tToCheck)
     {
         tCIDLib::TEnumMaskType emtTmp = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
+        const tCIDLib::TEnumMaskType emtToCheck = tCIDLib::TEnumMaskType(tToCheck);
         emtTmp &= emtToCheck;
         return (emtTmp == emtToCheck);
     }
@@ -215,9 +293,9 @@ namespace tCIDLib
     template <typename T> constexpr tCIDLib::TBoolean
     bBitsChanged(const T t1, const T t2, const T tMask)
     {
-        tCIDLib::TEnumMaskType emt1 = tCIDLib::TEnumMaskType(t1);
-        tCIDLib::TEnumMaskType emt2 = tCIDLib::TEnumMaskType(t2);
-        tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
+        const tCIDLib::TEnumMaskType emt1 = tCIDLib::TEnumMaskType(t1);
+        const tCIDLib::TEnumMaskType emt2 = tCIDLib::TEnumMaskType(t2);
+        const tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
         return T(emt1 & emtMask) != T(emt2 * emtMask);
     }
 
@@ -225,7 +303,7 @@ namespace tCIDLib
     eClearEnumBits(const T tCurrent, const T tBits)
     {
         tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
+        const tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
         emtCur &= ~emtBits;
         return T(emtCur);
     }
@@ -234,8 +312,8 @@ namespace tCIDLib
     eMaskEnumBits(const T tCurrent, const T tBits, const T tMask)
     {
         tCIDLib::TEnumMaskType emtCur = tCIDLib::TEnumMaskType(tCurrent);
-        tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
-        tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
+        const tCIDLib::TEnumMaskType emtBits = tCIDLib::TEnumMaskType(tBits);
+        const tCIDLib::TEnumMaskType emtMask = tCIDLib::TEnumMaskType(tMask);
 
         emtCur &= ~emtMask;
         emtCur |= (emtBits & emtMask);
@@ -311,7 +389,7 @@ namespace tCIDLib
 
 
     // Default relative magnitude comparator for sorting
-    template <typename T> tCIDLib::ESortComps eComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eComp(const T& t1, const T& t2)
     {
         if (t1 < t2)
             return tCIDLib::ESortComps::FirstLess;
@@ -321,7 +399,7 @@ namespace tCIDLib
     }
 
     // For reverse sorting
-    template <typename T> tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
+    template <typename T> constexpr tCIDLib::ESortComps eRevComp(const T& t1, const T& t2)
     {
         if (t2 < t1)
             return tCIDLib::ESortComps::FirstLess;
@@ -332,7 +410,8 @@ namespace tCIDLib
 
 
     // And for pointers
-    template <typename T> tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
+    template <typename T>
+    constexpr tCIDLib::ESortComps eCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt1 < *pt2)
             return tCIDLib::ESortComps::FirstLess;
@@ -341,7 +420,8 @@ namespace tCIDLib
         return tCIDLib::ESortComps::Equal;
     }
 
-    template <typename T> tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
+    template <typename T>
+    constexpr tCIDLib::ESortComps eRevCompPtr(const T* pt1, const T* pt2)
     {
         if (*pt2 < *pt1)
             return tCIDLib::ESortComps::FirstLess;
@@ -438,4 +518,32 @@ namespace tCIDLib
                 return tCIDLib::ESortComps::Equal;
             }
     };
+
+
+    // Ignore a return value
+    template <typename T> void IgnoreRet(const T&) {}
+
+
+    // Force a dependent type
+    template <typename T> struct MakeDepType
+    {
+        using type = T;
+    };
+
+
+    // Sometimes we have to use a reinterpret cast, so make the analyzer be quiet about it
+    template <typename T, typename F> T* pReCastPtr(F* pSrc)
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<T*>(pSrc);
+    }
+
+    //
+    //  A fairly common cast when dealing with C interfaces, which requires a reinterpret cast
+    //
+    template <typename F> tCIDLib::TVoid** pToVoidPP(F** pSrc)
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<tCIDLib::TVoid**>(pSrc);
+    }
 }

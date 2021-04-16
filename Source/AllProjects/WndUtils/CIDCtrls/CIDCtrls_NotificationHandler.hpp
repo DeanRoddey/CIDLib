@@ -19,9 +19,6 @@
 //  implements the classes that sit on the receiving window and handle and
 //  dispatch incoming events.
 //
-//  This was moved over from the old CIDWnd when we moved to wrapping standard
-//  controls instead of doing our own.
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -50,12 +47,24 @@ class CIDCTRLSEXP TNotHandlerBase
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        TNotHandlerBase
+        TNotHandlerBase() = delete;
+
+        explicit TNotHandlerBase
         (
             const   TNotificationId&        nidRequested
         );
 
+        TNotHandlerBase(const TNotHandlerBase&) = delete;
+        TNotHandlerBase(TNotHandlerBase&&) = delete;
+
         virtual ~TNotHandlerBase();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TNotHandlerBase& operator=(const TNotHandlerBase&) = delete;
+        TNotHandlerBase& operator=(TNotHandlerBase&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -67,11 +76,11 @@ class CIDCTRLSEXP TNotHandlerBase
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TNotificationId& nidRequested() const;
+        [[nodiscard]] const TNotificationId& nidRequested() const;
 
-        const TNotHandlerBase* pnothNext() const;
+        [[nodiscard]] const TNotHandlerBase* pnothNext() const;
 
-        TNotHandlerBase* pnothNext();
+        [[nodiscard]] TNotHandlerBase* pnothNext();
 
 
     protected :
@@ -82,14 +91,6 @@ class CIDCTRLSEXP TNotHandlerBase
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TNotHandlerBase();
-        TNotHandlerBase(const TNotHandlerBase&);
-        tCIDLib::TVoid operator=(const TNotHandlerBase&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -106,7 +107,7 @@ class CIDCTRLSEXP TNotHandlerBase
 };
 
 
-template <class T> class TNotifyHandler : public TNotHandlerBase
+template <typename T> class TNotifyHandler : public TNotHandlerBase
 {
     public :
         // -------------------------------------------------------------------
@@ -115,12 +116,14 @@ template <class T> class TNotifyHandler : public TNotHandlerBase
         //  This is the function type that must be provided, to which the
         //  notification is sent.
         // -------------------------------------------------------------------
-        typedef tCIDCtrls::EEvResponses (T::* THandlerFunc)();
+        using THandlerFunc = tCIDCtrls::EEvResponses (T::*)();
 
 
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
+        TNotifyHandler() = delete;
+
         TNotifyHandler(         T* const            pTarget
                         , const TNotificationId&    nidRequested
                         ,       THandlerFunc        pfnTarget) :
@@ -131,10 +134,20 @@ template <class T> class TNotifyHandler : public TNotHandlerBase
         {
         }
 
+        TNotifyHandler(const THandlerFunc&) = delete;
+        TNotifyHandler(THandlerFunc&&) = delete;
+
         ~TNotifyHandler()
         {
             // We don't own the target, we just reference it
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public opeators
+        // -------------------------------------------------------------------
+        TNotifyHandler& operator=(const TNotifyHandler&) = delete;
+        TNotifyHandler& operator=(TNotifyHandler&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -164,7 +177,7 @@ template <class T> class TNotifyHandler : public TNotHandlerBase
 };
 
 
-template <class T, class D> class TNotifyHandlerFor : public TNotHandlerBase
+template <typename T, class D> class TNotifyHandlerFor : public TNotHandlerBase
 {
     public :
         // -------------------------------------------------------------------
@@ -173,7 +186,7 @@ template <class T, class D> class TNotifyHandlerFor : public TNotHandlerBase
         //  This is the function type that must be provided, to which the
         //  notification is sent.
         // -------------------------------------------------------------------
-        typedef tCIDCtrls::EEvResponses (T::* THandlerFunc)(D& objData);
+        using THandlerFunc = tCIDCtrls::EEvResponses (T::*)(D& objData);
 
 
         // -------------------------------------------------------------------
@@ -198,11 +211,12 @@ template <class T, class D> class TNotifyHandlerFor : public TNotHandlerBase
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDCtrls::EEvResponses eInvoke(TObject* const pobjBeingSent)
+        tCIDCtrls::EEvResponses eInvoke(TObject* const pobjBeingSent) override
         {
-            // We know this is safe now
+            // In debug mode, check the types
             #if CID_DEBUG_ON
             D* pobjActual = dynamic_cast<D*>(pobjBeingSent);
+            CIDAssert(pobjActual != nullptr, L"Got wrong event response data object type");
             #else
             D* pobjActual = static_cast<D*>(pobjBeingSent);
             #endif

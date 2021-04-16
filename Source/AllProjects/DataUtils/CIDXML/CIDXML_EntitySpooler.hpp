@@ -86,7 +86,17 @@ class CIDXMLEXP TXMLEntSpooler : public TObject
             , const tCIDLib::TBoolean       bIgnoreBadChars
         );
 
+        TXMLEntSpooler(const TXMLEntSpooler&) = delete;
+        TXMLEntSpooler(TXMLEntSpooler&&) = delete;
+
         ~TXMLEntSpooler();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEntSpooler& operator=(const TXMLEntSpooler&) = delete;
+        TXMLEntSpooler& operator=(TXMLEntSpooler&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -150,7 +160,7 @@ class CIDXMLEXP TXMLEntSpooler : public TObject
 
         tCIDLib::TBoolean bSkippedQuote
         (
-                    tCIDLib::TCh& chSkipped
+            COP     tCIDLib::TCh&           chSkipped
         );
 
         tCIDLib::TBoolean bSkippedSpace();

@@ -99,7 +99,7 @@ class CIDMACROENGEXP TMEngTimeVal : public TMEngClassVal
 
         tCIDLib::TVoid SetPattern
         (
-            const   TTime::TCompList&       fcolToSet
+            const   TTimeCompList&          fcolToSet
             , const tCIDLib::TCh            chDateSep
             , const tCIDLib::TCh            chTimeSep
             , const tCIDLib::TCh            chTZSep
@@ -107,7 +107,7 @@ class CIDMACROENGEXP TMEngTimeVal : public TMEngClassVal
 
         tCIDLib::TVoid SetPattern
         (
-            const   TTime::TCompList&       fcolToSet
+            const   TTimeCompList&          fcolToSet
         );
 
         tCIDLib::TVoid SetTime
@@ -134,7 +134,7 @@ class CIDMACROENGEXP TMEngTimeVal : public TMEngClassVal
         tCIDLib::TCh        m_chDateSep;
         tCIDLib::TCh        m_chTimeSep;
         tCIDLib::TCh        m_chTZSep;
-        TTime::TCompList*   m_pfcolPattern;
+        TTimeCompList*      m_pfcolPattern;
         TTime               m_tmValue;
 
 
@@ -251,6 +251,7 @@ class CIDMACROENGEXP TMEngTimeInfo : public TMEngClassInfo
         tCIDLib::TCard2     m_c2MethId_AddStamp;
         tCIDLib::TCard2     m_c2MethId_DefCtor;
         tCIDLib::TCard2     m_c2MethId_Equal;
+        tCIDLib::TCard2     m_c2MethId_FormatToStr;
         tCIDLib::TCard2     m_c2MethId_GetCurMillis;
         tCIDLib::TCard2     m_c2MethId_GetCurMillis64;
         tCIDLib::TCard2     m_c2MethId_GetCurStamp;

@@ -277,9 +277,16 @@ class CIDIMGEXP TCIDImage :
             , const TCIDImage&              imgToCopy
         );
 
+        TCIDImage(TCIDImage&&) = delete;
+
         TCIDImage& operator=
         (
-            const   TCIDImage&              imgToAssign
+            const   TCIDImage&              imgSrc
+        );
+
+        TCIDImage& operator=
+        (
+                    TCIDImage&&             imgSrc
         );
 
 

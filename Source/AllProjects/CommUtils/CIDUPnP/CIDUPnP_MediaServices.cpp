@@ -46,132 +46,135 @@ RTTIDecls(TUPnPTrackItem, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDUPnP_MediaServices
 {
-    // -----------------------------------------------------------------------
-    //  This is some standard metadata that we just do some search and replace
-    //  in with the info provided to us in the SetAVTransportURI method. We
-    //  replace these tokens:
-    //
-    //  %(a)  - The artist
-    //  %(t)  - Item title
-    //  %(l)  - Album title
-    //  %(n)  - The track number
-    //  $(d)  - The release date
-    // -----------------------------------------------------------------------
-    const TString strDefMeta
-    (
-        L"<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">\n"
-        L"    <item id=\"{2B1A8947-E988-44B1-84F3-F7C1B86375C7}.0.4\" restricted=\"0\" parentID=\"4\">\n"
-        L"        <dc:title>%(t)</dc:title>\n"
-        //L"        <dc:creator>%(a)</dc:creator>\n"
-        //L"        <upnp:class>object.item.audioItem</upnp:class>\n"
-        L"        <upnp:genre>%(g)</upnp:genre>\n"
-        L"        <upnp:artist role=\"AlbumArtist\">%(a)</upnp:artist>\n"
-        L"        <upnp:artist role=\"Performer\">%(a)Acri</upnp:artist>\n"
-        //L"        <upnp:author role=\"Composer\">Robert R. Acri</upnp:author>\n"
-        L"        <upnp:album>%(l)</upnp:album>\n"
-        L"        <upnp:originalTrackNumber>%(n)</upnp:originalTrackNumber>\n"
-        L"        <dc:date>%(d)</dc:date>\n"
-        //L"        <upnp:actor>Bob Acri</upnp:actor>\n"
-        //L"        <desc id=\"artist\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
-        //L"            <microsoft:artistAlbumArtist>Bob Acri</microsoft:artistAlbumArtist>\n"
-        //L"            <microsoft:artistPerformer>Bob Acri</microsoft:artistPerformer>\n"
-        //L"        </desc>\n"
-        //L"        <desc id=\"author\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
-        //L"            <microsoft:authorComposer>Robert R. Acri</microsoft:authorComposer>\n"
-        //L"        </desc>\n"
-        //L"        <desc id=\"Year\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
-        //L"            <microsoft:year>2004</microsoft:year>\n"
-        //L"        </desc>\n"
-        //L"        <desc id=\"UserRating\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
-        //L"            <microsoft:userEffectiveRatingInStars>4</microsoft:userEffectiveRatingInStars>\n"
-        //L"            <microsoft:userEffectiveRating>75</microsoft:userEffectiveRating>\n"
-        //L"        </desc>\n"
-        L"    </item>\n"
-        L"</DIDL-Lite>\n"
-    );
+    namespace
+    {
+        // -------------------------------------------------------------------
+        //  This is some standard metadata that we just do some search and replace
+        //  in with the info provided to us in the SetAVTransportURI method. We
+        //  replace these tokens:
+        //
+        //  %(a)  - The artist
+        //  %(t)  - Item title
+        //  %(l)  - Album title
+        //  %(n)  - The track number
+        //  $(d)  - The release date
+        // -------------------------------------------------------------------
+        const TString strDefMeta
+        (
+            L"<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">\n"
+            L"    <item id=\"{2B1A8947-E988-44B1-84F3-F7C1B86375C7}.0.4\" restricted=\"0\" parentID=\"4\">\n"
+            L"        <dc:title>%(t)</dc:title>\n"
+            //L"        <dc:creator>%(a)</dc:creator>\n"
+            //L"        <upnp:class>object.item.audioItem</upnp:class>\n"
+            L"        <upnp:genre>%(g)</upnp:genre>\n"
+            L"        <upnp:artist role=\"AlbumArtist\">%(a)</upnp:artist>\n"
+            L"        <upnp:artist role=\"Performer\">%(a)Acri</upnp:artist>\n"
+            //L"        <upnp:author role=\"Composer\">Robert R. Acri</upnp:author>\n"
+            L"        <upnp:album>%(l)</upnp:album>\n"
+            L"        <upnp:originalTrackNumber>%(n)</upnp:originalTrackNumber>\n"
+            L"        <dc:date>%(d)</dc:date>\n"
+            //L"        <upnp:actor>Bob Acri</upnp:actor>\n"
+            //L"        <desc id=\"artist\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
+            //L"            <microsoft:artistAlbumArtist>Bob Acri</microsoft:artistAlbumArtist>\n"
+            //L"            <microsoft:artistPerformer>Bob Acri</microsoft:artistPerformer>\n"
+            //L"        </desc>\n"
+            //L"        <desc id=\"author\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
+            //L"            <microsoft:authorComposer>Robert R. Acri</microsoft:authorComposer>\n"
+            //L"        </desc>\n"
+            //L"        <desc id=\"Year\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
+            //L"            <microsoft:year>2004</microsoft:year>\n"
+            //L"        </desc>\n"
+            //L"        <desc id=\"UserRating\" nameSpace=\"urn:schemas-microsoft-com:WMPNSS-1-0/\" xmlns:microsoft=\"urn:schemas-microsoft-com:WMPNSS-1-0/\">\n"
+            //L"            <microsoft:userEffectiveRatingInStars>4</microsoft:userEffectiveRatingInStars>\n"
+            //L"            <microsoft:userEffectiveRating>75</microsoft:userEffectiveRating>\n"
+            //L"        </desc>\n"
+            L"    </item>\n"
+            L"</DIDL-Lite>\n"
+        );
 
 
-    // -----------------------------------------------------------------------
-    //  The commands and variables we use
-    // -----------------------------------------------------------------------
-    const TString   strAVCmd_AddURIToQueue(L"AddURIToQueue");
-    const TString   strAVCmd_BecomeLocalGroup(L"BecomeCoordinatorOfStandaloneGroup");
-    const TString   strAVCmd_ClearQueue(L"RemoveAllTracksFromQueue");
-    const TString   strAVCmd_GetCrossfadeMode(L"GetCrossfadeMode");
-    const TString   strAVCmd_Next(L"Next");
-    const TString   strAVCmd_Pause(L"Pause");
-    const TString   strAVCmd_Play(L"Play");
-    const TString   strAVCmd_Previous(L"Previous");
-    const TString   strAVCmd_QueryPosInfo(L"GetPositionInfo");
-    const TString   strAVCmd_QueryTransInfo(L"GetTransportInfo");
-    const TString   strAVCmd_QueryTransSet(L"GetTransportSettings");
-    const TString   strAVCmd_SaveQueue(L"SaveQueue");
-    const TString   strAVCmd_SetAVTransURI(L"SetAVTransportURI");
-    const TString   strAVCmd_SetCrossfadeMode(L"SetCrossfadeMode");
-    const TString   strAVCmd_SetPlayMode(L"SetPlayMode");
-    const TString   strAVCmd_StartAutoPlay(L"StartAutoPlay");
-    const TString   strAVCmd_Stop(L"Stop");
+        // -------------------------------------------------------------------
+        //  The commands and variables we use
+        // -------------------------------------------------------------------
+        const TString   strAVCmd_AddURIToQueue(L"AddURIToQueue");
+        const TString   strAVCmd_BecomeLocalGroup(L"BecomeCoordinatorOfStandaloneGroup");
+        const TString   strAVCmd_ClearQueue(L"RemoveAllTracksFromQueue");
+        const TString   strAVCmd_GetCrossfadeMode(L"GetCrossfadeMode");
+        const TString   strAVCmd_Next(L"Next");
+        const TString   strAVCmd_Pause(L"Pause");
+        const TString   strAVCmd_Play(L"Play");
+        const TString   strAVCmd_Previous(L"Previous");
+        const TString   strAVCmd_QueryPosInfo(L"GetPositionInfo");
+        const TString   strAVCmd_QueryTransInfo(L"GetTransportInfo");
+        const TString   strAVCmd_QueryTransSet(L"GetTransportSettings");
+        const TString   strAVCmd_SaveQueue(L"SaveQueue");
+        const TString   strAVCmd_SetAVTransURI(L"SetAVTransportURI");
+        const TString   strAVCmd_SetCrossfadeMode(L"SetCrossfadeMode");
+        const TString   strAVCmd_SetPlayMode(L"SetPlayMode");
+        const TString   strAVCmd_StartAutoPlay(L"StartAutoPlay");
+        const TString   strAVCmd_Stop(L"Stop");
 
-    const TString   strCDCmd_Browse(L"Browse");
-    const TString   strCDCmd_DestroyObject(L"DestroyObject");
+        const TString   strCDCmd_Browse(L"Browse");
+        const TString   strCDCmd_DestroyObject(L"DestroyObject");
 
-    const TString   strRCCmd_QueryMute(L"GetMute");
-    const TString   strRCCmd_QueryVolume(L"GetVolume");
-    const TString   strRCCmd_QueryVolumeDB(L"GetVolumeDB");
-    const TString   strRCCmd_QueryVolRange(L"GetVolumeDBRange");
-    const TString   strRCCmd_SetMute(L"SetMute");
-    const TString   strRCCmd_SetVolume(L"SetVolume");
-    const TString   strRCCmd_SetVolumeDB(L"SetVolumeDB");
-
-
-    // -----------------------------------------------------------------------
-    //  Some other command action invocation strings we check for a lot or
-    //  strings we use in lots of commands and such.
-    // -----------------------------------------------------------------------
-    const TString   strVal_EOM(L"END_OF_MEDIA");
-    const TString   strVal_InstID(L"0");
-    const TString   strVal_LastChange(L"LastChange");
-    const TString   strVal_Untitled(L"[Untitled Track]");
+        const TString   strRCCmd_QueryMute(L"GetMute");
+        const TString   strRCCmd_QueryVolume(L"GetVolume");
+        const TString   strRCCmd_QueryVolumeDB(L"GetVolumeDB");
+        const TString   strRCCmd_QueryVolRange(L"GetVolumeDBRange");
+        const TString   strRCCmd_SetMute(L"SetMute");
+        const TString   strRCCmd_SetVolume(L"SetVolume");
+        const TString   strRCCmd_SetVolumeDB(L"SetVolumeDB");
 
 
-    // -----------------------------------------------------------------------
-    //  Some elements and attr names in the returned XML, ones that are not
-    //  the names of variables be reported in composite LastChange type
-    //  evented values.
-    // -----------------------------------------------------------------------
-    const TString   strXML_Album(L"upnp:album");
-    const TString   strXML_Artist(L"dc:creator");
-    const TString   strXML_ArtURL(L"upnp:albumArtURI");
-    const TString   strXML_Item(L"item");
-    const TString   strXML_ID(L"id");
-    const TString   strXML_Master(L"Master");
-    const TString   strXML_MetaData(L"r:resMD");
-    const TString   strXML_ProtoInfo(L"protocolInfo");
-    const TString   strXML_Res(L"res");
-    const TString   strXML_Title(L"dc:title");
-    const TString   strXML_TrackNum(L"upnp:originalTrackNumber");
-    const TString   strXML_Val(L"val");
+        // -------------------------------------------------------------------
+        //  Some other command action invocation strings we check for a lot or
+        //  strings we use in lots of commands and such.
+        // -------------------------------------------------------------------
+        const TString   strVal_EOM(L"END_OF_MEDIA");
+        const TString   strVal_InstID(L"0");
+        const TString   strVal_LastChange(L"LastChange");
+        const TString   strVal_Untitled(L"[Untitled Track]");
 
 
-    // -----------------------------------------------------------------------
-    //  State variable names
-    // -----------------------------------------------------------------------
-    const TString   strVar_AbsTimePos(L"AbsoluteTimePosition");
-    const TString   strVar_AVTransURI(L"AVTransportURI");
-    const TString   strVar_ContUpdateIDs(L"ContainerUpdateIDs");
-    const TString   strVar_CrossfadeMode(L"CurrentCrossfadeMode");
-    const TString   strVar_CurPlayMode(L"CurrentPlayMode");
-    const TString   strVar_CurTrackDur(L"CurrentTrackDuration");
-    const TString   strVar_CurrentTrackMetaData(L"CurrentTrackMetaData");
-    const TString   strVar_CurTrackNum(L"CurrentTrack");
-    const TString   strVar_CurTrackURI(L"CurrentTrackURI");
-    const TString   strVar_Mute(L"Mute");
-    const TString   strVar_NumTracks(L"NumberOfTracks");
-    const TString   strVar_RelTimePos(L"RelativeTimePosition");
-    const TString   strVar_TransSpeed(L"TransportPlaySpeed");
-    const TString   strVar_TransState(L"TransportState");
-    const TString   strVar_TransStatus(L"TransportStatus");
-    const TString   strVar_Volume(L"Volume");
+        // -------------------------------------------------------------------
+        //  Some elements and attr names in the returned XML, ones that are not
+        //  the names of variables be reported in composite LastChange type
+        //  evented values.
+        // -------------------------------------------------------------------
+        const TString   strXML_Album(L"upnp:album");
+        const TString   strXML_Artist(L"dc:creator");
+        const TString   strXML_ArtURL(L"upnp:albumArtURI");
+        const TString   strXML_Item(L"item");
+        const TString   strXML_ID(L"id");
+        const TString   strXML_Master(L"Master");
+        const TString   strXML_MetaData(L"r:resMD");
+        const TString   strXML_ProtoInfo(L"protocolInfo");
+        const TString   strXML_Res(L"res");
+        const TString   strXML_Title(L"dc:title");
+        const TString   strXML_TrackNum(L"upnp:originalTrackNumber");
+        const TString   strXML_Val(L"val");
+
+
+        // -------------------------------------------------------------------
+        //  State variable names
+        // -------------------------------------------------------------------
+        const TString   strVar_AbsTimePos(L"AbsoluteTimePosition");
+        const TString   strVar_AVTransURI(L"AVTransportURI");
+        const TString   strVar_ContUpdateIDs(L"ContainerUpdateIDs");
+        const TString   strVar_CrossfadeMode(L"CurrentCrossfadeMode");
+        const TString   strVar_CurPlayMode(L"CurrentPlayMode");
+        const TString   strVar_CurTrackDur(L"CurrentTrackDuration");
+        const TString   strVar_CurrentTrackMetaData(L"CurrentTrackMetaData");
+        const TString   strVar_CurTrackNum(L"CurrentTrack");
+        const TString   strVar_CurTrackURI(L"CurrentTrackURI");
+        const TString   strVar_Mute(L"Mute");
+        const TString   strVar_NumTracks(L"NumberOfTracks");
+        const TString   strVar_RelTimePos(L"RelativeTimePosition");
+        const TString   strVar_TransSpeed(L"TransportPlaySpeed");
+        const TString   strVar_TransState(L"TransportState");
+        const TString   strVar_TransStatus(L"TransportStatus");
+        const TString   strVar_Volume(L"Volume");
+    }
 }
 
 
@@ -309,7 +312,7 @@ TUPnPAVTransService::AddURIToQueue( const   TString&            strURI
     m_colInParms.objAdd(CIDUPnP_MediaServices::strVal_InstID);
     m_colInParms.objAdd(strURI);
     m_colInParms.objAdd(strMetaData);
-    m_colInParms.objAdd(TString(TCardinal(c4FirstTrInd)));
+    m_colInParms.objPlace(TCardinal(c4FirstTrInd));
     if (bAsNext)
         m_colInParms.objAdd(kCIDUPnP_::strVal_One);
     else
@@ -855,7 +858,7 @@ TUPnPAVTransService::StartAutoplay( const   TString&            strURI
     m_colInParms.objAdd(CIDUPnP_MediaServices::strVal_InstID);
     m_colInParms.objAdd(strURI);
     m_colInParms.objAdd(TString::strEmpty());
-    m_colInParms.objAdd(TString(TCardinal(c4Volume)));
+    m_colInParms.objPlace(TCardinal(c4Volume));
     m_colInParms.objAdd(bIncLinked ? kCIDUPnP_::strVal_One : kCIDUPnP_::strVal_Zero);
     m_colInParms.objAdd(bResetVol ? kCIDUPnP_::strVal_One : kCIDUPnP_::strVal_Zero);
     InvokeAction
@@ -928,9 +931,9 @@ TUPnPAVTransService::bParseTimeVal( const   TString&                strTmVal
         if (strSecs.bLastOccurrence(kCIDLib::chPeriod, c4At))
             strSecs.CapAt(c4At);
 
-        tCIDLib::TCard4 c4Hours;
-        tCIDLib::TCard4 c4Mins;
-        tCIDLib::TCard4 c4Secs;
+        tCIDLib::TCard4 c4Hours = 0;
+        tCIDLib::TCard4 c4Mins = 0;
+        tCIDLib::TCard4 c4Secs = 0;
 
         if (!strHrs.bToCard4(c4Hours, tCIDLib::ERadices::Dec)
         ||  !strMins.bToCard4(c4Mins, tCIDLib::ERadices::Dec)
@@ -939,6 +942,7 @@ TUPnPAVTransService::bParseTimeVal( const   TString&                strTmVal
             ThrowBadOutActParms(strCmdName, CID_LINE);
         }
 
+        // #pragma warning(suppress : 6001) // These values were set above
         enctToSet = (c4Hours * kCIDLib::enctOneHour)
                     + (c4Mins * kCIDLib::enctOneMinute)
                     + (c4Secs * kCIDLib::enctOneSecond);
@@ -1347,8 +1351,8 @@ TUPnPContDirService::DoBrowse(  const   TString&            strContID
     else
         m_colInParms.objAdd(L"BrowseMetadata");
     m_colInParms.objAdd(L"*");
-    m_colInParms.objAdd(TString(TCardinal(c4StartAt)));
-    m_colInParms.objAdd(TString(TCardinal(c4ToGet)));
+    m_colInParms.objPlace(TCardinal(c4StartAt));
+    m_colInParms.objPlace(TCardinal(c4ToGet));
     m_colInParms.objAdd(L"*");
     InvokeAction(strCmd, m_colInParms, m_colOutParms);
 

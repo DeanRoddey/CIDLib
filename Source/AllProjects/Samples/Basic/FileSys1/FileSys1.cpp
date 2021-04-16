@@ -122,8 +122,8 @@ RecursiveSearch(const   TPathStr&           pathFull
     {
         do
         {
-            // Now handle this level if its a normal directory
-            if (fndbSearch.bIsNormalDir())
+            // Now handle this level if its a directory
+            if (fndbSearch.bIsDirectory())
                 RecursiveSearch(fndbSearch.pathFileName(), pathWC, c8TotalBytes, c4TotalFiles);
             c4TotalFiles++;
         }   while (diterCur.bFindNext(fndbSearch));

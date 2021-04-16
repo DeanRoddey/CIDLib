@@ -40,13 +40,11 @@
 #if defined(PLATFORM_WIN32_WIN7)
     #include    "../CIDKernel/Win32/CIDKernel_PlatformDefines.hpp"
     #include    "../CIDKernel/Win32/CIDKernel_PlatformTypes.hpp"
-    #include    "../CIDKernel/Win32/CIDKernel_PlatformConstants.hpp"
     #define     CIDBUILD_WIDEMAIN 1
 #elif defined(PLATFORM_LINUX)
     #include    "../CIDKernel/Linux/CIDKernel_PlatformDefines.hpp"
     #include    "../CIDKernel/Linux/CIDKernel_PlatformTypes.hpp"
-    #include    "../CIDKernel/Linux/CIDKernel_PlatformConstants.hpp"
-    #define     CIDBUILD_SHORTMAIN 1
+    #define     CIDBUILD_WIDEMAIN 1
 #else
     #error Unknown platform define
 #endif
@@ -56,6 +54,15 @@
 #include    "../CIDKernel/CIDKernel_Type.hpp"
 #include    "../CIDKernel/CIDKernel_Constant.hpp"
 #include    "../CIDKernel/CIDKernel_Unicode.hpp"
+
+// This one has to see the public types above
+#if defined(PLATFORM_WIN32_WIN7)
+    #include    "../CIDKernel/Win32/CIDKernel_PlatformConstants.hpp"
+#elif defined(PLATFORM_LINUX)
+    #include    "../CIDKernel/Linux/CIDKernel_PlatformConstants.hpp"
+#else
+    #error Unknown platform define
+#endif
 
 #define     CIDCTRLS_NOCLASSES
 #include    "../CIDKernel/CIDKernel_Type_Ctrls.hpp"
@@ -108,6 +115,19 @@ namespace tCIDBuild
     {
         NoAdopt
         , Adopt
+    };
+
+
+    // -----------------------------------------------------------------------
+    //  The code analysis levels, set via the /Analyze option. If just by itself
+    //  we are at level 1. Else they can add an =x to it to set it one of these
+    //  levels.
+    // -----------------------------------------------------------------------
+    enum class EAnalysisLevels
+    {
+        None
+        , Level1
+        , Level2
     };
 
 
@@ -336,6 +356,13 @@ namespace kCIDBuild
 
 
     // -----------------------------------------------------------------------
+    //  The path separators used in the project files. If not the same as the platform
+    //  path separator, we have to update the paths as we parse the file.
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCh      chProjectPathSep = L'\\';
+
+
+    // -----------------------------------------------------------------------
     //  Flags for TUtils::bExec
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4   c4ExecFlag_None     = 0;
@@ -358,20 +385,55 @@ namespace kCIDBuild
 
 
 // ---------------------------------------------------------------------------
+//  We need an out of line helper for some of the first headers below to be able
+//  to log stuff if they are inlined.
+// ---------------------------------------------------------------------------
+namespace tCIDBuild
+{
+    tCIDLib::TVoid LogMsg
+    (
+        const   tCIDLib::TCh* const         pszMsg
+    );
+}
+
+
+// ---------------------------------------------------------------------------
 //  The rest of the program includes
 // ---------------------------------------------------------------------------
 #include    "CIDBuild_Janitor.hpp"
 #include    "CIDBuild_RawStr.hpp"
 #include    "CIDBuild_String.hpp"
+#include    "CIDBuild_List.hpp"
+
+namespace tCIDBuild
+{
+    using TStrList = TList<TBldStr>;
+}
+
 #include    "CIDBuild_Utils.hpp"
 #include    "CIDBuild_BinFile.hpp"
 #include    "CIDBuild_TextFile.hpp"
 
+
+// ---------------------------------------------------------------------------
+//  Export global data
+//
+//  stdOut
+//      The standard output text stream that the program uses to output its
+//      info.
+// ---------------------------------------------------------------------------
+extern TTextFile    stdOut;
+
 #include    "CIDBuild_MsgIdInfo.hpp"
 #include    "CIDBuild_FindInfo.hpp"
 #include    "CIDBuild_KeyValuePair.hpp"
+
+namespace tCIDBuild
+{
+    using TKVPList = TList<TKeyValuePair>;
+}
+
 #include    "CIDBuild_LineSpooler.hpp"
-#include    "CIDBuild_List.hpp"
 #include    "CIDBuild_IDLInfo.hpp"
 #include    "CIDBuild_DependGraph.hpp"
 #include    "CIDBuild_ProjectInfo.hpp"
@@ -390,13 +452,8 @@ namespace kCIDBuild
 //
 //  facCIDBuild
 //      The facility object for this program.
-//
-//  stdOut
-//      The standard output text stream that the program uses to output its
-//      info.
 // ---------------------------------------------------------------------------
 extern TFacCIDBuild facCIDBuild;
-extern TTextFile    stdOut;
 
 
 // ---------------------------------------------------------------------------
@@ -413,7 +470,6 @@ TTextFile& operator<<(TTextFile&, const tCIDBuild::EActions);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EBldModes);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EErrors);
 TTextFile& operator<<(TTextFile&, const tCIDBuild::EProjTypes);
-TTextFile& operator<<(TTextFile&, const tCIDBuild::ERTLModes);
 
 template <typename T> tCIDLib::TBoolean bTestBits(const T tLHS, const T tRHS)
 {

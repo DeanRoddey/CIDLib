@@ -51,13 +51,23 @@ class TBinFile
             const   tCIDLib::EStdFiles      eStdFile
         );
 
+        TBinFile(const TBinFile&) = delete;
+        TBinFile(TBinFile&&) = delete;
+
         ~TBinFile();
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBinFile& operator<<(const tCIDLib::TCard4 c4ToWrite);
+        TBinFile& operator=(const TBinFile&) = delete;
+        TBinFile& operator=(TBinFile&&) = delete;
+
+        TBinFile& operator<<(const tCIDLib::TCard4 c4ToWrite)
+        {
+            c4Write(&c4ToWrite, sizeof(c4ToWrite));
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------
@@ -105,13 +115,6 @@ class TBinFile
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TBinFile(const TBinFile&);
-        tCIDLib::TVoid operator=(const TBinFile&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         //
         //  Most of these are provided by the platform implementation
@@ -142,11 +145,3 @@ class TBinFile
         tCIDBuild::TFileHandle  m_hflThis;
         TBldStr                 m_strFileName;
 };
-
-
-inline TBinFile& TBinFile::operator<<(const tCIDLib::TCard4 c4ToWrite)
-{
-    c4Write(&c4ToWrite, sizeof(c4ToWrite));
-    return *this;
-}
-

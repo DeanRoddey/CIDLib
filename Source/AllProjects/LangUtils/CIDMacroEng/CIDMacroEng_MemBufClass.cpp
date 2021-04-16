@@ -45,12 +45,15 @@ RTTIDecls(TMEngMemBufInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_MemBufClass
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strMemBuf(L"MemBuf");
-    const TString   strMemBufClassPath(L"MEng.System.Runtime.MemBuf");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strMemBuf(L"MemBuf");
+        const TString   strMemBufClassPath(L"MEng.System.Runtime.MemBuf");
+    }
 }
 
 
@@ -216,42 +219,48 @@ TMEngMemBufInfo::TMEngMemBufInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_CalcSum(kMacroEng::c2BadId)
-    , m_c2MethId_CheckIndRange(kMacroEng::c2BadId)
-    , m_c2MethId_CompBytes(kMacroEng::c2BadId)
-    , m_c2MethId_CopyIn(kMacroEng::c2BadId)
-    , m_c2MethId_CopyInAt(kMacroEng::c2BadId)
-    , m_c2MethId_CopyOut(kMacroEng::c2BadId)
-    , m_c2MethId_ExportString(kMacroEng::c2BadId)
-    , m_c2MethId_ExportStringAt(kMacroEng::c2BadId)
-    , m_c2MethId_ExportVarString(kMacroEng::c2BadId)
-    , m_c2MethId_ExtractDecDigAt(kMacroEng::c2BadId)
-    , m_c2MethId_ExtractDecValAt(kMacroEng::c2BadId)
-    , m_c2MethId_ExtractHexDigAt(kMacroEng::c2BadId)
-    , m_c2MethId_ExtractHexValAt(kMacroEng::c2BadId)
-    , m_c2MethId_GetCard1At(kMacroEng::c2BadId)
-    , m_c2MethId_GetCard2At(kMacroEng::c2BadId)
-    , m_c2MethId_GetCard4At(kMacroEng::c2BadId)
-    , m_c2MethId_GetInt1At(kMacroEng::c2BadId)
-    , m_c2MethId_GetInt2At(kMacroEng::c2BadId)
-    , m_c2MethId_GetInt4At(kMacroEng::c2BadId)
-    , m_c2MethId_GetAlloc(kMacroEng::c2BadId)
-    , m_c2MethId_GetMaxSize(kMacroEng::c2BadId)
-    , m_c2MethId_ImportString(kMacroEng::c2BadId)
-    , m_c2MethId_ImportStringAt(kMacroEng::c2BadId)
-    , m_c2MethId_InsertASCIIHexPair(kMacroEng::c2BadId)
-    , m_c2MethId_MakeSpace(kMacroEng::c2BadId)
-    , m_c2MethId_MoveToStart(kMacroEng::c2BadId)
-    , m_c2MethId_PutCard1At(kMacroEng::c2BadId)
-    , m_c2MethId_PutCard2At(kMacroEng::c2BadId)
-    , m_c2MethId_PutCard4At(kMacroEng::c2BadId)
-    , m_c2MethId_PutInt1At(kMacroEng::c2BadId)
-    , m_c2MethId_PutInt2At(kMacroEng::c2BadId)
-    , m_c2MethId_PutInt4At(kMacroEng::c2BadId)
-    , m_c2MethId_Reallocate(kMacroEng::c2BadId)
-    , m_c2MethId_SetAll(kMacroEng::c2BadId)
-    , m_c2MethId_SzCtor(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CalcSum(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CheckIndRange(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CompBytes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CopyIn(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CopyInAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_CopyOut(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExportString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExportStringAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExportVarString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExtractDecDigAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExtractDecValAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExtractHexDigAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExtractHexValAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindByte(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCard1At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCard2At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCard4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFloat4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFloat8At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetInt1At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetInt2At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetInt4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetAlloc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetMaxSize(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ImportString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ImportStringAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_InsertASCIIHexPair(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MakeSpace(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MoveToStart(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutCard1At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutCard2At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutCard4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutFloat4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutFloat8At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutInt1At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutInt2At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PutInt4At(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reallocate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveSpace(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetAll(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SzCtor(kCIDMacroEng::c2BadId)
     , m_c4Err_BadChar(kCIDLib::c4MaxCard)
     , m_c4Err_BadDigitRange(kCIDLib::c4MaxCard)
     , m_c4Err_BadIndex(kCIDLib::c4MaxCard)
@@ -1237,12 +1246,11 @@ TMEngMemBufInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             const tCIDLib::TCh chCur = strSrc[c4Index];
             if (chCur > 255)
                 ThrowAnErr(meOwner, m_c4Err_ByteRange);
-            mbufInst[c4At++] = tCIDLib::TCard1(chCur);
+            mbufInst.PutCard1(tCIDLib::TCard1(chCur), c4At++);
         }
 
         // Give back the count we actually did
-        TMEngCard4Val& mecvRet
-                    = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
+        TMEngCard4Val& mecvRet = meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd - 1);
         mecvRet.c4Value(c4Count);
     }
      else if (c2MethId == m_c2MethId_InsertASCIIHexPair)
@@ -1255,13 +1263,13 @@ TMEngMemBufInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         TRawStr::bFormatVal(c1Val, szTmp, 2, tCIDLib::ERadices::Hex);
         if (c1Val < 0x10)
         {
-            mbufInst[c4At] = 0x20;
-            mbufInst[c4At + 1] = tCIDLib::TCard1(szTmp[0]);
+            mbufInst.PutCard1(0x20, c4At);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[0]), c4At + 1);
         }
          else
         {
-            mbufInst[c4At] = tCIDLib::TCard1(szTmp[0]);
-            mbufInst[c4At + 1] = tCIDLib::TCard1(szTmp[1]);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[0]), c4At);
+            mbufInst.PutCard1(tCIDLib::TCard1(szTmp[1]), c4At + 1);
         }
     }
      else if (c2MethId == m_c2MethId_MakeSpace)
@@ -1456,7 +1464,7 @@ TMEngMemBufInfo::c4ExtractASCII(        TCIDMacroEngine&    meOwner
     //  doing a zero extension. Check each one to make sure it fits the
     //  radix.
     //
-    tCIDLib::TCh achBuf[c4MaxChars + 1];
+    tCIDLib::TCh achBuf[c4MaxChars + 1] = {0};
     tCIDLib::TCard4 c4Index = 0;
     for (; c4Index < c4Count; c4Index++)
     {

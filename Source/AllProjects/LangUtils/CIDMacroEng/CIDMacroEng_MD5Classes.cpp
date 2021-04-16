@@ -47,13 +47,16 @@ RTTIDecls(TMEngMD5Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_MD5Class
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strDigestName(L"MD5Digest");
-    const TString   strDigestPath(L"MEng.System.Runtime.MD5Digest");
-    const TString   strHashName(L"MD5Hash");
-    const TString   strHashClassPath(L"MEng.System.Runtime.MD5Hash");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strDigestName(L"MD5Digest");
+        const TString   strDigestPath(L"MEng.System.Runtime.MD5Digest");
+        const TString   strHashName(L"MD5Hash");
+        const TString   strHashClassPath(L"MEng.System.Runtime.MD5Hash");
+    }
 }
 
 
@@ -159,12 +162,12 @@ TMEngMD5HashInfo::TMEngMD5HashInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_CopyToMemBuf(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetAsString(kMacroEng::c2BadId)
-    , m_c2MethId_GetByteCount(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
+    , m_c2MethId_CopyToMemBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetAsString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByteCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -410,9 +413,9 @@ TMEngMD5Info::TMEngMD5Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_DigestBuf(kMacroEng::c2BadId)
-    , m_c2MethId_DigestStr(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DigestBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DigestStr(kCIDMacroEng::c2BadId)
 {
     //
     //  Add the hash class as an import of ours, so that it will get loaded

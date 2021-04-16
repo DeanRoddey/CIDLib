@@ -43,58 +43,61 @@ RTTIDecls(TBase64,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_Base64
 {
-    // -----------------------------------------------------------------------
-    //  A table to translate the binary data into base 64 values. These
-    //  represent the ASCII chars:
-    //
-    //    ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
-    //
-    //  They are not done as a character string since we don't want to assume
-    //  that a locally compiled constant string will generate ASCII codes.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1 ac1Encode[] =
+    namespace
     {
-        // A-Z
-        0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C
-      , 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58
-      , 0x59, 0x5A
+        // -----------------------------------------------------------------------
+        //  A table to translate the binary data into base 64 values. These
+        //  represent the ASCII chars:
+        //
+        //    ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
+        //
+        //  They are not done as a character string since we don't want to assume
+        //  that a locally compiled constant string will generate ASCII codes.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard1 ac1Encode[] =
+        {
+            // A-Z
+            0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C
+        , 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58
+        , 0x59, 0x5A
 
-        // a-z
-      , 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C
-      , 0x6D, 0x6E, 0x6F, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78
-      , 0x79, 0x7A
+            // a-z
+        , 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C
+        , 0x6D, 0x6E, 0x6F, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78
+        , 0x79, 0x7A
 
-        // 0-9
-      , 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39
+            // 0-9
+        , 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39
 
-        // +/
-      , 0x2B, 0x2F
-    };
-    const tCIDLib::TCard4 c4EncodeSz = tCIDLib::c4ArrayElems(ac1Encode);
-
-
-    // -----------------------------------------------------------------------
-    //  And a table for decoding back the other way. Again, as binary bytes
-    //  so we don't assume generation of ASCII codes.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1 ac1Decode[] =
-    {
-        0x7C, 0x24, 0x24, 0x24, 0x7D, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78
-      , 0x79, 0x7A, 0x7B, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x3E, 0x3F
-      , 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B
-      , 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57
-      , 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D
-      , 0x5E, 0x5F, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69
-      , 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x71
-    };
-    const tCIDLib::TCard4 c4DecodeSz = tCIDLib::c4ArrayElems(ac1Decode);
+            // +/
+        , 0x2B, 0x2F
+        };
+        constexpr tCIDLib::TCard4 c4EncodeSz = tCIDLib::c4ArrayElems(ac1Encode);
 
 
-    // -----------------------------------------------------------------------
-    //  Some Base64 related constants
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4RawBlkSz = 3;
-    const tCIDLib::TCard4 c4EncBlkSz = 4;
+        // -----------------------------------------------------------------------
+        //  And a table for decoding back the other way. Again, as binary bytes
+        //  so we don't assume generation of ASCII codes.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard1 ac1Decode[] =
+        {
+            0x7C, 0x24, 0x24, 0x24, 0x7D, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78
+        , 0x79, 0x7A, 0x7B, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x3E, 0x3F
+        , 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B
+        , 0x4C, 0x4D, 0x4E, 0x4F, 0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57
+        , 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D
+        , 0x5E, 0x5F, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69
+        , 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70, 0x71
+        };
+        constexpr tCIDLib::TCard4 c4DecodeSz = tCIDLib::c4ArrayElems(ac1Decode);
+
+
+        // -----------------------------------------------------------------------
+        //  Some Base64 related constants
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4RawBlkSz = 3;
+        constexpr tCIDLib::TCard4 c4EncBlkSz = 4;
+    }
 }
 
 
@@ -111,10 +114,6 @@ TBase64::TBase64() :
 
     m_bEscapeForwardSlashes(kCIDLib::False)
     , m_c4LineWidth(72)
-{
-}
-
-TBase64::~TBase64()
 {
 }
 
@@ -148,8 +147,10 @@ tCIDLib::TCard4 TBase64::c4Decode(TBinInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4BlkCnt = 0;
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz];
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz] = { 0 };
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz] =  { 0 };
 
     try
     {
@@ -236,10 +237,12 @@ tCIDLib::TCard4 TBase64::c4Encode(TBinInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
     tCIDLib::TCard4 c4Count = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Twice as big to allow for escapes
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         //
@@ -321,8 +324,10 @@ tCIDLib::TCard4 TBase64::c4LineWidth(const tCIDLib::TCard4 c4ToSet)
 tCIDLib::TVoid TBase64::Decode(TTextInStream& strmIn, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4BlkCnt = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz];
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4EncBlkSz] = {0};
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4RawBlkSz] = {0};
 
     try
     {
@@ -411,10 +416,12 @@ tCIDLib::TVoid TBase64::Decode(TTextInStream& strmIn, TBinOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(TBinInStream& strmIn, TTextOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Possibly twice as big if escaping
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         //
@@ -468,10 +475,12 @@ tCIDLib::TVoid TBase64::Encode(TBinInStream& strmIn, TTextOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(const TString& strSrc, TBinOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Could be twice as big if escaping
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
 
     const tCIDLib::TCh*   pszSrc = strSrc.pszBuffer();
     const tCIDLib::TCh*   pszEnd = pszSrc + strSrc.c4Length();
@@ -528,10 +537,12 @@ tCIDLib::TVoid TBase64::Encode(const TString& strSrc, TBinOutStream& strmOut)
 tCIDLib::TVoid TBase64::Encode(TTextInStream& strmIn, TTextOutStream& strmOut)
 {
     tCIDLib::TCard4 c4LnWidth = 0;
-    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz];
+
+    // Just enough init to make the analyzer happy
+    tCIDLib::TCard1 ac1In[CIDLib_Base64::c4RawBlkSz] = {0};
 
     // Possibly twice as large if padding
-    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2];
+    tCIDLib::TCard1 ac1Out[CIDLib_Base64::c4EncBlkSz * 2] = {0};
     while (kCIDLib::True)
     {
         // Get up a full block of source bytes
@@ -586,7 +597,7 @@ TBase64::c4EncodeBlock( const   tCIDLib::TCard1* const  pc1In
                         , const tCIDLib::TCard4         c4Len)
 {
     tCIDLib::TCard4 c4Ret = 0;
-    tCIDLib::TCard1 c1Cur;
+    tCIDLib::TCard1 c1Cur = 0;
 
     c1Cur = CIDLib_Base64::ac1Encode[pc1In[0] >> 2];
     if (m_bEscapeForwardSlashes && (c1Cur == 0x2F))

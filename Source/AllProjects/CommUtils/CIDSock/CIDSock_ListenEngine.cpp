@@ -87,6 +87,13 @@ TServerStreamSocket* TSockLEngConn::psockConn()
     return m_psockConn;
 }
 
+TServerStreamSocket* TSockLEngConn::psockOrphan()
+{
+    TServerStreamSocket* psockRet = m_psockConn;
+    m_psockConn = nullptr;
+    return psockRet;
+}
+
 tCIDLib::TVoid TSockLEngConn::Orphan()
 {
     m_psockConn = nullptr;
@@ -288,7 +295,7 @@ TSockListenerEng::Initialize(const  tCIDSock::ESockProtos eProtocol
     //  they do the same thing. We just tell each thread instance which mode it is
     //  servicing.
     //
-    tCIDLib::TBoolean bSecureMode;
+    tCIDLib::TBoolean bSecureMode = kCIDLib::False;
     if (m_ippnNonSecure)
     {
         bSecureMode = kCIDLib::False;
@@ -313,6 +320,12 @@ TSockLEngConn* TSockListenerEng::pslecWait(const tCIDLib::TCard4 c4WaitMSs)
     return m_colConnQ.pobjGetNext(c4WaitMSs, kCIDLib::False);
 }
 
+TUniquePtr<TSockLEngConn> TSockListenerEng::uptrWait(const tCIDLib::TCard4 c4WaitMSs)
+{
+    // Wait up to the indicated type for a connection
+    return TUniquePtr<TSockLEngConn>(m_colConnQ.pobjGetNext(c4WaitMSs, kCIDLib::False));
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -330,7 +343,7 @@ TSockListenerEng::eListenThread(TThread& thrThis, tCIDLib::TVoid* pData)
     //  Get the passed info, which tells us whether we are doing the secure or non-
     //  secure port.
     //
-    const tCIDLib::TBoolean bSecure = *reinterpret_cast<tCIDLib::TBoolean*>(pData);
+    const tCIDLib::TBoolean bSecure = *static_cast<tCIDLib::TBoolean*>(pData);
 
     // And now let the caller go
     thrThis.Sync();

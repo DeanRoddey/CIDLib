@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -35,7 +34,7 @@
 //  This template does some very basic collection tests that pretty much any
 //  collection must support.
 // ----------------------------------------------------------------------------
-template <class TCol, class TElem> tCIDLib::TVoid
+template <typename TCol, class TElem> tCIDLib::TVoid
 TestColBasics(          TTextOutStream& strmOut
                 ,       TCol&           colToTest
                 , const tCIDLib::TCard4 c4InitialCount)
@@ -60,7 +59,7 @@ TestColBasics(          TTextOutStream& strmOut
     }
 
     // Get a cursor and check the elements
-    TCol::TNCCursor cursTest(&colToTest);
+    typename TCol::TNCCursor cursTest(&colToTest);
 
     if (cursTest.c4ElemCount() != c4InitialCount)
         strmOut << CUR_LN << L"Element count not correct via cursor" << kCIDLib::NewLn;
@@ -70,7 +69,7 @@ TestColBasics(          TTextOutStream& strmOut
         strmOut << CUR_LN << L"Cursor reset failed" << kCIDLib::NewLn;
 
     // Create aanother cursor to test invalidation
-    TCol::TCursor cursTest2(&colToTest);
+    typename TCol::TCursor cursTest2(&colToTest);
 
     //
     //  Delete the first element. We have to reset the cursor, which leaves it
@@ -129,7 +128,7 @@ TestColBasics(          TTextOutStream& strmOut
 }
 
 
-template <class TCol, class TElem> tCIDLib::TVoid
+template <typename TCol, class TElem> tCIDLib::TVoid
 TestColCopy(TTextOutStream& strmOut, const TCol& colToTest)
 {
     // Create a copy of the collection

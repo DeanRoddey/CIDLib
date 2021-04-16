@@ -22,8 +22,6 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  Be careful about logging in here, since this might be used in the logging
-//      stuff, and cause a circular freak out.
 //
 // LOG:
 //
@@ -39,7 +37,6 @@
 //  PREFIX: col
 // ---------------------------------------------------------------------------
 template <typename TElem, typename TIndex = tCIDLib::TCard4>
-
 class TVector : public TCollection<TElem>
 {
     public  :
@@ -48,6 +45,17 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         using TMyElemType   = TElem;
         using TMyType       = TVector<TElem, TIndex>;
+        using TParType      = TCollection<TElem>;
+
+
+        // -------------------------------------------------------------------
+        //  Public, static methods
+        // -------------------------------------------------------------------
+        static const TClass& clsThis()
+        {
+            static const TClass clsRet(L"TVector<TElem,TIndex>");
+            return clsRet;
+        }
 
 
         // -------------------------------------------------------------------
@@ -74,10 +82,16 @@ class TVector : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TConstCursor(const TConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
+                }
+
+                TConstCursor(TConstCursor&& cursSrc) :
+
+                    TConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
                 }
 
                 ~TConstCursor() {}
@@ -90,15 +104,21 @@ class TVector : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolCursoring
-                            ? cursSrc.m_pcolCursoring->pmtxLock() : nullptr
-                        );
-
+                        TLocker lockrCol(cursSrc.m_pcolCursoring);
                         TParent::operator=(cursSrc);
                         m_i4CurIndex = cursSrc.m_i4CurIndex;
                         m_pcolCursoring = cursSrc.m_pcolCursoring;
+                    }
+                    return *this;
+                }
+
+                TConstCursor& operator=(TConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_i4CurIndex, cursSrc.m_i4CurIndex);
+                        tCIDLib::Swap(m_pcolCursoring, cursSrc.m_pcolCursoring);
                     }
                     return *this;
                 }
@@ -115,13 +135,13 @@ class TVector : public TCollection<TElem>
                     return !TConstCursor::operator==(cursSrc);
                 }
 
-                TConstCursor<TElem>& operator++()
+                TConstCursor& operator++()
                 {
                     this->bNext();
                     return *this;
                 }
 
-                TConstCursor<TElem> operator++(int)
+                TConstCursor operator++(int)
                 {
                     TConstCursor cursTmp(*this);
                     this->bNext();
@@ -132,7 +152,7 @@ class TVector : public TCollection<TElem>
                 // -----------------------------------------------------------
                 //  Public, inherited methods
                 // -----------------------------------------------------------
-                tCIDLib::TBoolean bIsValid() const override
+                tCIDLib::TBoolean bIsValid() const final
                 {
                     if (!TParent::bIsValid())
                         return kCIDLib::False;
@@ -145,11 +165,11 @@ class TVector : public TCollection<TElem>
                     );
                 }
 
-                tCIDLib::TBoolean bNext() override
+                tCIDLib::TBoolean bNext() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
 
                     // It could be -1 here, in which case we just move up to 0
@@ -158,18 +178,18 @@ class TVector : public TCollection<TElem>
                     return bIsValid();
                 }
 
-                tCIDLib::TBoolean bPrevious() override
+                tCIDLib::TBoolean bPrevious() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     if (m_i4CurIndex > -1)
                         m_i4CurIndex--;
                     return bIsValid();
                 }
 
-                tCIDLib::TBoolean bReset() override
+                tCIDLib::TBoolean bReset() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
@@ -178,11 +198,11 @@ class TVector : public TCollection<TElem>
                     return bIsValid();
                 }
 
-                tCIDLib::TBoolean bSeekToEnd() override
+                tCIDLib::TBoolean bSeekToEnd() final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->c4SerialNum(m_pcolCursoring->c4SerialNum());
                     const tCIDLib::TCard4 c4Count = m_pcolCursoring->c4ElemCount();
                     if (c4Count)
@@ -193,11 +213,11 @@ class TVector : public TCollection<TElem>
                     return bIsValid();
                 }
 
-                const TElem& objRCur() const override
+                const TElem& objRCur() const final
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolCursoring);
                     this->CheckSerialNum(m_pcolCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return m_pcolCursoring->objAt(TIndex(m_i4CurIndex));
@@ -267,13 +287,19 @@ class TVector : public TCollection<TElem>
                 {
                 }
 
-                // We have to lock first, so we can't use member init!
                 TNonConstCursor(const TNonConstCursor& cursSrc)
                 {
                     operator=(cursSrc);
                 }
 
-                ~TNonConstCursor() {}
+                TNonConstCursor(TNonConstCursor&& cursSrc) :
+
+                    TNonConstCursor()
+                {
+                    *this = tCIDLib::ForceMove(cursSrc);
+                }
+
+                ~TNonConstCursor() = default;
 
 
                 // -----------------------------------------------------------
@@ -283,20 +309,26 @@ class TVector : public TCollection<TElem>
                 {
                     if (this != &cursSrc)
                     {
-                        TMtxLocker lockCol
-                        (
-                            cursSrc.m_pcolNCCursoring
-                            ? cursSrc.m_pcolNCCursoring->pmtxLock() : nullptr
-                        );
+                        TLocker lockrCol(cursSrc.m_pcolNCCursoring);
                         TParent::operator=(cursSrc);
                         m_pcolNCCursoring = cursSrc.m_pcolNCCursoring;
                     }
                     return *this;
                 }
 
+                TNonConstCursor& operator=(TNonConstCursor&& cursSrc)
+                {
+                    if (this != &cursSrc)
+                    {
+                        TParent::operator=(tCIDLib::ForceMove(cursSrc));
+                        tCIDLib::Swap(m_pcolNCCursoring, cursSrc.m_pcolNCCursoring);
+                    }
+                    return *this;
+                }
+
                 TElem& operator*() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return static_cast<TElem&>
@@ -307,7 +339,7 @@ class TVector : public TCollection<TElem>
 
                 TElem* operator->() const
                 {
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return &static_cast<TElem&>
@@ -337,7 +369,7 @@ class TVector : public TCollection<TElem>
                 {
                     this->CheckInitialized(CID_FILE, CID_LINE);
 
-                    TMtxLocker lockCol(m_pcolNCCursoring->pmtxLock());
+                    TLocker lockrCol(m_pcolNCCursoring);
                     this->CheckSerialNum(m_pcolNCCursoring->c4SerialNum(), CID_FILE, CID_LINE);
                     this->CheckValid(this->bIsValid(), CID_FILE, CID_LINE);
                     return static_cast<TElem&>
@@ -372,7 +404,7 @@ class TVector : public TCollection<TElem>
 
 
         // -------------------------------------------------------------------
-        //  Typedefs for our nested cursor types and a comparator function
+        //  Aliases for our nested cursor types and a comparator function
         // -------------------------------------------------------------------
         using TCursor = TConstCursor<TElem>;
         using TNCCursor = TNonConstCursor<TElem>;
@@ -390,10 +422,7 @@ class TVector : public TCollection<TElem>
         {
             // Allocate the array of elem pointers and zero them
             m_apElems = new TElem*[m_c4CurAlloc];
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
         }
 
         TVector(const   TIndex              tInitAlloc
@@ -410,10 +439,7 @@ class TVector : public TCollection<TElem>
 
             // Allocate the array of elem pointers and zero them
             m_apElems = new TElem*[m_c4CurAlloc];
-            TRawMem::SetMemBuf
-            (
-                m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
         }
 
         TVector(const   TElem* const        pobjInitVals
@@ -434,7 +460,10 @@ class TVector : public TCollection<TElem>
             try
             {
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // alloc and count are the same size
                     m_apElems[c4Index] = new TElem(pobjInitVals[c4Index]);
+                }
             }
 
             catch(TError& errToCatch)
@@ -459,7 +488,7 @@ class TVector : public TCollection<TElem>
             , m_c4CurCount(0)
         {
             // Lock the other collection while we do this
-            TMtxLocker lockThat(colSrc.pmtxLock());
+            TLocker lockrThat(&colSrc);
 
             // Sanity check the source if debugging
             #if CID_DEBUG_ON
@@ -481,7 +510,10 @@ class TVector : public TCollection<TElem>
             try
             {
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)
                     m_apElems[c4Index] = new TElem(*colSrc.m_apElems[c4Index]);
+                }
             }
 
             catch(TError& errToCatch)
@@ -503,16 +535,22 @@ class TVector : public TCollection<TElem>
                 TRawMem::SetMemBuf
                 (
                     &m_apElems[m_c4CurCount]
-                    , tCIDLib::TCard1(0)
+                    , kCIDLib::c1MinCard
                     , sizeof(TElem*) * (m_c4CurAlloc - m_c4CurCount)
                 );
             }
         }
 
-        // Do the lightest setup possible then force an assign
+        //
+        //  Set up a minimal valid setup, then call the move operator. If the
+        //  source is thread safe, this one will be as well.
+        //
         TVector(TMyType&& colSrc) :
 
-            TVector(1, colSrc.eMTState())
+            TCollection<TElem>(colSrc)
+            , m_apElems(new TElem*[1])
+            , m_c4CurAlloc(1)
+            , m_c4CurCount(0)
         {
             *this = tCIDLib::ForceMove(colSrc);
         }
@@ -534,15 +572,14 @@ class TVector : public TCollection<TElem>
         {
             if (this != &colSrc)
             {
-                TMtxLocker lockUs(this->pmtxLock());
-                TMtxLocker lockSrc(colSrc.pmtxLock());
+                TLocker lockrUs(this);
+                TLocker lockrSrc(&colSrc);
 
-                // Sanity check the source if debugging
                 #if CID_DEBUG_ON
                 this->CheckAllocAndCount(colSrc.m_c4CurCount, colSrc.m_c4CurAlloc, CID_FILE, CID_LINE);
                 #endif
 
-                TParent::operator=(colSrc);
+                TParType::operator=(colSrc);
 
                 // Clean up our current stuff
                 RemoveAllElems();
@@ -559,9 +596,15 @@ class TVector : public TCollection<TElem>
 
                 tCIDLib::TCard4 c4Index;
                 for (c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // We range checked above
                     m_apElems[c4Index] = new TElem(*colSrc.m_apElems[c4Index]);
+                }
                 for (; c4Index < m_c4CurAlloc; c4Index++)
+                {
+                    CIDLib_Suppress(6386)  // We range checked above
                     m_apElems[c4Index] = 0;
+                }
 
                 this->c4IncSerialNum();
             }
@@ -572,16 +615,24 @@ class TVector : public TCollection<TElem>
         {
             if (&colSrc != this)
             {
-                TMtxLocker lockUs(this->pmtxLock());
-                TMtxLocker lockSrc(colSrc.pmtxLock());
+                // Lock us both if we are thread safe
+                TLocker lockrUs(this);
+                TLocker lockrSrc(&colSrc);
 
-                TParent::operator=(tCIDLib::ForceMove(colSrc));
-                tCIDLib::Swap(m_c4CurAlloc, colSrc.m_c4CurAlloc);
+                //
+                //  Call our parent first. This just really bumps the serial numbers
+                //  and some some sanity checks.
+                //
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+
+                // And now we just swap our few members
                 tCIDLib::Swap(m_c4CurCount, colSrc.m_c4CurCount);
+                tCIDLib::Swap(m_c4CurAlloc, colSrc.m_c4CurAlloc);
                 tCIDLib::Swap(m_apElems, colSrc.m_apElems);
 
-                this->c4IncSerialNum();
-                colSrc.c4IncSerialNum();
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
             }
             return *this;
         }
@@ -589,7 +640,7 @@ class TVector : public TCollection<TElem>
         const TElem& operator[](const TIndex tIndex) const
         {
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
             return *m_apElems[c4Index];
         }
@@ -597,7 +648,7 @@ class TVector : public TCollection<TElem>
         TElem& operator[](const TIndex tIndex)
         {
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
             return *m_apElems[c4Index];
         }
@@ -606,21 +657,38 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            if (clsTarget == clsThis())
+                return kCIDLib::True;
+            return TParType::bIsDescendantOf(clsTarget);
+        }
+
+        tCIDLib::TBoolean bIsEmpty() const final
+        {
+            TLocker lockrCol(this);
             return (m_c4CurCount == 0);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             return m_c4CurCount;
         }
 
-        TElem& objAdd(const TElem& objNew)
+        const TClass& clsIsA() const final
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            return clsThis();
+        }
+
+        const TClass& clsParent() const final
+        {
+            return TParType::clsThis();
+        }
+
+        TElem& objAdd(const TElem& objNew) final
+        {
+            TLocker lockrCol(this);
 
             if (m_c4CurCount == m_c4CurAlloc)
                 ExpandTo(m_c4CurCount + 1);
@@ -636,15 +704,15 @@ class TVector : public TCollection<TElem>
             return *m_apElems[m_c4CurCount - 1];
         }
 
-        [[nodiscard]] TCursor* pcursNew() const override
+        [[nodiscard]] TCursor* pcursNew() const final
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             return new TCursor(this);
         }
 
-        tCIDLib::TVoid RemoveAll() override
+        tCIDLib::TVoid RemoveAll() final
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             if (!m_c4CurCount)
                 return;
 
@@ -656,9 +724,89 @@ class TVector : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+
+        //
+        //  If not in the list add it. We assume an unsorted list. If it's sorted
+        //  you'd do a lot better yourself doing a binary search and adding if not
+        //  found.
+        //
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
+        tCIDLib::TBoolean bAddIfNew(const TElem& objToAdd, TComp pfnComp = TComp())
+        {
+            TLocker lockrThis(this);
+
+            // See if this element is in teh list
+            tCIDLib::TCard4 c4Index = 0;
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToAdd))
+                    return kCIDLib::False;
+            }
+
+            objAdd(objToAdd);
+            return kCIDLib::True;
+        }
+
+
+        //
+        //  We can remove an element by looking for one with that value, possibly
+        //  removing all such or just the first one. We assume the list is not
+        //  sorted. If it is, you can do better by doing a binary search and
+        //  removing it yourself.
+        //
+        template <typename TComp = tCIDLib::TDefEqComp<TMyElemType>>
+        tCIDLib::TBoolean
+        bRemoveIfMember(const TElem& objToRemove, TComp pfnComp = TComp())
+        {
+            TLocker lockrThis(this);
+
+            // See if this element is in teh list
+            tCIDLib::TCard4 c4Index = 0;
+            while (c4Index < m_c4CurCount)
+            {
+                if (pfnComp(*m_apElems[c4Index], objToRemove))
+                    break;
+                c4Index++;
+            }
+
+            // If not found, return false now
+            if (c4Index == m_c4CurCount)
+                return kCIDLib::False;
+
+            //
+            //  Put a janitor on the element that we are going to delete so
+            //  that it will delete on the way out. If it throws at that point
+            //  due to an error in the dtor, we don't care because we've got
+            //  our stuff straight, and it's now the caller's issue.
+            //
+            TJanitor<TMyElemType> janRemove(m_apElems[c4Index]);
+            m_apElems[c4Index] = 0;
+
+            //
+            //  Now bump down the count of elements and compact the list if
+            //  needed.
+            //
+            m_c4CurCount--;
+            if (c4Index < m_c4CurCount)
+            {
+                for (tCIDLib::TCard4 c4CompInd = c4Index;
+                                        c4CompInd < m_c4CurCount; c4CompInd++)
+                {
+                    m_apElems[c4CompInd] = m_apElems[c4CompInd + 1];
+                }
+
+                // Zero the last one, since it's not used anymore
+                m_apElems[m_c4CurCount] = 0;
+            }
+
+            // And invalidate cursors
+            this->c4IncSerialNum();
+            return kCIDLib::True;
+        }
+
         tCIDLib::TBoolean bRemoveIfMember(TElem* const pobjToRemove)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // See if this element is in teh list
             tCIDLib::TCard4 c4Index = 0;
@@ -679,7 +827,7 @@ class TVector : public TCollection<TElem>
             //  due to an error in the dtor, we don't care because we've got
             //  our stuff straight, and it's now the caller's issue.
             //
-            TJanitor<TElem> janRemove(m_apElems[c4Index]);
+            TJanitor<TMyElemType> janRemove(m_apElems[c4Index]);
             m_apElems[c4Index] = 0;
 
             //
@@ -706,7 +854,7 @@ class TVector : public TCollection<TElem>
 
         tCIDLib::TBoolean bRemoveLast()
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // If no elements, then we don't do anything
             if (!m_c4CurCount)
@@ -723,7 +871,7 @@ class TVector : public TCollection<TElem>
             //  problem for us. After the janitor has it, zero the element
             //  slot.
             //
-            TJanitor<TElem> janRemove(m_apElems[m_c4CurCount]);
+            TJanitor<TMyElemType> janRemove(m_apElems[m_c4CurCount]);
             m_apElems[m_c4CurCount] = 0;
 
             // Now invalidate cursors and return true
@@ -766,8 +914,8 @@ class TVector : public TCollection<TElem>
             //  range and put it back at the end. If down, then orphan the one after
             //  the range and put it back at the start.
             //
-            tCIDLib::TCard4 c4From;
-            tCIDLib::TCard4 c4To;
+            tCIDLib::TCard4 c4From = 0;
+            tCIDLib::TCard4 c4To = 0;
             if (bUp)
             {
                 c4From = c4StartIndex - 1;
@@ -789,14 +937,14 @@ class TVector : public TCollection<TElem>
 
         tCIDLib::TCard4 c4CurAlloc() const
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             return m_c4CurAlloc;
         }
 
         tCIDLib::TVoid CheckExpansion(const tCIDLib::TCard4 c4NewElems)
         {
             // If the new elements wouldn't fit, then expand
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             if (m_c4CurCount + c4NewElems >= m_c4CurAlloc)
                 ExpandTo(m_c4CurCount + c4NewElems);
         }
@@ -804,7 +952,7 @@ class TVector : public TCollection<TElem>
 
         template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
                 if (!iterCB(*m_apElems[c4Index], c4Index))
@@ -813,9 +961,9 @@ class TVector : public TCollection<TElem>
             return kCIDLib::True;
         }
 
-        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB) const
+        template <typename IterCB> tCIDLib::TBoolean bForEachNC(IterCB iterCB)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
                 if (!iterCB(*m_apElems[c4Index]))
@@ -824,10 +972,21 @@ class TVector : public TCollection<TElem>
             return kCIDLib::True;
         }
 
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            TLocker lockrThis(this);
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
+            {
+                if (!iterCB(*m_apElems[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
 
         tCIDLib::TVoid InsertAt(const TElem& objToInsert, const TIndex tAt)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Expand the array if we need to
             if (m_c4CurCount == m_c4CurAlloc)
@@ -864,7 +1023,7 @@ class TVector : public TCollection<TElem>
                     ,       TCompFunc           pfnComp
                     ,       TIndex&             tAt)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             //
             //  If we have no current values, then that's the easy one,
@@ -872,7 +1031,6 @@ class TVector : public TCollection<TElem>
             //  one item, then also do a simple check. Else we do the
             //  binary search.
             //
-            tCIDLib::ESortComps eRes;
             if (!m_c4CurCount)
             {
                 objAdd(objToInsert);
@@ -881,8 +1039,7 @@ class TVector : public TCollection<TElem>
             }
              else if (m_c4CurCount == 1)
             {
-                eRes = pfnComp(objToInsert, *m_apElems[0]);
-                if (eRes == tCIDLib::ESortComps::FirstLess)
+                if (pfnComp(objToInsert, *m_apElems[0]) == tCIDLib::ESortComps::FirstLess)
                 {
                     tAt = TIndex(0);
                     InsertAt(objToInsert, 0);
@@ -899,6 +1056,7 @@ class TVector : public TCollection<TElem>
             //  More than one, so let's do the binary search. So set up the
             //  two end points that are used to subdivide the list.
             //
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
             tCIDLib::TInt4 i4MidPoint = 0;
@@ -947,11 +1105,10 @@ class TVector : public TCollection<TElem>
             InsertAt(objToInsert, tCIDLib::TCard4(tAt));
         }
 
-
         const TElem& objAt(const TIndex tIndex) const
         {
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
             return *m_apElems[c4Index];
         }
@@ -959,15 +1116,51 @@ class TVector : public TCollection<TElem>
         TElem& objAt(const TIndex tIndex)
         {
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
             return *m_apElems[c4Index];
         }
 
+
+        template <typename T = TElem> T& objAddMove(T&& objNew)
+        {
+            TLocker lockrCol(this);
+
+            if (m_c4CurCount == m_c4CurAlloc)
+                ExpandTo(m_c4CurCount + 1);
+
+            //
+            //  Create a new copy of the object and store in the next slot,
+            //  bumping the counter after we add it.
+            //
+            m_apElems[m_c4CurCount++] = new T(tCIDLib::ForceMove(objNew));
+
+            // Invalidate any cursors and return a ref to the new element
+            this->c4IncSerialNum();
+            return *m_apElems[m_c4CurCount - 1];
+        }
+
+
+        // Construct an element in place
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            TLocker lockrCol(this);
+
+            if (m_c4CurCount == m_c4CurAlloc)
+                ExpandTo(m_c4CurCount + 1);
+
+            m_apElems[m_c4CurCount++] = new TElem(tCIDLib::Forward<TArgs>(Args)...);
+
+            // Invalidate any cursors and return a ref to the new element
+            this->c4IncSerialNum();
+            return *m_apElems[m_c4CurCount - 1];
+        }
+
+
         template <typename TCompFunc>
         TElem* pobjBinarySearch(const   TElem&          objToFind
                                 ,       TCompFunc       pfnComp
-                                ,       TIndex&         tAt)
+                                , COP   TIndex&         tAt)
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
@@ -1027,7 +1220,7 @@ class TVector : public TCollection<TElem>
         template <typename TCompFunc> const TElem*
         pobjBinarySearch(const  TElem&          objToFind
                         ,       TCompFunc       pfnComp
-                        ,       TIndex&         tAt) const
+                        , COP   TIndex&         tAt) const
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
@@ -1087,14 +1280,14 @@ class TVector : public TCollection<TElem>
         template <typename K, typename TCompFunc>
         TElem* pobjKeyedBinarySearch(const  K&          Key
                                     ,       TCompFunc   pfnComp
-                                    ,       TIndex&     tAt)
+                                    , COP   TIndex&     tAt)
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
-            tCIDLib::TInt4 i4MidPoint = 0;
+           tCIDLib::TInt4 i4MidPoint = 0;
+           tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             while (i4Begin <= i4End)
             {
                 // Divide the current range
@@ -1147,14 +1340,14 @@ class TVector : public TCollection<TElem>
         template <typename K, typename TCompFunc> const TElem*
         pobjKeyedBinarySearch(  const K&                Key
                                 ,     TCompFunc         pfnComp
-                                ,     TIndex&           tAt) const
+                                , COP TIndex&           tAt) const
         {
             // Set up the two end points that are used to subdivide the list
             tCIDLib::TInt4 i4End = tCIDLib::TInt4(m_c4CurCount) - 1;
             tCIDLib::TInt4 i4Begin = 0;
 
-            tCIDLib::ESortComps eRes;
             tCIDLib::TInt4 i4MidPoint = 0;
+            tCIDLib::ESortComps eRes = tCIDLib::ESortComps::Equal;
             while (i4Begin <= i4End)
             {
                 // Divide the current range
@@ -1204,11 +1397,12 @@ class TVector : public TCollection<TElem>
             return nullptr;
         }
 
+
         tCIDLib::TVoid
         Reallocate(const tCIDLib::TCard4 c4NewSize, const tCIDLib::TBoolean bKeepOld)
         {
             // If the new elements wouldn't fit, then expand
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // If the new size is the same as the current allocation, then optimize
             if (c4NewSize == m_c4CurAlloc)
@@ -1218,7 +1412,7 @@ class TVector : public TCollection<TElem>
                 {
                     TRawMem::SetMemBuf
                     (
-                        m_apElems, tCIDLib::TCard1(0), sizeof(TElem*) * m_c4CurAlloc
+                        m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc
                     );
                     m_c4CurCount = 0;
 
@@ -1251,7 +1445,7 @@ class TVector : public TCollection<TElem>
                     TRawMem::SetMemBuf
                     (
                         &apNew[m_c4CurCount]
-                        , tCIDLib::TCard1(0)
+                        , kCIDLib::c1MinCard
                         , sizeof(TElem*) * (c4NewSize - m_c4CurCount)
                     );
                 }
@@ -1269,8 +1463,7 @@ class TVector : public TCollection<TElem>
             }
         }
 
-        tCIDLib::TVoid
-        Reallocate(const tCIDLib::TCard4 c4NewSize, const TElem& objInitVal)
+        tCIDLib::TVoid Reallocate(const tCIDLib::TCard4 c4NewSize, const TElem& objInitVal)
         {
             //
             //  Call the other one to reallocate, don't keep any old values. That
@@ -1285,7 +1478,7 @@ class TVector : public TCollection<TElem>
 
         tCIDLib::TVoid RemoveAt(TCursor& cursAt)
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
             // Make sure the cursor is valid and belongs to this collection
             this->CheckCursorValid(cursAt, CID_FILE, CID_LINE);
@@ -1304,7 +1497,7 @@ class TVector : public TCollection<TElem>
         tCIDLib::TVoid RemoveAt(const TIndex tIndex)
         {
             const tCIDLib::TCard4 c4Index = tCIDLib::TCard4(tIndex);
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             this->CheckIndex(c4Index, m_c4CurCount, CID_FILE, CID_LINE);
 
             // Orphan the indicated object and delete it
@@ -1318,16 +1511,15 @@ class TVector : public TCollection<TElem>
         //  NOTE: This one cannot be done thread safe because it can change the
         //  thread safe state!
         //
-        tCIDLib::TVoid
-        Reset(const tCIDLib::EMTStates eToSet, const tCIDLib::TCard4 c4Init)
+        tCIDLib::TVoid Reset(const  tCIDLib::EMTStates  eMTSafe
+                            , const tCIDLib::TCard4     c4Init)
         {
-            // Call our parent to update the thread safety state
-            this->eMTState(eToSet);
-
             // Flush all elements
             RemoveAllElems();
             delete [] m_apElems;
             m_c4CurAlloc = 0;
+
+            this->SetMTState(eMTSafe);
 
             //
             //  Allocate the new stuff and copy the source elements, zeroing
@@ -1338,7 +1530,7 @@ class TVector : public TCollection<TElem>
             TRawMem::SetMemBuf
             (
                 m_apElems
-                , tCIDLib::TCard1(0)
+                , kCIDLib::c1MinCard
                 , sizeof(TElem*) * m_c4CurAlloc
             );
         }
@@ -1346,14 +1538,14 @@ class TVector : public TCollection<TElem>
         // Set all elements to a particular value
         tCIDLib::TVoid SetAll(const TElem& objToSet)
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
                 *m_apElems[c4Index] = objToSet;
         }
 
         template <typename TCompFunc> tCIDLib::TVoid Sort(TCompFunc pfnComp)
         {
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // If one or less, we are done
             if (m_c4CurCount < 2)
@@ -1381,7 +1573,7 @@ class TVector : public TCollection<TElem>
             // If no count, just return, else lock and do it
             if (!c4SCount)
                 return;
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // If one or less, we are done
             if (m_c4CurCount < 2)
@@ -1409,8 +1601,8 @@ class TVector : public TCollection<TElem>
 
         tCIDLib::TVoid StealAllFrom(TMyType& colSrc)
         {
-            TMtxLocker lockThis(this->pmtxLock());
-            TMtxLocker lockSrc(colSrc.pmtxLock());
+            TLocker lockrThis(this);
+            TLocker lockrSrc(&colSrc);
 
             // Remove all our elements
             RemoveAllElems();
@@ -1432,6 +1624,7 @@ class TVector : public TCollection<TElem>
             // Now steal all of his elements
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurCount; c4Index++)
             {
+                CIDLib_Suppress(6386)  // We range checked above
                 m_apElems[c4Index] = colSrc.m_apElems[c4Index];
                 colSrc.m_apElems[c4Index] = 0;
             }
@@ -1441,12 +1634,11 @@ class TVector : public TCollection<TElem>
             colSrc.c4IncSerialNum();
         }
 
-        tCIDLib::TVoid SwapItems(const  TIndex tFirst
-                                , const TIndex tSecond)
+        tCIDLib::TVoid SwapItems(const  TIndex tFirst, const TIndex tSecond)
         {
             const tCIDLib::TCard4 c4First = tCIDLib::TCard4(tFirst);
             const tCIDLib::TCard4 c4Second = tCIDLib::TCard4(tSecond);
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             this->CheckIndex(c4First, m_c4CurCount, CID_FILE, CID_LINE);
             this->CheckIndex(c4Second, m_c4CurCount, CID_FILE, CID_LINE);
 
@@ -1471,7 +1663,7 @@ class TVector : public TCollection<TElem>
         {
             const tCIDLib::TCard4 c4StartAt = tCIDLib::TCard4(tStartAt);
 
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
 
 			//
 			//	We can allow the start index to be at the item past the end. We just
@@ -1529,9 +1721,7 @@ class TVector : public TCollection<TElem>
                 // Zero out the remainder of the new slots
                 TRawMem::SetMemBuf
                 (
-                    &apNew[m_c4CurAlloc]
-                    , tCIDLib::TCard1(0)
-                    , sizeof(TElem*) * (c4NewSize - m_c4CurCount)
+                    &apNew[m_c4CurAlloc], kCIDLib::c1MinCard, sizeof(TElem*) * (c4NewSize - m_c4CurCount)
                 );
 
                 // Delete the old array and store the new info
@@ -1546,7 +1736,7 @@ class TVector : public TCollection<TElem>
         //  We remove the indicated index from the list and compact it, returning
         //  the removed item.
         //
-        TElem* pobjOrphanAt(const tCIDLib::TCard4 c4At)
+        [[nodiscard]] TElem* pobjOrphanAt(const tCIDLib::TCard4 c4At)
         {
             // Remember the element we are going to orphan
             TElem* pobjRet = m_apElems[c4At];
@@ -1578,16 +1768,16 @@ class TVector : public TCollection<TElem>
                     delete m_apElems[c4Index];
                 }
 
-                catch(const TError& errToCatch)
+                catch(TError& errToCatch)
                 {
                     // Not much we can do other than log
-                    if (!errToCatch.bLogged())
-                        TModule::LogEventObj(errToCatch);
+                    errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+                    TModule::LogEventObj(errToCatch);
                 }
 
                 catch(...)
                 {
-                    m_apElems[c4Index] = 0;
+                    m_apElems[c4Index] = nullptr;
                 }
             }
 
@@ -1595,12 +1785,7 @@ class TVector : public TCollection<TElem>
             //  Zero out all the slots now. For safety's sake, don't do the
             //  current count but the current alloc.
             //
-            TRawMem::SetMemBuf
-            (
-                m_apElems
-                , tCIDLib::TCard1(0)
-                , sizeof(TElem*) * m_c4CurAlloc
-            );
+            TRawMem::SetMemBuf(m_apElems, kCIDLib::c1MinCard, sizeof(TElem*) * m_c4CurAlloc);
 
             // And we now have zero elements
             m_c4CurCount = 0;
@@ -1632,8 +1817,8 @@ class TVector : public TCollection<TElem>
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         DefPolyDup(TMyType)
-        TemplateRTTIDefs(TMyType,TCollection<TElem>)
 };
+
 
 #pragma CIDLIB_POPPACK
 
@@ -1651,7 +1836,7 @@ TBinOutStream& operator<<(          TBinOutStream&          strmOut
                             , const TVector<TElem, TIndex>& colToStream)
 {
     // Don't let it change during this
-    TMtxLocker lockThis(colToStream.pmtxLock());
+    TLocker lockrThis(&colToStream);
 
     //
     //  Stream out a leading stream marker, then the element count, and the
@@ -1664,7 +1849,7 @@ TBinOutStream& operator<<(          TBinOutStream&          strmOut
                 <<  c4Count
                 <<  tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard)
                 <<  tCIDLib::TCard4(0)
-                <<  colToStream.eMTState();
+                <<  colToStream.eMTSafe();
 
     // If there were any elements, then stream them
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -1688,14 +1873,14 @@ operator>>(TBinInStream& strmIn, TVector<TElem, TIndex>& colToStream)
     tCIDLib::TCard4     c4Count;
     tCIDLib::TCard4     c4XORCount;
     tCIDLib::TCard4     c4OldMaxCount;
-    tCIDLib::EMTStates  eMTState;
-    strmIn >> c4Count >> c4XORCount >> c4OldMaxCount >> eMTState;
+    tCIDLib::EMTStates  eMTSafe;
+    strmIn >> c4Count >> c4XORCount >> c4OldMaxCount >> eMTSafe;
 
     if (c4XORCount != tCIDLib::TCard4(c4Count ^ kCIDLib::c4MaxCard))
         TCollectionBase::BadStoredCount(colToStream.clsIsA());
 
-    // Set up the vector with the new info and an initial size to hold the new stuff
-    colToStream.Reset(eMTState, c4Count);
+    // Update it to at leats hold the new count of elements
+    colToStream.Reset(eMTSafe, c4Count);
 
     // If there were any elements, then stream them in
     if (c4Count)

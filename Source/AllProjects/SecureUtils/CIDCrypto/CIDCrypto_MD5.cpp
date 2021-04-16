@@ -33,33 +33,36 @@
 
 namespace CIDCrypto_MD5
 {
-    // -----------------------------------------------------------------------
-    //  Local constant data
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4S11 = 7;
-    const tCIDLib::TCard4    c4S12 = 12;
-    const tCIDLib::TCard4    c4S13 = 17;
-    const tCIDLib::TCard4    c4S14 = 22;
-    const tCIDLib::TCard4    c4S21 = 5;
-    const tCIDLib::TCard4    c4S22 = 9;
-    const tCIDLib::TCard4    c4S23 = 14;
-    const tCIDLib::TCard4    c4S24 = 20;
-    const tCIDLib::TCard4    c4S31 = 4;
-    const tCIDLib::TCard4    c4S32 = 11;
-    const tCIDLib::TCard4    c4S33 = 16;
-    const tCIDLib::TCard4    c4S34 = 23;
-    const tCIDLib::TCard4    c4S41 = 6;
-    const tCIDLib::TCard4    c4S42 = 10;
-    const tCIDLib::TCard4    c4S43 = 15;
-    const tCIDLib::TCard4    c4S44 = 21;
-
-    const tCIDLib::TCard1    ac1Padding[64] =
+    namespace
     {
-        0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
+        // -------------------------------------------------------------------
+        //  Local constant data
+        // -------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4S11 = 7;
+        constexpr tCIDLib::TCard4    c4S12 = 12;
+        constexpr tCIDLib::TCard4    c4S13 = 17;
+        constexpr tCIDLib::TCard4    c4S14 = 22;
+        constexpr tCIDLib::TCard4    c4S21 = 5;
+        constexpr tCIDLib::TCard4    c4S22 = 9;
+        constexpr tCIDLib::TCard4    c4S23 = 14;
+        constexpr tCIDLib::TCard4    c4S24 = 20;
+        constexpr tCIDLib::TCard4    c4S31 = 4;
+        constexpr tCIDLib::TCard4    c4S32 = 11;
+        constexpr tCIDLib::TCard4    c4S33 = 16;
+        constexpr tCIDLib::TCard4    c4S34 = 23;
+        constexpr tCIDLib::TCard4    c4S41 = 6;
+        constexpr tCIDLib::TCard4    c4S42 = 10;
+        constexpr tCIDLib::TCard4    c4S43 = 15;
+        constexpr tCIDLib::TCard4    c4S44 = 21;
+
+        constexpr tCIDLib::TCard1    ac1Padding[64] =
+        {
+            0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        };
+    }
 }
 
 
@@ -159,11 +162,10 @@ tCIDLib::TVoid
 TMessageDigest5::DigestRaw( const   tCIDLib::TCard1* const  pc1Input
                             , const tCIDLib::TCard4         c4Bytes)
 {
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4PartLen;
+    CIDAssert(pc1Input != nullptr, L"Null input to DigestRaw");
 
     // Compute number of bytes mod block size
-    c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
+    tCIDLib::TCard4 c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
 
     // Update number of bits
     m_ac4Count[0] += tCIDLib::TCard4(c4Bytes << 3);
@@ -171,7 +173,7 @@ TMessageDigest5::DigestRaw( const   tCIDLib::TCard1* const  pc1Input
         m_ac4Count[1]++;
     m_ac4Count[1] += (c4Bytes >> 29);
 
-    c4PartLen = TMessageDigest5::c4BlockLen - c4Index;
+    const tCIDLib::TCard4 c4PartLen = TMessageDigest5::c4BlockLen - c4Index;
 
     // Transform as many times as possible.
     tCIDLib::TCard4  c4XIndex = 0;
@@ -192,24 +194,14 @@ TMessageDigest5::DigestRaw( const   tCIDLib::TCard1* const  pc1Input
 
     // Buffer remaining input if there is any
     if (c4Bytes - c4XIndex)
-    {
-        TRawMem::CopyMemBuf
-        (
-            &m_ac1Buffer[c4Index]
-            , &pc1Input[c4XIndex]
-            , c4Bytes - c4XIndex
-        );
-    }
+        TRawMem::CopyMemBuf(&m_ac1Buffer[c4Index], &pc1Input[c4XIndex], c4Bytes - c4XIndex);
 }
 
 tCIDLib::TVoid
 TMessageDigest5::DigestSrc(TBinInStream& strmSrc, const tCIDLib::TCard4 c4Bytes)
 {
-    tCIDLib::TCard4     c4Index;
-    tCIDLib::TCard4     c4PartLen;
-
     // Compute number of bytes mod block size
-    c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
+    tCIDLib::TCard4 c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
 
     // Update number of bits
     m_ac4Count[0] += tCIDLib::TCard4(c4Bytes << 3);
@@ -218,7 +210,7 @@ TMessageDigest5::DigestSrc(TBinInStream& strmSrc, const tCIDLib::TCard4 c4Bytes)
     m_ac4Count[1] += (c4Bytes >> 29);
 
     // How much we need to complete any current partial block
-    c4PartLen = TMessageDigest5::c4BlockLen - c4Index;
+    const tCIDLib::TCard4 c4PartLen = TMessageDigest5::c4BlockLen - c4Index;
 
     // Do as much as we can. Remember how much is left
     tCIDLib::TCard4  c4XCnt = 0;
@@ -275,16 +267,13 @@ tCIDLib::TVoid TMessageDigest5::StartNew()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TMessageDigest5::Complete(tCIDLib::TCard1* const pc1Digest)
 {
-    tCIDLib::TCard1   ac1Bits[8];
-    tCIDLib::TCard4   c4Index;
-    tCIDLib::TCard4   c4PadLen;
-
     // Save number of bits
+    tCIDLib::TCard1   ac1Bits[8] = {0};
     Encode(m_ac4Count, ac1Bits, 8);
 
     // Pad out to 56 mod the block size
-    c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
-    c4PadLen = (c4Index < 56) ? (56 - c4Index) : (120 - c4Index);
+    const tCIDLib::TCard4 c4Index = tCIDLib::TCard4((m_ac4Count[0] >> 3) & 0x3F);
+    const tCIDLib::TCard4 c4PadLen = (c4Index < 56) ? (56 - c4Index) : (120 - c4Index);
     DigestRaw(CIDCrypto_MD5::ac1Padding, c4PadLen);
 
     // Append length (before padding)
@@ -306,10 +295,7 @@ TMessageDigest5::Decode(const   tCIDLib::TCard1* const  pc1Input
     // If debugging, do a little precondition checking
     CIDAssert((c4InputLen % 4) == 0, L"MD5 block must be a multiple of 4 bytes");
 
-    tCIDLib::TCard4 c4InInd;
-    tCIDLib::TCard4 c4OutInd;
-
-    for (c4InInd = 0, c4OutInd = 0; c4InInd < c4InputLen; c4OutInd++, c4InInd += 4)
+    for (tCIDLib::TCard4 c4InInd = 0, c4OutInd = 0; c4InInd < c4InputLen; c4OutInd++, c4InInd += 4)
     {
         pc4Output[c4OutInd] =   tCIDLib::TCard4(pc1Input[c4InInd])
                                 | (tCIDLib::TCard4(pc1Input[c4InInd+1]) << 8)
@@ -327,10 +313,7 @@ TMessageDigest5::Encode(const   tCIDLib::TCard4* const  pc4Input
     // If debugging, do a little precondition checking
     CIDAssert((c4InputLen % 4) == 0, L"MD5 block must be a multiple of 4 bytes");
 
-    tCIDLib::TCard4 c4InInd;
-    tCIDLib::TCard4 c4OutInd;
-
-    for (c4InInd = 0, c4OutInd = 0; c4OutInd < c4InputLen; c4InInd++, c4OutInd += 4)
+    for (tCIDLib::TCard4 c4InInd = 0, c4OutInd = 0; c4OutInd < c4InputLen; c4InInd++, c4OutInd += 4)
     {
         pc1Output[c4OutInd] = tCIDLib::TCard1(pc4Input[c4InInd] & 0xFF);
         pc1Output[c4OutInd + 1] = tCIDLib::TCard1((pc4Input[c4InInd] >> 8) & 0xFF);
@@ -362,12 +345,7 @@ tCIDLib::TVoid TMessageDigest5::ScrubContext()
     m_ac4State[2] = 0;
     m_ac4State[3] = 0;
 
-    TRawMem::SetMemBuf
-    (
-        m_ac1Buffer
-        , tCIDLib::TCard4(0)
-        , sizeof(m_ac1Buffer) / sizeof(tCIDLib::TCard4)
-    );
+    TRawMem::SetMemBuf(m_ac1Buffer, tCIDLib::TCard1(1) , sizeof(m_ac1Buffer));
 }
 
 
@@ -461,9 +439,6 @@ TMessageDigest5::Transform(const tCIDLib::TCard1* const pac1Block)
     m_ac4State[3] += c4D;
 
     // Zero out sensitive information.
-    TRawMem::SetMemBuf
-    (
-        ac4X, tCIDLib::TCard4(0), TMessageDigest5::c4HashBytes
-    );
+    TRawMem::SetMemBuf(ac4X, tCIDLib::TCard4(0), TMessageDigest5::c4HashBytes);
 }
 

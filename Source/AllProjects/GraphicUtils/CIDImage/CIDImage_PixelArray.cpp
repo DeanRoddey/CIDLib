@@ -42,14 +42,17 @@ RTTIDecls(TPixelArray,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDImage_PixelArray
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format version
-    //
-    //  1.  Original version
-    //  2.  Moved to the pixelfmt/depth combination to describe the data format
-    //      and added new formats to cover the full range of PNG images.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format version
+        //
+        //  1.  Original version
+        //  2.  Moved to the pixelfmt/depth combination to describe the data format
+        //      and added new formats to cover the full range of PNG images.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 2;
+    }
 }
 
 
@@ -248,6 +251,13 @@ TPixelArray::TPixelArray(const TPixelArray& pixaSrc) :
     m_pixaiInt = new TPixelArrayImpl(*pixaSrc.m_pixaiInt);
 }
 
+TPixelArray::TPixelArray(TPixelArray&& pixaSrc) :
+
+    TPixelArray()
+{
+    tCIDLib::Swap(m_pixaiInt, pixaSrc.m_pixaiInt);
+}
+
 TPixelArray::~TPixelArray()
 {
     try
@@ -276,6 +286,15 @@ TPixelArray& TPixelArray::operator=(const TPixelArray& pixaSrc)
         m_pixaiInt = nullptr;
 
         m_pixaiInt = new TPixelArrayImpl(*pixaSrc.m_pixaiInt);
+    }
+    return *this;
+}
+
+TPixelArray& TPixelArray::operator=(TPixelArray&& pixaSrc)
+{
+    if (this != &pixaSrc)
+    {
+        tCIDLib::Swap(m_pixaiInt, pixaSrc.m_pixaiInt);
     }
     return *this;
 }
@@ -1096,9 +1115,10 @@ TSize TPixelArray::szImage() const
 //  first, and then slower.
 //
 tCIDLib::TVoid
-TPixelArray::ScaleAlpha(        tCIDLib::EDirs  eDir
-                        , const tCIDLib::TCard4 c4StartInd
-                        , const tCIDLib::TCard4 c4EndInd)
+TPixelArray::ScaleAlpha(        tCIDLib::EDirs      eDir
+                        , const tCIDLib::TCard4     c4StartInd
+                        , const tCIDLib::TCard4     c4EndInd
+                        , const tCIDLib::TBoolean   bPremultiply)
 {
     // If the start/end are reversed, flip them
     tCIDLib::TCard4 c4Low;
@@ -1121,7 +1141,7 @@ TPixelArray::ScaleAlpha(        tCIDLib::EDirs  eDir
         return;
     }
 
-    m_pixaiInt->ScaleAlpha(eDir, c4Low, c4High);
+    m_pixaiInt->ScaleAlpha(eDir, c4Low, c4High, bPremultiply);
 }
 
 

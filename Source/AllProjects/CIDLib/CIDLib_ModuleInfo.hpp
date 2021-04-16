@@ -61,45 +61,56 @@ class CIDLIBEXP TCIDModuleInfo :
             , const tCIDLib::EModFlags      eFlags
         );
 
-        TCIDModuleInfo
-        (
-            const   TCIDModuleInfo&         modiToCopy
-        );
+        TCIDModuleInfo(const TCIDModuleInfo&) = default;
+        TCIDModuleInfo(TCIDModuleInfo&&) = delete;
 
-        ~TCIDModuleInfo();
+        ~TCIDModuleInfo() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCIDModuleInfo& operator=
-        (
-            const   TCIDModuleInfo&         modiToAssign
-        );
+        TCIDModuleInfo& operator=(const TCIDModuleInfo&) = default;
+        TCIDModuleInfo& operator=(TCIDModuleInfo&&) = delete;
 
         tCIDLib::TBoolean operator==
         (
-            const   TCIDModuleInfo&         modiToCompare
+            const   TCIDModuleInfo&         modiSrc
         )   const;
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TCIDModuleInfo&         modiToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TCIDModuleInfo& modiSrc) const
+        {
+            return !operator==(modiSrc);
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4MajVersion() const;
+        tCIDLib::TCard4 c4MajVersion() const
+        {
+            return m_c4MajVersion;
+        }
 
-        tCIDLib::TCard4 c4MinVersion() const;
+        tCIDLib::TCard4 c4MinVersion() const
+        {
+            return m_c4MinVersion;
+        }
 
-        tCIDLib::EModFlags eFlags() const;
+        tCIDLib::EModFlags eFlags() const
+        {
+            return m_eFlags;
+        }
 
-        tCIDLib::EModTypes eModType() const;
+        tCIDLib::EModTypes eModType() const
+        {
+            return m_eModType;
+        }
 
-        const TString& strBaseName() const;
+        const TString& strBaseName() const
+        {
+            return m_strBaseName;
+        }
 
         tCIDLib::TVoid Set
         (
@@ -124,18 +135,18 @@ class CIDLIBEXP TCIDModuleInfo :
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
-        )   const;
+            CIOP    TTextOutStream&         strmDest
+        )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const override;
 
 
     private             :

@@ -52,7 +52,7 @@ TFacCIDEncode::TFacCIDEncode() :
     TFacility
     (
         L"CIDEncode"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -76,144 +76,144 @@ TFacCIDEncode::TFacCIDEncode() :
 
 
     // Do some variations on UTF-8
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF8", L"TUTF8Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF_8", L"TUTF8Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-8", L"TUTF8Converter"));
+    m_pcolMap->objPlace(L"UTF8", L"TUTF8Converter");
+    m_pcolMap->objPlace(L"UTF_8", L"TUTF8Converter");
+    m_pcolMap->objPlace(L"UTF-8", L"TUTF8Converter");
 
     // And some for US ASCII
-    m_pcolMap->objAdd(TKeyValuePair(L"USASCII", L"TUSASCIIConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"US-ASCII", L"TUSASCIIConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"US_ASCII", L"TUSASCIIConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ASCII", L"TUSASCIIConverter"));
+    m_pcolMap->objPlace(L"USASCII", L"TUSASCIIConverter");
+    m_pcolMap->objPlace(L"US-ASCII", L"TUSASCIIConverter");
+    m_pcolMap->objPlace(L"US_ASCII", L"TUSASCIIConverter");
+    m_pcolMap->objPlace(L"ASCII", L"TUSASCIIConverter");
 
     // And some for UTF-16, in both endians
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16LE", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16-LE", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16_LE", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16LE", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16L", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16-L", L"TUTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16L", L"TUTF16LEConverter"));
+    m_pcolMap->objPlace(L"UTF16LE", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF16-LE", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF16_LE", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF-16LE", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF16L", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF16-L", L"TUTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF-16L", L"TUTF16LEConverter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16BE", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16-BE", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16_BE", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16BE", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16B", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF16-B", L"TUTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16B", L"TUTF16BEConverter"));
+    m_pcolMap->objPlace(L"UTF16BE", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF16-BE", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF16_BE", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF-16BE", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF16B", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF16-B", L"TUTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF-16B", L"TUTF16BEConverter");
 
     // And some UCS-4, in both endians
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4B", L"TUCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4BE", L"TUCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4-B", L"TUCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4-BE", L"TUCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4L", L"TUCS4LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4LE", L"TUCS4LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4-L", L"TUCS4LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4-LE", L"TUCS4LEConverter"));
+    m_pcolMap->objPlace(L"UCS-4B", L"TUCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS-4BE", L"TUCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS4-B", L"TUCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS4-BE", L"TUCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS-4L", L"TUCS4LEConverter");
+    m_pcolMap->objPlace(L"UCS-4LE", L"TUCS4LEConverter");
+    m_pcolMap->objPlace(L"UCS4-L", L"TUCS4LEConverter");
+    m_pcolMap->objPlace(L"UCS4-LE", L"TUCS4LEConverter");
 
 
     // Do the Latin-x encodings
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin1", L"TLatin1Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-1", L"TLatin1Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-1", L"TLatin1Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-1", L"TLatin1Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP819", L"TLatin1Converter"));
+    m_pcolMap->objPlace(L"Latin1", L"TLatin1Converter");
+    m_pcolMap->objPlace(L"Latin-1", L"TLatin1Converter");
+    m_pcolMap->objPlace(L"ISO-8859-1", L"TLatin1Converter");
+    m_pcolMap->objPlace(L"8859-1", L"TLatin1Converter");
+    m_pcolMap->objPlace(L"CP819", L"TLatin1Converter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin2", L"TLatin2Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-2", L"TLatin2Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-2", L"TLatin2Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-2", L"TLatin2Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP912", L"TLatin2Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM912", L"TLatin2Converter"));
+    m_pcolMap->objPlace(L"Latin2", L"TLatin2Converter");
+    m_pcolMap->objPlace(L"Latin-2", L"TLatin2Converter");
+    m_pcolMap->objPlace(L"ISO-8859-2", L"TLatin2Converter");
+    m_pcolMap->objPlace(L"8859-2", L"TLatin2Converter");
+    m_pcolMap->objPlace(L"CP912", L"TLatin2Converter");
+    m_pcolMap->objPlace(L"IBM912", L"TLatin2Converter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin3", L"TLatin3Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-3", L"TLatin3Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-3", L"TLatin3Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-3", L"TLatin3Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP913", L"TLatin3Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM913", L"TLatin3Converter"));
+    m_pcolMap->objPlace(L"Latin3", L"TLatin3Converter");
+    m_pcolMap->objPlace(L"Latin-3", L"TLatin3Converter");
+    m_pcolMap->objPlace(L"ISO-8859-3", L"TLatin3Converter");
+    m_pcolMap->objPlace(L"8859-3", L"TLatin3Converter");
+    m_pcolMap->objPlace(L"CP913", L"TLatin3Converter");
+    m_pcolMap->objPlace(L"IBM913", L"TLatin3Converter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin4", L"TLatin4Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-4", L"TLatin4Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-4", L"TLatin4Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-4", L"TLatin4Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP914", L"TLatin4Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM914", L"TLatin4Converter"));
+    m_pcolMap->objPlace(L"Latin4", L"TLatin4Converter");
+    m_pcolMap->objPlace(L"Latin-4", L"TLatin4Converter");
+    m_pcolMap->objPlace(L"ISO-8859-4", L"TLatin4Converter");
+    m_pcolMap->objPlace(L"8859-4", L"TLatin4Converter");
+    m_pcolMap->objPlace(L"CP914", L"TLatin4Converter");
+    m_pcolMap->objPlace(L"IBM914", L"TLatin4Converter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin5", L"TLatin5Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-5", L"TLatin5Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-5", L"TLatin5Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-5", L"TLatin5Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP915", L"TLatin5Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Cyrillic", L"TLatin5Converter"));
+    m_pcolMap->objPlace(L"Latin5", L"TLatin5Converter");
+    m_pcolMap->objPlace(L"Latin-5", L"TLatin5Converter");
+    m_pcolMap->objPlace(L"ISO-8859-5", L"TLatin5Converter");
+    m_pcolMap->objPlace(L"8859-5", L"TLatin5Converter");
+    m_pcolMap->objPlace(L"CP915", L"TLatin5Converter");
+    m_pcolMap->objPlace(L"Cyrillic", L"TLatin5Converter");
 
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin6", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Latin-6", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-8859-6", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"8859-6", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1089", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM1089", L"TLatin6Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Arabic", L"TLatin6Converter"));
+    m_pcolMap->objPlace(L"Latin6", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"Latin-6", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"ISO-8859-6", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"8859-6", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"CP1089", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"IBM1089", L"TLatin6Converter");
+    m_pcolMap->objPlace(L"Arabic", L"TLatin6Converter");
 
     // Do the EBCDIC encodings
-    m_pcolMap->objAdd(TKeyValuePair(L"EBCDIC-CP-US", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP037", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CPIBM037", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM037", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"EBCDIC-CP-CA", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"EBCDIC-CP-WT", L"TEBCDIC037Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"EBCDIC-CP-NL", L"TEBCDIC037Converter"));
+    m_pcolMap->objPlace(L"EBCDIC-CP-US", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"CP037", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"CPIBM037", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"IBM037", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"EBCDIC-CP-CA", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"EBCDIC-CP-WT", L"TEBCDIC037Converter");
+    m_pcolMap->objPlace(L"EBCDIC-CP-NL", L"TEBCDIC037Converter");
 
     // Some miscellaneous IBM encodings
-    m_pcolMap->objAdd(TKeyValuePair(L"CP437", L"TPC437Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"IBM437", L"TPC437Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP850", L"TPC850Converter"));
+    m_pcolMap->objPlace(L"CP437", L"TPC437Converter");
+    m_pcolMap->objPlace(L"IBM437", L"TPC437Converter");
+    m_pcolMap->objPlace(L"CP850", L"TPC850Converter");
 
     // Some Microsoft encodings
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1251", L"TWin1251Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Windows-1251", L"TWin1251Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1252", L"TWin1252Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"Windows-1252", L"TWin1252Converter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1004", L"TWin1252Converter"));
+    m_pcolMap->objPlace(L"CP1251", L"TWin1251Converter");
+    m_pcolMap->objPlace(L"Windows-1251", L"TWin1251Converter");
+    m_pcolMap->objPlace(L"CP1252", L"TWin1252Converter");
+    m_pcolMap->objPlace(L"Windows-1252", L"TWin1252Converter");
+    m_pcolMap->objPlace(L"CP1004", L"TWin1252Converter");
 
     // Miscellaenous
-    m_pcolMap->objAdd(TKeyValuePair(L"ZWaveOEM", L"TZWaveOEMConverter"));
+    m_pcolMap->objPlace(L"ZWaveOEM", L"TZWaveOEMConverter");
 
     //
     //  Do some non-endian specific encodings. The best we can do is to
     //  set them up so that they are in the local host endianness.
     //
     #if defined(CIDIB_LITTLEENDIAN)
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF_16", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-2", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS_2", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS2", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-10646-UCS-2", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1200", L"UTF16LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4", L"UCS4LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS_4", L"UCS4LEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4", L"UCS4LEConverter"));
+    m_pcolMap->objPlace(L"UTF-16", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"UTF_16", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"UCS-2", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"UCS_2", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"UCS2", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"ISO-10646-UCS-2", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"CP1200", L"UTF16LEConverter");
+    m_pcolMap->objPlace(L"UCS-4", L"UCS4LEConverter");
+    m_pcolMap->objPlace(L"UCS_4", L"UCS4LEConverter");
+    m_pcolMap->objPlace(L"UCS4", L"UCS4LEConverter");
     #else
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF-16", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UTF_16", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-2", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS_2", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS2", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"ISO-10646-UCS-2", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"CP1200", L"UTF16BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS-4", L"UCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS_4", L"UCS4BEConverter"));
-    m_pcolMap->objAdd(TKeyValuePair(L"UCS4", L"UCS4BEConverter"));
+    m_pcolMap->objPlace(L"UTF-16", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"UTF_16", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"UCS-2", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"UCS_2", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"UCS2", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"ISO-10646-UCS-2", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"CP1200", L"UTF16BEConverter");
+    m_pcolMap->objPlace(L"UCS-4", L"UCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS_4", L"UCS4BEConverter");
+    m_pcolMap->objPlace(L"UCS4", L"UCS4BEConverter");
     #endif
 
     //
     //  Do a magic one for our tCIDLib::TCh format, which is different per
     //  platform. Its just used for doing embedded L"" type strings.
     //
-    m_pcolMap->objAdd(TKeyValuePair(kCIDLib::pszNativeWCEncoding, L"TNativeWCConverter"));
+    m_pcolMap->objPlace(kCIDLib::pszNativeWCEncoding, L"TNativeWCConverter");
 }
 
 TFacCIDEncode::~TFacCIDEncode()
@@ -238,14 +238,14 @@ tCIDLib::TVoid
 TFacCIDEncode::AddMapping(const TString& strName, const TString& strClass)
 {
     // Lock the map before we change it
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
 
     // See if this name exists already. If so, then update it, else add it
     TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
     if (pkvalFound)
         pkvalFound->strValue(strClass);
     else
-        m_pcolMap->objAdd(TKeyValuePair(strName, strClass));
+        m_pcolMap->objPlace(strName, strClass);
 }
 
 
@@ -298,7 +298,7 @@ TFacCIDEncode::bProbeForEncoding(const  TMemBuf&        mbufSrc
 tCIDLib::TBoolean
 TFacCIDEncode::bSupportsEncoding(const TString& strToCheck) const
 {
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
     return m_pcolMap->bKeyExists(strToCheck);
 }
 
@@ -327,8 +327,8 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
 //  the former and puts the pointer in a managed pointer object.
 //
 TTextConverter*
-TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
-                            , const tCIDLib::TBoolean   bThrowIfNot) const
+TFacCIDEncode::ptcvtMake(const  TString&            strName
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     //
     //  We lock the mapping list until we've gotten our value out of it.
@@ -336,7 +336,7 @@ TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
     //
     TString strClassName;
     {
-        TMtxLocker lockMap(m_pcolMap->pmtxLock());
+        TLocker lockrMap(m_pcolMap);
         TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
         if (pkvalFound)
             strClassName = pkvalFound->strValue();
@@ -364,11 +364,48 @@ TFacCIDEncode::ptcvtMakeNew(const   TString&            strName
     return ::pobjMakeNewOfClass<TTextConverter>(strClassName);
 }
 
-tCIDEncode::TTCvtPtr
-TFacCIDEncode::cptrMakeNew( const   TString&            strName
-                            , const tCIDLib::TBoolean   bThrowIfNot) const
+TTextConverter*
+TFacCIDEncode::ptcvtMake(const  TString&            strName
+                        , const tCIDLib::ETCvtActs  eErrAction
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMakeNew(strName, bThrowIfNot));
+    TTextConverter* ptcvtRet = ptcvtMake(strName, bThrowIfNot);
+    if (ptcvtRet)
+        ptcvtRet->eErrorAction(eErrAction);
+    return ptcvtRet;
+}
+
+TTextConverter*
+TFacCIDEncode::ptcvtMake(const  TString&        strName
+                        , const tCIDLib::TCh    chRepCar) const
+{
+    TTextConverter* ptcvtRet = ptcvtMake(strName, tCIDLib::ETCvtActs::Replace);
+    if (ptcvtRet)
+        ptcvtRet->chRepChar(chRepCar);
+    return ptcvtRet;
+}
+
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&            strName
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, bThrowIfNot));
+}
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&            strName
+                        , const tCIDLib::ETCvtActs  eErrAction
+                        , const tCIDLib::TBoolean   bThrowIfNot) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, eErrAction, bThrowIfNot));
+}
+
+tCIDEncode::TTCvtPtr
+TFacCIDEncode::cptrMake(const   TString&        strName
+                        , const tCIDLib::TCh    chRepChar) const
+{
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, chRepChar));
 }
 
 
@@ -378,7 +415,7 @@ TFacCIDEncode::cptrMakeNew( const   TString&            strName
 //
 TString TFacCIDEncode::strBaseNameFor(const TString& strName) const
 {
-    TMtxLocker lockMap(m_pcolMap->pmtxLock());
+    TLocker lockrMap(m_pcolMap);
 
     TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
     if (!pkvalFound)

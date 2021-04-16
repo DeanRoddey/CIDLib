@@ -64,10 +64,8 @@ class KRNLEXPORT TKrnlIPAddr
             , const tCIDSock::EAddrTypes    eType
         );
 
-        TKrnlIPAddr
-        (
-            const   TKrnlIPAddr&            kipaSrc
-        );
+        TKrnlIPAddr(const TKrnlIPAddr&) = default;
+        TKrnlIPAddr(TKrnlIPAddr&&) = default;
 
         ~TKrnlIPAddr();
 
@@ -75,6 +73,9 @@ class KRNLEXPORT TKrnlIPAddr
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TKrnlIPAddr& operator=(const TKrnlIPAddr&) = default;
+        TKrnlIPAddr& operator=(TKrnlIPAddr&&) = default;
+
         tCIDLib::TBoolean operator==
         (
             const   TKrnlIPAddr&            kipaSrc
@@ -85,15 +86,17 @@ class KRNLEXPORT TKrnlIPAddr
             const   TKrnlIPAddr&            kipaSrc
         )   const;
 
-        TKrnlIPAddr& operator=
-        (
-            const   TKrnlIPAddr&            kipaSrc
-        );
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bFromSockAddr
+        (
+            const   tCIDLib::TVoid* const   pAddr
+            , const tCIDLib::TCard4         c4Len
+            ,       tCIDLib::TIPPortNum&    ippnToFill
+        );
+
         tCIDLib::TBoolean bIsLoopback() const;
 
         tCIDLib::TBoolean bSet
@@ -104,6 +107,19 @@ class KRNLEXPORT TKrnlIPAddr
             , const tCIDLib::TCard4         c4ScopeId
             , const tCIDLib::TCard4         c4FlowInfo
         );
+
+        tCIDLib::TBoolean bToInAddr
+        (
+                    tCIDLib::TVoid* const   pAddr
+            ,       tCIDLib::TCard4&        c4SzInOut
+        )   const;
+
+        tCIDLib::TBoolean bToSockAddr
+        (
+                    tCIDLib::TVoid* const   pAddr
+            ,       tCIDLib::TCard4&        c4SzInOut
+            , const tCIDLib::TIPPortNum     ippnToSet = 0
+        )   const;
 
         tCIDLib::TCard4 c4Count() const;
 
@@ -117,27 +133,9 @@ class KRNLEXPORT TKrnlIPAddr
 
         tCIDLib::TVoid Reset();
 
-
-
-
-        // These are platform dependent
-        tCIDLib::TBoolean bFromSockAddr
+        [[nodiscard]] tCIDLib::TCard1* pc1ToSockAddr
         (
-            const   tCIDLib::TVoid* const   pAddr
-            , const tCIDLib::TCard4         c4Len
-            ,       tCIDLib::TIPPortNum&    ippnToFill
-        );
-
-        tCIDLib::TBoolean bToInAddr
-        (
-                    tCIDLib::TVoid* const   pAddr
-            ,       tCIDLib::TCard4&        c4SzInOut
-        )   const;
-
-        tCIDLib::TBoolean bToSockAddr
-        (
-                    tCIDLib::TVoid* const   pAddr
-            ,       tCIDLib::TCard4&        c4SzInOut
+                    tCIDLib::TCard4&        c4SzOut
             , const tCIDLib::TIPPortNum     ippnToSet = 0
         )   const;
 
@@ -205,6 +203,32 @@ namespace TKrnlIP
         TKrnlIPAddr         akipaAddrs[kCIDSock::c4MaxAddrs];
         tCIDLib::TCard4     c4AddrCnt;
         TKrnlIPAddr         kipaDNS1;
+
+        // Just to prevent init warnings from analyzer
+        TAdaptorInfo() :
+            szName()
+            , szDescr()
+            , ac1HWAddr()
+            , c4HWAddrSz(0)
+            , bDHCPEnabled(kCIDLib::False)
+            , bDedicated(kCIDLib::False)
+            , bLoopback(kCIDLib::False)
+            , bIPV4Enabled(kCIDLib::False)
+            , bIPV6Enabled(kCIDLib::False)
+            , bReady(kCIDLib::False)
+            , bTunnel(kCIDLib::False)
+            , akipaAddrs()
+            , c4AddrCnt(0)
+        {
+        }
+
+        TAdaptorInfo(const TAdaptorInfo&) = default;
+        TAdaptorInfo(TAdaptorInfo&&) = default;
+
+        ~TAdaptorInfo() = default;
+
+        TAdaptorInfo& operator=(const TAdaptorInfo&) = default;
+        TAdaptorInfo& operator=(TAdaptorInfo&&) = default;
     };
 
     KRNLEXPORT tCIDLib::TBoolean bAddToFirewall

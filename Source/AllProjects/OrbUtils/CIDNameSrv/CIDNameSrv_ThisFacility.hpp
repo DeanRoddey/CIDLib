@@ -39,6 +39,7 @@ class TFacCIDNameSrv : public TFacility, public MSignalHandler
         TFacCIDNameSrv();
 
         TFacCIDNameSrv(const TFacCIDNameSrv&) = delete;
+        TFacCIDNameSrv(TFacCIDNameSrv&&) = delete;
 
         ~TFacCIDNameSrv();
 
@@ -47,6 +48,7 @@ class TFacCIDNameSrv : public TFacility, public MSignalHandler
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDNameSrv& operator=(const TFacCIDNameSrv&) = delete;
+        TFacCIDNameSrv& operator=(TFacCIDNameSrv&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -55,7 +57,7 @@ class TFacCIDNameSrv : public TFacility, public MSignalHandler
         tCIDLib::TBoolean bHandleSignal
         (
             const   tCIDLib::ESignals       eSignal
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------

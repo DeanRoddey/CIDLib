@@ -51,14 +51,8 @@ AdvRTTIDecls(TStreamFmt,TObject)
 // ---------------------------------------------------------------------------
 TStreamFmt& TStreamFmt::Nul_TStreamFmt()
 {
-    static TStreamFmt* pstrmfNull = 0;
-    if (!pstrmfNull)
-    {
-        TBaseLock lockInit;
-        if (!pstrmfNull)
-            TRawMem::pExchangePtr(&pstrmfNull, new TStreamFmt);
-    }
-    return *pstrmfNull;
+    static TStreamFmt strmfNull;
+    return strmfNull;
 }
 
 
@@ -225,3 +219,14 @@ tCIDLib::ERadices TStreamFmt::eRadix(const tCIDLib::ERadices eToSet)
     return m_eRadix;
 }
 
+
+// Set ourself to the formatting of the source stream
+tCIDLib::TVoid TStreamFmt::SetFrom(const TTextOutStream& strmSrc)
+{
+    m_c4Precision    = strmSrc.m_c4Precision;
+    m_c4TrailingSp   = strmSrc.m_c4TrailingSp;
+    m_c4Width        = strmSrc.m_c4Width;
+    m_chFill         = strmSrc.m_chFill;
+    m_eJustification = strmSrc.m_eJustification;
+    m_eRadix         = strmSrc.m_eRadix;
+}

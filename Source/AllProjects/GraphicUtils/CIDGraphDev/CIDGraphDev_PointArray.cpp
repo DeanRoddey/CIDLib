@@ -72,7 +72,7 @@ TPointArray::TPointArray(const tCIDLib::TCard4 c4PointCount) :
     TRawMem::SetMemBuf
     (
         m_paptPoints
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , m_c4Count * sizeof(tCIDLib::THostPoint)
     );
 }
@@ -226,7 +226,7 @@ TPointArray::c4SetFromGraph(const   TGraphData&             grdatSrc
     const tCIDLib::TCard4 c4MissingSamples(grdatSrc.c4MaxSamples() - c4AvailSamples);
     TRawMem::SetMemBuf
     (
-        pf4SrcPers, tCIDLib::TCard1(0), sizeof(tCIDLib::TFloat4) * c4MissingSamples
+        pf4SrcPers, kCIDLib::c1MinCard, sizeof(tCIDLib::TFloat4) * c4MissingSamples
     );
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4AvailSamples; c4Index++)
     {
@@ -629,7 +629,7 @@ tCIDLib::TVoid TPointArray::Reallocate(const tCIDLib::TCard4 c4NewCount)
         TArrayJanitor<tCIDLib::THostPoint> janNew(c4NewCount);
         TRawMem::SetMemBuf
         (
-            janNew.paThis(), tCIDLib::TCard1(0), m_c4Count * sizeof(tCIDLib::THostPoint)
+            janNew.paThis(), kCIDLib::c1MinCard, m_c4Count * sizeof(tCIDLib::THostPoint)
         );
 
         // Looks good so clean up the old and orphan out the new
@@ -771,7 +771,7 @@ tCIDLib::TVoid TPointArray::ZeroAll()
     TRawMem::SetMemBuf
     (
         m_paptPoints
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , m_c4Count * sizeof(tCIDLib::THostPoint)
     );
 }
@@ -816,7 +816,7 @@ TPointArray::ZeroRange( const   tCIDLib::TCard4 c4FromIndex
     TRawMem::SetMemBuf
     (
         &m_paptPoints[c4ActualFrom]
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , ((c4ActualTo - c4ActualFrom) + 1) * sizeof(tCIDLib::THostPoint)
     );
 }

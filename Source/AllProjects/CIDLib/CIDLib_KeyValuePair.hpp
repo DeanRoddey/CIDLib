@@ -201,6 +201,7 @@ class CIDLIBEXP TKeyValuePair
         );
 
         TKeyValuePair(const TKeyValuePair&) = default;
+        TKeyValuePair(TKeyValuePair&&) = default;
 
         ~TKeyValuePair() = default;
 
@@ -209,6 +210,7 @@ class CIDLIBEXP TKeyValuePair
         //  Public operators
         // -------------------------------------------------------------------
         TKeyValuePair& operator=(const TKeyValuePair&) = default;
+        TKeyValuePair& operator=(TKeyValuePair&&) = default;
 
         tCIDLib::TBoolean operator<
         (
@@ -266,7 +268,7 @@ class CIDLIBEXP TKeyValuePair
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom
@@ -373,6 +375,7 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
         );
 
         TKeyValFPair(const TKeyValFPair&) = default;
+        TKeyValFPair(TKeyValFPair&&) = default;
 
         ~TKeyValFPair();
 
@@ -381,6 +384,7 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
         //  Public operators
         // -------------------------------------------------------------------
         TKeyValFPair& operator=(const TKeyValFPair&) = default;
+        TKeyValFPair& operator=(TKeyValFPair&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -428,12 +432,12 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -517,6 +521,7 @@ class CIDLIBEXP TKeyNumPair
         );
 
         TKeyNumPair(const TKeyNumPair&) = default;
+        TKeyNumPair(TKeyNumPair&&) = default;
 
         ~TKeyNumPair() = default;
 
@@ -525,6 +530,7 @@ class CIDLIBEXP TKeyNumPair
         //  Public operators
         // -------------------------------------------------------------------
         TKeyNumPair& operator=(const TKeyNumPair&) = default;
+        TKeyNumPair& operator=(TKeyNumPair&&) = default;
 
         tCIDLib::TBoolean operator<
         (
@@ -592,18 +598,18 @@ class CIDLIBEXP TKeyNumPair
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
-        )   const override;
+            CIOP    TTextOutStream&         strmDest
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -720,6 +726,7 @@ class CIDLIBEXP TKeyValues
         );
 
         TKeyValues(const TKeyValues&) = default;
+        TKeyValues(TKeyValues&&) = default;
 
         ~TKeyValues() = default;
 
@@ -728,6 +735,7 @@ class CIDLIBEXP TKeyValues
         //  Public operators
         // -------------------------------------------------------------------
         TKeyValues& operator=(const TKeyValues&) = default;
+        TKeyValues& operator=(TKeyValues&&) = default;
 
         tCIDLib::TBoolean operator<
         (
@@ -827,18 +835,18 @@ class CIDLIBEXP TKeyValues
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
-        )   const override;
+            CIOP    TTextOutStream&         strmDest
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -870,7 +878,7 @@ class CIDLIBEXP TKeyValues
 //   CLASS: TKeyObjPair
 //  PREFIX: kobj
 // ---------------------------------------------------------------------------
-template <class TKey, class TValue> class TKeyObjPair : public TObject
+template <typename TKey, class TValue> class TKeyObjPair : public TObject
 {
     public  :
         // -------------------------------------------------------------------
@@ -878,7 +886,7 @@ template <class TKey, class TValue> class TKeyObjPair : public TObject
         // -------------------------------------------------------------------
         static const TClass& clsThis()
         {
-            static const TClass* pclsThis = 0;
+            static const TClass* pclsThis = nullptr;
             if (!pclsThis)
             {
                 TBaseLock lockInit;
@@ -907,29 +915,9 @@ template <class TKey, class TValue> class TKeyObjPair : public TObject
         }
 
         TKeyObjPair(const TKeyObjPair&) = default;
+        TKeyObjPair(TKeyObjPair&&) = default;
 
         ~TKeyObjPair() = default;
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const
-        {
-            if (clsTarget == clsThis())
-                return kCIDLib::True;
-            return TObject::bIsDescendantOf(clsTarget);
-        }
-
-        const TClass& clsIsA() const
-        {
-            return clsThis();
-        }
-
-        const TClass& clsParent() const
-        {
-            return TObject::clsThis();
-        }
 
 
         // -------------------------------------------------------------------
@@ -960,6 +948,28 @@ template <class TKey, class TValue> class TKeyObjPair : public TObject
         }
 
         TKeyObjPair& operator=(const TKeyObjPair&) = default;
+        TKeyObjPair& operator=(TKeyObjPair&&) = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsDescendantOf(const TClass& clsTarget) const final
+        {
+            if (clsTarget == clsThis())
+                return kCIDLib::True;
+            return TObject::bIsDescendantOf(clsTarget);
+        }
+
+        const TClass& clsIsA() const final
+        {
+            return clsThis();
+        }
+
+        const TClass& clsParent() const final
+        {
+            return TObject::clsThis();
+        }
 
 
         // -------------------------------------------------------------------
@@ -1017,14 +1027,14 @@ template <class TKey, class TValue> class TKeyObjPair : public TObject
 //  We provide global streaming operators for the TKeyObjPair class since we
 //  cannot assume streamability for it's instantiation types.
 //
-template <class TKey, class TValue> TBinOutStream&
+template <typename TKey, class TValue> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TKeyObjPair<TKey,TValue>& objToWrite)
 {
     strmToWriteTo << objToWrite.objKey() << objToWrite.objValue();
     return strmToWriteTo;
 }
 
-template <class TKey, class TValue> TBinInStream&
+template <typename TKey, class TValue> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TKeyObjPair<TKey,TValue>& objToFill)
 {
     strmToReadFrom >> objToFill.objKey() >> objToFill.objValue();

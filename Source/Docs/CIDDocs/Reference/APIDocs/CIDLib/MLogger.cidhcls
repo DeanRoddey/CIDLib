@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="MLogger" Prefix="mlgr" Parent="N/A">
+
+    <Desc>
+        <P>MLogger is an abstract mixin class that represents a target for logged messages, which are in the form of <ClassRef Ref="TLogEvent"/>. See the Big Picture discussion of the <Link Type="Page" Ref="/BigPicture/" Id="/LogFramework">logging framework</Link> for more details. The same class is used for exceptions (though aliased to TError) so exceptions can be logged through this standard interface as well.</P>
+
+        <P>It is a mixin type interface, so any class can implement it and install itself as the process-wide log message sink. There are also standard ones you can create and install. In particular there is one that works in terms of the CIDLib Log Server so you can log to a centralized server from anywhere in the network. This is very heavily used in CQC.</P>
+
+        <P>The dispatching of log event objects happens via the <ClassRef Ref="TModule"/> class. All logging ultimately comes down to it. It will create the log event object, adding standard information to it (thread, process, etc...), then it will pass it to the installed logger object, calling the LogEvent() virtual method. This call is synchronized, so the classes that implement this interface can, for efficiency, use static data members for processing, formatting, flattening, etc... the log event as required to get it to its destination.</P>
+
+        <Note>Keep in mind that you are being called in the context of the thread that is logging the event. So you cannot take long to do this. If it's not something like logging to a local file, then you must queue the events and spool them out via a different thread, so that the logging threads can continue forward. Otherwise things can fall apart badly.</Note>
+
+        <P>Though the calls to LogEvent() are synchronized, if you have any other data that might be shared in some way, such as a shared file to which multiple programs are all logging, then you must provide appropriate synchronization of that. The synchronization only applies within the application.</P>
+
+        <Note>Any code in the LogEvent() method <Italic>must</Italic> be careful of logging anything, since it could get you into a circular loop. Keep the code simple and straightforward. Catch any exceptions and don't try to log them. Use the lowest level code you can get away with, possibly even CIDKernel classes if you can do that. If need be, log any exceptions that occur to a local file or something.</Note>
+
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="DefCtor">
+             <!-- The dtor is virtual so we have to do it separatekly -->
+            <Method Name="~MLogger" Attrs="Virtual">
+                <Desc>Just required for syntax reasons. It doesn't do anything.</Desc>
+                <MethVar/>
+            </Method>
+        </Ctors>
+    </PubIntf>
+
+    <ProtIntf>
+        <Ctors DefMethods="DefCtor" DelMethods="CopyCtor"/>
+
+        <Operators DelMethods="AssignOp"/>
+
+        <VirtMeths>
+            <Method Attrs="Pure" Name="LogEvent">
+                <Desc>The class that implements this interface must override this method and send the incoming object to whatever target it supports. This must be done either very quickly or asynchronously, see the class comments above.</Desc>
+                <MethVar><MethParam Name="logevSrc" Type="TLogEvent" PBy="CRef"/></MethVar>
+            </Method>
+        </VirtMeths>
+
+    </ProtIntf>
+
+</CppClass>

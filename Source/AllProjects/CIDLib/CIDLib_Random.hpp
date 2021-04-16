@@ -46,6 +46,7 @@ class CIDLIBEXP TRandomNum : public TObject
         TRandomNum();
 
         TRandomNum(const TRandomNum&) = delete;
+        TRandomNum(TRandomNum&&) = delete;
 
         ~TRandomNum();
 
@@ -54,6 +55,7 @@ class CIDLIBEXP TRandomNum : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TRandomNum& operator=(const TRandomNum&) = delete;
+        TRandomNum& operator=(TRandomNum&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -39,77 +39,80 @@ AdvRTTIDecls(TTime,TObject)
 
 namespace CIDLib_Time
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  bInitDone
-    //      This is a flag used to trigger all of the lazy evaluation that is
-    //      required for this class. Since there are multiple lazy statics,
-    //      this is easier.
-    //
-    //  pfcolXXX
-    //      Some prefab time component parsing format lists which will be
-    //      lazily faulted in as required.
-    //
-    //  pstrXXX
-    //      Some prefab format strings which will be lazily faulted in as
-    //      required.
-    // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitDone = kCIDLib::False;
-    TTime::TCompList*           pfcol12HHMM = nullptr;
-    TTime::TCompList*           pfcol24HHMMSS = nullptr;
-    TTime::TCompList*           pfcol24HHMM = nullptr;
-    TTime::TCompList*           pfcolCTime = nullptr;
-    TTime::TCompList*           pfcolDDMMYY = nullptr;
-    TTime::TCompList*           pfcolDDMMYYYY = nullptr;
-    TTime::TCompList*           pfcolDTStamp = nullptr;
-    TTime::TCompList*           pfcolFullDate = nullptr;
-    TTime::TCompList*           pfcolISO8601NTZ = nullptr;
-    TTime::TCompList*           pfcolMMDDYY = nullptr;
-    TTime::TCompList*           pfcolMMDDYYYY = nullptr;
-    TTime::TCompList*           pfcolRFC822 = nullptr;
-    TTime::TCompList*           pfcolYYMMDD = nullptr;
-    TTime::TCompList*           pfcolYYYYMMDD = nullptr;
-    TTime::TCompList*           pfcolYYYYMMDD24HHMM = nullptr;
-    TString*                    pstr24HHMM = nullptr;
-    TString*                    pstr24HHMMSS = nullptr;
-    TString*                    pstr24HM = nullptr;
-    TString*                    pstrCTime = nullptr;
-    TString*                    pstrDTStamp = nullptr;
-    TString*                    pstrDDMMYY = nullptr;
-    TString*                    pstrDDMMYYYY = nullptr;
-    TString*                    pstrFullDate = nullptr;
-    TString*                    pstrHHMM = nullptr;
-    TString*                    pstrHHMMap = nullptr;
-    TString*                    pstrHHMMSS = nullptr;
-    TString*                    pstrHM = nullptr;
-    TString*                    pstrMediaTime = nullptr;
-    TString*                    pstrMMSS = nullptr;
-    TString*                    pstrMMDD_24HHMM = nullptr;
-    TString*                    pstrMMDD_24HHMMSS = nullptr;
-    TString*                    pstrMMDDYY = nullptr;
-    TString*                    pstrMMDDYYYY = nullptr;
-    TString*                    pstrMMDD_HHMM = nullptr;
-    TString*                    pstrMMDD_HHMMSS = nullptr;
-    TString*                    pstrISO8601Basic = nullptr;
-    TString*                    pstrYYMMDD = nullptr;
-    TString*                    pstrYYYYMMDD = nullptr;
-    TString*                    pstrYYYYMMDD_NoSep = nullptr;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  atomInitDone
+        //      This is a flag used to trigger all of the lazy evaluation that is
+        //      required for this class. Since there are multiple lazy statics,
+        //      this is easier.
+        //
+        //  pfcolXXX
+        //      Some prefab time component parsing format lists which will be
+        //      lazily faulted in as required.
+        //
+        //  pstrXXX
+        //      Some prefab format strings which will be lazily faulted in as
+        //      required.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomInitDone;
+        TTimeCompList*      pfcol12HHMM = nullptr;
+        TTimeCompList*      pfcol24HHMMSS = nullptr;
+        TTimeCompList*      pfcol24HHMM = nullptr;
+        TTimeCompList*      pfcolCTime = nullptr;
+        TTimeCompList*      pfcolDDMMYY = nullptr;
+        TTimeCompList*      pfcolDDMMYYYY = nullptr;
+        TTimeCompList*      pfcolDTStamp = nullptr;
+        TTimeCompList*      pfcolFullDate = nullptr;
+        TTimeCompList*      pfcolISO8601NTZ = nullptr;
+        TTimeCompList*      pfcolMMDDYY = nullptr;
+        TTimeCompList*      pfcolMMDDYYYY = nullptr;
+        TTimeCompList*      pfcolRFC822 = nullptr;
+        TTimeCompList*      pfcolYYMMDD = nullptr;
+        TTimeCompList*      pfcolYYYYMMDD = nullptr;
+        TTimeCompList*      pfcolYYYYMMDD24HHMM = nullptr;
+        TString*            pstr24HHMM = nullptr;
+        TString*            pstr24HHMMSS = nullptr;
+        TString*            pstr24HM = nullptr;
+        TString*            pstrCTime = nullptr;
+        TString*            pstrDTStamp = nullptr;
+        TString*            pstrDDMMYY = nullptr;
+        TString*            pstrDDMMYYYY = nullptr;
+        TString*            pstrFullDate = nullptr;
+        TString*            pstrHHMM = nullptr;
+        TString*            pstrHHMMap = nullptr;
+        TString*            pstrHHMMSS = nullptr;
+        TString*            pstrHM = nullptr;
+        TString*            pstrMediaTime = nullptr;
+        TString*            pstrMMSS = nullptr;
+        TString*            pstrMMDD_24HHMM = nullptr;
+        TString*            pstrMMDD_24HHMMSS = nullptr;
+        TString*            pstrMMDDYY = nullptr;
+        TString*            pstrMMDDYYYY = nullptr;
+        TString*            pstrMMDD_HHMM = nullptr;
+        TString*            pstrMMDD_HHMMSS = nullptr;
+        TString*            pstrISO8601Basic = nullptr;
+        TString*            pstrYYMMDD = nullptr;
+        TString*            pstrYYYYMMDD = nullptr;
+        TString*            pstrYYYYMMDD_NoSep = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Some info we cache about time zone settings, to optimize some things
-    //  a bit.
-    // -----------------------------------------------------------------------
-    tCIDLib::TInt4          i4LastOffset = 0;
-    TString*                pstrTZName = nullptr;
+        // -----------------------------------------------------------------------
+        //  Some info we cache about time zone settings, to optimize some things
+        //  a bit.
+        // -----------------------------------------------------------------------
+        TAtomicInt          atomLastTZ;
+        TString*            pstrTZName = nullptr;
 
 
-    // -----------------------------------------------------------------------
-    //  Used in the sunrise/sunset calculations below
-    // -----------------------------------------------------------------------
-    const tCIDLib::TFloat8 f8Rads = kCIDLib::f8PI / 180.0;
-    const tCIDLib::TFloat8 f8Degs = 180.0 / kCIDLib::f8PI;
+        // -----------------------------------------------------------------------
+        //  Used in the sunrise/sunset calculations below
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TFloat8 f8Rads = kCIDLib::f8PI / 180.0;
+        constexpr tCIDLib::TFloat8 f8Degs = 180.0 / kCIDLib::f8PI;
+    }
 }
 
 
@@ -204,6 +207,11 @@ f8SunLong(  const   tCIDLib::TFloat8    f8Day
 }
 
 
+// Complete the type we had to forward reference
+using TTimeCompList = TFundVector<tCIDLib::ETimeComps, tCIDLib::TCard4>;
+
+
+
 // ---------------------------------------------------------------------------
 //   CLASS: TTime
 //  PREFIX: tm
@@ -261,7 +269,7 @@ tCIDLib::TCard4 TTime::c4CvtToJulian(const  tCIDLib::TCard4     c4Year
         c4M += 12;
     }
 
-    tCIDLib::TCard4 c4B;
+    tCIDLib::TCard4 c4B = 0;
     if ((c4Y < 1582)
     ||  ((c4Y == 1582) && ((c4M < 10) || ((c4M == 10) && (c4D <= 4)))))
     {
@@ -318,8 +326,8 @@ tCIDLib::TCard8 TTime::c8Millis()
 
 // Just a passthrough to the kernel level
 tCIDLib::TVoid
-TTime::CurNTPTime(          tCIDLib::TCard4&    c4Secs
-                    ,       tCIDLib::TCard4&    c4Fract
+TTime::CurNTPTime(  COP     tCIDLib::TCard4&    c4Secs
+                    , COP   tCIDLib::TCard4&    c4Fract
                     , const tCIDLib::TBoolean   bNWOrder)
 {
     TKrnlTimeStamp::CurNTPTime(c4Secs, c4Fract, bNWOrder);
@@ -424,107 +432,107 @@ TTime::CvtFromJulian(const  tCIDLib::TFloat8    f8Julian
 
 
 // Provide access the the pre-fab time parsing component lists
-const TTime::TCompList& TTime::fcol12HHMM()
+const TTimeCompList& TTime::fcol12HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol12HHMM;
 }
 
-const TTime::TCompList& TTime::fcol24HHMM()
+const TTimeCompList& TTime::fcol24HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol24HHMM;
 }
 
-const TTime::TCompList& TTime::fcol24HHMMSS()
+const TTimeCompList& TTime::fcol24HHMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcol24HHMMSS;
 }
 
-const TTime::TCompList& TTime::fcolCTime()
+const TTimeCompList& TTime::fcolCTime()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolCTime;
 }
 
-const TTime::TCompList& TTime::fcolDDMMYY()
+const TTimeCompList& TTime::fcolDDMMYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDDMMYY;
 }
 
-const TTime::TCompList& TTime::fcolDDMMYYYY()
+const TTimeCompList& TTime::fcolDDMMYYYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDDMMYYYY;
 }
 
-const TTime::TCompList& TTime::fcolDTStamp()
+const TTimeCompList& TTime::fcolDTStamp()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolDTStamp;
 }
 
-const TTime::TCompList& TTime::fcolFullDate()
+const TTimeCompList& TTime::fcolFullDate()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolFullDate;
 }
 
-const TTime::TCompList& TTime::fcolISO8601NTZ()
+const TTimeCompList& TTime::fcolISO8601NTZ()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolISO8601NTZ;
 }
 
-const TTime::TCompList& TTime::fcolMMDDYY()
+const TTimeCompList& TTime::fcolMMDDYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolMMDDYY;
 }
 
-const TTime::TCompList& TTime::fcolMMDDYYYY()
+const TTimeCompList& TTime::fcolMMDDYYYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolMMDDYYYY;
 }
 
-const TTime::TCompList& TTime::fcolRFC822()
+const TTimeCompList& TTime::fcolRFC822()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolRFC822;
 }
 
-const TTime::TCompList& TTime::fcolYYMMDD()
+const TTimeCompList& TTime::fcolYYMMDD()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolYYMMDD;
 }
 
-const TTime::TCompList& TTime::fcolYYYYMMDD()
+const TTimeCompList& TTime::fcolYYYYMMDD()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolYYYYMMDD;
 }
 
-const TTime::TCompList& TTime::fcolYYYYMMDD24HHMM()
+const TTimeCompList& TTime::fcolYYYYMMDD24HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pfcolYYYYMMDD24HHMM;
 }
@@ -593,147 +601,147 @@ TTime::LocalToUTC(  const   tCIDLib::TEncodedTime&  enctLocal
 // Accesses the various pre-fab format strings
 const TString& TTime::strCTime()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrCTime;
 }
 
 const TString& TTime::str24HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstr24HHMM;
 }
 
 const TString& TTime::str24HHMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstr24HHMMSS;
 }
 
 const TString& TTime::str24HM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstr24HM;
 }
 
 const TString& TTime::strDDMMYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrDDMMYY;
 }
 
 const TString& TTime::strDDMMYYYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrDDMMYYYY;
 }
 
 const TString& TTime::strDTStamp()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrDTStamp;
 }
 
 const TString& TTime::strFullDate()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrFullDate;
 }
 
 const TString& TTime::strHHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrHHMM;
 }
 
 const TString& TTime::strHHMMap()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrHHMMap;
 }
 
 const TString& TTime::strHHMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrHHMMSS;
 }
 
 const TString& TTime::strHM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrHM;
 }
 
 const TString& TTime::strMediaTime()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMediaTime;
 }
 
 const TString& TTime::strMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMSS;
 }
 
 const TString& TTime::strMMDD_24HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDD_24HHMM;
 }
 
 const TString& TTime::strMMDD_24HHMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDD_24HHMMSS;
 }
 
 const TString& TTime::strMMDD_HHMM()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDD_HHMM;
 }
 
 const TString& TTime::strMMDD_HHMMSS()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDD_HHMMSS;
 }
 
 const TString& TTime::strMMDDYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDDYY;
 }
 
 const TString& TTime::strMMDDYYYY()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrMMDDYYYY;
 }
 
 const TString& TTime::strISO8601Basic()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrISO8601Basic;
 }
@@ -746,13 +754,15 @@ const TString& TTime::strTimeZoneName()
     //  As long as the offset doesn't change, we don't have to update
     //  the name.
     //
-    if (!CIDLib_Time::pstrTZName)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDLib_Time::pstrTZName)
+        if (!atomInitDone)
         {
-            tCIDLib::TZStr64 szTZName;
-            if (!TKrnlTimeStamp::bTZOffset(CIDLib_Time::i4LastOffset)
+            tCIDLib::TInt4 i4TZOfs = 0;
+            tCIDLib::TZStr64 szTZName = L"";
+            if (!TKrnlTimeStamp::bTZOffset(i4TZOfs)
             ||  !TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName)))
             {
                 facCIDLib().ThrowKrnlErr
@@ -765,16 +775,18 @@ const TString& TTime::strTimeZoneName()
                     , tCIDLib::EErrClasses::CantDo
                 );
             }
-            TRawMem::pExchangePtr(&CIDLib_Time::pstrTZName, new TString(szTZName));
+            CIDLib_Time::atomLastTZ.SetValue(i4TZOfs);
+            CIDLib_Time::pstrTZName = new TString(szTZName);
+            atomInitDone.Set();
         }
     }
 
     // See if the offset has changed. If so, update the name
     const tCIDLib::TInt4 i4NewOfs = i4Offset();
-    if (i4NewOfs != CIDLib_Time::i4LastOffset)
+    if (i4NewOfs != CIDLib_Time::atomLastTZ.i4Value())
     {
         TBaseLock lockInit;
-        if (i4NewOfs != CIDLib_Time::i4LastOffset)
+        if (i4NewOfs != CIDLib_Time::atomLastTZ.i4Value())
         {
             tCIDLib::TZStr64 szTZName;
             if (!TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName)))
@@ -790,7 +802,7 @@ const TString& TTime::strTimeZoneName()
                 );
             }
             *CIDLib_Time::pstrTZName = szTZName;
-            CIDLib_Time::i4LastOffset = i4NewOfs;
+            CIDLib_Time::atomLastTZ.SetValue(i4NewOfs);
         }
     }
     return *CIDLib_Time::pstrTZName;
@@ -798,21 +810,21 @@ const TString& TTime::strTimeZoneName()
 
 const TString& TTime::strYYMMDD()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrYYMMDD;
 }
 
 const TString& TTime::strYYYYMMDD()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrYYYYMMDD;
 }
 
 const TString& TTime::strYYYYMMDD_NoSep()
 {
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
         LazyInit();
     return *CIDLib_Time::pstrYYYYMMDD_NoSep;
 }
@@ -1011,6 +1023,12 @@ TTime::UTCToLocal(  const   tCIDLib::TEncodedTime&  enctUTC
 TTime::TTime() :
 
     m_pstrDefFormat(nullptr)
+{
+}
+
+TTime::TTime(const tCIDLib::TCh* const pszDefFormat) :
+
+    m_pstrDefFormat(new TString(pszDefFormat))
 {
 }
 
@@ -1373,33 +1391,33 @@ bGetTimeVal(const   TString&            strToParse
 tCIDLib::TBoolean
 TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLocal)
 {
-    enum EStates
+    enum class EStates
     {
-        EState_StartWS
-        , EState_Year
-        , EState_YearSep
-        , EState_Month
-        , EState_MonthSep
-        , EState_Day
-        , EState_Divider
-        , EState_Hour
-        , EState_HourSep
-        , EState_Min
-        , EState_MinSep
-        , EState_Sec
-        , EState_TZSep
-        , EState_TZHour
-        , EState_TZHourSep
-        , EState_TZMin
-        , EState_TZEnd
-        , EState_EndWS
+        StartWS
+        , Year
+        , YearSep
+        , Month
+        , MonthSep
+        , Day
+        , Divider
+        , Hour
+        , HourSep
+        , Min
+        , MinSep
+        , Sec
+        , TZSep
+        , TZHour
+        , TZHourSep
+        , TZMin
+        , TZEnd
+        , EndWS
     };
 
-    EStates eState = EState_StartWS;
+    EStates eState = EStates::StartWS;
 
     // Default ones that don't have to be provided
-    tCIDLib::TCard4 c4Year;
-    tCIDLib::TCard4 c4Month;
+    tCIDLib::TCard4 c4Year = 0;
+    tCIDLib::TCard4 c4Month = 0;
     tCIDLib::TCard4 c4Day = 1;
     tCIDLib::TCard4 c4Hour = 0;
     tCIDLib::TCard4 c4Min = 0;
@@ -1417,7 +1435,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
         tCIDLib::TBoolean   bSkippedDay = kCIDLib::True;
         tCIDLib::TCard4     c4Count = strToParse.c4Length();
         tCIDLib::TCard4     c4Index = 0;
-        tCIDLib::TFloat8    f8DecVal;
+        tCIDLib::TFloat8    f8DecVal = 0;
         TString             strTmp;
 
         while (c4Index < c4Count)
@@ -1426,34 +1444,34 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
             switch(eState)
             {
-                case EState_StartWS :
+                case EStates::StartWS :
                     // Break out on a non-whitespace
                     if (TRawStr::bIsSpace(chCur))
                         c4Index++;
                     else
-                        eState = EState_Year;
+                        eState = EStates::Year;
                     break;
 
-                case EState_Year :
+                case EStates::Year :
                     // Has to be four digits
                     strToParse.CopyOutSubStr(strTmp, c4Index, 4);
                     c4Year = strTmp.c4Val(tCIDLib::ERadices::Dec);
                     c4Index += 4;
 
-                    eState = EState_YearSep;
+                    eState = EStates::YearSep;
                     break;
 
-                case EState_YearSep :
+                case EStates::YearSep :
                     // If a separator, then skip it
                     bGotYearSep = (chCur == kCIDLib::chHyphenMinus);
                     if (bGotYearSep)
                         c4Index++;
 
                     // Have to get the month now
-                    eState = EState_Month;
+                    eState = EStates::Month;
                     break;
 
-                case EState_Month :
+                case EStates::Month :
                     // Has to be two digits
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Month = strTmp.c4Val(tCIDLib::ERadices::Dec);
@@ -1472,15 +1490,15 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     {
                         if (!bGotYearSep)
                             return kCIDLib::False;
-                        eState = EState_Divider;
+                        eState = EStates::Divider;
                     }
                      else
                     {
-                        eState = EState_MonthSep;
+                        eState = EStates::MonthSep;
                     }
                     break;
 
-                case EState_MonthSep :
+                case EStates::MonthSep :
                     //
                     //  If a separator, eat it, else move to the day. If not, and
                     //  we got a year separator, then that's a failure.
@@ -1491,10 +1509,10 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
 
                     // We have to be moving to the day
-                    eState = EState_Day;
+                    eState = EStates::Day;
                     break;
 
-                case EState_Day :
+                case EStates::Day :
                     // Has to be two digits, since we don't support the ordinal or week types
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Day = strTmp.c4Val(tCIDLib::ERadices::Dec);
@@ -1508,20 +1526,20 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     bSkippedDay = kCIDLib::False;
 
                     // Next is the divider if anything left
-                    eState = EState_Divider;
+                    eState = EStates::Divider;
                     break;
 
-                case EState_Divider :
+                case EStates::Divider :
                     // If a divider, skip it. Either way, move to the hour now
                     if (chCur == L'T')
                     {
                         bGotDivider = kCIDLib::True;
                         c4Index++;
                     }
-                    eState = EState_Hour;
+                    eState = EStates::Hour;
                     break;
 
-                case EState_Hour :
+                case EStates::Hour :
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Hour, f8DecVal))
                     {
                         //
@@ -1529,11 +1547,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         //  this.
                         //
                         c4Min = tCIDLib::TCard4(60.0 * f8DecVal);
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
-                        eState = EState_HourSep;
+                        eState = EStates::HourSep;
                     }
 
                     //
@@ -1550,7 +1568,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
                     break;
 
-                case EState_HourSep :
+                case EStates::HourSep :
                     //
                     //  Skip the hour separator if we have one. If we hit the TZ sep
                     //  then move to TZ mode. The only thing required is the hour.
@@ -1558,18 +1576,18 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     if ((chCur == kCIDLib::chHyphenMinus)
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
                         // Skip the separator if there
                         if (chCur == kCIDLib::chColon)
                             c4Index++;
-                        eState = EState_Min;
+                        eState = EStates::Min;
                     }
                     break;
 
-                case EState_Min :
+                case EStates::Min :
                     // Get the minute value
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Min, f8DecVal))
                     {
@@ -1578,12 +1596,12 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         //  this.
                         //
                         c4Sec = tCIDLib::TCard4(60.0 * f8DecVal);
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else if (c4Index < c4Count)
                     {
                         // Move up to the seconds
-                        eState = EState_MinSep;
+                        eState = EStates::MinSep;
                     }
 
                     // Make sure it's a valid minute
@@ -1591,7 +1609,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
                     break;
 
-                case EState_MinSep :
+                case EStates::MinSep :
                     //
                     //  If we hit the time zone separator, then move to that. Else
                     //  skip the separator and move to the second.
@@ -1599,7 +1617,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     if ((chCur == kCIDLib::chHyphenMinus)
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
-                        eState = EState_TZSep;
+                        eState = EStates::TZSep;
                     }
                      else
                     {
@@ -1612,11 +1630,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         else if (bGotHourSep)
                             return kCIDLib::False;
 
-                        eState = EState_Sec;
+                        eState = EStates::Sec;
                     }
                     break;
 
-                case EState_Sec :
+                case EStates::Sec :
                 {
                     // We'll set up millis if we get a decimal value
                     if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Sec, f8DecVal))
@@ -1627,11 +1645,11 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                         return kCIDLib::False;
 
                     // Check for time zone next
-                    eState = EState_TZSep;
+                    eState = EStates::TZSep;
                     break;
                 }
 
-                case EState_TZSep :
+                case EStates::TZSep :
                     //
                     //  If just a Z, then we are done. If a + or -, then move to the
                     //
@@ -1639,47 +1657,47 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     ||  (chCur == kCIDLib::chPlusSign))
                     {
                         c4Index++;
-                        eState = EState_TZHour;
+                        eState = EStates::TZHour;
                         bNegTZ = (chCur == kCIDLib::chHyphenMinus);
                     }
                      else
                     {
-                        eState = EState_TZEnd;
+                        eState = EStates::TZEnd;
                     }
                     break;
 
-                case EState_TZHour :
+                case EStates::TZHour :
                     // Get the hours part of the offset
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs = strTmp.i4Val(tCIDLib::ERadices::Dec) * 60;
                     c4Index += 2;
 
-                    eState = EState_TZHourSep;
+                    eState = EStates::TZHourSep;
                     break;
 
-                case EState_TZHourSep :
+                case EStates::TZHourSep :
                     if (chCur == kCIDLib::chColon)
                         c4Index++;
-                    eState = EState_TZMin;
+                    eState = EStates::TZMin;
                     break;
 
 
-                case EState_TZMin :
+                case EStates::TZMin :
                     strToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs += strTmp.i4Val(tCIDLib::ERadices::Dec);
                     c4Index += 2;
-                    eState = EState_TZEnd;
+                    eState = EStates::TZEnd;
                     break;
 
-                case EState_TZEnd :
+                case EStates::TZEnd :
                     if (chCur != L'Z')
                         return kCIDLib::False;
 
                     c4Index++;
-                    eState = EState_EndWS;
+                    eState = EStates::EndWS;
                     break;
 
-                case EState_EndWS :
+                case EStates::EndWS :
                     // If not whitespace, we failed
                     if (!TRawStr::bIsSpace(chCur))
                         return kCIDLib::False;
@@ -1700,7 +1718,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
         //  The minimum would be a YYYYMM or YYYY-MM. Otherwise, we have already
         //  caught any other errors.
         //
-        if (eState < EState_Month)
+        if (eState < EStates::Month)
             return kCIDLib::False;
 
         // Set us from the collected values
@@ -1738,7 +1756,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
          else
         {
             //
-            //  Adjust our time to zulu time, if non-zero fofset. We basically do
+            //  Adjust our time to zulu time, if non-zero offset. We basically do
             //  the opposit of the sign of the TZ offset, to bring it back to zero.
             //  Even if they want local time, we have to do this first anyway, for
             //  sanity's sake, to make the conversion easier.
@@ -1786,7 +1804,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 //
 tCIDLib::TBoolean
 TTime::bParseFromText(  const   TString&        strSrc
-                        , const TCompList&      fcolCompList
+                        , const TTimeCompList&  fcolCompList
                         , const tCIDLib::TCh    chDateSep
                         , const tCIDLib::TCh    chTimeSep
                         , const tCIDLib::TCh    chTZSep)
@@ -2155,7 +2173,7 @@ TTime::FormatToStr(         TString&                strToWriteTo
         );
     }
 
-    tCIDLib::TCard4 c4Tmp;
+    tCIDLib::TCard4 c4Tmp = 0;
     const tCIDLib::TCard4 c4TokCnt = strTokList.c4Length();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TokCnt; c4Index++)
     {
@@ -2189,10 +2207,7 @@ TTime::FormatToStr(         TString&                strToWriteTo
 
             case kCIDLib::chLatin_A :
                 // The long weekday name
-                strBuild.eReplaceToken
-                (
-                    TLocale::strDay(eWeekDay), kCIDLib::chLatin_A
-                );
+                strBuild.eReplaceToken(TLocale::strDay(eWeekDay), kCIDLib::chLatin_A);
                 break;
 
             case kCIDLib::chLatin_D :
@@ -2201,29 +2216,18 @@ TTime::FormatToStr(         TString&                strToWriteTo
                 break;
 
             case kCIDLib::chLatin_d :
-                // The full weekday name, faulting in the stream if needed
-                strBuild.eReplaceToken
-                (
-                    TLocale::strDay(eWeekDay), kCIDLib::chLatin_d
-                );
+                // The full weekday name
+                strBuild.eReplaceToken(TLocale::strDay(eWeekDay), kCIDLib::chLatin_d);
                 break;
 
             case kCIDLib::chLatin_e :
                 // This one is the elapsed seconds
-                strBuild.eReplaceToken
-                (
-                    enctRaw / kCIDLib::enctOneSecond
-                    , kCIDLib::chLatin_e
-                );
+                strBuild.eReplaceToken(enctRaw / kCIDLib::enctOneSecond, kCIDLib::chLatin_e);
                 break;
 
             case kCIDLib::chLatin_E :
                 // This one is the elapsed minutes
-                strBuild.eReplaceToken
-                (
-                    enctRaw / kCIDLib::enctOneMinute
-                    , kCIDLib::chLatin_E
-                );
+                strBuild.eReplaceToken(enctRaw / kCIDLib::enctOneMinute, kCIDLib::chLatin_E);
                 break;
 
             case kCIDLib::chLatin_H :
@@ -2591,16 +2595,16 @@ tCIDLib::TVoid TTime::LocalToUTC()
 //
 tCIDLib::TVoid
 TTime::ParseFromText(const  TString&        strSrc
-                    , const TCompList&      fcolCompList
+                    , const TTimeCompList&  fcolCompList
                     , const tCIDLib::TCh    chDateSep
                     , const tCIDLib::TCh    chTimeSep
                     , const tCIDLib::TCh    chTZSep)
 {
-    enum EHourTypes
+    enum class EHourTypes
     {
-        EHourType_24
-        , EHourType_AM
-        , EHourType_PM
+        Hour24
+        , HourAM
+        , HourPM
     };
 
     //
@@ -2613,8 +2617,8 @@ TTime::ParseFromText(const  TString&        strSrc
     tCIDLib::TCard4     c4Minute = 0;
     tCIDLib::TCard4     c4Second = 0;
     tCIDLib::TCard4     c4MilliSecs = 0;
-    tCIDLib::EWeekDays  eDay;
-    EHourTypes          eHourType = EHourType_24;
+    tCIDLib::EWeekDays  eDay = tCIDLib::EWeekDays::Count;
+    EHourTypes          eHourType = EHourTypes::Hour24;
     tCIDLib::EMonths    eMonth = tCIDLib::EMonths::January;
     tCIDLib::TInt4      i4TZOfs = i4Offset();
 
@@ -2642,9 +2646,9 @@ TTime::ParseFromText(const  TString&        strSrc
     // Set up an input stream on the src string
     TTextStringInStream strmSrc(&strSrc);
 
-    tCIDLib::TCh    chCur;
-    tCIDLib::TCard4 c4Count;
-    tCIDLib::TInt4  i4Val;
+    tCIDLib::TCh    chCur = kCIDLib::chNull;
+    tCIDLib::TCard4 c4Count = 0;
+    tCIDLib::TInt4  i4Val = 0;
     TString         strTok;
     while (c4FmtIndex < c4FmtLen)
     {
@@ -2745,9 +2749,9 @@ TTime::ParseFromText(const  TString&        strSrc
                     if (eComp == tCIDLib::ETimeComps::AMPM)
                     {
                         if (strTok == TLocale::strAMString())
-                            eHourType = EHourType_AM;
+                            eHourType = EHourTypes::HourAM;
                         else if (strTok == TLocale::strPMString())
-                            eHourType = EHourType_PM;
+                            eHourType = EHourTypes::HourPM;
                         else
                             bGotIt = kCIDLib::False;
                     }
@@ -3028,18 +3032,10 @@ TTime::ParseFromText(const  TString&        strSrc
     //  adjust the hour if we got a 12 hour format, based on the AM/PM
     //  designation.
     //
-    if (eHourType == EHourType_PM)
+    if (eHourType == EHourTypes::HourPM)
         c4Hour += 12;
 
-    if (!m_ktmsThis.bFromDetails
-    (
-        c4Year
-        , eMonth
-        , c4Day
-        , c4Hour
-        , c4Minute
-        , c4Second
-        , 0))
+    if (!m_ktmsThis.bFromDetails(c4Year, eMonth, c4Day, c4Hour, c4Minute, c4Second, 0))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -3307,8 +3303,9 @@ tCIDLib::TVoid TTime::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TTime::LazyInit()
 {
+    // The caller already checked once, so just assume we need to lock
     TBaseLock lockInit;
-    if (!CIDLib_Time::bInitDone)
+    if (!CIDLib_Time::atomInitDone)
     {
         // Get some quicky references to current local date/time stuff
         const tCIDLib::TCh chDateSep = TLocale::chDateSeparator();
@@ -3442,26 +3439,26 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pstrYYYYMMDD_NoSep = new TString(L"%(Y,4,0)%(M,2,0)%(D,2,0)");
 
         // Set up the time parsing components lists
-        CIDLib_Time::pfcol12HHMM = new TCompList;
+        CIDLib_Time::pfcol12HHMM = new TTimeCompList;
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Hour12);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcol12HHMM->c4AddElement(tCIDLib::ETimeComps::AMPM);
 
-        CIDLib_Time::pfcol24HHMM = new TCompList;
+        CIDLib_Time::pfcol24HHMM = new TTimeCompList;
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::Hour24);
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMM->c4AddElement(tCIDLib::ETimeComps::Minute);
 
-        CIDLib_Time::pfcol24HHMMSS = new TCompList;
+        CIDLib_Time::pfcol24HHMMSS = new TTimeCompList;
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Hour24);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::TimeSep);
         CIDLib_Time::pfcol24HHMMSS->c4AddElement(tCIDLib::ETimeComps::Second);
 
-        CIDLib_Time::pfcolCTime = new TCompList;
+        CIDLib_Time::pfcolCTime = new TTimeCompList;
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3477,21 +3474,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolCTime->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolDDMMYY = new TCompList;
+        CIDLib_Time::pfcolDDMMYY = new TTimeCompList;
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYY->c4AddElement(tCIDLib::ETimeComps::Year2);
 
-        CIDLib_Time::pfcolDDMMYYYY = new TCompList;
+        CIDLib_Time::pfcolDDMMYYYY = new TTimeCompList;
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolDDMMYYYY->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolDTStamp = new TCompList;
+        CIDLib_Time::pfcolDTStamp = new TTimeCompList;
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3507,7 +3504,7 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::Minute);
         CIDLib_Time::pfcolDTStamp->c4AddElement(tCIDLib::ETimeComps::AMPM);
 
-        CIDLib_Time::pfcolFullDate = new TCompList;
+        CIDLib_Time::pfcolFullDate = new TTimeCompList;
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::MonthName);
@@ -3516,7 +3513,7 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolFullDate->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolISO8601NTZ = new TCompList;
+        CIDLib_Time::pfcolISO8601NTZ = new TTimeCompList;
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Hyphen);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::MonthNum);
@@ -3529,21 +3526,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Second);
         CIDLib_Time::pfcolISO8601NTZ->c4AddElement(tCIDLib::ETimeComps::Minute);
 
-        CIDLib_Time::pfcolMMDDYY = new TCompList;
+        CIDLib_Time::pfcolMMDDYY = new TTimeCompList;
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYY->c4AddElement(tCIDLib::ETimeComps::Year2);
 
-        CIDLib_Time::pfcolMMDDYYYY = new TCompList;
+        CIDLib_Time::pfcolMMDDYYYY = new TTimeCompList;
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DayNum);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolMMDDYYYY->c4AddElement(tCIDLib::ETimeComps::Year4);
 
-        CIDLib_Time::pfcolRFC822 = new TCompList;
+        CIDLib_Time::pfcolRFC822 = new TTimeCompList;
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::DayName);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Punct);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Space);
@@ -3561,21 +3558,21 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::Space);
         CIDLib_Time::pfcolRFC822->c4AddElement(tCIDLib::ETimeComps::TZ);
 
-        CIDLib_Time::pfcolYYMMDD = new TCompList;
+        CIDLib_Time::pfcolYYMMDD = new TTimeCompList;
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::Year2);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYMMDD->c4AddElement(tCIDLib::ETimeComps::DayNum);
 
-        CIDLib_Time::pfcolYYYYMMDD = new TCompList;
+        CIDLib_Time::pfcolYYYYMMDD = new TTimeCompList;
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::MonthNum);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD->c4AddElement(tCIDLib::ETimeComps::DayNum);
 
-        CIDLib_Time::pfcolYYYYMMDD24HHMM = new TCompList;
+        CIDLib_Time::pfcolYYYYMMDD24HHMM = new TTimeCompList;
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::Year4);
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::DateSep);
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::MonthNum);
@@ -3587,7 +3584,7 @@ tCIDLib::TVoid TTime::LazyInit()
         CIDLib_Time::pfcolYYYYMMDD24HHMM->c4AddElement(tCIDLib::ETimeComps::Minute);
 
         // And set the flag LAST!
-        CIDLib_Time::bInitDone = kCIDLib::True;
+        CIDLib_Time::atomInitDone.Set();
     }
 }
 

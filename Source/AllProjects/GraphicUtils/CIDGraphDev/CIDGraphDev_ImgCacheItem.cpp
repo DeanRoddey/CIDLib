@@ -171,7 +171,9 @@ tCIDLib::TVoid TImgCacheItem::Reset(const   TString&            strImgName
 }
 
 
-// Set up the image cache item with all the info it needs
+//
+//  Set up the image cache item with all the info it needs.
+//
 tCIDLib::TVoid
 TImgCacheItem::Set( const   tCIDLib::TBoolean   bThumb
                     , const tCIDLib::TCard4     c4Size
@@ -183,7 +185,7 @@ TImgCacheItem::Set( const   tCIDLib::TBoolean   bThumb
     //  Let's create the bitmap first. We need to probe it and figure out
     //  what type of iamge it is.
     //
-    TCIDImage* pimgNew = 0;
+    TCIDImage* pimgNew = nullptr;
     if (!facCIDImgFact().bDecodeImg(mbufData, c4Size, pimgNew, kCIDLib::True))
     {
         // It's not valid data, so just go back an empty image and return

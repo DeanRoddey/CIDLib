@@ -56,8 +56,8 @@ TXMLCMNode::TXMLCMNode(const tCIDXML::ECMNodeTypes eNodeType) :
 
     m_c4MaxNFAStates(0)
     , m_eNodeType(eNodeType)
-    , m_pbtsFirst(0)
-    , m_pbtsLast(0)
+    , m_pbtsFirst(nullptr)
+    , m_pbtsLast(nullptr)
 {
 }
 
@@ -82,58 +82,6 @@ TXMLCMLeaf::TXMLCMLeaf( const   tCIDLib::TCard4 c4ElemId
 
 TXMLCMLeaf::~TXMLCMLeaf()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCMLeaf: Public, inherited methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean TXMLCMLeaf::bIsNullable() const
-{
-    // Its nullable if an epsilon node
-    return (m_c4StatePos == kCIDLib::c4MaxCard);
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCMLeaf: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TCard4 TXMLCMLeaf::c4ElemId() const
-{
-    return m_c4ElemId;
-}
-
-tCIDLib::TCard4 TXMLCMLeaf::c4StatePos() const
-{
-    return m_c4StatePos;
-}
-
-tCIDLib::TCard4 TXMLCMLeaf::c4StatePos(const tCIDLib::TCard4 c4NewPos)
-{
-    m_c4StatePos = c4NewPos;
-    return m_c4StatePos;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCMLeaf: Protected, inherited methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid TXMLCMLeaf::CalculateFirst(TBitset& btsToSet) const
-{
-    // If an epsilon node, then first pos is empty
-    if (m_c4StatePos == kCIDLib::c4MaxCard)
-        btsToSet.Clear();
-    else
-        btsToSet.bSetBitState(m_c4StatePos, kCIDLib::True);
-}
-
-tCIDLib::TVoid TXMLCMLeaf::CalculateLast(TBitset& btsToSet) const
-{
-    // If an epsilon node, then lst pos is empty
-    if (m_c4StatePos == kCIDLib::c4MaxCard)
-        btsToSet.Clear();
-    else
-        btsToSet.bSetBitState(m_c4StatePos, kCIDLib::True);
 }
 
 
@@ -206,30 +154,6 @@ tCIDLib::TBoolean TXMLCMBinOp::bIsNullable() const
         return (m_pxcmnLeft->bIsNullable() && m_pxcmnRight->bIsNullable());
 
     return (m_pxcmnLeft->bIsNullable() || m_pxcmnRight->bIsNullable());
-}
-
-
-// ---------------------------------------------------------------------------
-//  Public, non-virtual methods
-// ---------------------------------------------------------------------------
-TXMLCMNode* TXMLCMBinOp::pxcmnLeft()
-{
-    return m_pxcmnLeft;
-}
-
-const TXMLCMNode* TXMLCMBinOp::pxcmnLeft() const
-{
-    return m_pxcmnLeft;
-}
-
-TXMLCMNode* TXMLCMBinOp::pxcmnRight()
-{
-    return m_pxcmnRight;
-}
-
-const TXMLCMNode* TXMLCMBinOp::pxcmnRight() const
-{
-    return m_pxcmnRight;
 }
 
 
@@ -315,41 +239,3 @@ TXMLCMUnaryOp::~TXMLCMUnaryOp()
 }
 
 
-// ---------------------------------------------------------------------------
-//  TXMLCMUnaryOp: Public, inherited methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean TXMLCMUnaryOp::bIsNullable() const
-{
-    // Unary nodes are all some sort of repetition and so are always nullable
-    return kCIDLib::True;
-}
-
-
-// ---------------------------------------------------------------------------
-//  Public, non-virtual methods
-// ---------------------------------------------------------------------------
-TXMLCMNode* TXMLCMUnaryOp::pxcmnChild()
-{
-    return m_pxcmnChild;
-}
-
-const TXMLCMNode* TXMLCMUnaryOp::pxcmnChild() const
-{
-    return m_pxcmnChild;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TXMLCMUnaryOp: Protected, inherited methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid TXMLCMUnaryOp::CalculateFirst(TBitset& btsToSet) const
-{
-    // Its just our child's first pos set
-    btsToSet = m_pxcmnChild->btsFirstPos();
-}
-
-tCIDLib::TVoid TXMLCMUnaryOp::CalculateLast(TBitset& btsToSet) const
-{
-    // Its just our child's last pos set
-    btsToSet = m_pxcmnChild->btsLastPos();
-}

@@ -313,8 +313,8 @@ TFacCIDBuild::bFileCopiesCallBack(  const   TBldStr&        strTarget
             }
             strTargetFile = facCIDBuild.strOutDir();
             strTargetFile.Append(pfcCur.strOutPath());
-            if (strTargetFile.chLast() != L'\\')
-                strTargetFile.Append(L"\\");
+            if (strTargetFile.chLast() != kCIDBuild::chPathSep)
+                strTargetFile.Append(kCIDBuild::chPathSep);
             strTargetFile.AppendAt(fndiSrc.strFileName(), c4NameOfs);
 
             //

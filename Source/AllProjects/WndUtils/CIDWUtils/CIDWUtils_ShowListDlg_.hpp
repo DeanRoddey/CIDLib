@@ -43,6 +43,7 @@ class TShowListDlg : public TDlgBox
         TShowListDlg();
 
         TShowListDlg(const TShowListDlg&) = delete;
+        TShowListDlg(TShowListDlg&&) = delete;
 
         ~TShowListDlg();
 
@@ -51,6 +52,7 @@ class TShowListDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TShowListDlg& operator=(const TShowListDlg&) = delete;
+        TShowListDlg& operator=(TShowListDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

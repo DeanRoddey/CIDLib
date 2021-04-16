@@ -31,21 +31,26 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <psapi.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------
-//  Local types
+//  Define our publically opaque per-platfrom data
 // ---------------------------------------------------------------------------
-struct TConSaveInfo
+struct TKrnlExtProcess::TPlatData
 {
-    BOOL        bInCon;
-    HANDLE      hIn;
-    DWORD       dwInFlags;
+    BOOL        bInCon = 0;
+    HANDLE      hIn = nullptr;
+    DWORD       dwInFlags = 0;
 
-    BOOL        bOutCon;
-    HANDLE      hOut;
-    DWORD       dwOutFlags;
+    BOOL        bOutCon = 0;
+    HANDLE      hOut = nullptr;
+    DWORD       dwOutFlags = 0;
 };
 
 
@@ -54,13 +59,16 @@ struct TConSaveInfo
 // ---------------------------------------------------------------------------
 namespace CIDKernel_ExternalProcess_Win32
 {
-    // -----------------------------------------------------------------------
-    //  We suppor the 'reattachment' to processes by persisting a platform
-    //  specific formatted string of attach info for later use. This is used
-    //  as a prefix on our platform's version of that string, to help insure
-    //  later that we are getting a string we formatted.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const pszAttachInfoPref = L"CIDW32AI";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We support the 'reattachment' to processes by persisting a platform
+        //  specific formatted string of attach info for later use. This is used
+        //  as a prefix on our platform's version of that string, to help insure
+        //  later that we are getting a string we formatted.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const pszAttachInfoPref = L"CIDW32AI";
+    }
 }
 
 
@@ -73,7 +81,7 @@ namespace CIDKernel_ExternalProcess_Win32
 //  This method is called to save console information around the execution
 //  of an external process.
 //
-static tCIDLib::TVoid QueryConInfo(TConSaveInfo& SaveInfo)
+static tCIDLib::TVoid QueryConInfo(TKrnlExtProcess::TPlatData& SaveInfo)
 {
     //
     //  To prevent the child process from freaking out our console handle
@@ -91,7 +99,7 @@ static tCIDLib::TVoid QueryConInfo(TConSaveInfo& SaveInfo)
 //  This method is called to restore the console mode settings after an
 //  external process is run.
 //
-static tCIDLib::TVoid RestoreConInfo(const TConSaveInfo& SaveInfo)
+static tCIDLib::TVoid RestoreConInfo(const TKrnlExtProcess::TPlatData& SaveInfo)
 {
     if (SaveInfo.bInCon)
         ::SetConsoleMode(SaveInfo.hIn, SaveInfo.dwInFlags);
@@ -101,13 +109,11 @@ static tCIDLib::TVoid RestoreConInfo(const TConSaveInfo& SaveInfo)
 
 
 //
-//  This method is called to build up an environment block from an array of
-//  pointers to environment strings. If successful, it allocates a buffer
-//  which becomes the property of the caller.
+//  This method is called to build up an environment block from a list of
+//  environment strings. If successful, it allocates a buffer which becomes
+//  the property of the caller.
 //
-static tCIDLib::TCh*
-pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
-                , const tCIDLib::TCard4 c4EnvironCount)
+static [[nodiscard]] tCIDLib::TCh* pszBuildEnviron(tCIDKernel::TStrList& klistSrc)
 {
     //
     //  First lets see how much space we need to create the environment
@@ -116,9 +122,17 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
     //  1.)
     //
     tCIDLib::TCard4 c4BufSize = 1;
-    tCIDLib::TCard4 c4Index;
-    for (c4Index = 0; c4Index < c4EnvironCount; c4Index++)
-        c4BufSize += TRawStr::c4StrLen(apszEnviron[c4Index]) + 1;
+
+    tCIDLib::TCard4 c4EnvCount = 0;
+    if (klistSrc.bResetCursor())
+    {
+        TKrnlString* pkstrCur = nullptr;
+        while (klistSrc.bNext(pkstrCur))
+        {
+            c4BufSize += pkstrCur->c4Length() + 1;
+            c4EnvCount++;
+        }
+    }
 
     // Allocate the buffer
     tCIDLib::TCh* pszEnvBuffer = new tCIDLib::TCh[c4BufSize];
@@ -129,33 +143,35 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
 
     // And now fill it in
     tCIDLib::TCh* pszTmp = pszEnvBuffer;
-    for (c4Index = 0; c4Index < c4EnvironCount; c4Index++)
+    if (klistSrc.bResetCursor())
     {
-        // Get the length of this string
-        tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(apszEnviron[c4Index]);
-
-        // And copy it into the buffer
-        TRawMem::CopyMemBuf
-        (
-            pszTmp
-            , apszEnviron[c4Index]
-            , (c4Len+1) * kCIDLib::c4UniBytes
-        );
-
-        // Move the temp pointer past this string's nul
-        pszTmp += c4Len+1;
-
-        // If debug then keep track of chars used so far
-        #if CID_DEBUG_ON
-        if (c4CharsLeft < c4Len+1)
+        TKrnlString* pkstrCur = nullptr;
+        while (klistSrc.bNext(pkstrCur))
         {
-            delete [] pszEnvBuffer;
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
-            return 0;
-        }
+            // Get the length of this string
+            tCIDLib::TCard4 c4Len = pkstrCur->c4Length();
 
-        c4CharsLeft -= c4Len+1;
-        #endif
+            // And copy it into the buffer
+            TRawMem::CopyMemBuf
+            (
+                pszTmp, pkstrCur->pszValue(), (c4Len + 1) * kCIDLib::c4UniBytes
+            );
+
+            // Move the temp pointer past this string's nul
+            pszTmp += c4Len + 1;
+
+            // If debug then keep track of chars used so far
+            #if CID_DEBUG_ON
+            if (c4CharsLeft < c4Len+1)
+            {
+                delete [] pszEnvBuffer;
+                TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
+                return nullptr;
+            }
+
+            c4CharsLeft -= c4Len+1;
+            #endif
+        }
     }
 
     // Add in the second terminating nul for the end of buffer
@@ -164,7 +180,7 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
     {
         delete [] pszEnvBuffer;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_BufferOverflow);
-        return 0;
+        return nullptr;
     }
     #endif
 
@@ -185,28 +201,20 @@ pszBuildEnviron(        tCIDLib::TCh**  apszEnviron
 // ---------------------------------------------------------------------------
 TKrnlExtProcess::TKrnlExtProcess() :
 
-    m_pExtra(0)
+    m_pPlatData(nullptr)
 {
-    // Allocate the new process handle and get it set up
+    // Allocate the new process handle
     m_hprocThis.m_phprociThis = new TProcessHandleImpl;
-    m_hprocThis.m_phprociThis->pidThis = 0;
-    m_hprocThis.m_phprociThis->hProcess = 0;
 
-    // And allocate the extra data structure and init it
-    TConSaveInfo* pSaveInfo = new TConSaveInfo;
-    pSaveInfo->bInCon = 0;
-    pSaveInfo->bOutCon = 0;
-    pSaveInfo->hIn = 0;
-    pSaveInfo->hOut = 0;
-
-    // Store it in the per-platform storage field
-    m_pExtra = new TConSaveInfo;
+    // And allocate our per-platform data structure and init it
+    m_pPlatData = new TPlatData;
 }
 
 TKrnlExtProcess::~TKrnlExtProcess()
 {
-    // Clean up the extra data
-    delete static_cast<TConSaveInfo*>(m_pExtra);
+    // Clean up the platform data
+    delete m_pPlatData;
+    m_pPlatData = nullptr;
 
     // Close the process handle if open
     if (m_hprocThis.m_phprociThis->hProcess)
@@ -360,10 +368,7 @@ tCIDLib::TBoolean TKrnlExtProcess::bKill()
 }
 
 
-//
-//  Using the handle of the running process, get the full path to it. Flip
-//  the slashes to internal CIDLib format for return.
-//
+// Using the handle of the running process, get the full path to it
 tCIDLib::TBoolean
 TKrnlExtProcess::bQueryFullPath(        tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars)
@@ -479,10 +484,8 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
                         , const tCIDLib::TCh*           pszInitPath
-                        ,       tCIDLib::TCh**          apszParms
-                        , const tCIDLib::TCard4         c4ParmCount
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistParms
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlags
                         , const tCIDLib::EExtProcShows  eShow)
 {
@@ -507,11 +510,13 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     //  room for a space after it (if there are any parameters) and quote
     //  characters around it (in case it has whitespace in it.)
     //
-    tCIDLib::TCard4 c4Index;
     tCIDLib::TCard4 c4BufSize = TRawStr::c4StrLen(pszPath) + 3;
-
-    for (c4Index = 0; c4Index < c4ParmCount; c4Index++)
-        c4BufSize += TRawStr::c4StrLen(apszParms[c4Index]) + 3;
+    if (klistParms.bResetCursor())
+    {
+        TKrnlString* pkstrCur = nullptr;
+        while (klistParms.bNext(pkstrCur))
+            c4BufSize += pkstrCur->c4Length() + 3;
+    }
 
     // Ok, now lets allocate the buffer and put a janitor on it.
     tCIDLib::TCh* pszCmdLine = new tCIDLib::TCh[c4BufSize + 1];
@@ -525,22 +530,25 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     //  the command line. We prepend a separator space between each one and
     //  put quotes around them. The storage for this was accounted for above.
     //
-    for (c4Index = 0; c4Index < c4ParmCount; c4Index++)
+    if (klistParms.bResetCursor())
     {
-        TRawStr::CatStr(pszCmdLine, L" \"");
-        TRawStr::CatStr(pszCmdLine, apszParms[c4Index]);
-        TRawStr::CatStr(pszCmdLine, L"\"");
+        TKrnlString* pkstrCur = nullptr;
+        while (klistParms.bNext(pkstrCur))
+        {
+            TRawStr::CatStr(pszCmdLine, L" \"");
+            TRawStr::CatStr(pszCmdLine, pkstrCur->pszValue());
+            TRawStr::CatStr(pszCmdLine, L"\"");
+        }
     }
 
     // And call the other version
-    return bStart(pszCmdLine, pszInitPath, apszEnviron, c4EnvironCount, eFlags, eShow);
+    return bStart(pszCmdLine, pszInitPath, klistEnviron, eFlags, eShow);
 }
 
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                         , const tCIDLib::TCh*           pszInitPath
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
+                        ,       tCIDKernel::TStrList&   klistEnviron
                         , const tCIDLib::EExtProcFlags  eFlags
                         , const tCIDLib::EExtProcShows  eShow)
 {
@@ -572,7 +580,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  code that understands the portable format and then we put it back
     //  together in our required format.
     //
-    const tCIDLib::TCard4 c4MaxParms = 1024;
+    constexpr tCIDLib::TCard4 c4MaxParms = 1024;
     tCIDLib::TCh* apszParms[c4MaxParms];
     const tCIDLib::TCard4 c4ParmCount = c4BreakOutParms
     (
@@ -681,10 +689,10 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  Now lets build up the environment buffer, if we have any environment
     //  strings. If not, it just stays zero.
     //
-    tCIDLib::TCh* pszEnvBuffer = 0;
-    if (c4EnvironCount)
+    tCIDLib::TCh* pszEnvBuffer = nullptr;
+    if (!klistEnviron.bIsEmpty())
     {
-        pszEnvBuffer = pszBuildEnviron(apszEnviron, c4EnvironCount);
+        pszEnvBuffer = pszBuildEnviron(klistEnviron);
         if (!pszEnvBuffer)
             return kCIDLib::False;
     }
@@ -757,8 +765,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
     //  To prevent the child process from freaking out our console handle
     //  mode settings, save them and restore them.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    QueryConInfo(*pSaveInfo);
+    QueryConInfo(*m_pPlatData);
 
 
     //
@@ -784,7 +791,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
         TKrnlError::SetLastHostError(::GetLastError());
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
 
         return kCIDLib::False;
     }
@@ -809,7 +816,7 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
                 return kCIDLib::False;
 
             // Restore the saved console info
-            RestoreConInfo(*pSaveInfo);
+            RestoreConInfo(*m_pPlatData);
         }
     }
     return kCIDLib::True;
@@ -925,7 +932,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
     //  code that understands the portable format and then we put it back
     //  together in our required format.
     //
-    const tCIDLib::TCard4 c4MaxParms = 1024;
+    constexpr tCIDLib::TCard4 c4MaxParms = 1024;
     tCIDLib::TCh* apszParms[c4MaxParms];
     const tCIDLib::TCard4 c4ParmCount = c4BreakOutParms
     (
@@ -990,8 +997,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
     //  To prevent the child process from freaking out our console handle
     //  mode settings, save them and restore them.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    QueryConInfo(*pSaveInfo);
+    QueryConInfo(*m_pPlatData);
 
     //
     //  And now invoke the process. We pass the command processor as the
@@ -1007,7 +1013,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
         TKrnlError::SetLastHostError(::GetLastError());
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
         return kCIDLib::False;
     }
 
@@ -1026,7 +1032,7 @@ TKrnlExtProcess::bSystemEscape( const   tCIDLib::TCh* const     pszCommandLine
             return kCIDLib::False;
 
         // Restore the console mode
-        RestoreConInfo(*pSaveInfo);
+        RestoreConInfo(*m_pPlatData);
     }
     return kCIDLib::True;
 }
@@ -1187,8 +1193,7 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::TBoolean&   bState
     //  Assume its dead at this point, and put back the console mode that
     //  was saved away when it started.
     //
-    TConSaveInfo* pSaveInfo = static_cast<TConSaveInfo*>(m_pExtra);
-    RestoreConInfo(*pSaveInfo);
+    RestoreConInfo(*m_pPlatData);
 
     // If it failed, then the handle may be bad or something
     if (eRes == tCIDLib::EWaitRes::Error)

@@ -46,75 +46,78 @@ RTTIDecls(TMacroDbgMainWnd,TFrameWindow)
 // ---------------------------------------------------------------------------
 namespace CIDMacroDbg_DbgMainWnd
 {
-    // -----------------------------------------------------------------------
-    //  Some ids that the callbacks from the macro execution thread post to
-    //  us so that we know what the debugger is doing.
-    //
-    //  i4Broken          - The runner thread saw a break request or hit a
-    //                      break point, and is now blocked and waiting.
-    //  i4EndSession      - We were forced to exit due to the session being
-    //                      closed.
-    //  i4Finished        - The macro has finished running
-    // -----------------------------------------------------------------------
-    const tCIDLib::TInt4    i4Broken            = 1;
-    const tCIDLib::TInt4    i4EndSession        = 2;
-    const tCIDLib::TInt4    i4Finished          = 3;
-    const tCIDLib::TInt4    i4BreakAndGo        = 4;
-
-
-    // -----------------------------------------------------------------------
-    //  Posted to ourself. When the user double clicks on an error in the
-    //  build results window we get an event and move the editor cursor to
-    //  the location. We also want to take the focus, but can't do it then
-    //  so we post ourself an event to take the focus.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TInt4    i4ErrLocGo          = 10;
-
-
-    // -----------------------------------------------------------------------
-    //  To create unique thread names for each instance
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4         c4ThreadInst    = 1;
-
-
-    // -----------------------------------------------------------------------
-    //  The gap between the editor the file list below it
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4EditorGap     = 16;
-
-
-    // -----------------------------------------------------------------------
-    //  Some pseudo menu commands that we want to add to the accel table, but
-    //  they aren't really in any menu. It's just for keyboard invocation, and
-    //  the accellerator handling invokes the menu handler.
-    //
-    //  Make sure to keep these out of the possible range of the actual context
-    //  menu ids.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4FakeMenu_ToggleBPoint     = 5000;
-    const tCIDLib::TCard4   c4FakeMenu_ToggleBPEnable   = 5001;
-    const tCIDLib::TCard4   c4FakeMenu_FindNext         = 5002;
-
-
-    // -----------------------------------------------------------------------
-    //  The special characters
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh achSpecialChars[] =
+    namespace
     {
-        kCIDLib::chAsterisk
-        , kCIDLib::chCloseBracket
-        , kCIDLib::chCloseParen
-        , kCIDLib::chColon
-        , kCIDLib::chComma
-        , kCIDLib::chEquals
-        , kCIDLib::chExclamation
-        , kCIDLib::chOpenBracket
-        , kCIDLib::chOpenParen
-        , kCIDLib::chPeriod
-        , kCIDLib::chQuotation
-        , kCIDLib::chSemiColon
-        , kCIDLib::chNull
-    };
+        // -----------------------------------------------------------------------
+        //  Some ids that the callbacks from the macro execution thread post to
+        //  us so that we know what the debugger is doing.
+        //
+        //  i4Broken          - The runner thread saw a break request or hit a
+        //                      break point, and is now blocked and waiting.
+        //  i4EndSession      - We were forced to exit due to the session being
+        //                      closed.
+        //  i4Finished        - The macro has finished running
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TInt4    i4Broken            = 1;
+        constexpr tCIDLib::TInt4    i4EndSession        = 2;
+        constexpr tCIDLib::TInt4    i4Finished          = 3;
+        constexpr tCIDLib::TInt4    i4BreakAndGo        = 4;
+
+
+        // -----------------------------------------------------------------------
+        //  Posted to ourself. When the user double clicks on an error in the
+        //  build results window we get an event and move the editor cursor to
+        //  the location. We also want to take the focus, but can't do it then
+        //  so we post ourself an event to take the focus.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TInt4    i4ErrLocGo          = 10;
+
+
+        // -----------------------------------------------------------------------
+        //  To create unique thread names for each instance
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard4         c4ThreadInst    = 1;
+
+
+        // -----------------------------------------------------------------------
+        //  The gap between the editor the file list below it
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4EditorGap     = 16;
+
+
+        // -----------------------------------------------------------------------
+        //  Some pseudo menu commands that we want to add to the accel table, but
+        //  they aren't really in any menu. It's just for keyboard invocation, and
+        //  the accellerator handling invokes the menu handler.
+        //
+        //  Make sure to keep these out of the possible range of the actual context
+        //  menu ids.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4FakeMenu_ToggleBPoint     = 5000;
+        constexpr tCIDLib::TCard4   c4FakeMenu_ToggleBPEnable   = 5001;
+        constexpr tCIDLib::TCard4   c4FakeMenu_FindNext         = 5002;
+
+
+        // -----------------------------------------------------------------------
+        //  The special characters
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCh achSpecialChars[] =
+        {
+            kCIDLib::chAsterisk
+            , kCIDLib::chCloseBracket
+            , kCIDLib::chCloseParen
+            , kCIDLib::chColon
+            , kCIDLib::chComma
+            , kCIDLib::chEquals
+            , kCIDLib::chExclamation
+            , kCIDLib::chOpenBracket
+            , kCIDLib::chOpenParen
+            , kCIDLib::chPeriod
+            , kCIDLib::chQuotation
+            , kCIDLib::chSemiColon
+            , kCIDLib::chNull
+        };
+    }
 }
 
 
@@ -224,7 +227,7 @@ const TNotificationId TMacroDbgMainWnd::nidChange(L"CMLDbgChangeEvent");
 TMacroDbgMainWnd::TMacroDbgMainWnd( MMEngClassMgr* const        pmecmToUse
                                     , MMEngFileResolver* const  pmefrToUse) :
 
-    m_c2OneTimeMethod(kMacroEng::c2BadId)
+    m_c2OneTimeMethod(kCIDMacroEng::c2BadId)
     , m_c4GoToLine(0)
     , m_c4LastLine(0)
     , m_c4NewIP(0)
@@ -358,7 +361,7 @@ TMacroDbgMainWnd::eAtLine(  const   TMEngClassInfo&     meciCurrent
     if (m_eActionReq == EActionReqs::None)
     {
         // See if the class is currently loaded
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         TSrcTab* pwndCur = pwndFindSrcTab(meciCurrent.strClassPath());
         TSrcEditor* pwndEdit = 0;
@@ -421,7 +424,7 @@ TMacroDbgMainWnd::eAtLine(  const   TMEngClassInfo&     meciCurrent
 
         // Sync while we update the data members, reset the event, and post
         {
-            TMtxLocker lockSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             // Save the old new values to the last values
             m_c4LastLine    = m_c4NewLine;
@@ -1526,7 +1529,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
         //
         if (m_eCurState == EStates::Running)
         {
-            TMtxLocker mtxSync(&m_mtxSync);
+            TLocker mtxSync(&m_mtxSync);
             m_eActionReq = EActionReqs::Break;
         }
     }
@@ -1563,7 +1566,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
         //
         if ((m_eCurState == EStates::Running) || (m_eCurState == EStates::Stopped))
         {
-            TMtxLocker mtxSync(&m_mtxSync);
+            TLocker mtxSync(&m_mtxSync);
             m_eActionReq = EActionReqs::Exit;
             if (m_eCurState == EStates::Stopped)
                 m_evSync.Trigger();
@@ -1728,7 +1731,7 @@ TMacroDbgMainWnd::MenuCommand(  const   tCIDLib::TResId     ridItem
 
 
 TTextInStream*
-TMacroDbgMainWnd::pstrmDoLoad(  const   TString&             strClassPath
+TMacroDbgMainWnd::pstrmDoLoad(  const   TString&                strClassPath
                                 , const tCIDMacroEng::EResModes eMode)
 {
     TString strTmp;
@@ -2239,7 +2242,7 @@ tCIDLib::TVoid TMacroDbgMainWnd::GoOrRestart(const EGoActions eAction)
                 return;
             }
 
-            if (c2EntryPnt == kMacroEng::c2BadId)
+            if (c2EntryPnt == kCIDMacroEng::c2BadId)
             {
                 TErrBox msgbWarn
                 (

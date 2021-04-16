@@ -72,10 +72,8 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             , const TString&                strInstance
         );
 
-        TOrbId
-        (
-            const   TOrbId&                 oidToCopy
-        );
+        TOrbId(const TOrbId&) = default;
+        TOrbId(TOrbId&&) = default;
 
         ~TOrbId();
 
@@ -83,19 +81,17 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TOrbId& operator=
-        (
-            const   TOrbId&                 oidToAssign
-        );
+        TOrbId& operator=(const TOrbId&) = default;
+        TOrbId& operator=(TOrbId&& oidSrc) = default;
 
         tCIDLib::TBoolean operator==
         (
-            const   TOrbId&                 oidToCompare
+            const   TOrbId&                 oidSrc
         )   const;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TOrbId&                 oidToCompare
+            const   TOrbId&                 oidSrc
         )   const;
 
 
@@ -112,11 +108,11 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
             const   tCIDLib::TCard4         c4Modulus
         )   const;
 
-        tCIDLib::THashVal hshThis() const;
+        [[nodiscard]] tCIDLib::THashVal hshThis() const;
 
-        const TMD5Hash& mhashInterface() const;
+        [[nodiscard]] const TMD5Hash& mhashInterface() const;
 
-        const TMD5Hash& mhashInstance() const;
+        [[nodiscard]] const TMD5Hash& mhashInstance() const;
 
         tCIDLib::TVoid Set
         (
@@ -144,17 +140,17 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -189,7 +185,6 @@ class CIDORBEXP TOrbId : public TObject, public MStreamable, public MFormattable
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TOrbId,TObject)
-        DefPolyDup(TOrbId)
 };
 
 
@@ -205,7 +200,8 @@ class CIDORBEXP TOrbIdKeyOps : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         TOrbIdKeyOps();
 
-        TOrbIdKeyOps(const TOrbIdKeyOps& kopsToCopy);
+        TOrbIdKeyOps(const TOrbIdKeyOps& kopsSrc);
+        TOrbIdKeyOps(TOrbIdKeyOps&&) = delete;
 
         ~TOrbIdKeyOps();
 
@@ -214,6 +210,7 @@ class CIDORBEXP TOrbIdKeyOps : public TObject, public MDuplicable
         //  Public operators
         // -------------------------------------------------------------------
         TOrbIdKeyOps& operator=(const TOrbIdKeyOps&);
+        TOrbIdKeyOps& operator=(TOrbIdKeyOps&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -52,9 +52,7 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TSafeCard4Counter()
-        {
-        }
+        TSafeCard4Counter() = default;
 
         TSafeCard4Counter(const tCIDLib::TCard4 c4InitVal) :
 
@@ -63,16 +61,16 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
         }
 
         TSafeCard4Counter(const TSafeCard4Counter&) = delete;
+        TSafeCard4Counter(TSafeCard4Counter&&) = delete;
 
-        ~TSafeCard4Counter()
-        {
-        }
+        ~TSafeCard4Counter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TSafeCard4Counter& operator=(const TSafeCard4Counter&) = delete;
+        TSafeCard4Counter& operator=(TSafeCard4Counter&&) = delete;
 
         tCIDLib::TCard4 operator++()
         {
@@ -96,6 +94,31 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
             return c4Dec() + 1;
         }
 
+        tCIDLib::TCard4 operator*() const
+        {
+            return c4Value();
+        }
+
+        tCIDLib::TBoolean operator==(const tCIDLib::TCard4 c4Val) const
+        {
+            return(c4Value() == c4Val);
+        }
+
+        tCIDLib::TBoolean operator!=(const tCIDLib::TCard4 c4Val) const
+        {
+            return !operator==(c4Val);
+        }
+
+        tCIDLib::TBoolean operator==(const TSafeCard4Counter& scntSrc) const
+        {
+            return(c4Value() == scntSrc.c4Value());
+        }
+
+        tCIDLib::TBoolean operator!=(const TSafeCard4Counter& scntSrc) const
+        {
+            return !operator==(scntSrc);
+        }
+
 
     private :
         // -------------------------------------------------------------------
@@ -103,6 +126,7 @@ class CIDLIBEXP TSafeCard4Counter : public TObject, public TKrnlSafeCard4Counter
         // -------------------------------------------------------------------
         RTTIDefs(TSafeCard4Counter,TObject)
 };
+
 
 
 // ---------------------------------------------------------------------------
@@ -115,9 +139,7 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TSafeInt4Counter()
-        {
-        }
+        TSafeInt4Counter() = default;
 
         TSafeInt4Counter(const tCIDLib::TInt4 i4InitVal) :
 
@@ -126,16 +148,16 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         }
 
         TSafeInt4Counter(const TSafeInt4Counter&) = delete;
+        TSafeInt4Counter(TSafeInt4Counter&&) = delete;
 
-        ~TSafeInt4Counter()
-        {
-        }
+        ~TSafeInt4Counter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TSafeInt4Counter& operator=(const TSafeInt4Counter&) = delete;
+        TSafeInt4Counter& operator=(TSafeInt4Counter&&) = delete;
 
         tCIDLib::TInt4 operator++()
         {
@@ -157,6 +179,31 @@ class CIDLIBEXP TSafeInt4Counter : public TObject, public TKrnlSafeInt4Counter
         {
             // Add one tp the return value for post-inc semantics
             return i4Dec() + 1;
+        }
+
+        tCIDLib::TInt4 operator*() const
+        {
+            return i4Value();
+        }
+
+        tCIDLib::TBoolean operator==(const tCIDLib::TInt4 i4Val) const
+        {
+            return(i4Value() == i4Val);
+        }
+
+        tCIDLib::TBoolean operator!=(const tCIDLib::TInt4 i4Val) const
+        {
+            return !operator==(i4Val);
+        }
+
+        tCIDLib::TBoolean operator==(const TSafeInt4Counter& scntSrc) const
+        {
+            return(i4Value() == scntSrc.i4Value());
+        }
+
+        tCIDLib::TBoolean operator!=(const TSafeInt4Counter& scntSrc) const
+        {
+            return !operator==(scntSrc);
         }
 
 
@@ -188,6 +235,7 @@ class CIDLIBEXP TSafeCard4Janitor
         }
 
         TSafeCard4Janitor(const TSafeCard4Janitor&) = delete;
+        TSafeCard4Janitor(TSafeCard4Janitor&&) = delete;
 
         ~TSafeCard4Janitor()
         {
@@ -199,6 +247,7 @@ class CIDLIBEXP TSafeCard4Janitor
         //  Public operators
         // -------------------------------------------------------------------
         TSafeCard4Janitor& operator=(const TSafeCard4Janitor&) = delete;
+        TSafeCard4Janitor& operator=(TSafeCard4Janitor&&) = delete;
 
 
     private :
@@ -233,6 +282,7 @@ class CIDLIBEXP TSafeInt4Janitor
         }
 
         TSafeInt4Janitor(const TSafeInt4Janitor&) = delete;
+        TSafeInt4Janitor(TSafeInt4Janitor&&) = delete;
 
         ~TSafeInt4Janitor()
         {
@@ -244,6 +294,7 @@ class CIDLIBEXP TSafeInt4Janitor
         //  Public operators
         // -------------------------------------------------------------------
         TSafeInt4Janitor& operator=(const TSafeInt4Janitor&) = delete;
+        TSafeInt4Janitor& operator=(TSafeInt4Janitor&&) = delete;
 
 
     private :

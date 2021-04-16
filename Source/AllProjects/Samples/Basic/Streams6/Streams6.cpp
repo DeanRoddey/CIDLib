@@ -43,23 +43,13 @@
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
-// ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-
-// ----------------------------------------------------------------------------
 //  Do the magic main module code
 //
 //  This tells CIDLib what the main thread of the program is. This is the
 //  only thread object that is run automatically. All others are started
 //  manually when required or desired.
 // ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid* pData);
 CIDLib_MainModule(TThread(L"Streams6MainThread", eMainThreadFunc))
 
 
@@ -77,32 +67,28 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    //
-    //  Create a stream format object for the number colum, and one for
-    //  the line text.
-    //
-    TStreamFmt  strmfNum(4, 0, tCIDLib::EHJustify::Right, kCIDLib::chSpace);
-    TStreamFmt  strmfText(0, 0, tCIDLib::EHJustify::Left, kCIDLib::chSpace);
-
     // Get quick refs to the redirectable input/output consoles
     TTextInStream& strmIn = TSysInfo::strmIn();
     TTextOutStream& strmOut = TSysInfo::strmOut();
 
     //
-    //  Just read until the end of input, processing each line. Let any
-    //  exceptions just propogate back to the caller.
+    //  Just read until the end of input, processing each line. We output
+    //  the line number, right justified in a 4 character field, then a period,
+    //  then the line text.
+    //
+    //  We use the simple Format() method for this, since it makes it easy. It
+    //  takes a format string and variable parameters. The token numbers are not
+    //  actually used in this case, they are positional relative to the provided
+    //  tokens, but they have to have a number, so 1, 2, 3 is the obvious thing.
     //
     TString strInput;
     tCIDLib::TCard4 c4Line(1);
     while (!strmIn.bEndOfStream())
     {
         strmIn.c4GetLine(strInput);
-        strmOut << strmfNum << c4Line++
-                << strmfText << L". " << strInput << kCIDLib::NewLn;
+        strmOut.Format(L"%(1,4). %(2)\n", c4Line++, strInput);
     }
 
     strmOut.Flush();
     return tCIDLib::EExitCodes::Normal;
 }
-
-

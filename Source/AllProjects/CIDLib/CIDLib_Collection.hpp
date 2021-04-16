@@ -15,19 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This header implements the base class for all template collections. All
-//  of the collections derive from TCollectionBase and must implement its
-//  virtual interface. This interface allows for basic things like checking
-//  the number of elements, checking for empty, checking for full. I.e. things
-//  that do not depend upon any particular ordering or storage style or
-//  knowledge of the storage mechanism or element type.
-//
-//  By value collections also implement the MDuplicable interface, which allows
-//  a collection to be duplicated polymorphically (with all its contents.) This is
-//  a powerful concept. It means that all element classes must support copy
-//  construction and assignment, but that was already a requirement anyway for a
-//  'by value' collection of elements (in order to get elements in and out of the
-//  collection.)
+//  This header introduces collections at the templated level. So here we know the
+//  element type.
 //
 //  There are two derivatives of TCollectionBase, which represent the two main types
 //  of by value collections, element based and map based. Element based collections
@@ -35,13 +24,15 @@
 //  whether the key is conceptually part of the element or a separate thing. Either
 //  way, they require another instantiation parameter, that of the key field. Hash
 //  key based ones have self contained elements, but must provide a key extractor
-//  so that the key can be known to the collection.
+//  so that the key can be known to the collection. Hash based ones just use the element
+//  themselves as the key.
 //
 //  TRefCollection is the derivative of TCollectionBase that serves as the base for
 //  all 'by reference' collections. The main difference is that the by value
 //  derivatives use an objAdd(const TElem&)) method and the by ref one use an
 //  Add(TElem* const) method, representing the two ways that they accept their elements.
-//  The former of course copies the added element.
+//  The former of course copies the added element (it also supports moving in, and
+//  constructing in place.)
 //
 //  And finally we introduce two commonly used node classes, which are based on the
 //  fundamental doubly linked list node. Many collections are based on this doubly
@@ -54,104 +45,12 @@
 //  templatized stuff in order to make the generated code smaller, mostly error
 //  checking/throwing stuff.
 //
-//  Publish/Subscribe
 //
-//  Collections can support the publish/subscribe frameweork, so that client code
-//  can subscribe to changes. That makes it much easier to track changes in the
-//  collection than trying to insure that they put checks at every point in their
-//  own code where the collection might be changed.
+//  At this level we do nothing for move, copy, assign, though we delete the move
+//  ctor and only support assign (allowing it to just default to a call to the
+//  base class.)
 //
-//  So the base collection classes have a pointer to a published topic object, which
-//  they will create if asked to by the derived class. We don't directly expose that
-//  setup method since not all collections support pub/sub yet.
-//
-//  So the derived class calls EnablePublish() to enable it. It's assumed that, if pub/sub
-//  is enabled that someone is listening, so posting events isn't a waste of time, so
-//  no need to bother constantly checking if there are any subscribers. DisablePubSub()
-//  can be called to close the topic.
-//
-//  We can only support one topic. So EnablePublish takes a desired topic path, but if
-//  publishing is already enabled it returns the already set up path, so the caller can
-//  use that instead. If it wasn't already set up, you get back the path you passed in.
-//  If you care, you can compare them to see if your path was used. We have another
-//  version that just takes the path to use and throws if it is already enabled under
-//  another path. If it's already enabled under the same path it just returns since
-//  you can just use your desired path already.
-//
-//  We provide a small set of PublishXXX() variations that the derived class should
-//  call to report changes. There are only so many scenarios and we want to keep them
-//  small. Most just take an event type plus an index or key. Others take a little more
-//  info. We generate the correct topic object and publish it.
-//
-//  There is also a public PublishElemChange() method that we call if we can know that
-//  an element was changed. Often we cannot know (because it was directly modified) so
-//  this one is public, allowing the code that changed it to report the change.
-//
-//  * When we remove an element, we publish FIRST, then remove. This way, sync subscribers
-//    get a chance to get info about the element before we kill it. This can be very
-//    convenient, though they have to be careful to understand that is what is happening.
-//
-//  Bulk load with Pub/Sub
-//
-//  There is a HUGE gotcha here. Each item added generates a msg. If you spit out
-//  100K items into a collection at once, that will cause 100K msgs, which isn't
-//  practical (and will throw since the subcriber's queue isn't nearly that big.) Same
-//  with a big remove of elements. There is no clean way to automagically deal with this,
-//  because we cannot get back msgs already published and we don't know it's a bulk
-//  load/remove starting if they are done one at a time, or when it ended. The client
-//  code MUST cooperate or it's going to get full subscription queue errors.
-//
-//  So they have to call our BlockModeStart() method, do the load, then call our
-//  BlockModeEnd() method with the start/count values of what it loaded/removed. Or, if
-//  they are not contiguous they must pass c4MaxCard for the start value, which just
-//  sends a Reordered event (effectively, hey, reload from this collection.)
-//
-//  There's just no way around it. We use a flag that is set while doing this.
-//  Obviously they have to worry about exceptions that would leave the flag set, so
-//  we provide a janitor. It will set the flag and remember the start index. It can
-//  be ticked each time one is added/removed to bump a counter. When it dtors, it will
-//  call BlockModeEnd.
-//
-//  If a copy/assign is done with the block mode flag set, it is just cleared. A
-//  full report will be issued anyway with the new content.
-//
-//  Synchronization
-//
-//  Collections can be created thread safe. If so, a mutex is created. The derived
-//  classes can lock on that as required, and we do the same at our level.
-//
-//  You would have to explicitly change those things.
-//
-//  Move/Assign
-//
-//  You have to be very careful with move/assign. This ONLY deals with element
-//  content, it doesn't change thread safety, adoption status for by ref vectors,
-//  publish topic, etc... We only provide a move assignment operator. We want derived
-//  classes, in their move ctors, to do minimal setup, then do a move assign, which
-//  allows for locking on the source.
-//
-//  It does change anything required to represent the elements in the same order
-//  (they should be considered equal by the criteria below.) So, for instance, a
-//  hash collection would adopt the source hash modulus so that it will have the
-//  same element ordering after the operation.
-//
-//  The serial number of both source and target are bumped an move op, and the src's
-//  for a move ctor.
-//
-//  As with all changes, the derived class has to deal with pub/sub if enabled.
-//  For assign, remove current elements, post a clear. Take on the new elements,
-//  and post a block mode add.
-//
-//  Equality
-//
-//  Equality for collections means that they have the same number of elements
-//  and that those elements, in iteration order, are equal. This is only meaningful
-//  for by value collections. Anything beyond that client code has to check themselves
-//  because things mentioned above in the Move/Assign section that are not affected
-//  by these operations are considered internal details.
-//
-//  So there is a global equality operator below that works generically for all
-//  non-fundamental collections.
+//  For by ref collections we disable copy/assign and only support move assign.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -169,615 +68,17 @@ class TColBlockModeJan;
 
 
 // ---------------------------------------------------------------------------
-//   CLASS: TColPubSubInfo
-//  PREFIX: colpsi
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TColPubSubInfo : public TObject
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public types
-        //
-        //  These events use these members, else they don't use any:
-        //
-        //      BlockAdded
-        //          Index1  - Index of first item added
-        //          Index2  - Count of items added after that
-        //
-        //      BlockChanged
-        //          Index1  - Index of first item changed
-        //          Index2  - Count of items changed after that
-        //
-        //      BlockRemoved
-        //          Index1  - Index of first item removed
-        //          Index2  - Count of items removed after that
-        //
-        //      ElemAdded
-        //          Index1  - Index where it was added
-        //
-        //      ElemChanged
-        //          Index1 - Index of element changed
-        //
-        //      ElemMoved
-        //          Index1  - Where it was originally
-        //          Index2  - Where it ended up
-        //
-        //      ElemChanged
-        //      ElemRemoved
-        //          Index1  - Index of element modified or removed
-        //
-        //      Loaded
-        //          The previous contents has been replaced with new contents
-        //          Index1 - The count of elements newly added
-        //
-        //      Reordered
-        //          The elements are the same but the order has been affected
-        //
-        //      Swapped
-        //          Index1  - Index of element moved to index 2
-        //          Index2  - Index of element moved to index 1
-        // -------------------------------------------------------------------
-        enum class EEvents
-        {
-            BlockAdded
-            , BlockChanged
-            , BlockRemoved
-            , Cleared
-            , ElemAdded
-            , ElemChanged
-            , ElemMoved
-            , ElemRemoved
-            , Reordered
-            , Swapped
-
-            , Count
-        };
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and destructor
-        // -------------------------------------------------------------------
-        TColPubSubInfo();
-
-        TColPubSubInfo
-        (
-            const   EEvents                 eEvent
-            , const tCIDLib::TCard4         c4Index = 0
-        );
-
-        TColPubSubInfo
-        (
-            const   EEvents                 eEvent
-            , const TString&                stRKey
-        );
-
-        TColPubSubInfo
-        (
-            const   EEvents                 eEvent
-            , const tCIDLib::TCard4         c4Index1
-            , const tCIDLib::TCard4         c4Index2
-        );
-
-        TColPubSubInfo(const TColPubSubInfo&) = delete;
-
-        ~TColPubSubInfo();
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TColPubSubInfo& operator=
-        (
-            const   TColPubSubInfo&         colpsiSrc
-        );
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4Index1() const
-        {
-            return m_c4Index1;
-        }
-
-        tCIDLib::TCard4 c4Index2() const
-        {
-            return m_c4Index2;
-        }
-
-        EEvents eEvent() const
-        {
-            return m_eEvent;
-        }
-
-        const TString& strKey() const
-        {
-            return m_strKey;
-        }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_c4Index1
-        //  m_c4Index2
-        //      Some indices that mean different things based on the event. See the
-        //      class comments above.
-        //
-        //  m_eEvent
-        //      The event being reported
-        //
-        //  m_strKey
-        //      Used for add/remove in key based collections.
-        // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4Index1;
-        tCIDLib::TCard4 m_c4Index2;
-        EEvents         m_eEvent;
-        TString         m_strKey;
-
-
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TColPubSubInfo,TObject)
-};
-
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TCollectionBase
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TCollectionBase : public TObject
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bWaitForData
-        (
-                    TMtxLocker&             lockQueue
-            , const TCollectionBase&        colSrc
-            , const tCIDLib::TCard4         c4WaitMSs
-            ,       TThreadWaitList&        twlWaitList
-            , const tCIDLib::TBoolean       bThrowIfNot
-        );
-
-        static tCIDLib::TVoid BadStoredCount
-        (
-            const   TClass&                 clsCol
-        );
-
-
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        ~TCollectionBase();
-
-
-        // -------------------------------------------------------------------
-        //  Public, pure virtual methods
-        // -------------------------------------------------------------------
-        virtual tCIDLib::TBoolean bIsEmpty() const = 0;
-
-        virtual tCIDLib::TCard4 c4ElemCount() const = 0;
-
-        virtual tCIDLib::TVoid RemoveAll() = 0;
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsFull(const tCIDLib::TCard4 c4Limit) const
-        {
-            return (c4ElemCount() >= c4Limit);
-        }
-
-        tCIDLib::TBoolean bIsMTSafe() const;
-
-        tCIDLib::TBoolean bPublishEnabled() const
-        {
-            return (m_ppstopReport != nullptr);
-        }
-
-        tCIDLib::TCard4 c4SerialNum() const;
-
-        tCIDLib::TVoid CheckIsFull
-        (
-            const   tCIDLib::TCard4         c4Limit
-            , const tCIDLib::TCh* const     pszDescr
-        );
-
-        tCIDLib::EMTStates eMTState() const;
-
-        TMutex* pmtxLock() const
-        {
-            return m_pmtxLock;
-        }
-
-        tCIDLib::TVoid Lock(const tCIDLib::TCard4 c4Timeout = kCIDLib::c4MaxWait) const
-        {
-            // If this one is lockable, then do the lock
-            if (m_pmtxLock)
-                m_pmtxLock->Lock(c4Timeout);
-        }
-
-        tCIDLib::TVoid PublishBlockChanged
-        (
-            const   tCIDLib::TCard4         c4At
-            , const tCIDLib::TCard4         c4Count
-        );
-
-        tCIDLib::TVoid PublishElemChanged
-        (
-            const   tCIDLib::TCard4         c4At
-        );
-
-        tCIDLib::TVoid PublishReload();
-
-        const TString& strTopicPath() const
-        {
-            if (!m_ppstopReport)
-                return TString::strEmpty();
-            return m_ppstopReport->strPath();
-        }
-
-        tCIDLib::TVoid Unlock() const
-        {
-            // If this one is lockable, then do the unlock
-            if (m_pmtxLock)
-                m_pmtxLock->Unlock();
-        }
-
-
-    protected   :
-        // -------------------------------------------------------------------
-        //  Declare our friends
-        // -------------------------------------------------------------------
-        friend class TColBlockModeJan;
-
-
-        // -------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // -------------------------------------------------------------------
-        TCollectionBase
-        (
-            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
-        );
-
-        TCollectionBase
-        (
-            const   TCollectionBase&        colSrc
-        );
-
-        TCollectionBase& operator=
-        (
-            const   TCollectionBase&        colSrc
-        );
-
-        TCollectionBase(TCollectionBase&&) = delete;
-
-        TCollectionBase& operator=
-        (
-                    TCollectionBase&&       colSrc
-        );
-
-
-        // -------------------------------------------------------------------
-        //  Protected, non-virtual methods
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCheckNewSize
-        (
-            const   tCIDLib::TCard4         c4New
-            , const tCIDLib::TCard4         c4Current
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid BlockModeEnd
-        (
-            const   tCIDLib::TBoolean       bAddMode
-            , const tCIDLib::TCard4         c4Index
-            , const tCIDLib::TCard4         c4Count
-        );
-
-        tCIDLib::TVoid BlockModeStart();
-
-        tCIDLib::TCard4 c4IncSerialNum();
-
-        tCIDLib::TVoid CheckAllocAndCount
-        (
-            const   tCIDLib::TCard4         c4Count
-            , const tCIDLib::TCard4         c4Alloc
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        );
-
-        tCIDLib::TVoid CheckCursorValid
-        (
-            const   TCursorBase&            cursToCheck
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid CheckIndex
-        (
-            const   tCIDLib::TCard4         c4ToCheck
-            , const tCIDLib::TCard4         c4CurCount
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid CheckOneNonAdopting
-        (
-            const   tCIDLib::EAdoptOpts     eAdoptSrc
-            , const tCIDLib::EAdoptOpts     eAdoptTar
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid CheckReallocParms
-        (
-            const   tCIDLib::TCard4         c4NewSize
-            , const tCIDLib::TCard4         c4CurCount
-            , const tCIDLib::TBoolean       bKeepOld
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid ColIsEmpty
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid ColIsFull
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-            , const tCIDLib::TCard4         c4Max
-        )   const;
-
-        tCIDLib::TVoid DuplicateElem
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid DuplicateKey
-        (
-            const   TObject&                objKey
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::EMTStates eMTState
-        (
-            const   tCIDLib::EMTStates      eState
-        );
-
-        tCIDLib::TVoid EnablePublish
-        (
-            const   TString&                strDesiredPath
-            ,       TString&                strActualPath
-        );
-
-        tCIDLib::TVoid EnablePublish
-        (
-            const   TString&                strTopicPath
-        );
-
-        tCIDLib::TVoid HashChanged
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid KeyNotFound
-        (
-             const  tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid MustClearFirst
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid NodeNotFound
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid NotMemberNode
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        ) const;
-
-        tCIDLib::TVoid NotMyCursor
-        (
-            const   TClass&                 clsCursor
-            , const TClass&                 clsCol
-            , const tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid NullNodeAdded
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-        tCIDLib::TVoid PublishAdd
-        (
-            const   tCIDLib::TCard4         c4At
-        );
-
-        tCIDLib::TVoid PublishAdd
-        (
-            const   TString&                strKey
-        );
-
-        tCIDLib::TVoid PublishBlockAdded
-        (
-            const   tCIDLib::TCard4         c4At
-            , const tCIDLib::TCard4         c4Count
-        );
-
-        tCIDLib::TVoid PublishBlockRemoved
-        (
-            const   tCIDLib::TCard4         c4At
-            , const tCIDLib::TCard4         c4Count
-        );
-
-        tCIDLib::TVoid PublishClear();
-
-        tCIDLib::TVoid PublishMoved
-        (
-            const   tCIDLib::TCard4         c4From
-            , const tCIDLib::TCard4         c4To
-        );
-
-        tCIDLib::TVoid PublishRemove
-        (
-            const   tCIDLib::TCard4         c4At
-        );
-
-        tCIDLib::TVoid PublishRemove
-        (
-            const   TString&                strRemove
-        );
-
-        tCIDLib::TVoid PublishReorder();
-
-        tCIDLib::TVoid PublishSwap
-        (
-            const   tCIDLib::TCard4         c4At1
-            , const tCIDLib::TCard4         c4At2
-        );
-
-        tCIDLib::TVoid SrcTooBig
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-            , const tCIDLib::TCard4         c4SrcElems
-            , const tCIDLib::TCard4         c4TarMax
-        )   const;
-
-        tCIDLib::TVoid Unsupported
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-            , const tCIDLib::TCh* const     pszOpName
-        )   const;
-
-        tCIDLib::TVoid ZeroSize
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        )   const;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        //  m_bInBlockMode
-        //      This indicates we are in a block mode and we will not send individual
-        //      add/remove reports if pub/sub is enabled.
-        //
-        //  m_c4SerialNum
-        //      This is a serial number from the collection. It is bumped up every time
-        //      changes are made to the element content. Cursors watch it to know if they
-        //      are out of date.
-        //
-        //      We start the serial number at 1! This makes it easier for code that
-        //      needs to watch for changes. They can set their last serial number to
-        //      zero, and it will always trigger an initial inequality.
-        //
-        //  m_pmtxLock
-        //      This is the optional mutex that allows this collection to be lockable.
-        //      The derived class indicates to our constructor whether this collection
-        //      should be mutlti-thread safe.
-        //
-        //  m_ppstopReport
-        //      A topic to report changes to subscribers. See the header comments above
-        //      for details. Only created if the derived class sets it up.
-        // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bInBlockMode;
-        tCIDLib::TCard4     m_c4SerialNum;
-        TMutex*             m_pmtxLock;
-        TPubSubTopic*       m_ppstopReport;
-
-
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TCollectionBase,TObject)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//   CLASS: TFundColBase
-//  PREFIX: col
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TFundColBase : public TCollectionBase
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor
-        // -------------------------------------------------------------------
-        ~TFundColBase();
-
-
-    protected   :
-        // -------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // -------------------------------------------------------------------
-        TFundColBase
-        (
-            const   tCIDLib::EMTStates      eMTSafe = tCIDLib::EMTStates::Unsafe
-        );
-
-        TFundColBase(const TFundColBase& colSrc) :
-
-            TCollectionBase(colSrc)
-        {
-        }
-
-        tCIDLib::TVoid operator=(const TFundColBase&) = delete;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TFundColBase, TCollectionBase)
-};
-
-
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TCollection
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem>
+template <typename TElem>
 class TCollection : public TCollectionBase, public MDuplicable
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TCollection()
-        {
-        }
+        ~TCollection() = default;
 
 
         // -------------------------------------------------------------------
@@ -805,11 +106,13 @@ class TCollection : public TCollectionBase, public MDuplicable
         //
         //  Call back each element, breaking out on false return. Can be a function
         //  pointer or lambda. We use a cursor so it will work for any of our
-        //  collection derivatives.
+        //  collection derivatives. We can only provide the const version here
+        //  since we don't understand the derived class' non-const cursors, and
+        //  it may not even provide one. It has to implement the non-const version.
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TColCursor<TElem>* pcursEach = pcursNew();
             TJanitor<TColCursor<TElem>> janCursor(pcursEach);
             while (pcursEach->bIsValid())
@@ -832,25 +135,11 @@ class TCollection : public TCollectionBase, public MDuplicable
         {
         }
 
-        TCollection(const TCollection<TElem>& colSrc) :
-
-            TCollectionBase(colSrc)
-        {
-        }
+        TCollection(const TCollection<TElem>&) = default;
+        TCollection<TElem>& operator=(const TCollection<TElem>&) = default;
 
         TCollection(TCollection<TElem>&&) = delete;
-
-        TCollection<TElem>& operator=(const TCollection<TElem>& colSrc)
-        {
-            TCollectionBase::operator=(colSrc);
-            return *this;
-        }
-
-        TCollection<TElem>& operator=(TCollection<TElem>&&  colSrc)
-        {
-            TCollectionBase::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TCollection<TElem>& operator=(TCollection<TElem>&&) = default;
 
 
     private :
@@ -866,7 +155,7 @@ class TCollection : public TCollectionBase, public MDuplicable
 //   CLASS: TMapCollection
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem, class TKey> class TMapCollection
+template <typename TElem, class TKey> class TMapCollection
 
     : public TCollection<TKeyObjPair<TKey, TElem>>
 {
@@ -912,30 +201,11 @@ template <class TElem, class TKey> class TMapCollection
         {
         }
 
-        TMapCollection(const TMyType& colSrc) :
+        TMapCollection(const TMyType&) = default;
+        TMapCollection& operator=(const TMyType&) = default;
 
-            TParent(colSrc)
-        {
-        }
-
-        TMapCollection& operator=(const TMyType& colSrc)
-        {
-            if (&colSrc != this)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TMapCollection(TMyType&& colSrc) :
-
-            TParent(tCIDLib::ForceMove(colSrc))
-        {
-        }
-
-        TMapCollection& operator=(TMyType&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TMapCollection(TMyType&&) = delete;
+        TMapCollection& operator=(TMyType&&) = default;
 };
 
 
@@ -944,7 +214,7 @@ template <class TElem, class TKey> class TMapCollection
 //   CLASS: TBasicColNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicColNode : public TDLstNode
+template <typename TElem> class TBasicColNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -958,7 +228,21 @@ template <class TElem> class TBasicColNode : public TDLstNode
         {
         }
 
+        TBasicColNode(TElem&& objData) :
+
+            m_objData(tCIDLib::ForceMove(objData))
+        {
+        }
+
+        // A special one for in place elements.
+        template <typename... TArgs> TBasicColNode(TArgs&&... Args) :
+
+            m_objData(tCIDLib::Forward<TArgs>(Args)...)
+        {
+        }
+
         TBasicColNode(const TBasicColNode<TElem>&) = delete;
+        TBasicColNode(TBasicColNode<TElem>&&) = delete;
 
         ~TBasicColNode() {}
 
@@ -967,6 +251,7 @@ template <class TElem> class TBasicColNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TBasicColNode<TElem>& operator=(const TBasicColNode<TElem>&) = delete;
+        TBasicColNode<TElem>& operator=(TBasicColNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1005,7 +290,7 @@ template <class TElem> class TBasicColNode : public TDLstNode
 //   CLASS: TRefCollection
 //  PREFIX: curs
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefCollection : public TCollectionBase
+template <typename TElem> class TRefCollection : public TCollectionBase
 {
     public  :
         // -------------------------------------------------------------------
@@ -1023,13 +308,6 @@ template <class TElem> class TRefCollection : public TCollectionBase
                     TElem* const            pobjToAdd
         ) = 0;
 
-        virtual tCIDLib::EAdoptOpts eAdopt() const = 0;
-
-        virtual tCIDLib::TVoid GiveAllTo
-        (
-                    TRefCollection<TElem>&  colTarget
-        ) = 0;
-
         virtual tCIDLib::TVoid OrphanElem
         (
                     TElem* const            pobjToRemove
@@ -1043,14 +321,25 @@ template <class TElem> class TRefCollection : public TCollectionBase
         ) = 0;
 
 
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EAdoptOpts eAdopt() const
+        {
+            return m_eAdopt;
+        }
+
+
         //
         //  Call back each element, breaking out on false return. Can be a function
         //  pointer or lambda. We use a cursor so it will work for any of our
-        //  collection derivatives.
+        //  collection derivatives. We can only provide a constant version. We don't
+        //  understand constant cursors here, and the derived class may not even
+        //  provide one. They have to provide any non-const version of this.
         //
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
-            TMtxLocker lockThis(this->pmtxLock());
+            TLocker lockrThis(this);
             TColCursor<TElem>* pcursEach = pcursNew();
             TJanitor<TColCursor<TElem>> janCursor(pcursEach);
             while (pcursEach->bIsValid())
@@ -1067,25 +356,43 @@ template <class TElem> class TRefCollection : public TCollectionBase
         // -------------------------------------------------------------------
         //  Hidden constructors and operators
         // -------------------------------------------------------------------
-        TRefCollection(const tCIDLib::EMTStates eMTSafe = tCIDLib::EMTStates::Unsafe) :
+        TRefCollection( const   tCIDLib::EAdoptOpts eAdopt
+                        , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
             TCollectionBase(eMTSafe)
+            , m_eAdopt(eAdopt)
         {
         }
+
 
         TRefCollection(TRefCollection&&) = delete;
-
+        TRefCollection(const TRefCollection&) = delete;
         TRefCollection<TElem>& operator=(TRefCollection&& colSrc)
         {
-             TCollectionBase::operator=(tCIDLib::ForceMove(colSrc));
-             return *this;
+            if ((colSrc.m_eAdopt == tCIDLib::EAdoptOpts::Adopt)
+            &&  (m_eAdopt == tCIDLib::EAdoptOpts::NoAdopt))
+            {
+                // We consider this an error. They have to use GiveElements()
+                MovedAdopted(CID_FILE, CID_LINE);
+            }
+
+            TParent::operator=(colSrc);
+            return *this;
         }
 
-        TRefCollection(const TRefCollection&) = delete;
         TRefCollection<TElem>& operator=(const TRefCollection&) = delete;
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_eAdopt
+        //      The derived class tells us if we are adopting or not, usually they
+        //      are just passing it on.
+        // -------------------------------------------------------------------
+        tCIDLib::EAdoptOpts     m_eAdopt;
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
@@ -1098,7 +405,7 @@ template <class TElem> class TRefCollection : public TCollectionBase
 //   CLASS: TBasicRefColNode
 //  PREFIX: node
 // ---------------------------------------------------------------------------
-template <class TElem> class TBasicColRefNode : public TDLstNode
+template <typename TElem> class TBasicColRefNode : public TDLstNode
 {
     public  :
         // -------------------------------------------------------------------
@@ -1114,6 +421,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
         }
 
         TBasicColRefNode(const TBasicColRefNode<TElem>&) = delete;
+        TBasicColRefNode( TBasicColRefNode<TElem>&&) = delete;
 
         ~TBasicColRefNode()
         {
@@ -1127,6 +435,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
         //  Public operators
         // -------------------------------------------------------------------
         TBasicColRefNode<TElem>& operator=(const TBasicColRefNode<TElem>&) = delete;
+        TBasicColRefNode<TElem>& operator=(TBasicColRefNode<TElem>&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1137,7 +446,7 @@ template <class TElem> class TBasicColRefNode : public TDLstNode
             m_pobjData = nullptr;
         }
 
-        TElem* pobjOrphanData()
+        [[nodiscard]] TElem* pobjOrphanData()
         {
             TElem* pobjRet = m_pobjData;
             m_pobjData = nullptr;
@@ -1199,6 +508,7 @@ class CIDLIBEXP TColBlockModeJan
         );
 
         TColBlockModeJan(const TColBlockModeJan&) = delete;
+        TColBlockModeJan(TColBlockModeJan&&) = delete;
 
         ~TColBlockModeJan();
 
@@ -1207,6 +517,7 @@ class CIDLIBEXP TColBlockModeJan
         //  Public operators
         // -------------------------------------------------------------------
         TColBlockModeJan& operator=(const TColBlockModeJan&) = delete;
+        TColBlockModeJan& operator=(TColBlockModeJan&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1251,8 +562,8 @@ tCIDLib::TBoolean operator==(const TCollection<TElem>& col1, const TCollection<T
         return kCIDLib::True;
 
     // Lock both of the collections while we do this
-    TMtxLocker lockThis(col1.pmtxLock());
-    TMtxLocker lockSrc(col2.pmtxLock());
+    TLocker lockrThis(&col1);
+    TLocker lockrSrc(&col2);
 
     if (col1.c4ElemCount() != col2.c4ElemCount())
         return kCIDLib::False;
@@ -1286,8 +597,8 @@ operator==(const TRefCollection<TElem>& col1, const TRefCollection<TElem>& col2)
         return kCIDLib::True;
 
     // Lock both of the collections while we do this
-    TMtxLocker lockThis(col1.pmtxLock());
-    TMtxLocker lockSrc(col2.pmtxLock());
+    TLocker lockrThis(&col1);
+    TLocker lockrSrc(&col2);
 
     if (col1.c4ElemCount() != col2.c4ElemCount())
         return kCIDLib::False;
@@ -1330,8 +641,8 @@ namespace tCIDLib
             return kCIDLib::True;
 
         // Lock both of the collections while we do this
-        TMtxLocker lockThis(col1.pmtxLock());
-        TMtxLocker lockSrc(col2.pmtxLock());
+        TLocker lockrThis(&col1);
+        TLocker lockrSrc(&col2);
 
         if (col1.c4ElemCount() != col2.c4ElemCount())
             return kCIDLib::False;
@@ -1363,8 +674,8 @@ namespace tCIDLib
             return kCIDLib::True;
 
         // Lock both of the collections while we do this
-        TMtxLocker lockThis(col1.pmtxLock());
-        TMtxLocker lockSrc(col2.pmtxLock());
+        TLocker lockrThis(&col1);
+        TLocker lockrSrc(&col2);
 
         if (col1.c4ElemCount() != col2.c4ElemCount())
             return kCIDLib::False;
@@ -1387,4 +698,3 @@ namespace tCIDLib
 }
 
 #pragma CIDLIB_POPPACK
-

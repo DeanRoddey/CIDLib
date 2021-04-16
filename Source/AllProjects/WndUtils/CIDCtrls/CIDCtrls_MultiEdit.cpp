@@ -329,14 +329,14 @@ TMultiEdit::Create( const   TWindow&                wndParent
                     , const tCIDCtrls::EExWndStyles eExStyles)
 {
     // Load the containing DLL if not already done
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
-    if (!bLoaded)
+    static TAtomicFlag atomLoaded;
+    if (!atomLoaded)
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!atomLoaded)
         {
             ::LoadLibrary(L"Msftedit.dll");
-            bLoaded = kCIDLib::True;
+            atomLoaded.Set();
         }
     }
 
@@ -461,7 +461,7 @@ tCIDLib::TVoid TMultiEdit::SetNewFont(const TFontSelAttrs& fselNew)
     TGraphWndDev gdevTmp(*this);
 
     CHARFORMAT2 Fmt;
-    TRawMem::SetMemBuf(&Fmt, tCIDLib::TCard1(0), sizeof(Fmt));
+    TRawMem::SetMemBuf(&Fmt, kCIDLib::c1MinCard, sizeof(Fmt));
     Fmt.cbSize = sizeof(Fmt);
 
     Fmt.dwMask = CFM_SIZE | CFM_WEIGHT | CFM_CHARSET;

@@ -43,29 +43,23 @@ class CIDENCODEEXP TLatin1Converter : public TTextConverter
         // -------------------------------------------------------------------
         TLatin1Converter();
 
-        TLatin1Converter
-        (
-            const   TLatin1Converter&       tcvtToCopy
-        );
+        TLatin1Converter(const TLatin1Converter&) = default;
+        TLatin1Converter(TLatin1Converter&&) = default;
 
-        ~TLatin1Converter();
+        ~TLatin1Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLatin1Converter& operator=
-        (
-            const   TLatin1Converter&       tcvtToAssign
-        );
+        TLatin1Converter& operator=(const TLatin1Converter&) = default;
+        TLatin1Converter& operator=(TLatin1Converter&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EBaseTextFmts eBaseFmt() const;
-
-        tCIDLib::TVoid Reset();
+        tCIDLib::EBaseTextFmts eBaseFmt() const override;
 
 
     protected :
@@ -80,7 +74,7 @@ class CIDENCODEEXP TLatin1Converter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -90,7 +84,7 @@ class CIDENCODEEXP TLatin1Converter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
 
     private :

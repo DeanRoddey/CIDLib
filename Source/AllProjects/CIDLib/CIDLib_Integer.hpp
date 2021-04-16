@@ -80,6 +80,7 @@ class CIDLIBEXP TInteger :
         );
 
         TInteger(const TInteger&) = default;
+        TInteger(TInteger&&) = default;
 
         ~TInteger() = default;
 
@@ -88,6 +89,7 @@ class CIDLIBEXP TInteger :
         //  Public operators
         // -------------------------------------------------------------------
         TInteger& operator=(const TInteger&) = default;
+        TInteger& operator=(TInteger&&) = default;
 
         constexpr operator tCIDLib::TInt4() const
         {
@@ -179,6 +181,18 @@ class CIDLIBEXP TInteger :
             const   tCIDLib::TInt4         i4Src
         );
 
+        TInteger& operator--(int)
+        {
+            m_i4Val--;
+            return *this;
+        }
+
+        TInteger& operator++(int)
+        {
+            m_i4Val++;
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -265,6 +279,7 @@ class CIDLIBEXP TInteger64 :
         );
 
         TInteger64(const TInteger64&) = default;
+        TInteger64(TInteger64&&) = default;
 
         ~TInteger64() = default;
 
@@ -273,6 +288,7 @@ class CIDLIBEXP TInteger64 :
         //  Public operators
         // -------------------------------------------------------------------
         TInteger64& operator=(const TInteger64&) = default;
+        TInteger64& operator=(TInteger64&&) = default;
 
         TInteger64& operator=
         (
@@ -359,6 +375,18 @@ class CIDLIBEXP TInteger64 :
             const   tCIDLib::TInt8          i8Src
         );
 
+        TInteger64& operator--(int)
+        {
+            m_i8Val--;
+            return *this;
+        }
+
+        TInteger64& operator++(int)
+        {
+            m_i8Val++;
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -442,6 +470,7 @@ class CIDLIBEXP TLocInteger : public TInteger
         );
 
         TLocInteger(const TLocInteger&) = default;
+        TLocInteger(TLocInteger&&) = default;
 
         ~TLocInteger();
 
@@ -450,6 +479,7 @@ class CIDLIBEXP TLocInteger : public TInteger
         //  Public operators
         // -------------------------------------------------------------------
         TLocInteger& operator=(const TLocInteger&) = default;
+        TLocInteger& operator=(TLocInteger&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -489,7 +519,7 @@ class CIDLIBEXP TLocInteger : public TInteger
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
     private :
@@ -519,6 +549,7 @@ class CIDLIBEXP TLocInteger64 : public TInteger64
         );
 
         TLocInteger64(const TLocInteger64&) = default;
+        TLocInteger64(TLocInteger64&&) = default;
 
         ~TLocInteger64();
 
@@ -527,6 +558,7 @@ class CIDLIBEXP TLocInteger64 : public TInteger64
         //  Public operators
         // -------------------------------------------------------------------
         TLocInteger64& operator=(const TLocInteger64&) = default;
+        TLocInteger64& operator=(TLocInteger64&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -566,7 +598,7 @@ class CIDLIBEXP TLocInteger64 : public TInteger64
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
     private :
         // -------------------------------------------------------------------

@@ -155,6 +155,8 @@ class CIDCTRLSEXP TMCLBColDef
             const   TMCLBColDef&            mclbcdSrc
         );
 
+        TMCLBColDef(TMCLBColDef&&) = delete;
+
         ~TMCLBColDef();
 
 
@@ -165,6 +167,8 @@ class CIDCTRLSEXP TMCLBColDef
         (
             const   TMCLBColDef&            mclbcdSrc
         );
+
+        TMCLBColDef& operator=(TMCLBColDef&&) = default;
 
 
     protected :
@@ -208,6 +212,7 @@ class CIDCTRLSEXP TMColListBox : public TCtrlWnd
         TMColListBox();
 
         TMColListBox(const TMColListBox&) = delete;
+        TMColListBox(TMColListBox&&) = delete;
 
         ~TMColListBox();
 
@@ -216,6 +221,7 @@ class CIDCTRLSEXP TMColListBox : public TCtrlWnd
         //  Public oeprators
         // -------------------------------------------------------------------
         TMColListBox& operator=(const TMColListBox&) = delete;
+        TMColListBox& operator=(TMColListBox&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -289,10 +295,10 @@ class CIDCTRLSEXP TMColListBox : public TCtrlWnd
         // -------------------------------------------------------------------
         //  Private types and constants
         // -------------------------------------------------------------------
-        const tCIDCtrls::TWndId             kWndId_Hdr = kCIDCtrls::widFirstCtrl;
-        const tCIDCtrls::TWndId             kWndId_Display = kCIDCtrls::widFirstCtrl + 1;
-        const tCIDCtrls::TWndId             kWndId_HScroll = kCIDCtrls::widFirstCtrl + 2;
-        const tCIDCtrls::TWndId             kWndId_VScroll = kCIDCtrls::widFirstCtrl + 3;
+        static constexpr tCIDCtrls::TWndId  kWndId_Hdr = kCIDCtrls::widFirstCtrl;
+        static constexpr tCIDCtrls::TWndId  kWndId_Display = kCIDCtrls::widFirstCtrl + 1;
+        static constexpr tCIDCtrls::TWndId  kWndId_HScroll = kCIDCtrls::widFirstCtrl + 2;
+        static constexpr tCIDCtrls::TWndId  kWndId_VScroll = kCIDCtrls::widFirstCtrl + 3;
 
 
         // -------------------------------------------------------------------

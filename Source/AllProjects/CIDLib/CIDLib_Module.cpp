@@ -16,7 +16,7 @@
 // DESCRIPTION:
 //
 //  TModule is the basic public class that represents a loadable file,
-//  a DLL or Exe module.
+//  a library or executable module.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -40,63 +40,111 @@ RTTIDecls(TModule,TObject)
 
 namespace CIDLib_Module
 {
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  bInitLogger
-    //      Indicates that we've initialized the logger. We can't just use
-    //      the plgrCurrent pointer, since if there is no env or command
-    //      line info to set up a logger, we don't set up one, and we don't
-    //      want to continue to check over and over for that info.
-    //
-    //  bInitMsgs
-    //      A flag to control whether we've done local static initialization
-    //      yet.
-    //
-    //  c4EntryCount
-    //      A counter to watch for nested exceptions and bail out before a
-    //      stack overflow. Since we synchronize the work below, it basically
-    //      just works as a reentrancy counter on the logging current thread,
-    //      which is what we want.
-    //
-    //  plgrCurrent
-    //      This is the current logger that we send all errors and messages
-    //      logged through this process to. We don't own it.
-    //
-    //  pszTitle1
-    //  pszTitle2
-    //      The two title strings used in standard popups, support for which
-    //      is provided here. They are defaulted so something is there until
-    //      they get loaded from translatable text.
-    //
-    //  pszExceptDuringLog
-    //  pszRecursiveError
-    //  pszStrLoadFailure
-    //      Errors displayed when things go wrong during fundamental ops
-    //      provided here. They are defaulted so something is there until
-    //      they get loaded from translatable text.
-    // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitLogger = kCIDLib::False;
-    volatile tCIDLib::TBoolean  bInitMsgs = kCIDLib::False;
-    tCIDLib::TCard4             c4EntryCount = 0;
-    MLogger*                    plgrCurrent = 0;
-    const tCIDLib::TCh*         pszTitle1 = kCIDLib_::pszTitle1;
-    const tCIDLib::TCh*         pszTitle2 = kCIDLib_::pszTitle2;
-    const tCIDLib::TCh*         pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
-    const tCIDLib::TCh*         pszRecursiveError = kCIDLib_::pszRecursiveError;
-    const tCIDLib::TCh*         pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  atomInitMsgs
+        //      A flag to control whether we've done local static initialization
+        //      yet.
+        //
+        //  eAdoptLogger
+        //      Indicates whether we own the installed logger (if any) or not.
+        //
+        //  plgrCurrent
+        //      This is the current logger that we send all errors and messages
+        //      logged through this process to. We don't own it. We may own it or not
+        //      depending on the eAdoptLogger value.
+        //
+        //  pszTitle1
+        //  pszTitle2
+        //      The two title strings used in standard popups, support for which
+        //      is provided here. They are defaulted so something is there until
+        //      they get loaded from translatable text.
+        //
+        //  pszExceptDuringLog
+        //  pszRecursiveError
+        //  pszStrLoadFailure
+        //      Errors displayed when things go wrong during fundamental ops
+        //      provided here. They are defaulted so something is there until
+        //      they get loaded from translatable text.
+        // -----------------------------------------------------------------------
+        TAtomicFlag          atomInitMsgs;
+        const tCIDLib::TCh*  pszTitle1 = kCIDLib_::pszTitle1;
+        const tCIDLib::TCh*  pszTitle2 = kCIDLib_::pszTitle2;
+        const tCIDLib::TCh*  pszExceptDuringLog = kCIDLib_::pszExceptDuringLog;
+        const tCIDLib::TCh*  pszRecursiveError = kCIDLib_::pszRecursiveError;
+        const tCIDLib::TCh*  pszStrLoadFailure = kCIDLib_::pszStrLoadFailure;
 
 
-    // -----------------------------------------------------------------------
-    //  m_bInitStats
-    //  m_sciStartTime
-    //
-    //      We maintain some stats cache values. This is the storage for those
-    //      and a lazy init flag to fault them in.
-    // -----------------------------------------------------------------------
-    volatile tCIDLib::TBoolean  bInitStats = kCIDLib::False;
-    TStatsCacheItem             sciStartTime;
+        // -----------------------------------------------------------------------
+        //  m_bInitStats
+        //  m_sciStartTime
+        //  m_sciDroppedLogEvs
+        //  m_sciLogErrors
+        //      We maintain some stats cache values. This is the storage for those
+        //      and a lazy init flag to fault them in.
+        // -----------------------------------------------------------------------
+        TAtomicFlag      atomInitStats;
+        TStatsCacheItem  sciStartTime;
+        TStatsCacheItem  sciDroppedLogEvs;
+        TStatsCacheItem  sciLogErrors;
+
+        //
+        //  We need a little structure we use to maintain a list of log event objects
+        //  to be spooled out by our spooling thread. We don't want to use any
+        //  high level stuff since it may log messages and get us into a circular
+        //  freakout. So we just maintain a simple linked list, and all we ever do
+        //  with it is add at the start and remove at the end. The spooling thread
+        //  keeps a head and tail pointer (new ones are added at the head and removed
+        //  at from the tail by the thread.
+        //
+        //  If the events aren't time stamped and marked, we do that
+        //
+        struct TLogQEvent
+        {
+            TLogQEvent(const TLogEvent& logevSrc) :
+
+                logevData(logevSrc)
+            {
+                logevData.SetLogged();
+            }
+
+            TLogQEvent(TLogEvent&& logevSrc) :
+
+                logevData(tCIDLib::ForceMove(logevSrc))
+            {
+                logevData.SetLogged();
+            }
+
+            // For emplacement via the log msg variations
+            template <typename... TArgs> TLogQEvent(TArgs&&... Args) :
+
+                logevData(tCIDLib::Forward<TArgs>(Args)...)
+            {
+                logevData.SetLogged();
+            }
+
+            TLogQEvent*     plogqevPrev = nullptr;
+            TLogQEvent*     plogqevNext = nullptr;
+            TLogEvent       logevData;
+        };
+
+        //
+        //  We need a mutex for local sync. Because module stuff can be called
+        //  early in the process, we use a lazy faulting in scheme here, to be
+        //  sure it'll be available when needed.
+        //
+        TMutex* pmtxLogSync()
+        {
+            static TMutex mtxLogSync(tCIDLib::ELockStates::Unlocked);
+            return &mtxLogSync;
+        }
+    }
 }
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -104,10 +152,10 @@ namespace CIDLib_Module
 // ---------------------------------------------------------------------------
 static tCIDLib::TVoid InitMsgs(const TModule& modSrc)
 {
-    if (!CIDLib_Module::bInitMsgs)
+    if (!CIDLib_Module::atomInitMsgs)
     {
         TBaseLock lockInit;
-        if (!CIDLib_Module::bInitMsgs)
+        if (!CIDLib_Module::atomInitMsgs)
         {
             tCIDLib::TBoolean   bOk;
             const tCIDLib::TCh* pszTmp;
@@ -124,10 +172,551 @@ static tCIDLib::TVoid InitMsgs(const TModule& modSrc)
             if (bOk)
                 CIDLib_Module::pszStrLoadFailure = pszTmp;
 
-            CIDLib_Module::bInitMsgs = kCIDLib::True;
+            CIDLib_Module::atomInitMsgs.Set();
         }
     }
 }
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TLogSpoolThread
+//  PREFIX: thr
+//
+//  This is our internal log even spooler thread. It is spun up upon first need.
+// ---------------------------------------------------------------------------
+class TLogSpoolThread : public TThread
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TLogSpoolThread() :
+
+            TThread(L"CIDLibIntLogSpoolerThread")
+            , m_bTriedDefault(kCIDLib::False)
+            , m_c4QueueSize(0)
+            , m_eAdopt(tCIDLib::EAdoptOpts::NoAdopt)
+            , m_eAdoptNew(tCIDLib::EAdoptOpts::NoAdopt)
+            , m_plgrNew(nullptr)
+            , m_plgrTarget(nullptr)
+            , m_plogqevHead(nullptr)
+            , m_plogqevTail(nullptr)
+        {
+            //
+            //  Check for a default logger defined in the environment and store that
+            //  info if so. After this we won't have to keep checking.
+            //
+            if (TSysInfo::pszLogInfo())
+                m_kstrDefLoggerInfo = TSysInfo::pszLogInfo();
+            else
+                TKrnlEnvironment::bFind(kCIDLib_::pszLocalLog, m_kstrDefLoggerInfo);
+        }
+
+        ~TLogSpoolThread() {}
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+
+        //
+        //  This is just advisory for the code below to not bother creating an object
+        //  if there's no logger set. It might get created the next clock tick but
+        //  that's fine.
+        //
+        tCIDLib::TBoolean bHaveLogger()
+        {
+            //
+            //  If we don't have one, and there's default info available, and we've not
+            //  tried to create that guy already, then try to fault it in.
+            //
+            if (!m_plgrTarget && !m_bTriedDefault && !m_kstrDefLoggerInfo.bIsEmpty())
+                SetDefaultLogger();
+
+            return m_plgrTarget != nullptr;
+        }
+
+        tCIDLib::TVoid SetLogger(       MLogger* const          plgrNew
+                                , const tCIDLib::EAdoptOpts     eAdopt)
+        {
+            TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+
+            // If there is one that hasn't been gotten yet we have to deal with it
+            if (m_plgrNew && (m_eAdoptNew == tCIDLib::EAdoptOpts::Adopt))
+            {
+                try
+                {
+                    delete m_plgrNew;
+                }
+
+                catch(...)
+                {
+                    TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+                }
+            }
+
+            m_eAdoptNew = eAdopt;
+            m_plgrNew = plgrNew;
+        }
+
+        // We have to just copy it
+        tCIDLib::TVoid QueueEvent(const TLogEvent& logevSrc)
+        {
+            QueueEvent(new CIDLib_Module::TLogQEvent(logevSrc));
+        }
+
+        // We can move it
+        tCIDLib::TVoid QueueEvent(TLogEvent&& logevSrc)
+        {
+            QueueEvent(new CIDLib_Module::TLogQEvent(tCIDLib::ForceMove(logevSrc)));
+        }
+
+        // For TModule to create directly, mostl for emplacement scenarios
+        tCIDLib::TVoid QueueEvent(CIDLib_Module::TLogQEvent* const plogqevNew)
+        {
+            TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+
+            //
+            //  Make sure there is space available. If not, then we need to reject this
+            //  guy.
+            //
+            if (m_c4QueueSize >= c4MaxLogQSize)
+            {
+                try
+                {
+                    delete plogqevNew;
+                }
+
+                catch(...)
+                {
+                    TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+                }
+                TStatsCache::c8IncCounter(CIDLib_Module::sciDroppedLogEvs);
+                return;
+            }
+
+            if (!m_plogqevTail && !m_plogqevHead)
+            {
+                //
+                //  Special case #1 of an empty list, just point the head and tail at
+                //  this guy
+                //
+                m_plogqevHead = plogqevNew;
+                m_plogqevTail = plogqevNew;
+
+                // Make sure prev/next are both null
+                m_plogqevHead->plogqevPrev = nullptr;
+                m_plogqevHead->plogqevNext = nullptr;
+            }
+             else if (m_plogqevHead == m_plogqevTail)
+            {
+                //
+                //  Special case #2, we have a single node currently. So we just
+                //  set this guy as the head (the tail stays the same), and we
+                //  point them at each other.
+                //
+                m_plogqevHead = plogqevNew;
+                m_plogqevHead->plogqevPrev = nullptr;
+                m_plogqevHead->plogqevNext = m_plogqevTail;
+                m_plogqevTail->plogqevPrev = m_plogqevHead;
+            }
+             else
+            {
+                //
+                //  The standard case, we have to work the new one into the head of
+                //  the list. The tail is not directly used, though it could be the
+                //  Next node of the head if we only have two nodes.
+                //
+                CIDLib_Module::TLogQEvent* plogqevOldHead = m_plogqevHead;
+
+                // Make the new guy the head (with no previous)
+                m_plogqevHead = plogqevNew;
+                m_plogqevHead->plogqevPrev = nullptr;
+
+                // Make the old head his next and him the old guy's previous
+                m_plogqevHead->plogqevNext = plogqevOldHead;
+                plogqevOldHead->plogqevPrev = m_plogqevHead;
+            }
+        }
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eProcess() final;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private class constants
+        // -------------------------------------------------------------------
+        static const tCIDLib::TCard4 c4DefLogMaxChars   = 512;
+        static const tCIDLib::TCard4 c4MaxLogQSize      = 8192;
+
+
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid SetDefaultLogger();
+
+
+        // -------------------------------------------------------------------
+        //  Private members
+        //
+        //  This stuff is protected by the mutex that is faulted in in the local
+        //  namespace above.
+        //
+        //  m_bTriedDefault
+        //      WE can fault in a commandline/env driven logger, but it could be
+        //      bad info and we don't want to continously try to do that, so we
+        //      set this once we've go through that.
+        //
+        //  m_c4QueueSize
+        //      We can't let the queue run wild if the logger somehow starts really
+        //      getting slow to process events. So we keep up with the size and
+        //      will start rejecting once we hit c4MaxLogQSize.
+        //
+        //  m_eAdopt
+        //  m_eAdoptNew
+        //      We may or may not adopt the logger, depending on what the caller that
+        //      gave it to us says. We need one for the logger and the new logger.
+        //
+        //  m_plgrNew
+        //  m_plgrTarget
+        //      This is the target we send the messages to. We don't have to lock
+        //      across calls to this. If the outside world sets a new one, it will
+        //      be put into m_plgrNew while locked, and we'll locked and store that
+        //      new pointer. If they happened to do two before we store the first,
+        //      the first one would never get used.
+        //
+        //  m_plogqevHead
+        //  m_plogqevTail
+        //      These are our head and tail nodes. New ones are added at the head and
+        //      the spooling thread pulls old ones from the tail. If both are null
+        //      the list is empty. If both point to the same node, there's only one
+        //      node. Else, it's a standard doubly linked list scenario.
+        //
+        //  m_kstrDefLoggerInfo
+        //      In the ctor we see if a default logger is defined in the environment.
+        //      If so, we will try to fault one of those in if bHasLogger() is called
+        //      and we've not tried it already.
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean           m_bTriedDefault;
+        tCIDLib::TCard4             m_c4QueueSize;
+        tCIDLib::EAdoptOpts         m_eAdopt;
+        tCIDLib::EAdoptOpts         m_eAdoptNew;
+        TKrnlString                 m_kstrDefLoggerInfo;
+        MLogger*                    m_plgrNew;
+        MLogger*                    m_plgrTarget;
+        CIDLib_Module::TLogQEvent*  m_plogqevHead = nullptr;
+        CIDLib_Module::TLogQEvent*  m_plogqevTail = nullptr;
+};
+
+
+tCIDLib::EExitCodes TLogSpoolThread::eProcess()
+{
+    while (!bCheckShutdownRequest())
+    {
+        try
+        {
+            // If there's a new logger, let's get that
+            if (m_plgrNew)
+            {
+                TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+                if (m_plgrNew)
+                {
+                    // Clean up any current one if we adopted it
+                    if (m_plgrTarget && (m_eAdopt == tCIDLib::EAdoptOpts::Adopt))
+                    {
+                        try
+                        {
+                            delete m_plgrTarget;
+                        }
+
+                        catch(...)
+                        {
+                            TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+                        }
+                    }
+
+                    m_eAdopt = m_eAdoptNew;
+                    m_plgrTarget = m_plgrNew;
+
+                    m_eAdoptNew = tCIDLib::EAdoptOpts::NoAdopt;
+                    m_plgrNew = nullptr;
+                }
+            }
+
+            //
+            //  Do a quick check to see if the tail is non-null before we bother
+            //  locking. Once set only we can null it again, so this is safe to
+            //  do.
+            //
+            if (m_plogqevTail)
+            {
+                CIDLib_Module::TLogQEvent* plogqevCur = nullptr;
+                {
+                    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+
+                    // We have some special cases to deal with.
+                    if (m_plogqevHead == m_plogqevTail)
+                    {
+                        //
+                        //  If head and tail are the same, then we have one node, so
+                        //  we take it and set both to null since the list is empty
+                        //  now.
+                        //
+                        plogqevCur = m_plogqevTail;
+                        m_plogqevTail = nullptr;
+                        m_plogqevHead = nullptr;
+                    }
+                     else if (m_plogqevHead->plogqevNext == m_plogqevTail)
+                    {
+                        //
+                        //  We have two so they are pointing at each other. We take
+                        //  take the tail and store the current head in the tail
+                        //  pointer, so we are back to the single node. The head
+                        //  now has no next node.
+                        //
+                        plogqevCur = m_plogqevTail;
+                        m_plogqevTail = m_plogqevHead;
+                        m_plogqevHead->plogqevNext = nullptr;
+                    }
+                     else
+                    {
+                        //
+                        //  It's the standard scenario, so take the tail and store
+                        //  it's previous node in the tail ptr, setting the new tail's
+                        //  next to null.
+                        //
+                        plogqevCur = m_plogqevTail;
+                        m_plogqevTail = plogqevCur->plogqevPrev;
+                        m_plogqevTail->plogqevNext = nullptr;
+                    }
+                }
+
+                try
+                {
+                    //
+                    //  Let's send this one to the logger if we have one. Just to be
+                    //  safe make sure we really ended up with a node.
+                    //
+                    if (m_plgrTarget)
+                        m_plgrTarget->LogEvent(plogqevCur->logevData);
+                }
+
+                catch(...)
+                {
+                    TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+                }
+
+                // And clean up the event object
+                try
+                {
+                    delete plogqevCur;
+                }
+
+                catch(...)
+                {
+                    TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+                }
+            }
+             else
+            {
+                // Else sleep a bit, breaking out if asked to stop
+                if (!bSleep(1000))
+                    break;
+            }
+        }
+
+        catch(...)
+        {
+            TStatsCache::c8IncCounter(CIDLib_Module::sciLogErrors);
+        }
+    }
+
+    //  Dump any remaining events from our list.
+    //  <TBD>
+
+    return tCIDLib::EExitCodes::Normal;
+}
+
+
+tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
+{
+    //
+    //  We have to lock while we do this since the default may create named
+    //  resources that could fail if multiple threads tried to do it. And we
+    //  ultimately need to set the logger pointer.
+    //
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+
+    //
+    //  Some one could have beaten us to it. We don't want to lock every time
+    //  just to test that stuff that lead us here.
+    //
+    if (m_plgrTarget || m_plgrNew || m_bTriedDefault)
+        return;
+
+    // Before we do anything remember we've tried this in case it goes wrong
+    m_bTriedDefault = kCIDLib::True;
+
+    const tCIDLib::TCard4 c4MaxBufSz = 1024;
+
+    #pragma warning(suppress : 26494) // We don't need to initialize these
+    tCIDLib::TCh szFileName[c4MaxBufSz + 1];
+    #pragma warning(suppress : 26494) // We don't need to initialize these
+    tCIDLib::TCh szMutexName[c4MaxBufSz + 1];
+
+    szFileName[0] = kCIDLib::chNull;
+    szMutexName[0] = kCIDLib::chNull;
+
+    //
+    //  Preload the failure strings. If they fail to load, then put
+    //  in a default english messages.
+    //
+    tCIDLib::TBoolean bOk;
+    const tCIDLib::TCh* pszBadFormat = facCIDLib().pszLoadCIDMsg
+    (
+        kCIDErrs::errcMod_BadLogInfoFmt, bOk
+    );
+    if (!bOk)
+        pszBadFormat = kCIDLib_::pszBadLocalLog;
+
+    const tCIDLib::TCh* pszErrOpenLgr = facCIDLib().pszLoadCIDMsg
+    (
+        kCIDErrs::errcMod_ErrOpenLgr, bOk
+    );
+    if (!bOk)
+        pszErrOpenLgr = kCIDLib_::pszErrCreatingLgr;
+
+    //
+    //  The local log information is a blob that we have to parse out.
+    //  It is in this format:
+    //
+    //      filename;format;mutexname
+    //
+    //  The file name is the name of the file to log to. It is
+    //  followed by an optional format and mutex name. The format must
+    //  be either Ascii or Unicode. The mutex name is optional and
+    //  should be just the last component of a standard CIDLib
+    //  named resource name. If the format is not provided but the
+    //  mutex is, then it should be filename;;mutexname.
+    //
+    TTextConverter* ptcvtToUse = nullptr;
+    tCIDLib::TCh* pszCtx = nullptr;
+    tCIDLib::TCh* pszTokenize = m_kstrDefLoggerInfo.pszReplicate();
+    TJanitor<tCIDLib::TCh> janTokenize(pszTokenize);
+    tCIDLib::TCh* pszTmp = TRawStr::pszStrTokenize(pszTokenize, L";", &pszCtx);
+    if (pszTmp)
+    {
+        TRawStr::CopyStr(szFileName, pszTmp, c4MaxBufSz);
+
+        //
+        //  The next two are optional so we don't fail if they are not
+        //  there. But the format string can be malformed.
+        //
+        pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
+        if (pszTmp)
+        {
+            if (pszTmp[0])
+            {
+                if (TRawStr::bCompareStrI(pszTmp, L"UTF-8"))
+                    ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::UTF8);
+                else if (TRawStr::bCompareStrI(pszTmp, L"UTF-16"))
+                    ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::Def16);
+            }
+
+            // And check for a mutex name
+            pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
+            if (pszTmp)
+                TRawStr::CopyStr(szMutexName, pszTmp, c4MaxBufSz);
+        }
+
+        // If not explicit converter, then use UTF8
+        if (!ptcvtToUse)
+            ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::UTF8);
+
+        //
+        //  According to whether we have a mutex name, lets create the
+        //  resource name object or not.
+        //
+        TResourceName rsnTmp(L"CharmedQuark", L"CIDLib", szMutexName);
+        const TResourceName* prsnMutex
+        (
+            szMutexName[0] ? &rsnTmp : &TResourceName::Nul_TResourceName()
+        );
+
+        try
+        {
+            //
+            //  If no mutex, then assume it's for exclusive use and set
+            //  the access to exclusive out stream, which lets us write
+            //  and others read, but only we can write.
+            //
+            TTextFileLogger* plgrNew = new TTextFileLogger
+            (
+                szFileName
+                , szMutexName[0] ? tCIDLib::EAccessModes::Write
+                                : tCIDLib::EAccessModes::Excl_OutStream
+                , ptcvtToUse
+                , *prsnMutex
+            );
+
+            // Set the rollover size to something reasonable
+            plgrNew->c8RolloverSize(0x10000);
+
+            //
+            //  We have to do this (somewhat redundantly) ourself. We cannot
+            //  call SetLogger() because we would deadlock, and we can't release
+            //  the lock until we have the new logger set.
+            //
+            //  But we know there's no current logger or we wouldn't have gotten
+            //  called here, so we don't have to release one.
+            //
+            //  However, there's a remote possibility that there was a new one
+            //  set that wasn't stored yet, so deal with that.
+            //
+            if (m_plgrNew)
+            {
+                if (m_eAdoptNew == tCIDLib::EAdoptOpts::Adopt)
+                {
+                    m_eAdoptNew = tCIDLib::EAdoptOpts::NoAdopt;
+                    try { delete m_plgrNew; } catch(...) {}
+                }
+                m_plgrNew = nullptr;
+            }
+
+            m_plgrTarget = plgrNew;
+            m_eAdopt = tCIDLib::EAdoptOpts::Adopt;
+        }
+
+        catch(...)
+        {
+        }
+    }
+}
+
+
+
+
+// And now we need a lazy faulting in method for our spooling thread
+static TLogSpoolThread* pthrSpooler()
+{
+    static TLogSpoolThread* pthrSpooler = nullptr;
+    if (!pthrSpooler)
+    {
+        TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+        if (!pthrSpooler)
+        {
+            pthrSpooler = new TLogSpoolThread();
+            pthrSpooler->Start();
+        }
+    }
+    return pthrSpooler;
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -160,27 +749,26 @@ TModule::bLoadOSMsg(const tCIDLib::TOSErrCode errcId, TString& strMsgBuf)
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
-                        ,       TString&            strToFill)
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
 
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -193,29 +781,27 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
-                        ,       TString&            strToFill)
+TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildRawModName( modiSrc.strBaseName().pszBuffer()
-                                        , modiSrc.c4MajVersion()
-                                        , modiSrc.c4MinVersion()
-                                        , modiSrc.eModType()
-                                        , c4BufSz
-                                        , achBuf))
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(modiSrc.strBaseName().pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
+                                    , modiSrc.c4MajVersion()
+                                    , modiSrc.c4MinVersion()
+                                    , modiSrc.eModType()))
     {
         facCIDLib().ThrowErr
         (
@@ -229,34 +815,33 @@ TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
     }
 
     // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 }
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -269,22 +854,23 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    // Copy the result back to the caller's string
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 
     //
     //  Now lets fill in the prefered and default language versions of the
-    //  associated message file name. It has the same base name, plus the
+    //  associated message file name. It uses the portable base name, plus the
     //  language suffix and the CIDMsg extension.
     //
-    TPathStr pathTmp = strToFill;
+    TPathStr pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffix());
     pathTmp.AppendExt(L"CIDMsgs");
     strPrefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strDefLanguageSuffix());
@@ -293,51 +879,51 @@ TModule::BuildRawModName(const  TString&            strBaseName
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo& modiSrc
-                        ,       TString&        strToFill
+TModule::BuildModName(  const   TCIDModuleInfo& modiSrc
+                        ,       TString&        strPortable
+                        ,       TString&        strLoadable
                         ,       TString&        strPrefLangMsgs
                         ,       TString&        strDefLangMsgs)
 {
     // Just call the other version
-    BuildRawModName
+    BuildModName
     (
         modiSrc.strBaseName()
         , modiSrc.c4MajVersion()
         , modiSrc.c4MinVersion()
         , modiSrc.eModType()
-        , strToFill
+        , strPortable
+        , strLoadable
         , strPrefLangMsgs
         , strDefLangMsgs
     );
 }
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TString&            strBaseName
+TModule::BuildModName(  const   TString&            strBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
                         , const tCIDLib::ELanguages ePrefLanguage
                         , const tCIDLib::ELanguages eDefLanguage
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs
                         ,       TString&            strEnLangMsgs)
 {
     //
     //  We have to pass this on to the CIDKernel, because each platform
-    //  will do this differently. We just pass in a ridicuously big buffer
-    //  for it to fill in. There is no path involved so someone would have
-    //  to be insane to have an actual file name longer than this.
+    //  will do this differently.
     //
-    const tCIDLib::TCard4 c4BufSz = 2047;
-    tCIDLib::TCh achBuf[c4BufSz + 1];
-
-    if (!TKrnlModule::bBuildRawModName( strBaseName.pszBuffer()
-                                        , c4MajVersion
-                                        , c4MinVersion
-                                        , eModType
-                                        , c4BufSz
-                                        , achBuf))
+    TKrnlString kstrPortable;
+    TKrnlString kstrLoadable;
+    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+                                    , kstrPortable
+                                    , kstrLoadable
+                                    , c4MajVersion
+                                    , c4MinVersion
+                                    , eModType))
     {
         facCIDLib().ThrowErr
         (
@@ -350,29 +936,30 @@ TModule::BuildRawModName(const  TString&            strBaseName
         );
     }
 
-    // Just copy the result back to the caller's string
-    strToFill = achBuf;
+    // Copy the result back to the caller's string
+    strPortable = kstrPortable.pszValue();
+    strLoadable = kstrLoadable.pszValue();
 
     //
     //  Now lets fill in the prefered, default, and english language
-    //  versions of the associated message file name. It has the same base
-    //  name, plus the language suffix and the CIDMsg extension.
+    //  versions of the associated message file name. It uses the portable
+    //  module name, plus the language suffix and the CIDMsg extension.
     //
-    TPathStr pathTmp = strToFill;
+    TPathStr pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(ePrefLanguage));
     pathTmp.AppendExt(L"CIDMsg");
     strPrefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(eDefLanguage));
     pathTmp.AppendExt(L"CIDMsg");
     strDefLangMsgs = pathTmp;
 
-    pathTmp = strToFill;
+    pathTmp = strPortable;
     pathTmp.bRemoveExt();
     pathTmp.Append(L"_");
     pathTmp.Append(TLocale::strLanguageSuffixFor(tCIDLib::ELanguages::English));
@@ -382,16 +969,17 @@ TModule::BuildRawModName(const  TString&            strBaseName
 
 
 tCIDLib::TVoid
-TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
+TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
                         , const tCIDLib::ELanguages ePrefLanguage
                         , const tCIDLib::ELanguages eDefLanguage
-                        ,       TString&            strToFill
+                        ,       TString&            strPortable
+                        ,       TString&            strLoadable
                         ,       TString&            strPrefLangMsgs
                         ,       TString&            strDefLangMsgs
                         ,       TString&            strEnLangMsgs)
 {
     // Just call the other version
-    BuildRawModName
+    BuildModName
     (
         modiSrc.strBaseName()
         , modiSrc.c4MajVersion()
@@ -399,7 +987,8 @@ TModule::BuildRawModName(const  TCIDModuleInfo&     modiSrc
         , modiSrc.eModType()
         , ePrefLanguage
         , eDefLanguage
-        , strToFill
+        , strPortable
+        , strLoadable
         , strPrefLangMsgs
         , strDefLangMsgs
         , strEnLangMsgs
@@ -412,8 +1001,8 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
                             , const tCIDLib::TBoolean   bFullFormat)
 {
     // Call the other version to get the values out
-    tCIDLib::TCard4 c4Maj;
-    tCIDLib::TCard4 c4Min;
+    tCIDLib::TCard4 c4Maj = 0;
+    tCIDLib::TCard4 c4Min = 0;
     tCIDLib::TCard4 c4Revision = 0;
     if (bFullFormat)
         ParseVersionStr(strToParse, c4Maj, c4Min, c4Revision);
@@ -430,13 +1019,24 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
 }
 
 
-tCIDLib::TVoid TModule::InstallLogger(MLogger* const plgrToAdopt)
+//
+//  We just drop the logger. If we adopted the existing one (if there is one) we will
+//  clean it up.
+//
+tCIDLib::TVoid TModule::OrphanLogger()
 {
-    TMtxLocker lockLog(pmtxLogSync());
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    pthrTar->SetLogger(nullptr, tCIDLib::EAdoptOpts::NoAdopt);
+}
 
-    // Store the new logger
-    CIDLib_Module::plgrCurrent = plgrToAdopt;
-    CIDLib_Module::bInitLogger = kCIDLib::True;
+
+// Set a new logger on the spooler thread
+tCIDLib::TVoid
+TModule::InstallLogger(MLogger* const plgrToSet, const tCIDLib::EAdoptOpts eAdopt)
+{
+    TLocker lockrSync(CIDLib_Module::pmtxLogSync());
+    pthrSpooler()->SetLogger(plgrToSet, eAdopt);
 }
 
 
@@ -446,115 +1046,57 @@ tCIDLib::TVoid TModule::LogEventObj(const TLogEvent& logevToLog)
     // Get the severity out since its used a lot below
     tCIDLib::ESeverities eSev = logevToLog.eSeverity();
 
-    // Get control of the sync semaphore before we do anything
-    TMtxLocker lockLog(pmtxLogSync());
-
-    //
-    //  See if there is a recursive error going on. If so, we need to
-    //  do an emergency popup and give up.
-    //
-    if (CIDLib_Module::c4EntryCount > 16)
-    {
-        // Let the lock go so we don't hang up everyone
-        lockLog.Release();
-
-        TKrnlPopup::Show
-        (
-            CID_FILE
-            , CID_LINE
-            , CIDLib_Module::pszTitle1
-            , CIDLib_Module::pszTitle2
-            , 0
-            , 0
-            , 0
-            , CIDLib_Module::pszRecursiveError
-            , kCIDLib::pszEmptyZStr
-        );
-        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
-    }
-
-    //
-    //  Bump the entry counter. We use a janitor so its sure to get put
-    //  back on any entry, and before the mutex locker above lets the
-    //  mutex go.
-    //
-    TCardJanitor janEntry
-    (
-        &CIDLib_Module::c4EntryCount, CIDLib_Module::c4EntryCount + 1
-    );
-
-    //
-    //  If there is an installed logger, then we need to log it. Mark
-    //  it as logged, so that if its throw also, the catcher will know
-    //  if its been logged or not.
-    //
-    if (plgrTarget())
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
     {
         logevToLog.SetLogged();
         try
         {
-            plgrTarget()->LogEvent(logevToLog);
+            pthrTar->QueueEvent(logevToLog);
         }
 
         catch(const TError& errToCatch)
         {
-            // Let the lock go so we don't hang up everyone
-            lockLog.Release();
-
-            #if CID_DEBUG_ON
-            TKrnlPopup::Show
-            (
-                errToCatch.strFileName().pszBuffer()
-                , errToCatch.c4LineNum()
-                , CIDLib_Module::pszTitle1
-                , CIDLib_Module::pszExceptDuringLog
-                , errToCatch.errcId()
-                , 0
-                , 0
-                , errToCatch.strErrText().pszBuffer()
-                , errToCatch.strAuxText().pszBuffer()
-            );
-            #endif
+            ShowLogFailure(errToCatch);
         }
 
         catch(...)
         {
-            // Let the lock go so we don't hang up everyone
-            lockLog.Release();
-
-            #if CID_DEBUG_ON
-            TKrnlPopup::Show
-            (
-                CID_FILE
-                , CID_LINE
-                , CIDLib_Module::pszTitle1
-                , CIDLib_Module::pszTitle2
-                , 0
-                , 0
-                , 0
-                , CIDLib_Module::pszExceptDuringLog
-                , kCIDLib::pszEmptyZStr
-            );
-            #endif
+            ShowLogFailure(CID_FILE, CID_LINE);
         }
     }
 
-    //
-    //  If its at or above the process fatal level, then we need to exit the
-    //  program now. We use the standard runtime error code.
-    //
-    //  If we are in testing mode, then we don't exit since the host process
-    //  is just probing to insure that errors are caught and wants to continue
-    //  processing.
-    //
-    if ((eSev >= tCIDLib::ESeverities::ProcFatal)
-    &&  (eSev != tCIDLib::ESeverities::Status)
-    &&  !TSysInfo::bTestMode())
-    {
-        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
-    }
+    CheckFatal(eSev);
 }
 
+
+tCIDLib::TVoid TModule::LogEventObj(TLogEvent&& logevToLog)
+{
+    // Get the severity out since its used a lot below
+    tCIDLib::ESeverities eSev = logevToLog.eSeverity();
+
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        logevToLog.SetLogged();
+        try
+        {
+            pthrTar->QueueEvent(tCIDLib::ForceMove(logevToLog));
+        }
+
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSev);
+}
 
 //
 //  This method is designed to log bulk events, generally when they recieved
@@ -564,104 +1106,30 @@ tCIDLib::TVoid TModule::LogEventObj(const TLogEvent& logevToLog)
 //  sense in the context of a server handling errors from a remote client. The
 //  client is the one who needs to do all of that stuff, in its own context.
 //
-tCIDLib::TVoid TModule::LogEventObjs(const TCollection<TLogEvent>& colToLog)
+//  NOTE that the elements are moved to the queue, so the collection will be
+//  full of empty elements on return. This is slightly more efficient than just
+//  making copies.
+//
+#pragma warning(suppress : 26460) // Parm can't be const because we move elements from it
+tCIDLib::TVoid TModule::LogEventObjs(TCollection<TLogEvent>& colToLog)
 {
-    // Get control of the sync semaphore before we do anything
-    TMtxLocker lockLog(pmtxLogSync());
-
-    //
-    //  See if there is a recursive error going on. If so, we need to
-    //  do an emergency popup and give up.
-    //
-    if (CIDLib_Module::c4EntryCount > 16)
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
     {
-        // Let the lock go so we don't hang up everyone
-        lockLog.Release();
+        // Get a cursor for the collection and iterate through it
+        TColCursor<TLogEvent>& cursErrs = *colToLog.pcursNew();
+        TJanitor<TColCursor<TLogEvent> > janCursor(&cursErrs);
 
-        TKrnlPopup::Show
-        (
-            CID_FILE
-            , CID_LINE
-            , CIDLib_Module::pszTitle1
-            , CIDLib_Module::pszTitle2
-            , 0
-            , 0
-            , 0
-            , CIDLib_Module::pszRecursiveError
-            , kCIDLib::pszEmptyZStr
-        );
-        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
-    }
-
-    //
-    //  Bump the entry counter. We use a janitor so its sure to get put
-    //  back on any entry, and before the mutex locker above lets the
-    //  mutex go.
-    //
-    TCardJanitor janEntry
-    (
-        &CIDLib_Module::c4EntryCount
-        , CIDLib_Module::c4EntryCount + 1
-    );
-
-    // Get a cursor for the collection and iterate through it
-    TColCursor<TLogEvent>* pcursErrs = colToLog.pcursNew();
-    TJanitor<TColCursor<TLogEvent> > janCursor(pcursErrs);
-
-    // If we have any elements and a logger installed, then lets log them
-    MLogger* plgrCur = plgrTarget();
-    if (pcursErrs->bIsValid() && plgrCur)
-    {
-        for (; pcursErrs->bIsValid(); pcursErrs->bNext())
+        for (; cursErrs; ++cursErrs)
         {
-            const TLogEvent& errCur = pcursErrs->objRCur();
-            errCur.SetLogged();
-
+            cursErrs->SetLogged();
             try
             {
-                plgrCur->LogEvent(errCur);
-            }
-
-            catch(const TError&)
-            {
-                // Let the lock go so we don't hang up everyone
-                lockLog.Release();
-
-                #if CID_DEBUG_ON
-                TKrnlPopup::Show
-                (
-                    errCur.strFileName().pszBuffer()
-                    , errCur.c4LineNum()
-                    , CIDLib_Module::pszTitle1
-                    , CIDLib_Module::pszExceptDuringLog
-                    , errCur.errcId()
-                    , 0
-                    , 0
-                    , errCur.strErrText().pszBuffer()
-                    , errCur.strAuxText().pszBuffer()
-                );
-                #endif
+                pthrTar->QueueEvent(tCIDLib::ForceMove(*cursErrs));
             }
 
             catch(...)
             {
-                // Let the lock go so we don't hang up everyone
-                lockLog.Release();
-
-                #if CID_DEBUG_ON
-                TKrnlPopup::Show
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , CIDLib_Module::pszTitle1
-                    , CIDLib_Module::pszTitle2
-                    , 0
-                    , 0
-                    , 0
-                    , CIDLib_Module::pszExceptDuringLog
-                    , kCIDLib::pszEmptyZStr
-                );
-                #endif
             }
         }
     }
@@ -717,7 +1185,7 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
                                         ,       tCIDLib::TCard4&    c4Revision)
 {
     // Find the periods, which separates the threeparts
-    tCIDLib::TCard4 c4Ofs1;
+    tCIDLib::TCard4 c4Ofs1 = 0;
     tCIDLib::TCard4 c4Ofs2 = 0;
     if (!strToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs1)
     ||  !strToParse.bLastOccurrence(kCIDLib::chPeriod, c4Ofs2)
@@ -761,24 +1229,6 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
 }
 
 
-//
-//  This method handles the lazy initialization of the logging sync mutex
-//  that is used to serialize multiple threads logging at the same time.
-//
-TMutex* TModule::pmtxLogSync()
-{
-    static TMutex* pmtxLogSync = nullptr;
-
-    if (!pmtxLogSync)
-    {
-        TBaseLock lockInit;
-        if (!pmtxLogSync)
-            TRawMem::pExchangePtr(&pmtxLogSync, new TMutex(tCIDLib::ELockStates::Unlocked));
-    }
-    return pmtxLogSync;
-}
-
-
 
 // ---------------------------------------------------------------------------
 //  TModule: Constructors and Destructor
@@ -786,15 +1236,18 @@ TMutex* TModule::pmtxLogSync()
 TModule::TModule(const  TCIDModuleInfo&     modiSrc
                 , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(modiSrc.eModType())
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
-    , m_strName(modiSrc.strBaseName())
 {
-    // Call a common init that builds up names based on type and version info
     DoInit
     (
-        modiSrc.c4MajVersion(), modiSrc.c4MinVersion(), modiSrc.eFlags(), bLoad
+        modiSrc.strBaseName()
+        , modiSrc.c4MajVersion()
+        , modiSrc.c4MinVersion()
+        , modiSrc.eModType()
+        , modiSrc.eFlags()
+        , bLoad
+        , nullptr
     );
 }
 
@@ -805,46 +1258,50 @@ TModule::TModule(   const   TString&            strName
                     , const tCIDLib::EModFlags  eFlags
                     , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(eModType)
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
-    , m_strName(strName)
 {
-    // Call a common init that builds up names based on type and version info
-    DoInit(c4MajVer, c4MinVer, eFlags, bLoad);
+    DoInit(strName, c4MajVer, c4MinVer, eModType, eFlags, bLoad, nullptr);
+}
+
+TModule::TModule(   const   TString&            strName
+                    , const TString&            strFromPath
+                    , const tCIDLib::EModTypes  eModType
+                    , const tCIDLib::TCard4     c4MajVer
+                    , const tCIDLib::TCard4     c4MinVer
+                    , const tCIDLib::EModFlags  eFlags) :
+
+    m_kmodThis()
+    , m_pc1Res(nullptr)
+{
+    // Create our other names, then do common init. This is always a load
+    DoInit
+    (
+        strName, c4MajVer, c4MinVer, eModType, eFlags, kCIDLib::True, &strFromPath
+    );
 }
 
 
 //
-//  Load a facility from a specific path, not via the library path. It may or may not
-//  be version stamped, we don't care at this level.
+//  Load an external module on a specific path. This is not for CIDLib facilities
+//  but to load other modules that we may need to mess with. They can pass just the
+//  name or the full path, as required.
 //
-TModule::TModule(const  TString&            strFullPath
-                , const tCIDLib::EModTypes  eModType
-                , const tCIDLib::EModFlags  eFlags
+TModule::TModule(const  TString&            strPath
                 , const tCIDLib::TBoolean   bLoad) :
 
-    m_eModType(eModType)
-    , m_kmodThis()
+    m_kmodThis()
     , m_pc1Res(nullptr)
 {
     // If not already done, initialize statistics
     InitStats();
 
-    // Get a copy of the name part (no extension) and store that
-    TPathStr pathTmp(strFullPath);
-    pathTmp.bQueryName(m_strName);
-
-    // Remove the name part and store that as the path
-    pathTmp.bRemoveNameExt();
-    m_strPath = pathTmp;
-
-    // Load from the original full path
-    tCIDLib::TBoolean bRes;
+    // Load or query from the original full path
+    tCIDLib::TBoolean bRes = kCIDLib::False;
     if (bLoad)
-        bRes = m_kmodThis.bLoadFromName(strFullPath.pszBuffer());
+        bRes = m_kmodThis.bLoadExternal(strPath.pszBuffer());
     else
-        bRes = m_kmodThis.bQueryFromName(strFullPath.pszBuffer());
+        bRes = m_kmodThis.bQueryExternal(strPath.pszBuffer());
 
     if (!bRes)
     {
@@ -856,59 +1313,11 @@ TModule::TModule(const  TString&            strFullPath
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , m_strName
+            , strPath
         );
     }
-
-    DoInit2(strFullPath, eFlags);
 }
 
-//
-//  Load a facility from a specific path, not the library path. It may or may not be
-//  version stamped, we don't care at this level.
-//
-TModule::TModule(const  TString&            strFacName
-                , const TString&            strLoadFrom
-                , const tCIDLib::EModTypes  eModType
-                , const tCIDLib::EModFlags  eFlags
-                , const tCIDLib::TBoolean   bLoad) :
-
-    m_eModType(eModType)
-    , m_kmodThis()
-    , m_pc1Res(nullptr)
-    , m_strName(strFacName)
-    , m_strPath(strLoadFrom)
-{
-    // If not already done, initialize statistics
-    InitStats();
-
-    // Create the full path to load
-    TPathStr pathFull(strLoadFrom);
-    pathFull.AddLevel(strFacName);
-
-    // Load from the full path
-    tCIDLib::TBoolean bRes;
-    if (bLoad)
-        bRes = m_kmodThis.bLoadFromName(pathFull.pszBuffer());
-    else
-        bRes = m_kmodThis.bQueryFromName(pathFull.pszBuffer());
-
-    if (!bRes)
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , bLoad ? kCIDErrs::errcMod_LoadByName : kCIDErrs::errcMod_QueryByName
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::Unknown
-            , m_strName
-        );
-    }
-
-    DoInit2(pathFull, eFlags);
-}
 
 TModule::~TModule()
 {
@@ -980,7 +1389,7 @@ TModule::bLoadCIDMsg(const  tCIDLib::TMsgId     midToLoad
 
 tCIDLib::EModTypes TModule::eModType() const
 {
-    return m_eModType;
+    return m_kmodThis.eModType();
 }
 
 
@@ -1081,38 +1490,54 @@ TModule::LogKrnlErr(const   TString&                strFileName
                     , const tCIDLib::ESeverities    eSeverity
                     , const tCIDLib::EErrClasses    eClass) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strKrnlMsg(kCIDLib::pszEmptyZStr, 128);
+            TString strMsg(kCIDLib::pszEmptyZStr, 128);
 
-    TString strKrnlMsg(kCIDLib::pszEmptyZStr, 128);
-    TString strMsg(kCIDLib::pszEmptyZStr, 128);
+            //
+            //  Load up the host OS message, if this was caused by an underlying
+            //  host error. Note that it sets the string to a default message if
+            //  this fails, so we don't do anything if so.
+            //
+            if (klogevToLog.errcHostId())
+                bLoadOSMsg(klogevToLog.errcHostId(), strKrnlMsg);
 
-    //
-    //  Load up the host OS message, if this was caused by an underlying
-    //  host error. Note that it sets the string to a default message if
-    //  this fails, so we don't do anything if so.
-    //
-    if (klogevToLog.errcHostId())
-        bLoadOSMsg(klogevToLog.errcHostId(), strKrnlMsg);
+            // Load the CIDLib error message
+            bLoadCIDMsg(errcToLog, strMsg);
 
-    // Load the CIDLib error message
-    bLoadCIDMsg(errcToLog, strMsg);
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , errcToLog
+                    , klogevToLog
+                    , strMsg
+                    , strKrnlMsg
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , errcToLog
-        , klogevToLog
-        , strMsg
-        , strKrnlMsg
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1127,46 +1552,62 @@ TModule::LogKrnlErr(const   TString&                strFileName
                     , const MFormattable&           fmtblToken3
                     , const MFormattable&           fmtblToken4) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strKrnlMsg(kCIDLib::pszEmptyZStr, 128);
+            TString strText(kCIDLib::pszEmptyZStr, 256);
 
-    TString strKrnlMsg(kCIDLib::pszEmptyZStr, 128);
-    TString strText(kCIDLib::pszEmptyZStr, 256);
+            //
+            //  Load up the host OS message, if this was caused by an underlying
+            //  host error. Note that it sets the string to a default message if
+            //  this fails, so we don't do anything if so.
+            //
+            if (klogevToLog.errcHostId())
+                bLoadOSMsg(klogevToLog.errcHostId(), strKrnlMsg);
 
-    //
-    //  Load up the host OS message, if this was caused by an underlying
-    //  host error. Note that it sets the string to a default message if
-    //  this fails, so we don't do anything if so.
-    //
-    if (klogevToLog.errcHostId())
-        bLoadOSMsg(klogevToLog.errcHostId(), strKrnlMsg);
+            // Get a copy of the err text and do the token replacement
+            bLoadCIDMsg
+            (
+                errcToLog
+                , strText
+                , fmtblToken1
+                , fmtblToken2
+                , fmtblToken3
+                , fmtblToken4
+            );
 
-    // Get a copy of the err text and do the token replacement
-    bLoadCIDMsg
-    (
-        errcToLog
-        , strText
-        , fmtblToken1
-        , fmtblToken2
-        , fmtblToken3
-        , fmtblToken4
-    );
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , errcToLog
+                    , klogevToLog
+                    , strText
+                    , strKrnlMsg
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , errcToLog
-        , klogevToLog
-        , strText
-        , strKrnlMsg
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 
@@ -1177,21 +1618,37 @@ TModule::LogMsg(const   TString&                strFileName
                 , const tCIDLib::ESeverities    eSeverity
                 , const tCIDLib::EErrClasses    eClass) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1202,22 +1659,38 @@ TModule::LogMsg(const   TString&                strFileName
                 , const tCIDLib::ESeverities    eSeverity
                 , const tCIDLib::EErrClasses    eClass) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , strAuxText
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , strAuxText
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1227,24 +1700,40 @@ TModule::LogMsg(const   TString&                strFileName
                 , const tCIDLib::ESeverities    eSeverity
                 , const tCIDLib::EErrClasses    eClass) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strMsg(kCIDLib::pszEmptyZStr, 256);
+            bLoadCIDMsg(midToLog, strMsg);
 
-    TString strMsg(kCIDLib::pszEmptyZStr, 256);
-    bLoadCIDMsg(midToLog, strMsg);
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1255,25 +1744,41 @@ TModule::LogMsg(const   TString&                strFileName
                 , const tCIDLib::ESeverities    eSeverity
                 , const tCIDLib::EErrClasses    eClass) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strMsg(kCIDLib::pszEmptyZStr, 256);
+            bLoadCIDMsg(midToLog, strMsg);
 
-    TString strMsg(kCIDLib::pszEmptyZStr, 256);
-    bLoadCIDMsg(midToLog, strMsg);
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , strAuxText
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , strAuxText
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1287,33 +1792,49 @@ TModule::LogMsg(const   TString&                strFileName
                 , const MFormattable&           fmtblToken3
                 , const MFormattable&           fmtblToken4) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strTmp(strMsg, 256);
 
-    TString strTmp(strMsg, 256);
+            // Do parameter replacement
+            if (!MFormattable::bIsNullObject(fmtblToken1))
+                strTmp.eReplaceToken(fmtblToken1, L'1');
+            if (!MFormattable::bIsNullObject(fmtblToken2))
+                strTmp.eReplaceToken(fmtblToken2, L'2');
+            if (!MFormattable::bIsNullObject(fmtblToken3))
+                strTmp.eReplaceToken(fmtblToken3, L'3');
+            if (!MFormattable::bIsNullObject(fmtblToken4))
+                strTmp.eReplaceToken(fmtblToken4, L'4');
 
-    // Do parameter replacement
-    if (!MFormattable::bIsNullObject(fmtblToken1))
-        strTmp.eReplaceToken(fmtblToken1, L'1');
-    if (!MFormattable::bIsNullObject(fmtblToken2))
-        strTmp.eReplaceToken(fmtblToken2, L'2');
-    if (!MFormattable::bIsNullObject(fmtblToken3))
-        strTmp.eReplaceToken(fmtblToken3, L'3');
-    if (!MFormattable::bIsNullObject(fmtblToken4))
-        strTmp.eReplaceToken(fmtblToken4, L'4');
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strTmp
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strTmp
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1327,32 +1848,47 @@ TModule::LogMsg(const   TString&                strFileName
                 , const MFormattable&           fmtblToken3
                 , const MFormattable&           fmtblToken4) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strMsg(kCIDLib::pszEmptyZStr, 256);
+            bLoadCIDMsg
+            (
+                midToLog
+                , strMsg
+                , fmtblToken1
+                , fmtblToken2
+                , fmtblToken3
+                , fmtblToken4
+            );
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    TString strMsg(kCIDLib::pszEmptyZStr, 256);
-    bLoadCIDMsg
-    (
-        midToLog
-        , strMsg
-        , fmtblToken1
-        , fmtblToken2
-        , fmtblToken3
-        , fmtblToken4
-    );
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1367,28 +1903,44 @@ TModule::LogMsg(const   TString&                strFileName
                 , const MFormattable&           fmtblToken3
                 , const MFormattable&           fmtblToken4) const
 {
-    // If there's no target logger, then short circuit
-    if (!plgrTarget())
-        return;
+    TLogSpoolThread* pthrTar = pthrSpooler();
+    if (pthrTar->bHaveLogger())
+    {
+        try
+        {
+            TString strMsg(kCIDLib::pszEmptyZStr, 256);
+            bLoadCIDMsg
+            (
+                midToLog, strMsg, fmtblToken1, fmtblToken2, fmtblToken3, fmtblToken4
+            );
 
-    TString strMsg(kCIDLib::pszEmptyZStr, 256);
-    bLoadCIDMsg
-    (
-        midToLog, strMsg, fmtblToken1, fmtblToken2, fmtblToken3, fmtblToken4
-    );
+            pthrTar->QueueEvent
+            (
+                new CIDLib_Module::TLogQEvent
+                (
+                    m_strName
+                    , strFileName
+                    , c4LineNum
+                    , strMsg
+                    , strAuxText
+                    , eSeverity
+                    , eClass
+                )
+            );
+        }
 
-    // Create the event object, and log it
-    TLogEvent logevToLog
-    (
-        m_strName
-        , strFileName
-        , c4LineNum
-        , strMsg
-        , strAuxText
-        , eSeverity
-        , eClass
-    );
-    LogEventObj(logevToLog);
+        catch(const TError& errToCatch)
+        {
+            ShowLogFailure(errToCatch);
+        }
+
+        catch(...)
+        {
+            ShowLogFailure(CID_FILE, CID_LINE);
+        }
+    }
+
+    CheckFatal(eSeverity);
 }
 
 tCIDLib::TVoid
@@ -1578,11 +2130,14 @@ TModule::pszLoadCIDMsg(const tCIDLib::TMsgId midToLoad) const
 }
 
 
-TString TModule::strMsg(const tCIDLib::TMsgId midToLoad) const
+TString
+TModule::strMsg(const   tCIDLib::TMsgId     midToLoad
+                , const tCIDLib::TCard4     c4ExtraSpace) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg(midToLoad, strRet);
-    return strRet;
+    // Get the text, put it into string object, and return that by value
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    return TString(pszMsg, c4ExtraSpace);
 }
 
 TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
@@ -1591,31 +2146,51 @@ TString TModule::strMsg(const   tCIDLib::TMsgId midToLoad
                         , const MFormattable&   fmtblToken3
                         , const MFormattable&   fmtblToken4) const
 {
-    TString strRet(kCIDLib::pszEmptyZStr, 1024);
-    bLoadCIDMsg
-    (
-        midToLoad
-        , strRet
-        , fmtblToken1
-        , fmtblToken2
-        , fmtblToken3
-        , fmtblToken4
-    );
-    return strRet;
+    //
+    //  Same as above, but leave some room for tokens. It might still not be enough
+    //  and the string has to expand, but we can prevent a lot of expansions without
+    //  making the string a lot bigger than it needs to be.
+    //
+    tCIDLib::TBoolean bRet;
+    const tCIDLib::TCh* pszMsg = m_kmodThis.pszLoadCIDFacMsg(midToLoad, bRet);
+    TString strRet(pszMsg, 64);
+
+    // And now do token replacement if we got the real msg
+    if (bRet)
+    {
+        if (!MFormattable::bIsNullObject(fmtblToken1))
+            strRet.eReplaceToken(fmtblToken1, L'1');
+        if (!MFormattable::bIsNullObject(fmtblToken2))
+            strRet.eReplaceToken(fmtblToken2, L'2');
+        if (!MFormattable::bIsNullObject(fmtblToken3))
+            strRet.eReplaceToken(fmtblToken3, L'3');
+        if (!MFormattable::bIsNullObject(fmtblToken4))
+            strRet.eReplaceToken(fmtblToken4, L'4');
+    }
+    return tCIDLib::ForceMove(strRet);
 }
 
 
-// REturn the name of this module
-const TString& TModule::strName() const
+TString TModule::strLoadableName() const
 {
-    return m_strName;
+    return TString(m_kmodThis.kstrLoadableName().pszValue());
 }
 
 
-// Return the path to this module
-const TString& TModule::strPath() const
+TString TModule::strPath() const
 {
-    return m_strPath;
+    return TString(m_kmodThis.kstrSrcPath().pszValue());
+}
+
+
+// This one may not be set if this is not a CIDLib facility type module
+TString TModule::strPortableName() const
+{
+    if (m_kmodThis.kstrPortableName().pszValue())
+        return TString(m_kmodThis.kstrPortableName().pszValue());
+
+    // We just return the loadable name instead
+    return TString(m_kmodThis.kstrLoadableName().pszValue());
 }
 
 
@@ -1911,244 +2486,89 @@ tCIDLib::TBoolean TModule::bTraceErrs() const
 
 
 // ---------------------------------------------------------------------------
-//  TModule: Protected, static methods
+//  TModule: Private, static methods
 // ---------------------------------------------------------------------------
 
-//
-//  This method handles the lazy init of the default logger object. If one
-//  has not been set, then a default one is created using the CID_LOCALLOG
-//  environment variable if it is set. If that's not set, then no logger is
-//  set.
-//
-MLogger* TModule::plgrTarget()
+// Called after each logged event, with the severity, to see if we need to abort
+tCIDLib::TVoid TModule::CheckFatal(const tCIDLib::ESeverities eSev)
 {
-    TMtxLocker lockInit(pmtxLogSync());
-
     //
-    //  If the logger has never been set, then we need to create a default
-    //  on. We assume it will log in the default text format for the platform
-    //  but the environment can override that.
+    //  If its at or above the process fatal level, then we need to exit the
+    //  program now. We use the standard runtime error code.
     //
-    if (!CIDLib_Module::bInitLogger)
+    //  If we are in testing mode, then we don't exit since the host process
+    //  is just probing to insure that errors are caught and wants to continue
+    //  processing.
+    //
+    if ((eSev >= tCIDLib::ESeverities::ProcFatal)
+    &&  (eSev != tCIDLib::ESeverities::Status)
+    &&  !TSysInfo::bTestMode())
     {
-        //
-        //  Indicate that'we tried to set up a logger. If we don't, then
-        //  we won't bother to try from here on out.
-        //
-        CIDLib_Module::bInitLogger = kCIDLib::True;
-
-        tCIDLib::TBoolean       bGotIt = kCIDLib::False;
-        const tCIDLib::TCard4   c4BufMax = 512;
-        TTextConverter*         ptcvtToUse = nullptr;
-        tCIDLib::TCh            szInfoBuf[c4BufMax+1];
-
-        //
-        //  First we need to see if the information was provided on the
-        //  command line via the /LocalLog= parameter. If so, then that
-        //  takes precedence. If not, then check the environment.
-        //
-        if (TSysInfo::pszLogInfo())
-        {
-            bGotIt = kCIDLib::True;
-            TRawStr::CopyStr(szInfoBuf, TSysInfo::pszLogInfo(), c4BufMax);
-        }
-         else
-        {
-            // Check the environment
-            bGotIt = TKrnlEnvironment::bFind(kCIDLib_::pszLocalLog, szInfoBuf, c4BufMax);
-        }
-
-        if (bGotIt)
-        {
-            tCIDLib::TCh szFileName[c4BufMax+1];
-            tCIDLib::TCh szMutexName[c4BufMax+1];
-
-            szFileName[0] = kCIDLib::chNull;
-            szMutexName[0] = kCIDLib::chNull;
-
-            //
-            //  Preload the failure strings. If they fail to load, then put
-            //  in a default english messages.
-            //
-            tCIDLib::TBoolean bOk;
-            const tCIDLib::TCh* pszBadFormat = facCIDLib().pszLoadCIDMsg
-            (
-                kCIDErrs::errcMod_BadLogInfoFmt
-                , bOk
-            );
-            if (!bOk)
-                pszBadFormat = kCIDLib_::pszBadLocalLog;
-
-            const tCIDLib::TCh* pszErrOpenLgr = facCIDLib().pszLoadCIDMsg
-            (
-                kCIDErrs::errcMod_ErrOpenLgr
-                , bOk
-            );
-            if (!bOk)
-                pszErrOpenLgr = kCIDLib_::pszErrCreatingLgr;
-
-            //
-            //  The local log information is a blob that we have to parse out.
-            //  It is in this format:
-            //
-            //      filename;format;mutexname
-            //
-            //  The file name is the name of the file to log to. It is
-            //  followed by an optional format and mutex name. The format must
-            //  be either Ascii or Unicode. The mutex name is optional and
-            //  should be just the last component of a standard CIDLib
-            //  named resource name. If the format is not provided but the
-            //  mutex is, then it should be filename;;mutexname.
-            //
-            tCIDLib::TCh* pszCtx = nullptr;
-            tCIDLib::TCh* pszTmp = TRawStr::pszStrTokenize(szInfoBuf, L";", &pszCtx);
-            if (!pszTmp)
-            {
-                //
-                //  Note that we must call straight to low level popup here
-                //  since doing otherwise might cause a recursive call back
-                //  here.
-                //
-                TKrnlPopup::Show
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , CIDLib_Module::pszTitle1
-                    , CIDLib_Module::pszTitle2
-                    , 0
-                    , 0
-                    , 0
-                    , pszBadFormat
-                    , kCIDLib::pszEmptyZStr
-                );
-                TProcess::ExitProcess(tCIDLib::EExitCodes::InitFailed);
-            }
-            TRawStr::CopyStr(szFileName, pszTmp, c4BufMax);
-
-            //
-            //  The next two are optional so we don't fail if they are not
-            //  there. But the format string can be malformed.
-            //
-            pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
-            if (pszTmp)
-            {
-                if (pszTmp[0])
-                {
-                    if (TRawStr::bCompareStrI(pszTmp, L"UTF-8"))
-                        ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::UTF8);
-                    else if (TRawStr::bCompareStrI(pszTmp, L"UTF-16"))
-                        ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::Def16);
-                    else
-                    {
-                        // Indicate unknown encoding
-                        TKrnlPopup::Show
-                        (
-                            CID_FILE
-                            , CID_LINE
-                            , CIDLib_Module::pszTitle1
-                            , CIDLib_Module::pszTitle2
-                            , 0
-                            , 0
-                            , 0
-                            , pszBadFormat
-                            , kCIDLib::pszEmptyZStr
-                        );
-
-                        // And default to a UTF-8 encoding
-                        ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::UTF8);
-                    }
-                }
-
-                // And check for a mutex name
-                pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
-                if (pszTmp)
-                    TRawStr::CopyStr(szMutexName, pszTmp, c4BufMax);
-            }
-
-            // If not explicit converter, then use UTF8
-            if (!ptcvtToUse)
-                ptcvtToUse = new TUTFConverter(TUTFConverter::EEncodings::UTF8);
-
-            //
-            //  According to whether we have a mutex name, lets create the
-            //  resource name object or not.
-            //
-            TResourceName rsnTmp(L"CharmedQuark", L"CIDLib", szMutexName);
-            const TResourceName* prsnMutex = szMutexName[0]
-                                             ? &rsnTmp
-                                             : &TResourceName::Nul_TResourceName();
-
-            try
-            {
-                //
-                //  If no mutex, then assume it's for exclusive use and set
-                //  the access to exclusive out stream, which lets us write
-                //  and others read, but only we can write.
-                //
-                TTextFileLogger* plgrNew = new TTextFileLogger
-                (
-                    szFileName
-                    , szMutexName[0] ? tCIDLib::EAccessModes::Write
-                                     : tCIDLib::EAccessModes::Excl_OutStream
-                    , ptcvtToUse
-                    , *prsnMutex
-                );
-
-                // Set the rollover size to something reasonable
-                plgrNew->c8RolloverSize(0x10000);
-
-                // And store the pointer now
-                CIDLib_Module::plgrCurrent = plgrNew;
-            }
-
-            catch(const TError& errToCatch)
-            {
-                TKrnlPopup::Show
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , CIDLib_Module::pszTitle1
-                    , CIDLib_Module::pszTitle2
-                    , errToCatch.errcId()
-                    , errToCatch.errcKrnlId()
-                    , errToCatch.errcHostId()
-                    , pszErrOpenLgr
-                    , szFileName
-                );
-                TProcess::ExitProcess(tCIDLib::EExitCodes::InitFailed);
-            }
-
-            catch(...)
-            {
-                TKrnlPopup::Show
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , CIDLib_Module::pszTitle1
-                    , CIDLib_Module::pszTitle2
-                    , 0
-                    , 0
-                    , 0
-                    , pszErrOpenLgr
-                    , szFileName
-                );
-                TProcess::ExitProcess(tCIDLib::EExitCodes::InitFailed);
-            }
-        }
+        TProcess::ExitProcess(tCIDLib::EExitCodes::RuntimeError);
     }
-    return CIDLib_Module::plgrCurrent;
+}
+
+
+// Called if we fail to queue up an event
+tCIDLib::TVoid
+TModule::ShowLogFailure(const tCIDLib::TCh* const pszFile, const tCIDLib::TCard4 c4Line)
+{
+    #if CID_DEBUG_ON
+    TKrnlPopup::Show
+    (
+        pszFile
+        , c4Line
+        , CIDLib_Module::pszTitle1
+        , CIDLib_Module::pszTitle2
+        , 0
+        , 0
+        , 0
+        , CIDLib_Module::pszExceptDuringLog
+        , kCIDLib::pszEmptyZStr
+    );
+    #endif
+}
+
+tCIDLib::TVoid TModule::ShowLogFailure(const TLogEvent& logevShow)
+{
+    #if CID_DEBUG_ON
+    TKrnlPopup::Show
+    (
+        logevShow.strFileName().pszBuffer()
+        , logevShow.c4LineNum()
+        , CIDLib_Module::pszTitle1
+        , CIDLib_Module::pszExceptDuringLog
+        , logevShow.errcId()
+        , 0
+        , 0
+        , logevShow.strErrText().pszBuffer()
+        , logevShow.strAuxText().pszBuffer()
+    );
+    #endif
 }
 
 
 // ---------------------------------------------------------------------------
 //  TModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
-                                , const tCIDLib::TCard4     c4MinVer
-                                , const tCIDLib::EModFlags  eFlags
-                                , const tCIDLib::TBoolean   bLoad)
+
+//
+//  Ths is the common init needed for all of the CIDLib facility loading type
+//  ctors. We have all the names and any path stored at this point.
+//
+tCIDLib::TVoid
+TModule::DoInit(const   TString&            strBaseName
+                , const tCIDLib::TCard4     c4MajVer
+                , const tCIDLib::TCard4     c4MinVer
+                , const tCIDLib::EModTypes  eModType
+                , const tCIDLib::EModFlags  eFlags
+                , const tCIDLib::TBoolean   bLoad
+                , const TString* const      pstrSrcPath)
 {
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
+
+    // Initialize our stats if not alreayd done
+    InitStats();
 
     //
     //  Init the module handle data member. According to the bLoad parameter
@@ -2156,24 +2576,32 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     //
     if (bLoad)
     {
-        bRes = m_kmodThis.bLoadFromName
-        (
-            m_strName.pszBuffer()
-            , m_eModType
-            , c4MajVer
-            , c4MinVer
-            , eFlags
-        );
+        if (pstrSrcPath)
+        {
+            bRes = m_kmodThis.bLoadFromPath
+            (
+                strBaseName.pszBuffer()
+                , c4MajVer
+                , c4MinVer
+                , pstrSrcPath->pszBuffer()
+                , eModType
+                , eFlags
+            );
+        }
+         else
+        {
+            bRes = m_kmodThis.bLoadFromName
+            (
+                strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
+            );
+        }
     }
      else
     {
+        // This only uses the name since we are querying something already loaded
         bRes = m_kmodThis.bQueryFromName
         (
-            m_strName.pszBuffer()
-            , m_eModType
-            , c4MajVer
-            , c4MinVer
-            , eFlags
+            strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
         );
     }
 
@@ -2187,9 +2615,15 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , m_strName
+            , strBaseName
         );
     }
+
+    //
+    //  It worked, so store away the base name. We store our own copy of this because
+    //  we use it a lot.
+    //
+    m_strName = strBaseName;
 
     //
     //  Ok, lets try to load up the local strings that are preloaded and
@@ -2197,64 +2631,27 @@ tCIDLib::TVoid TModule::DoInit( const   tCIDLib::TCard4     c4MajVer
     //  sure that's what is loading. But it should always be the first module
     //  that loads and uses this class.
     //
-    if (!CIDLib_Module::bInitMsgs)
+    if (!CIDLib_Module::atomInitMsgs)
     {
-        if (m_strName == L"CIDLib")
+        if (strBaseName == L"CIDLib")
             InitMsgs(*this);
     }
 
-    // Find the module path and save it
-    const tCIDLib::TCard4 c4NameChars = kCIDLib::c4MaxPathLen;
-    tCIDLib::TCh szModPath[c4NameChars+1];
-    tCIDLib::TCh szModName[c4NameChars+1];
-    if (!TKrnlModule::bRawQueryModName( m_kmodThis.hmodThis()
-                                        , szModName
-                                        , szModPath
-                                        , c4NameChars))
-    {
-        facCIDLib().ThrowKrnlErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcMod_QueryModPath
-            , TKrnlError::kerrLast()
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotFound
-            , m_strName
-        );
-    }
-    m_strPath = szModPath;
 
-    // Do the other init, passing the ufll path
-    TPathStr pathFull(m_strPath);
-    pathFull.AddLevel(szModName);
-    DoInit2(pathFull, eFlags);
-}
-
-
-//
-//  We get the full module path loaded from which will include the version stamp
-//  if the module is versioned. So we can us that to build the path to the resource
-//  file.
-//
-tCIDLib::TVoid
-TModule::DoInit2(const  TString&            strModPath
-                , const tCIDLib::EModFlags  eFlags)
-{
-    //
-    //  If we have a resource file, then load it up. We build up the file
-    //  name and load up the raw resource buffer pointer.
-    //
+        // If it has a resource file, we need to load that
     if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EModFlags::HasResFile))
     {
-        TPathStr pathTmp(strModPath);
-
-        // Remove the module's extension and add the resource file's
-        pathTmp.bRemoveExt();
-        pathTmp.AppendExt(L"CIDRes");
+        //
+        //  All the associated resources are based on the portable name. That should
+        //  always be set here since this is only called for CIDLib facility type
+        //  modules.
+        //
+        TPathStr pathResFile(m_kmodThis.kstrSrcPath().pszValue());
+        pathResFile.AddLevel(m_kmodThis.kstrPortableName().pszValue());
+        pathResFile.AppendExt(L"CIDRes");
 
         // And load up the resources
-        LoadRes(pathTmp);
+        LoadRes(pathResFile);
     }
 }
 
@@ -2263,10 +2660,10 @@ TModule::DoInit2(const  TString&            strModPath
 tCIDLib::TVoid TModule::InitStats()
 {
     // If we've not faulted in our stats cache stuff yet, then do that.
-    if (!CIDLib_Module::bInitStats)
+    if (!CIDLib_Module::atomInitStats)
     {
         TBaseLock lockInit;
-        if (!CIDLib_Module::bInitStats)
+        if (!CIDLib_Module::atomInitStats)
         {
             //
             //  The start time of the app. We just set it here and it
@@ -2282,7 +2679,21 @@ tCIDLib::TVoid TModule::InitStats()
             );
             TStatsCache::SetValue(CIDLib_Module::sciStartTime, TTime::enctNow());
 
-            CIDLib_Module::bInitStats = kCIDLib::True;
+            TStatsCache::RegisterItem
+            (
+                kCIDLib::pszStat_AppInfo_DroppedLogEvs
+                , tCIDLib::EStatItemTypes::Counter
+                , CIDLib_Module::sciDroppedLogEvs
+            );
+
+            TStatsCache::RegisterItem
+            (
+                kCIDLib::pszStat_AppInfo_LogErrors
+                , tCIDLib::EStatItemTypes::Counter
+                , CIDLib_Module::sciLogErrors
+            );
+
+            CIDLib_Module::atomInitStats.Set();
         }
     }
 }
@@ -2323,5 +2734,6 @@ tCIDLib::TVoid TModule::LoadRes(const TString& strResFile)
         }
     }
 }
+
 
 

@@ -42,7 +42,10 @@ RTTIDecls(TCIDRTPTrans,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDRTP_Transmitter
 {
-    const tCIDLib::TCard4 c4MaxFreeMQSz = 256;
+    namespace
+    {
+        const tCIDLib::TCard4 c4MaxFreeMQSz = 256;
+    }
 }
 
 
@@ -63,10 +66,14 @@ TCIDRTPTrans::TCIDRTPTrans() :
     , m_c4PayloadMSs(0)
     , m_c4PayloadSamples(0)
     , m_c4SampleBytes(0)
+    , m_c4SentBytes(0)
+    , m_c4SentPackets(0)
+    , m_c4SyncSrc(0)
     , m_c4TotalBytes(0)
     , m_c4TotalMSs(0)
     , m_colFreeMQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
     , m_colProcQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
+    , m_enctStartTime(0)
     , m_prtpioIn(nullptr)
     , m_thrReader
       (
@@ -318,7 +325,7 @@ TCIDRTPTrans::c4BuildRTCPHeader(const   tCIDLib::TCard1     c1Type
     //
     //  Calc the length, which is number of 32 bit chunks minus 1.
     //
-    tCIDLib::TCard2 c2Len;
+    tCIDLib::TCard2 c2Len = 0;
     switch(c1Type)
     {
         case 200 :

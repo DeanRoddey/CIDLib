@@ -16,7 +16,10 @@
 // DESCRIPTION:
 //
 //  This is the header for the CIDLib_Base64.cpp file, which provides support
-//  for converting between binary and Base64 formats.
+//  for converting between binary and Base64 formats. It's stateless and just
+//  converts what you pass it. It uses streams for input and output so it's
+//  easy to do an ongoing sequence of operations that accumulate to a single
+//  output.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -41,15 +44,17 @@ class CIDLIBEXP TBase64 : public TObject
         // -------------------------------------------------------------------
         TBase64();
 
-        TBase64(const TBase64&)  =delete;
+        TBase64(const TBase64&) = default;
+        TBase64(TBase64&&) = default;
 
-        ~TBase64();
+        ~TBase64() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBase64& operator=(const TBase64&) = delete;
+        TBase64& operator=(const TBase64&) = default;
+        TBase64& operator=(TBase64&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -128,8 +133,8 @@ class CIDLIBEXP TBase64 : public TObject
         //  Private data members
         //
         //  m_bEscapeForwardSlashes
-        //      In some cases, such as transmitting over JSON, we need to escape forward
-        //      slashes or recipients may choke on it. Default is not to.
+        //      In some cases, such as transmitting over JSON, we need to escape
+        //      forward slashes or recipients may choke on it. Default is not to.
         //
         //  m_c4LineWidth
         //      The maximum line width to generate when encoding. Defaults to

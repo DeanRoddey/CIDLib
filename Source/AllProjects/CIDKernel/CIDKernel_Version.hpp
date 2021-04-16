@@ -41,9 +41,9 @@ namespace kCIDLib
     //  in from the build environment, which we then set here and all other
     //  CIDLib code uses these.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MajVersion    = CID_MAJVER;
-    const tCIDLib::TCard4           c4MinVersion    = CID_MINVER;
-    const tCIDLib::TCard4           c4Revision      = CID_REVISION;
+    constexpr tCIDLib::TCard4       c4MajVersion    = CID_MAJVER;
+    constexpr tCIDLib::TCard4       c4MinVersion    = CID_MINVER;
+    constexpr tCIDLib::TCard4       c4Revision      = CID_REVISION;
     const tCIDLib::TCh* const       pszVersion      = CIDLib_MakeLStr3(CID_VERSTRING);
     const tCIDLib::TCh* const       pszVerSuffix    = CIDLib_MakeLStr3(CID_VERSUFF);
 }

@@ -68,7 +68,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             // We can only zero it in this case
             TRawMem::SetMemBuf
             (
-                m_ptElements, tCIDLib::TCard1(0), sizeof(TElem) * m_c4ElemCount
+                m_ptElements, kCIDLib::c1MinCard, sizeof(TElem) * m_c4ElemCount
             );
         }
 
@@ -86,7 +86,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             // We can only zero it in this case
             TRawMem::SetMemBuf
             (
-                m_ptElements, tCIDLib::TCard1(0), sizeof(TElem) * m_c4ElemCount
+                m_ptElements, kCIDLib::c1MinCard, sizeof(TElem) * m_c4ElemCount
             );
         }
 
@@ -117,12 +117,13 @@ class TFundArray : public TFundColBase, public MDuplicable
             );
         }
 
+        // Do a minimal setup and call move operator
         TFundArray(TMyType&& fcolSrc) :
 
             m_c4ElemCount(1)
             , m_ptElements(new TElem[1])
         {
-            TRawMem::SetMemBuf(m_ptElements, tCIDLib::TCard1(0), sizeof(TElem));
+            TRawMem::SetMemBuf(m_ptElements, kCIDLib::c1MinCard, sizeof(TElem));
             *this = tCIDLib::ForceMove(fcolSrc);
         }
 
@@ -303,6 +304,16 @@ class TFundArray : public TFundColBase, public MDuplicable
             return kCIDLib::True;
         }
 
+        template <typename IterCB> tCIDLib::TBoolean bForEachNCI(IterCB iterCB)
+        {
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4ElemCount; c4Index++)
+            {
+                if (!iterCB(m_ptElements[c4Index], c4Index))
+                    return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
 
         const TElem* ptElements() const
         {
@@ -396,7 +407,7 @@ class TFundArray : public TFundColBase, public MDuplicable
             TRawMem::SetMemBuf
             (
                 m_ptElements
-                , tCIDLib::TCard1(0)
+                , kCIDLib::c1MinCard
                 , m_c4ElemCount * sizeof(TElem)
             );
         }

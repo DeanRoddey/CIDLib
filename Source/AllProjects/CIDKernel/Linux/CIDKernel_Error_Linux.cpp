@@ -169,25 +169,6 @@ namespace
     const tCIDLib::TCard4 __c4ErrCount = tCIDLib::c4ArrayElems(__amapList);
 
 
-    // ---------------------------------------------------------------------------
-    //  Local data
-    //
-    //  __keyPTDSlotId
-    //      The per thread slot id for storing the last error on each thread.
-    // ---------------------------------------------------------------------------
-    pthread_key_t    __keyPTDSlotId;
-
-
-
-    // ---------------------------------------------------------------------------
-    //  Local methods
-    // ---------------------------------------------------------------------------
-    tCIDLib::TVoid __destroyThreadData(tCIDLib::TVoid* pData)
-    {
-        TKrnlError* kerr = static_cast<TKrnlError*>(pData);
-        delete kerr;
-    }
-
     tCIDLib::TErrCode __errcMapError(const tCIDLib::TErrCode errcToMap)
     {
         // Set up the two end points that are used to subdivide the list
@@ -214,45 +195,18 @@ namespace
         return kKrnlErrs::errcHostErr;
     }
 
-    TKrnlError& kerrCaller()
-    {
-        // Get the slot value for this thread
-        TKrnlError* pkerrRet = static_cast<TKrnlError*>(::pthread_getspecific(__keyPTDSlotId));
-
-        // If there is no object there, then allocate one and store it
-        if (!pkerrRet)
-        {
-            pkerrRet = new TKrnlError;
-            tCIDLib::TSInt iRc = ::pthread_setspecific(__keyPTDSlotId, pkerrRet);
-            if (iRc)
-            {
-                kmodCIDKernel.ErrorPopUp
-                (
-                    iRc
-                    , CID_FILE
-                    , CID_LINE
-                    , kmodCIDKernel.pszLoadCIDFacMsg(kKrnlErrs::errcErr_SetSlot)
-                );
-            }
-        }
-        return *pkerrRet;
-    }
+    // A per-thread value to store the last error
+    thread_local TKrnlError kerrCaller;
 }
 
 // ---------------------------------------------------------------------------
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TCIDKrnlModule::__InitTermError(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::InitTermError(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
-        //
-        //  Allocate our per-thread slot id. This is where we store last err
-        //  info for each thread.
-        //
-        ::pthread_key_create(&__keyPTDSlotId, __destroyThreadData);
-
         //
         //  If we debugging, then make sure that the error id array above
         //  really is in sorted order. If not, then we are in trouble because
@@ -269,10 +223,6 @@ TCIDKrnlModule::__InitTermError(const tCIDLib::EInitTerm eInitTerm)
         }
         #endif
     }
-    else if (eInitTerm == tCIDLib::EInitTerm::Terminate)
-    {
-        ::pthread_key_delete(__keyPTDSlotId);
-    }
 }
 
 
@@ -283,7 +233,7 @@ TCIDKrnlModule::__InitTermError(const tCIDLib::EInitTerm eInitTerm)
 // ---------------------------------------------------------------------------
 const TKrnlError& TKrnlError::kerrLast()
 {
-    return kerrCaller();
+    return kerrCaller;
 }
 
 
@@ -296,14 +246,14 @@ TKrnlError::ThrowHostError(const tCIDLib::TOSErrCode errcHostId)
 
 tCIDLib::TVoid TKrnlError::SetLastError(const TKrnlError& kerrToSet)
 {
-    kerrCaller() = kerrToSet;
+    kerrCaller = kerrToSet;
 }
 
 
 tCIDLib::TVoid
 TKrnlError::SetLastHostError(const tCIDLib::TOSErrCode errcHostId)
 {
-    kerrCaller().Set(__errcMapError(errcHostId), errcHostId);
+    kerrCaller.Set(__errcMapError(errcHostId), errcHostId);
 }
 
 
@@ -311,5 +261,5 @@ tCIDLib::TVoid
 TKrnlError::SetLastKrnlError(const  tCIDLib::TErrCode   errcKrnlId
                             , const tCIDLib::TOSErrCode errcHostId)
 {
-    kerrCaller().Set(errcKrnlId, errcHostId);
+    kerrCaller.Set(errcKrnlId, errcHostId);
 }

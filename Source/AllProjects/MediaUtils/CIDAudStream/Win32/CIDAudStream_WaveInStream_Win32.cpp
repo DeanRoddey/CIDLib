@@ -30,8 +30,13 @@
 //  Includes. We use some kernel helpers here.
 // ---------------------------------------------------------------------------
 #include    "CIDAudStream_.hpp"
+
+#pragma warning(push)
+#pragma warning(disable : 26461 26473 26812)
 #include    <windows.h>
 #include    <mmsystem.h>
+#pragma warning(pop)
+
 #include    "CIDKernel_InternalHelpers_.hpp"
 
 
@@ -51,20 +56,20 @@ namespace CIDAudStream_WaveInSrcStream_Win32
     //  per sample PCM, mono. For now, it's the only format supported. This stuff needs
     //  to be expanded to support format setting from the outside.
     //
-    const tCIDLib::TCard4   c4Channels      = 1;
+    constexpr tCIDLib::TCard4   c4Channels      = 1;
 
     // 16000 samples per second, two bytes per sample
-    const tCIDLib::TCard4   c4SampleRate    = 16000;
-    const tCIDLib::TCard4   c4SampleBytes   = 2;
+    constexpr tCIDLib::TCard4   c4SampleRate    = 16000;
+    constexpr tCIDLib::TCard4   c4SampleBytes   = 2;
 
     // An 16th of a second of audio samples
-    const tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
+    constexpr tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
 
     // Bytes required to hold that number of samples
-    const tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
+    constexpr tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
 
     // Number of buffers we have (which will get us three seconds of buffering)
-    const tCIDLib::TCard4   c4BufCount      = 48;
+    constexpr tCIDLib::TCard4   c4BufCount      = 48;
 }
 
 
@@ -109,14 +114,14 @@ struct TWaveInSrcStreamInfo
 tCIDLib::TBoolean
 TWaveInSrcStream::bReadBytes(       tCIDLib::TCard1* const  pc1ToFill
                             , const tCIDLib::TCard4         c4MaxBytes
-                            ,       tCIDLib::TCard4&        c4BytesRead
+                            , COP   tCIDLib::TCard4&        c4BytesRead
                             , const tCIDLib::TCard4         c4WaitMSs)
 {
     if (!m_pInfo)
         ThrowNotReady();
 
     // Lock while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If we have some left over data from last time, return it first. It's even
@@ -223,7 +228,7 @@ tCIDLib::TVoid TWaveInSrcStream::FlushBufs()
     if (!m_pInfo)
         ThrowNotReady();
 
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Just move through the buffers until we find one not ready
     while (kCIDLib::True)
@@ -269,7 +274,7 @@ tCIDLib::TVoid TWaveInSrcStream::Initialize()
     try
     {
         m_pInfo = new TWaveInSrcStreamInfo;
-        TRawMem::SetMemBuf(m_pInfo, tCIDLib::TCard1(0), sizeof(TWaveInSrcStreamInfo));
+        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TWaveInSrcStreamInfo));
 
         //
         //  Allocate our overflow buffer. It's the same size as one of our regular
@@ -385,15 +390,15 @@ tCIDLib::TVoid TWaveInSrcStream::Initialize()
 
 // Returns the sample format for for this stream.
 tCIDLib::TVoid
-TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
-                                , tCIDLib::TCard4&  c4SamplesPerSec
-                                , tCIDLib::TCard4&  c4BytesPerSample) const
+TWaveInSrcStream::QueryFormat(  COP     tCIDLib::TCard4&    c4Channels
+                                , COP   tCIDLib::TCard4&    c4SamplesPerSec
+                                , COP   tCIDLib::TCard4&    c4BytesPerSample) const
 {
     // Make sure we are ready
     if (!m_pInfo)
         ThrowNotReady();
 
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     c4Channels = CIDAudStream_WaveInSrcStream_Win32::c4Channels;
     c4SamplesPerSec = CIDAudStream_WaveInSrcStream_Win32::c4SampleRate;
     c4BytesPerSample = CIDAudStream_WaveInSrcStream_Win32::c4SampleBytes;
@@ -406,7 +411,7 @@ TWaveInSrcStream::QueryFormat(  tCIDLib::TCard4&    c4Channels
 //
 tCIDLib::TVoid TWaveInSrcStream::Terminate()
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     if (m_pInfo)
     {

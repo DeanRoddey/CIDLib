@@ -80,10 +80,8 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
             , const tCIDXML::EDefAttrTypes  eDefaultType
         );
 
-        TDTDAttrDef
-        (
-            const   TDTDAttrDef&            xadToCopy
-        );
+        TDTDAttrDef(const TDTDAttrDef&) = default;
+        TDTDAttrDef(TDTDAttrDef&&) = default;
 
         ~TDTDAttrDef();
 
@@ -91,10 +89,8 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDTDAttrDef& operator=
-        (
-            const   TDTDAttrDef&            xadToAssign
-        );
+        TDTDAttrDef& operator=(const TDTDAttrDef&) = default;
+        TDTDAttrDef& operator=(TDTDAttrDef&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -104,9 +100,9 @@ class CIDXMLEXP TDTDAttrDef : public TXMLAttrDef
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
-        const TString& strFullName() const;
+        const TString& strFullName() const final;
 
 
         // -------------------------------------------------------------------

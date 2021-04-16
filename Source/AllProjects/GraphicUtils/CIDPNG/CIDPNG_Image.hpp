@@ -81,11 +81,6 @@ class CIDPNGEXP TPNGImage : public TCIDImage
 
         TPNGImage
         (
-            const   TPNGImage&              imgSrc
-        );
-
-        TPNGImage
-        (
             const   TCIDImage&              imgSrc
         );
 
@@ -93,6 +88,16 @@ class CIDPNGEXP TPNGImage : public TCIDImage
         (
             const   TCIDImage&              imgSrc
             , const TSize&                  szNew
+        );
+
+        TPNGImage
+        (
+            const   TPNGImage&              imgSrc
+        );
+
+        TPNGImage
+        (
+                    TPNGImage&&             imgSrc
         );
 
         ~TPNGImage();
@@ -103,12 +108,17 @@ class CIDPNGEXP TPNGImage : public TCIDImage
         // -------------------------------------------------------------------
         TPNGImage& operator=
         (
+            const   TCIDImage&              imgSrc
+        );
+
+        TPNGImage& operator=
+        (
             const   TPNGImage&              imgSrc
         );
 
         TPNGImage& operator=
         (
-            const   TCIDImage&              imgSrc
+                    TPNGImage&&             imgSrc
         );
 
 

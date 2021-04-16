@@ -56,7 +56,8 @@ class CIDXMLEXP TXMLTreeAttr : public TObject
         // -------------------------------------------------------------------
         TXMLTreeAttr() = delete;
 
-        TXMLTreeAttr(const TXMLTreeAttr&) = delete;
+        TXMLTreeAttr(const TXMLTreeAttr&) = default;
+        TXMLTreeAttr(TXMLTreeAttr&&) = default;
 
         ~TXMLTreeAttr();
 
@@ -64,7 +65,8 @@ class CIDXMLEXP TXMLTreeAttr : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLTreeAttr& operator=(const TXMLTreeAttr&) = delete;
+        TXMLTreeAttr& operator=(const TXMLTreeAttr&) = default;
+        TXMLTreeAttr& operator=(TXMLTreeAttr&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -191,6 +193,7 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
         TXMLTreeNode() = delete;
 
         TXMLTreeNode(const TXMLTreeNode&) = delete;
+        TXMLTreeNode(TXMLTreeNode&&) = delete;
 
         ~TXMLTreeNode();
 
@@ -199,6 +202,8 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TXMLTreeNode& operator=(const TXMLTreeNode&) = delete;
+        TXMLTreeNode& operator=(TXMLTreeNode&&) = delete;
+
 
         // -------------------------------------------------------------------
         //  Public, virtual methods
@@ -233,7 +238,7 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const override;
 
 
     private :
@@ -269,6 +274,7 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
         TXMLTreeComment() = delete;
 
         TXMLTreeComment(const TXMLTreeComment&) = delete;
+        TXMLTreeComment(TXMLTreeComment&&) = delete;
 
         ~TXMLTreeComment();
 
@@ -277,6 +283,7 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
         //  Public operators
         // -------------------------------------------------------------------
         TXMLTreeComment& operator=(const TXMLTreeComment&) = delete;
+        TXMLTreeComment& operator=(TXMLTreeComment&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -287,7 +294,7 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -348,6 +355,7 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
         TXMLTreeDecl() = delete;
 
         TXMLTreeDecl(const TXMLTreeDecl&) = delete;
+        TXMLTreeDecl(TXMLTreeDecl&&) = delete;
 
         ~TXMLTreeDecl();
 
@@ -356,6 +364,7 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
         //  Public operators
         // -------------------------------------------------------------------
         TXMLTreeDecl& operator=(const TXMLTreeDecl&) = delete;
+        TXMLTreeDecl& operator=(TXMLTreeDecl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -366,7 +375,7 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -438,6 +447,7 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
         TXMLTreeDTD() = delete;
 
         TXMLTreeDTD(const TXMLTreeDTD&) = delete;
+        TXMLTreeDTD(TXMLTreeDTD&&) = delete;
 
         ~TXMLTreeDTD();
 
@@ -445,7 +455,8 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLTreeDTD& operator=(const TXMLTreeDTD&);
+        TXMLTreeDTD& operator=(const TXMLTreeDTD&) = delete;
+        TXMLTreeDTD& operator=(TXMLTreeDTD&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -456,7 +467,7 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -526,6 +537,7 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         TXMLTreeElement() = delete;
 
         TXMLTreeElement(const TXMLTreeElement&) = delete;
+        TXMLTreeElement(TXMLTreeElement&&) = delete;
 
         ~TXMLTreeElement();
 
@@ -534,6 +546,7 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         //  Unimplemented constructors and operators
         // -------------------------------------------------------------------
         TXMLTreeElement& operator=(const TXMLTreeElement&) = delete;
+        TXMLTreeElement& operator=(TXMLTreeElement&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -544,7 +557,7 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -581,21 +594,44 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         template <typename IterCB> tCIDLib::TBoolean bForEach(IterCB iterCB) const
         {
             // IF there were no children, this guy can be null
-            if (!m_pcolChildren)
-                return kCIDLib::True;
-
-            const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+            if (m_pcolChildren)
             {
-                const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
-                if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
                 {
-                    const tCIDLib::TBoolean bRet = iterCB
-                    (
-                        static_cast<const TXMLTreeElement&>(xtnodeCur)
-                    );
-                    if (!bRet)
-                        return bRet;
+                    const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+                    if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                    {
+                        const tCIDLib::TBoolean bRet = iterCB
+                        (
+                            static_cast<const TXMLTreeElement&>(xtnodeCur)
+                        );
+                        if (!bRet)
+                            return bRet;
+                    }
+                }
+            }
+            return kCIDLib::True;
+        }
+
+        template <typename IterCB> tCIDLib::TBoolean bForEachI(IterCB iterCB) const
+        {
+            // If there were no children, this guy can be null
+            if (m_pcolChildren)
+            {
+                const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
+                for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+                {
+                    const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
+                    if (xtnodeCur.eType() == tCIDXML::ENodeTypes::Element)
+                    {
+                        const tCIDLib::TBoolean bRet = iterCB
+                        (
+                            static_cast<const TXMLTreeElement&>(xtnodeCur), c4Index
+                        );
+                        if (!bRet)
+                            return bRet;
+                    }
                 }
             }
             return kCIDLib::True;
@@ -679,6 +715,11 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
             const   tCIDLib::TCard4         c4Count
             ,       tCIDLib::TCard4&        c4FoundAt
         )   const;
+
+        const TString& strAttr(const TString& strName) const
+        {
+           return xtattrNamed(strName).strValue();
+        }
 
 
     protected :
@@ -774,6 +815,7 @@ class CIDXMLEXP TTreeAttrCursor : public TObject
         );
 
         TTreeAttrCursor(const TTreeAttrCursor&) = delete;
+        TTreeAttrCursor(TTreeAttrCursor&&) = delete;
 
         ~TTreeAttrCursor();
 
@@ -782,6 +824,7 @@ class CIDXMLEXP TTreeAttrCursor : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TTreeAttrCursor& operator=(const TTreeAttrCursor&) = delete;
+        TTreeAttrCursor& operator=(TTreeAttrCursor&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -830,6 +873,7 @@ class CIDXMLEXP TTreeChildCursor : public TObject
         );
 
         TTreeChildCursor(const TTreeChildCursor&) = delete;
+        TTreeChildCursor(TTreeChildCursor&&) = delete;
 
         ~TTreeChildCursor();
 
@@ -837,7 +881,8 @@ class CIDXMLEXP TTreeChildCursor : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TTreeChildCursor& operator=(const TTreeChildCursor&);
+        TTreeChildCursor& operator=(const TTreeChildCursor&) = delete;
+        TTreeChildCursor& operator=(TTreeChildCursor&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -898,6 +943,7 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
         TXMLTreePI() = delete;
 
         TXMLTreePI(const TXMLTreePI&) = delete;
+        TXMLTreePI(TXMLTreePI&&) = delete;
 
         ~TXMLTreePI();
 
@@ -906,6 +952,7 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
         //  Unimplemented constructors and operators
         // -------------------------------------------------------------------
         TXMLTreePI& operator=(const TXMLTreePI&) = delete;
+        TXMLTreePI& operator=(TXMLTreePI&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -916,7 +963,7 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -985,6 +1032,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         TXMLTreeText() = delete;
 
         TXMLTreeText(const TXMLTreeText&) = delete;
+        TXMLTreeText(TXMLTreeText&&) = delete;
 
         ~TXMLTreeText();
 
@@ -993,6 +1041,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         //  Public operators
         // -------------------------------------------------------------------
         TXMLTreeText& operator=(const TXMLTreeText&) = delete;
+        TXMLTreeText& operator=(TXMLTreeText&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1003,7 +1052,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -1095,6 +1144,7 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
         TXMLTreeDocument();
 
         TXMLTreeDocument(const TXMLTreeDocument&) = delete;
+        TXMLTreeDocument(TXMLTreeDocument&&) = delete;
 
         ~TXMLTreeDocument();
 
@@ -1103,6 +1153,7 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TXMLTreeDocument& operator=(const TXMLTreeDocument&) = delete;
+        TXMLTreeDocument& operator=(TXMLTreeDocument&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -1135,8 +1186,12 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const;
+        )   const final;
 
+
+        // -------------------------------------------------------------------
+        //  Protected, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TVoid AddChild
         (
                     TXMLTreeNode* const     pxtnodeToAdopt

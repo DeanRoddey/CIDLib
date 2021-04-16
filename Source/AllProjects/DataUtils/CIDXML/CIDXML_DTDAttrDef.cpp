@@ -89,38 +89,15 @@ TDTDAttrDef::TDTDAttrDef(const TString& strName) :
 {
 }
 
-TDTDAttrDef::TDTDAttrDef(const TDTDAttrDef& xadToCopy) :
-
-    TXMLAttrDef(xadToCopy)
-    , m_strName(xadToCopy.m_strName)
-{
-}
-
 TDTDAttrDef::~TDTDAttrDef()
 {
 }
 
 
 // ---------------------------------------------------------------------------
-//  TDTDAttrDef: Public operators
-// ---------------------------------------------------------------------------
-TDTDAttrDef& TDTDAttrDef::operator=(const TDTDAttrDef& xadToCopy)
-{
-    if (this == &xadToCopy)
-        return *this;
-
-    TXMLAttrDef::operator=(xadToCopy);
-    m_strName = xadToCopy.m_strName;
-
-    return *this;
-}
-
-
-// ---------------------------------------------------------------------------
 //  TDTDAttrDef: Public, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid
-TDTDAttrDef::FormatTo(TTextOutStream& strmDest, const TXMLValidator&) const
+tCIDLib::TVoid TDTDAttrDef::FormatTo(TTextOutStream& strmDest, const TXMLValidator&) const
 {
     strmDest << m_strName << L" ";
 

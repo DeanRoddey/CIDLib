@@ -30,12 +30,23 @@
 #include    "../CIDBuild.hpp"
 
 
+// ---------------------------------------------------------------------------
+//  TToolsDriver: Protected, non-virtual methods
+// ---------------------------------------------------------------------------
+
+// Nothing to do yet for Linux
+tCIDLib::TVoid
+TToolsDriver::PostLink( const   TProjectInfo&   projiTarget
+                        , const TBldStr&        strTarget)
+{
+}
+
 
 // ---------------------------------------------------------------------------
 //  TToolsDriver: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TVoid
-TToolsDriver::__BuildLibName(const  TBldStr&    strTargetProject
+tCIDLib::TVoid
+TToolsDriver::BuildLibName( const   TBldStr&    strTargetProject
                             ,       TBldStr&    strToFill)
 {
     strToFill = L"lib";

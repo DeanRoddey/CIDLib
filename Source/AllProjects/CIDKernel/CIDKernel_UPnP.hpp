@@ -79,7 +79,9 @@ class KRNLEXPORT MUPnPSvcCallback
         // -------------------------------------------------------------------
         MUPnPSvcCallback();
         MUPnPSvcCallback(const MUPnPSvcCallback&);
+        MUPnPSvcCallback(MUPnPSvcCallback&&) = delete;
         MUPnPSvcCallback& operator=(const MUPnPSvcCallback&);
+        MUPnPSvcCallback& operator=(MUPnPSvcCallback&&) = delete;
 };
 
 
@@ -91,6 +93,12 @@ class KRNLEXPORT MUPnPSvcCallback
 class KRNLEXPORT TKrnlUPnPService
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Forward declare our per-platfrom structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
         // -------------------------------------------------------------------
         //  Public Constructors and Destructor
         // -------------------------------------------------------------------
@@ -147,11 +155,11 @@ class KRNLEXPORT TKrnlUPnPService
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pData
+        //  m_pPlatData
         //      An opaque pointer to that the OS implementation can point at
         //      whatever it needs to track.
         // -------------------------------------------------------------------
-        tCIDLib::TVoid*     m_pData;
+        TPlatData*  m_pPlatData;
 };
 
 
@@ -163,6 +171,12 @@ class KRNLEXPORT TKrnlUPnPService
 class KRNLEXPORT TKrnlUPnPDevice
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Forward declare our per-platfrom structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
         // -------------------------------------------------------------------
         //  Public Constructors and Destructor
         // -------------------------------------------------------------------
@@ -243,7 +257,7 @@ class KRNLEXPORT TKrnlUPnPDevice
         //      This is an opaque pointer to whatever information the per-
         //      platform implementation needs to maintain.
         // -------------------------------------------------------------------
-        tCIDLib::TVoid* m_pData;
+        TPlatData*  m_pPlatData;
 };
 
 
@@ -255,6 +269,12 @@ class KRNLEXPORT TKrnlUPnPDevice
 class KRNLEXPORT TKrnlUPnPFinder
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Forward declare our per-platfrom structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -299,15 +319,11 @@ class KRNLEXPORT TKrnlUPnPFinder
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_c4RefCount
-        //      For various reasons these devices are reference counted. When
-        //      it hits zero, we delete ourself.
-        //
-        //  m_pData
+        //  m_pPlatData
         //      This is an opaque pointer to whatever information the per-
         //      platform implementation needs to maintain.
         // -------------------------------------------------------------------
-        tCIDLib::TVoid* m_pData;
+        TPlatData* m_pPlatData;
 };
 
 
@@ -398,6 +414,12 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
 {
     public :
         // -------------------------------------------------------------------
+        //  Forward declare our per-platfrom structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
+        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TKrnlUPnPAsyncFinder();
@@ -408,6 +430,7 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
         );
 
         TKrnlUPnPAsyncFinder(const TKrnlUPnPAsyncFinder&) = delete;
+        TKrnlUPnPAsyncFinder(TKrnlUPnPAsyncFinder&&) = delete;
 
         ~TKrnlUPnPAsyncFinder();
 
@@ -416,6 +439,7 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlUPnPAsyncFinder& operator=(const TKrnlUPnPAsyncFinder&) = delete;
+        TKrnlUPnPAsyncFinder& operator=(TKrnlUPnPAsyncFinder&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -453,12 +477,12 @@ class KRNLEXPORT TKrnlUPnPAsyncFinder
         //      must be set before starting any searches. It can't be changed
         //      once set. It can be set in the ctor or later via SetCallback().
         //
-        //  m_pFinderInfo
+        //  m_pPlatData
         //      An opaque pointer that the per-platform implementation can
         //      use for its own needs.
         // -------------------------------------------------------------------
         MUPnPAsyncFinderCB* m_pmkupnpfcbTar;
-        tCIDLib::TVoid*     m_pFinderInfo;
+        TPlatData*          m_pPlatData;
 };
 
 #pragma CIDLIB_POPPACK

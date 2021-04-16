@@ -52,15 +52,18 @@ RTTIDecls(TMEngXMLTreeParserInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_XMLTreeParserClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the classes that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strXMLTreeAnchor(L"XMLTreeAnchor");
-    const TString   strXMLTreeAnchorClassPath(L"MEng.System.Runtime.XMLTreeAnchor");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the classes that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strXMLTreeAnchor(L"XMLTreeAnchor");
+        const TString   strXMLTreeAnchorClassPath(L"MEng.System.Runtime.XMLTreeAnchor");
 
-    const TString   strXMLTreeParser(L"XMLTreeParser");
-    const TString   strXMLTreeParserClassPath(L"MEng.System.Runtime.XMLTreeParser");
+        const TString   strXMLTreeParser(L"XMLTreeParser");
+        const TString   strXMLTreeParserClassPath(L"MEng.System.Runtime.XMLTreeParser");
+    }
 }
 
 
@@ -308,19 +311,21 @@ bNextPrevChild(         TMEngXMLTreeAnchorVal&  mecvToUpdate
     //  only the root would have no parent and therefore cannot ever be the
     //  incoming child anchor.
     //
-    CIDAssert(m_pxtnodeValue != 0, L"The parent anchor is invalid");
+    CIDAssert(m_pxtnodeValue != nullptr, L"The parent anchor is invalid");
     tCIDLib::TCard4 c4Index = mecvToUpdate.m_c4Index;
     CIDAssert(c4Index != kCIDLib::c4MaxCard, L"The child anchor is invalid");
-    const TXMLTreeElement& xtnodeCur = m_pxtnodeValue->xtnodeChildAtAsElement(c4Index);
-    CIDAssert
-    (
-        &xtnodeCur == mecvToUpdate.m_pxtnodeValue
-        , L"The child anchor is not a child of the provided parent anchor"
-    );
+    {
+        const TXMLTreeElement& xtnodeCur = m_pxtnodeValue->xtnodeChildAtAsElement(c4Index);
+        CIDAssert
+        (
+            &xtnodeCur == mecvToUpdate.m_pxtnodeValue
+            , L"The child anchor is not a child of the provided parent anchor"
+        );
+    }
 
     // Looks ok, so let's try to move to the next or previous node
     const tCIDLib::TCard4 c4Count = m_pxtnodeValue->c4ChildCount();
-    const TXMLTreeElement* pxtnodeNew = 0;
+    const TXMLTreeElement* pxtnodeNew = nullptr;
     if (bNext)
     {
         c4Index++;
@@ -426,7 +431,7 @@ TMEngXMLTreeAnchorInfo::TMEngXMLTreeAnchorInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -757,27 +762,27 @@ TMEngXMLTreeParserInfo::TMEngXMLTreeParserInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2EnumId_NodeTypes(kMacroEng::c2BadId)
-    , m_c2MethId_ChildExists(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_FindChildByName(kMacroEng::c2BadId)
-    , m_c2MethId_FormatTo(kMacroEng::c2BadId)
-    , m_c2MethId_GetAnchor(kMacroEng::c2BadId)
-    , m_c2MethId_GetAttribute(kMacroEng::c2BadId)
-    , m_c2MethId_GetAttribute2(kMacroEng::c2BadId)
-    , m_c2MethId_GetChildAnchor(kMacroEng::c2BadId)
-    , m_c2MethId_GetChildText(kMacroEng::c2BadId)
-    , m_c2MethId_GetElemName(kMacroEng::c2BadId)
-    , m_c2MethId_GetErrorAt(kMacroEng::c2BadId)
-    , m_c2MethId_GetRootAnchor(kMacroEng::c2BadId)
-    , m_c2MethId_NextPrevChild(kMacroEng::c2BadId)
-    , m_c2MethId_ParseBuf(kMacroEng::c2BadId)
-    , m_c2MethId_ParseFile(kMacroEng::c2BadId)
-    , m_c2MethId_ParseString(kMacroEng::c2BadId)
-    , m_c2MethId_SetDefOptions(kMacroEng::c2BadId)
-    , m_c2MethId_SetOption(kMacroEng::c2BadId)
-    , m_c2TypeId_Anchor(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_NodeTypes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ChildExists(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindChildByName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatTo(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetAnchor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetAttribute(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetAttribute2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetChildAnchor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetChildText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetElemName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetErrorAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetRootAnchor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_NextPrevChild(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseBuf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseFile(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetDefOptions(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetOption(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Anchor(kCIDMacroEng::c2BadId)
     , m_c4ErrBadAnchor(kCIDLib::c4MaxCard)
     , m_c4ErrBadErrIndex(kCIDLib::c4MaxCard)
     , m_c4ErrChildNotFound(kCIDLib::c4MaxCard)
@@ -1222,13 +1227,12 @@ TMEngXMLTreeParserInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
         if (mecvRet.bValue(pxtnodeFind != nullptr))
         {
             mecvRet.bValue(kCIDLib::True);
-
-            TMEngXMLTreeAnchorVal& mecvAnchor
+            mecvActual.SetAnchorInfo
             (
-                meOwner.mecvStackAtAs<TMEngXMLTreeAnchorVal>(c4FirstInd + 4)
+                pxtnodeFind
+                , c4At
+                , meOwner.mecvStackAtAs<TMEngXMLTreeAnchorVal>(c4FirstInd + 4)
             );
-            mecvActual.SetAnchorInfo(pxtnodeFind, c4At, mecvAnchor);
-
             meOwner.mecvStackAtAs<TMEngCard4Val>(c4FirstInd + 3).c4Value(c4At);
         }
     }

@@ -165,7 +165,7 @@ class CIDAIEXP TAIBTNode : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TAIBTNode operator=(const TAIBTNode&) = delete;
+        TAIBTNode& operator=(const TAIBTNode&) = delete;
 
 
         // -------------------------------------------------------------------

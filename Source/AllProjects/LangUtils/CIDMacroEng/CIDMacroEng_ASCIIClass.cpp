@@ -45,8 +45,11 @@ RTTIDecls(TMEngASCIIInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_ASCIIClass
 {
-    const TString   strName(L"ASCII");
-    const TString   strClassPath(L"MEng.System.Runtime.ASCII");
+    namespace
+    {
+        const TString   strName(L"ASCII");
+        const TString   strClassPath(L"MEng.System.Runtime.ASCII");
+    }
 }
 
 
@@ -78,14 +81,17 @@ TMEngASCIIInfo::TMEngASCIIInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_FromDecDigit(kMacroEng::c2BadId)
-    , m_c2MethId_FromHexDigit(kMacroEng::c2BadId)
-    , m_c2MethId_IsDecDigit(kMacroEng::c2BadId)
-    , m_c2MethId_IsHexDigit(kMacroEng::c2BadId)
-    , m_c2MethId_ToDecDigit(kMacroEng::c2BadId)
-    , m_c2MethId_ToHexDigit(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromDecDigit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromHexDigit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsDecDigit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsHexDigit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ToDecDigit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ToHexDigit(kCIDMacroEng::c2BadId)
+    , m_c4Err_NotDecDig(kCIDLib::c4MaxCard)
+    , m_c4Err_NotHexDig(kCIDLib::c4MaxCard)
+    , m_c4Err_Overflow(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
 {
 }

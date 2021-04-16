@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -69,7 +68,6 @@ static TTestFuncRecord      aTestFunctions[] =
     ,   { TFacTestCIDLib::TestTextConverters, L"TextConverters" , kCIDLib::False }
     ,   { TFacTestCIDLib::TestLocales       , L"Locales"        , kCIDLib::False }
     ,   { TFacTestCIDLib::TestRTTI          , L"RTTI"           , kCIDLib::False }
-    ,   { TFacTestCIDLib::TestPerThreadData , L"PerThread"      , kCIDLib::False }
     ,   { TFacTestCIDLib::TestFundData      , L"FundData"       , kCIDLib::False }
     ,   { TFacTestCIDLib::TestSearchSort    , L"SearchSort"     , kCIDLib::False }
     ,   { TFacTestCIDLib::TestVectors       , L"Vectors"        , kCIDLib::False }
@@ -122,7 +120,6 @@ static tCIDLib::TVoid RunTests()
         }
     }
 }
-
 
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
@@ -363,9 +360,6 @@ tCIDLib::TVoid TFacTestCIDLib::ShowSystemInfo()
             << strmfLegend << L"Fac Path: "
             << strmfData << facTestCIDLib.strPath()
             << kCIDLib::NewLn
-
-            << strmfLegend << L"CPU Type: "
-            << strmfData << TSysInfo::eCPUType() << kCIDLib::NewLn
 
             << strmfLegend << L"OS Version: "
             << strmfData << c4OSMajVer << L"." << c4OSMinVer << L"." << c4OSRev

@@ -38,8 +38,16 @@
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <langinfo.h>
-#include <linux/limits.h>
-#include <linux/uio.h>
+#include <limits.h>
+
+//
+//  An error in the headers, this is also included in socket.h below and 
+//  causes duplicate definitions. If that is later fixed, we'll have to
+//  include this again (or make this conditional somehow.)
+//
+// #include <linux/uio.h>
+//
+
 #include <math.h>
 #include <mntent.h>
 #include <netdb.h>
@@ -51,6 +59,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/kd.h>
 #include <sys/mman.h>
@@ -63,22 +72,13 @@
 #include <sys/utsname.h>
 #include <sys/vfs.h>
 #include <sys/wait.h>
-#include <term.h>
 #include <termios.h>
+#include <unistd.h>
 #include <utime.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <term.h>
 
-// Including these last eliminates some warnings
-#include <readline/history.h>
-#include <readline/readline.h>
-
-// This is necessary because the file <readline/rlstdc.h>
-// destroys anyone who is not gcc!
-#if defined(__KCC)
-#undef inline
-#undef const
-#endif
 
 //
 // Forward delcarations
@@ -98,9 +98,9 @@ namespace TKrnlLinux
 union semun
 {
     int                 val;
-    struct semid_ds*    buf;
+    struct semid_ds*    idbuf;
     unsigned short int* array;
-    struct seminfo*     __buf;
+    struct seminfo*     infobuf;
 };
 #endif
 
@@ -108,6 +108,12 @@ union semun
 //
 // Internal structures
 //
+struct TCommHandleImpl
+{
+    tCIDLib::TSInt      hComm;
+};
+
+
 struct TConsoleHandleImpl
 {
     struct termios              TermInfo;

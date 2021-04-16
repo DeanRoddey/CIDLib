@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TKrnlMutex" Prefix="kmtxx" Parent="N/A">
+
+    <Desc>
+        Place holder for now, so we can have references to this class in other docs without getting a missing ref error.
+    </Desc>
+
+    <PubIntf>
+        <Ctors DefMethods="DefCtor">
+        </Ctors>
+
+    </PubIntf>
+
+</CppClass>

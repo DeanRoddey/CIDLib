@@ -102,7 +102,7 @@ TQOutStreamImpl::c4WriteBytes(  const   tCIDLib::TVoid* const   pBuffer
                                 , const tCIDLib::TCard4         c4BytesToWrite)
 {
     // Lock and process the new data
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
 
     //
     //  We will transcode buffers full of chars from the passed generic
@@ -110,13 +110,10 @@ TQOutStreamImpl::c4WriteBytes(  const   tCIDLib::TVoid* const   pBuffer
     //  chunks of chars at a time.
     //
     const tCIDLib::TCard4   c4BufSz = 2047;
-    tCIDLib::TCh            achBuf[c4BufSz + 1];
+    tCIDLib::TCh            achBuf[c4BufSz + 1] = L"";
     tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4CurIndex = 0;
-    const tCIDLib::TCard1*  pc1Src = reinterpret_cast<const tCIDLib::TCard1*>
-    (
-        pBuffer
-    );
+    const tCIDLib::TCard1*  pc1Src = static_cast<const tCIDLib::TCard1*>(pBuffer);
 
     //
     //  If we have any partial line content from the last flush, then we'll
@@ -176,7 +173,7 @@ TQOutStreamImpl::c4WriteBytes(  const   tCIDLib::TVoid* const   pBuffer
 tCIDLib::TCard8 TQOutStreamImpl::c8CurPos() const
 {
     // Just return our dummy value
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
     return m_c8CurPos;
 }
 
@@ -184,7 +181,7 @@ tCIDLib::TCard8 TQOutStreamImpl::c8CurPos() const
 tCIDLib::TVoid TQOutStreamImpl::Reset()
 {
     // Just reset our dummy position value
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
     m_c8CurPos = 0;
 }
 
@@ -207,7 +204,7 @@ TQOutStreamImpl::bQueryNewMsgs(         tCIDLib::TCard4&        c4MsgIndex
                                 ,       tCIDLib::TStrCollect&   colToFill
                                 , const tCIDLib::TBoolean       bAddNewLine)
 {
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
 
     // Calc the current last index
     const tCIDLib::TCard4 c4LastIndex = m_c4BaseIndex + m_c4MsgIndex;
@@ -231,7 +228,7 @@ TQOutStreamImpl::bQueryNewMsgs(         tCIDLib::TCard4&        c4MsgIndex
         //  provide all of the elements he wants, so adjust the actual
         //  index. Else, subtract the base to get the actual.
         //
-        tCIDLib::TCard4 c4Index;
+        tCIDLib::TCard4 c4Index = 0;
         if (c4MsgIndex < m_c4BaseIndex)
             c4Index = 0;
         else if (c4MsgIndex < c4LastIndex)
@@ -268,7 +265,7 @@ TQOutStreamImpl::bQueryNewMsgs( tCIDLib::TCard4&    c4MsgIndex
                                 , TString&          strToFill
                                 , tCIDLib::TCard4&  c4LineCount)
 {
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
 
     // Calc the current last index
     const tCIDLib::TCard4 c4LastIndex = m_c4BaseIndex + m_c4MsgIndex;
@@ -293,7 +290,7 @@ TQOutStreamImpl::bQueryNewMsgs( tCIDLib::TCard4&    c4MsgIndex
         //  provide all of the elements he wants, so adjust the actual
         //  index. Else, subtract the base to get the actual.
         //
-        tCIDLib::TCard4 c4Index;
+        tCIDLib::TCard4 c4Index = 0;
         if (c4MsgIndex < m_c4BaseIndex)
             c4Index = 0;
         else if (c4MsgIndex < c4LastIndex)
@@ -327,7 +324,7 @@ TQOutStreamImpl::bQueryNewMsgs( tCIDLib::TCard4&    c4MsgIndex
 
 tCIDLib::TCard4 TQOutStreamImpl::c4CurMsgIndex() const
 {
-    TMtxLocker lockQ(&m_mtxSync);
+    TLocker lockrQ(&m_mtxSync);
 
     // Add the current index to the base index to get the whole thing
     return m_c4BaseIndex + m_c4MsgIndex;

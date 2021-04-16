@@ -57,6 +57,7 @@ class CIDMATHEXP TComplex :
         );
 
         TComplex(const TComplex&) = default;
+        TComplex(TComplex&&) = default;
 
         ~TComplex();
 
@@ -65,6 +66,7 @@ class CIDMATHEXP TComplex :
         //  Public operators
         // -------------------------------------------------------------------
         TComplex& operator=(const TComplex&) = default;
+        TComplex& operator=(TComplex&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -133,17 +135,17 @@ class CIDMATHEXP TComplex :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -166,30 +168,9 @@ class CIDMATHEXP TComplex :
 };
 
 
-TComplex CIDMATHEXP operator-
-(
-    const   TComplex&   cplxLHS
-    , const TComplex&   cplxRHS
-);
-
-TComplex CIDMATHEXP operator+
-(
-    const   TComplex&   cplxLHS
-    , const TComplex&   cplxRHS
-);
-
-TComplex CIDMATHEXP operator*
-(
-    const   TComplex&   cplxLHS
-    , const TComplex&   cplxRHS
-);
-
-TComplex CIDMATHEXP operator/
-(
-    const   TComplex&   cplxLHS
-    , const TComplex&   cplxRHS
-);
+TComplex CIDMATHEXP operator-(const TComplex& cplxLHS, const TComplex& cplxRHS);
+TComplex CIDMATHEXP operator+(const TComplex& cplxLHS, const TComplex& cplxRHS);
+TComplex CIDMATHEXP operator*(const TComplex& cplxLHS, const TComplex& cplxRHS);
+TComplex CIDMATHEXP operator/(const TComplex& cplxLHS, const TComplex&  cplxRHS);
 
 #pragma CIDLIB_POPPACK
-
-

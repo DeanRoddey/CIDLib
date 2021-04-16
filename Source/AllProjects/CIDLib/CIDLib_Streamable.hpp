@@ -48,7 +48,7 @@ class   TClass;
 
 // ---------------------------------------------------------------------------
 //  CLASS: MStreamable
-// PREFIX: strmbl
+// PREFIX: mstrmbl
 // ---------------------------------------------------------------------------
 class CIDLIBEXP MStreamable
 {
@@ -56,8 +56,6 @@ class CIDLIBEXP MStreamable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        MStreamable() = default;
-
         virtual ~MStreamable() = default;
 
 
@@ -84,13 +82,13 @@ class CIDLIBEXP MStreamable
         friend TBinOutStream& operator<<
         (
                     TBinOutStream&          strmToWriteTo
-            , const MStreamable&            strmblToWrite
+            , const MStreamable&            mstrmblToWrite
         );
 
         friend TBinInStream& operator>>
         (
                     TBinInStream&           strmToReadFrom
-            ,       MStreamable&            strmblToRead
+            ,       MStreamable&            mstrmblToRead
         );
 
 
@@ -98,8 +96,11 @@ class CIDLIBEXP MStreamable
         //  Hidden but available so that including classes can have default
         //  generated copy/assignment.
         // -------------------------------------------------------------------
+        MStreamable() = default;
         MStreamable(const MStreamable&) = default;
+        MStreamable(MStreamable&&) = default;
         MStreamable& operator=(const MStreamable&) = default;
+        MStreamable& operator=(MStreamable&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -108,7 +109,7 @@ class CIDLIBEXP MStreamable
         virtual tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   = 0;
+        ) = 0;
 
         virtual tCIDLib::TVoid StreamTo
         (
@@ -133,16 +134,16 @@ class CIDLIBEXP MStreamable
 //  uses.
 // ---------------------------------------------------------------------------
 inline TBinOutStream&
-operator<<(TBinOutStream& strmTarget, const MStreamable& strmblToWrite)
+operator<<(TBinOutStream& strmTarget, const MStreamable& mstrmblToWrite)
 {
-    strmblToWrite.StreamTo(strmTarget);
+    mstrmblToWrite.StreamTo(strmTarget);
     return strmTarget;
 }
 
 inline TBinInStream&
-operator>>(TBinInStream& strmSource, MStreamable& strmblToFill)
+operator>>(TBinInStream& strmSource, MStreamable& mstrmblToFill)
 {
-    strmblToFill.StreamFrom(strmSource);
+    mstrmblToFill.StreamFrom(strmSource);
     return strmSource;
 }
 

@@ -179,7 +179,7 @@ class TBuildResTab : public TTabWindow, public MMEngPrsErrHandler
         //  We provide a templatized method to register typesafe handlers
         //  for events.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const            pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TPrsErrPosInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)
@@ -245,6 +245,15 @@ class TBuildResTab : public TTabWindow, public MMEngPrsErrHandler
                 //  Constructors and Destructor
                 // -----------------------------------------------------------
                 TErrInfo();
+
+                TErrInfo
+                (
+                    const   tCIDLib::TCard4 c4ColNum
+                    , const tCIDLib::TCard4 c4LineNum
+                    , const tCIDMacroEng::EPrsEvs eEvent
+                    , const TString&        strClassPath
+                    , const TString&        strText
+                );
 
                 TErrInfo
                 (

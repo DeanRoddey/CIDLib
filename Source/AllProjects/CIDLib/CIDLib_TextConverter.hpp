@@ -31,6 +31,8 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 class TMemBuf;
+class TBinInStream;
+class TTextInStream;
 
 
 // ---------------------------------------------------------------------------
@@ -57,6 +59,13 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TCard4 c4ConvertFrom
+        (
+                    TBinInStream&           strmSrc
+            ,       TTextOutStream&         strmTar
+            ,       tCIDLib::TCard4&        c4OutChars
+        );
+
         tCIDLib::TCard4 c4ConvertFrom
         (
             const   tCIDLib::TCard1* const  pc1Src
@@ -87,6 +96,13 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   tCIDLib::TCh            chSrc
             ,       tCIDLib::TCard1* const  pc1ToFill
             , const tCIDLib::TCard4         c4MaxBytes
+        );
+
+        tCIDLib::TCard4 c4ConvertTo
+        (
+                    TTextInStream&          strmSrc
+            ,       TBinOutStream&          strmTar
+            ,       tCIDLib::TCard4&        c4OutBytes
         );
 
         tCIDLib::TCard4 c4ConvertTo
@@ -134,11 +150,11 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   tCIDLib::TCh            chToSet
         );
 
-        tCIDLib::ETCvtActions eErrorAction() const;
+        tCIDLib::ETCvtActs eErrorAction() const;
 
-        tCIDLib::ETCvtActions eErrorAction
+        tCIDLib::ETCvtActs eErrorAction
         (
-            const   tCIDLib::ETCvtActions   eAction
+            const   tCIDLib::ETCvtActs      eAction
         );
 
         const TString& strEncodingName() const;
@@ -153,15 +169,11 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
             const   TString&                strEncodingName
         );
 
-        TTextConverter
-        (
-            const   TTextConverter&         tcvtSrc
-        );
+        TTextConverter(const TTextConverter&) = default;
+        TTextConverter(TTextConverter&&) = default;
 
-        tCIDLib::TVoid operator=
-        (
-            const   TTextConverter&         tcvtSrc
-        );
+        TTextConverter& operator=(const TTextConverter&) = default;
+        TTextConverter& operator=(TTextConverter&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -215,9 +227,9 @@ class CIDLIBEXP TTextConverter : public TObject, public MDuplicable
         //      The name of the encoding that the derived class handles. Its
         //      constructor will pass on this value to our constructor.
         // -------------------------------------------------------------------
-        tCIDLib::TCh            m_chRepChar;
-        tCIDLib::ETCvtActions   m_eErrAction;
-        TString                 m_strEncodingName;
+        tCIDLib::TCh        m_chRepChar;
+        tCIDLib::ETCvtActs  m_eErrAction;
+        TString             m_strEncodingName;
 
 
         // -------------------------------------------------------------------

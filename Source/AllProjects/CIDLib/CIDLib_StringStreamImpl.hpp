@@ -22,10 +22,10 @@
 //
 //  1)  This is a wierd one in some ways. Strings are ONLY Unicode format,
 //      but we are allowing a binary stream to stream into it. The stream
-//      classes make sure that its only ever used in UTF-16 encoding mode,
-//      but it could be set up otherwise. If so, then junk data could be
-//      streamed into it. It wouldn't fail, it would just place meaningless
-//      Unicode characters into the string.
+//      classes make sure that its only ever used in the correct native
+//      character encoding mode, but it could be set up otherwise. If so,
+//      then junk data could be streamed into it. It wouldn't fail, it would
+//      just place meaningless characters into the string.
 //
 //      Since we provide convenience classes to create most combinations of
 //      streams, the TTextStringInStream and TTextStringOutStream classes
@@ -36,9 +36,6 @@
 //
 //      We cannot even check here that the right thing is being done upstream,
 //      since the text stream buffers and writes out bunches of bytes at once.
-//      The fact even that it wrote an odd number of bytes means nothing,
-//      since the next bunch might contain the second byte of that final
-//      character.
 //
 //  2)  The current position maintained by these classes are in terms of
 //      Unicode chars into the string. However, the semantics of the binary
@@ -76,6 +73,7 @@ class CIDLIBEXP TStringStreamImplInfo
         );
 
         TStringStreamImplInfo(const TStringStreamImplInfo&) = delete;
+        TStringStreamImplInfo(TStringStreamImplInfo&&) = delete;
 
         ~TStringStreamImplInfo();
 
@@ -84,6 +82,7 @@ class CIDLIBEXP TStringStreamImplInfo
         //  Public operators
         // -------------------------------------------------------------------
         TStringStreamImplInfo& operator=(const TStringStreamImplInfo&) = delete;
+        TStringStreamImplInfo& operator=(TStringStreamImplInfo&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -127,6 +126,11 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
 
         TStringInStreamImpl
         (
+                    TString&&               strToTake
+        );
+
+        TStringInStreamImpl
+        (
             const   tCIDLib::TCard4         c4InitSize
         );
 
@@ -136,6 +140,7 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         );
 
         TStringInStreamImpl(const TStringInStreamImpl&) = delete;
+        TStringInStreamImpl(TStringInStreamImpl&&) = delete;
 
         ~TStringInStreamImpl();
 
@@ -144,12 +149,13 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TStringInStreamImpl& operator=(const TStringInStreamImpl&) = delete;
+        TStringInStreamImpl& operator=(TStringInStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override
+        tCIDLib::TBoolean bIsOpen() const final
         {
             // Always true for this type
             return kCIDLib::True;
@@ -159,15 +165,15 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         (
                     tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToRead
-        )   override;
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const  override
+        tCIDLib::TCard8 c8CurPos() const  final
         {
             // Convert our character index into a byte count
             return m_c4CurPos * kCIDLib::c4CharBytes;
         }
 
-        tCIDLib::TVoid Reset() override
+        tCIDLib::TVoid Reset() final
         {
             m_c4CurPos = 0;
         }
@@ -175,7 +181,7 @@ class CIDLIBEXP TStringInStreamImpl : public TInStreamImpl
         tCIDLib::TVoid SkipForwardBy
         (
             const   tCIDLib::TCard4         c4SkipBy
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -254,6 +260,7 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         );
 
         TStringOutStreamImpl(const TStringOutStreamImpl&) = delete;
+        TStringOutStreamImpl(TStringOutStreamImpl&&) = delete;
 
         ~TStringOutStreamImpl();
 
@@ -262,12 +269,13 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         //  Public operators
         // -------------------------------------------------------------------
         TStringOutStreamImpl& operator==(const TStringOutStreamImpl&) = delete;
+        TStringOutStreamImpl& operator==(TStringOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override
+        tCIDLib::TBoolean bIsOpen() const final
         {
             // Always true for this type
             return kCIDLib::True;
@@ -277,21 +285,21 @@ class CIDLIBEXP TStringOutStreamImpl : public TOutStreamImpl
         (
             const   tCIDLib::TVoid* const   pBuffer
             , const tCIDLib::TCard4         c4BytesToWrite
-        )   override;
+        )   final;
 
-        tCIDLib::TCard8 c8CurPos() const override
+        tCIDLib::TCard8 c8CurPos() const final
         {
             // Convert our character index into a byte count
             return m_c4CurPos * kCIDLib::c4CharBytes;
         }
 
-        tCIDLib::TVoid Reset() override
+        tCIDLib::TVoid Reset() final
         {
             m_c4CurPos = 0;
             m_pstrOut->Clear();
         }
 
-        tCIDLib::TVoid SeekToEnd() override
+        tCIDLib::TVoid SeekToEnd() final
         {
             // Reset our current position to the logical end
             m_c4CurPos = m_pstrOut->c4Length();

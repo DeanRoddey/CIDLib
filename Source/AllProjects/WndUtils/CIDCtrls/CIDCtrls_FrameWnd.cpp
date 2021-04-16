@@ -42,8 +42,11 @@ RTTIDecls(TFrameWnd, TWindow)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_FrameWnd
 {
-    static const tCIDLib::TCh* pszClass = L"CIDCtrlsStdFrame";
-    static const tCIDLib::TCh* pszClassHV = L"CIDCtrlsStdHVFrame";
+    namespace
+    {
+        const tCIDLib::TCh* pszClass = L"CIDCtrlsStdFrame";
+        const tCIDLib::TCh* pszClassHV = L"CIDCtrlsStdHVFrame";
+    }
 }
 
 
@@ -66,14 +69,14 @@ TFrameWnd::AreaForClient(const  TArea&                  areaClient
                         , const tCIDLib::TBoolean       bHasMenu)
 {
     RECT rectClient;
-    areaClient.ToRectl(*(tCIDLib::THostRectl*)&rectClient, tCIDLib::ERectlTypes::NonInclusive);
+    areaClient.ToRectl(*(tCIDLib::THostRectl*)&rectClient);
     ::AdjustWindowRectEx
     (
         &rectClient, tCIDLib::c4EnumOrd(eStyles), bHasMenu, tCIDLib::c4EnumOrd(eExStyles)
     );
 
     // And convert back to the output area
-    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient, tCIDLib::ERectlTypes::NonInclusive);
+    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient);
 }
 
 
@@ -97,6 +100,7 @@ TFrameWnd::TFrameWnd() :
     , m_hwndLastFocus(kCIDCtrls::hwndInvalid)
     , m_pmenuBar(nullptr)
     , m_pwndStatusBar(nullptr)
+    , m_widClient(0)
     , m_widNext(kCIDCtrls::widFirstCtrl)
 {
 }
@@ -530,6 +534,28 @@ TMenuBar* TFrameWnd::pmenuCur()
 
 
 //
+//  It's quite common to use a generic window as a client, so we provide a helper to
+//  do that. We also then set that guy's id as our client id, so we'll keep it sized
+//  to the available area.
+//
+TGenericWnd*
+TFrameWnd::pwndInstallGenericClientWnd(const tCIDCtrls::TWndId widToUse)
+{
+    TGenericWnd* pwndGen = new TGenericWnd();
+    pwndGen->CreateGenWnd
+    (
+        *this
+        , areaClient()
+        , tCIDCtrls::EWndStyles::ClippingVisChild
+        , tCIDCtrls::EExWndStyles::ControlParent
+        , widToUse
+    );
+    SetClientId(widToUse);
+    return pwndGen;
+}
+
+
+//
 //  If we have a current menu, then destroy it and close our accellerator table,
 //  which is driven by the menu.
 //
@@ -629,11 +655,7 @@ TFrameWnd::RestorePosState( const   tCIDCtrls::EPosStates   eState
            WndPlace.showCmd = SW_RESTORE;
     }
 
-    areaNormal.ToRectl
-    (
-        *(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaNormal.ToRectl(*(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition);
     ::SetWindowPlacement(hwndThis(), &WndPlace);
 }
 
@@ -651,11 +673,7 @@ TFrameWnd::RestorePosState( const   TArea&              areaTo
     ::GetWindowPlacement(hwndThis(), &WndPlace);
 
     // Put the passed area in as the restore area
-    areaTo.ToRectl
-    (
-        *(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaTo.ToRectl(*(tCIDLib::THostRectl*)&WndPlace.rcNormalPosition);
 
     // Ok, now do the actual restore
     if (bShow)
@@ -756,11 +774,7 @@ tCIDLib::TVoid TFrameWnd::SizeToClient(const TArea& areaFitTo)
 
     // And convert back to the output area
     TArea areaNew;
-    areaNew.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectClient
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaNew.FromRectl(*(tCIDLib::THostRectl*)&rectClient);
     SetSize(areaNew.szArea(), kCIDLib::False);
 }
 
@@ -786,6 +800,22 @@ TFrameWnd::AreaChanged( const   TArea&                  areaPrev
         // If we have a status bar, tell it we changed size
         if (m_pwndStatusBar)
             m_pwndStatusBar->ParentSizeChanged();
+
+        //
+        //  If we have a client id set, then let's try to position it to fit the
+        //  remaining available client area.
+        //
+        if (m_widClient)
+        {
+            TWindow* pwndClient = pwndChildById(m_widClient);
+            if (pwndClient)
+            {
+                // Calculate the area between menus and status bars and so forth
+                TArea areaNewCl;
+                QueryClientArea(areaNewCl, kCIDLib::True);
+                pwndClient->SetSize(areaNewCl.szArea(), kCIDLib::True);
+            }
+        }
     }
 }
 
@@ -1069,6 +1099,16 @@ tCIDLib::TBoolean TFrameWnd::bRestoring()
 // TFrameWnd: Protected, non-virtual methods
 // ---------------------------------------------------------------------------
 
+//
+//  The derived class can tell us what the window that we should treat as our client
+//  window is.
+//
+tCIDLib::TVoid TFrameWnd::SetClientId(const tCIDCtrls::TWndId widToSet)
+{
+    m_widClient = widToSet;
+}
+
+
 // Return the next available child id
 tCIDCtrls::TWndId TFrameWnd::widNext()
 {
@@ -1106,12 +1146,12 @@ tCIDLib::TVoid TFrameWnd::DoInit()
     //  NOTE that we don't use the standard custom window classes that TWindow
     //  registers for use by everyone else. We want our own
     //
-    static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    if (!bInitDone)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         // Lock while we do this
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const TRGBClr rgbBgn = facCIDCtrls().rgbSysClr(tCIDCtrls::ESysColors::Window);
             RegWndClass
@@ -1133,7 +1173,7 @@ tCIDLib::TVoid TFrameWnd::DoInit()
                 , rgbBgn
                 , kCIDLib::True
             );
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
 }

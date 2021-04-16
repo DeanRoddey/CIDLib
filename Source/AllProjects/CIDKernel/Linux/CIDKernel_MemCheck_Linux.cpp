@@ -20,6 +20,7 @@
 //  or OS heap debugging services.
 //
 // CAVEATS/GOTCHAS:
+//
 //  There ain't nothin' there.
 //
 // LOG:
@@ -34,7 +35,7 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_MemCheck.hpp"
 
-
+#if CID_DEBUG_ON
 
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlMemCheck
@@ -45,7 +46,8 @@
 //  TKrnlMemCheck: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TKrnlMemCheck::TKrnlMemCheck() :
-    __pSnapShot(0)
+
+    m_pSnapShot(nullptr)
 {
 }
 
@@ -57,7 +59,12 @@ TKrnlMemCheck::~TKrnlMemCheck()
 // ---------------------------------------------------------------------------
 //  TKrnlMemCheck: Public, static methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKrnlMemCheck::ReportToFile(const TKrnlFile& kflTarget)
+tCIDLib::TVoid TKrnlMemCheck::DumpLeaks()
+{
+}
+
+
+tCIDLib::TVoid TKrnlMemCheck::ReportToFile(const tCIDLib::TCh* const)
 {
 }
 
@@ -70,3 +77,11 @@ tCIDLib::TVoid TKrnlMemCheck::ReportToStdOut()
 tCIDLib::TVoid TKrnlMemCheck::ValidateHeap()
 {
 }
+
+tCIDLib::TVoid
+TKrnlMemCheck::SetHeapCheckLevel(const  tCIDLib::EHeapChkLevels eToSet
+                                , const tCIDLib::TBoolean       bNonFreeing)
+{
+}
+
+#endif

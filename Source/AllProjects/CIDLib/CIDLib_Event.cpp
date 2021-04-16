@@ -318,7 +318,7 @@ TEvent::InitNamed(          tCIDLib::TBoolean&      bCreated
         if (!m_kevImpl.bCreate(eInitState, bManual))
         {
             const TKrnlError& kerrLast = TKrnlError::kerrLast();
-            tCIDLib::TErrCode errcToThrow;
+            tCIDLib::TErrCode errcToThrow = 0;
             if (kerrLast.errcId() == kKrnlErrs::errcGen_AlreadyExists)
                 errcToThrow = kCIDErrs::errcEv_AlreadyExists;
             else

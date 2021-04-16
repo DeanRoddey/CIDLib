@@ -615,31 +615,31 @@ THTTPClient::ExpandBodyText(const   TString&            strText
         strOut.Clear();
 
     // We do a little state machine
-    enum EStates
+    enum class EStates
     {
-        EState_WaitRef
-        , EState_WaitType
-        , EState_WaitLT
-        , EState_WaitGT
-        , EState_WaitAmp2
-        , EState_WaitAmp3
-        , EState_WaitQuot2
-        , EState_WaitQuot3
-        , EState_WaitQuot4
-        , EState_WaitRadix
+        WaitRef
+        , WaitType
+        , WaitLT
+        , WaitGT
+        , WaitAmp2
+        , WaitAmp3
+        , WaitQuot2
+        , WaitQuot3
+        , WaitQuot4
+        , WaitRadix
 
         // These have to be in this order
-        , EState_WaitNum1
-        , EState_WaitNum2
-        , EState_WaitNum3
-        , EState_WaitNum4
-        , EState_WaitSemi
+        , WaitNum1
+        , WaitNum2
+        , WaitNum3
+        , WaitNum4
+        , WaitSemi
     };
 
     const tCIDLib::TCh* const pszStart = strText.pszBuffer();
     const tCIDLib::TCh* pszCur = pszStart;
 
-    EStates eState = EState_WaitRef;
+    EStates eState = EStates::WaitRef;
     tCIDLib::TCard2 c2NumRef = 0;
     tCIDLib::ERadices eRadix = tCIDLib::ERadices::Dec;
     while (*pszCur)
@@ -652,13 +652,13 @@ THTTPClient::ExpandBodyText(const   TString&            strText
         const tCIDLib::TCh chCur = *pszCur++;
         switch(eState)
         {
-            case EState_WaitRef :
+            case EStates::WaitRef :
             {
                 if (chCur == kCIDLib::chAmpersand)
                 {
                     c2NumRef = 0;
                     eRadix = tCIDLib::ERadices::Dec;
-                    eState = EState_WaitType;
+                    eState = EStates::WaitType;
                 }
                  else
                 {
@@ -667,28 +667,28 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitType :
+            case EStates::WaitType :
             {
                 if (chCur == kCIDLib::chPoundSign)
-                    eState = EState_WaitRadix;
+                    eState = EStates::WaitRadix;
                 else if (chCur == kCIDLib::chLatin_a)
-                    eState = EState_WaitAmp2;
+                    eState = EStates::WaitAmp2;
                 else if (chCur == kCIDLib::chLatin_g)
-                    eState = EState_WaitGT;
+                    eState = EStates::WaitGT;
                 else if (chCur == kCIDLib::chLatin_l)
-                    eState = EState_WaitLT;
+                    eState = EStates::WaitLT;
                 else if (chCur == kCIDLib::chLatin_q)
-                    eState = EState_WaitQuot2;
+                    eState = EStates::WaitQuot2;
                 else
                     ThrowBadCharRef(pszCur - pszStart);
                 break;
             }
 
-            case EState_WaitGT :
+            case EStates::WaitGT :
             {
                 if (chCur == kCIDLib::chLatin_t)
                 {
-                    eState = EState_WaitSemi;
+                    eState = EStates::WaitSemi;
                     strOut.Append(kCIDLib::chGreaterThan);
                 }
                  else
@@ -698,11 +698,11 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitLT :
+            case EStates::WaitLT :
             {
                 if (chCur == kCIDLib::chLatin_t)
                 {
-                    eState = EState_WaitSemi;
+                    eState = EStates::WaitSemi;
                     strOut.Append(kCIDLib::chLessThan);
                 }
                  else
@@ -712,20 +712,20 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitAmp2 :
+            case EStates::WaitAmp2 :
             {
                 if (chCur == kCIDLib::chLatin_m)
-                    eState = EState_WaitAmp3;
+                    eState = EStates::WaitAmp3;
                 else
                     ThrowBadCharRef(pszCur - pszStart);
                 break;
             }
 
-            case EState_WaitAmp3 :
+            case EStates::WaitAmp3 :
             {
                 if (chCur == kCIDLib::chLatin_p)
                 {
-                    eState = EState_WaitSemi;
+                    eState = EStates::WaitSemi;
                     strOut.Append(kCIDLib::chAmpersand);
                 }
                  else
@@ -735,29 +735,29 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitQuot2 :
+            case EStates::WaitQuot2 :
             {
                 if (chCur == kCIDLib::chLatin_u)
-                    eState = EState_WaitQuot3;
+                    eState = EStates::WaitQuot3;
                 else
                     ThrowBadCharRef(pszCur - pszStart);
                 break;
             }
 
-            case EState_WaitQuot3 :
+            case EStates::WaitQuot3 :
             {
                 if (chCur == kCIDLib::chLatin_o)
-                    eState = EState_WaitQuot4;
+                    eState = EStates::WaitQuot4;
                 else
                     ThrowBadCharRef(pszCur - pszStart);
                 break;
             }
 
-            case EState_WaitQuot4 :
+            case EStates::WaitQuot4 :
             {
                 if (chCur == kCIDLib::chLatin_t)
                 {
-                    eState = EState_WaitSemi;
+                    eState = EStates::WaitSemi;
                     strOut.Append(kCIDLib::chQuotation);
                 }
                  else
@@ -767,16 +767,16 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitRadix :
+            case EStates::WaitRadix :
             {
                 if ((chCur == kCIDLib::chLatin_x) || (chCur == kCIDLib::chLatin_X))
                 {
                     eRadix = tCIDLib::ERadices::Hex;
-                    eState = EState_WaitNum1;
+                    eState = EStates::WaitNum1;
                 }
                  else if (TRawStr::bIsDigit(chCur))
                 {
-                    eState = EState_WaitNum2;
+                    eState = EStates::WaitNum2;
                     c2NumRef = tCIDLib::TCard2(chCur - 0x30);
                 }
                  else
@@ -786,7 +786,7 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitNum1 :
+            case EStates::WaitNum1 :
             {
                 if (TRawStr::bIsHexDigit(chCur))
                 {
@@ -802,15 +802,15 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitNum2 :
-            case EState_WaitNum3 :
-            case EState_WaitNum4 :
+            case EStates::WaitNum2 :
+            case EStates::WaitNum3 :
+            case EStates::WaitNum4 :
             {
                 if (chCur == kCIDLib::chSemiColon)
                 {
                     // Put out the numeric char and go back to start
                     strOut.Append(tCIDLib::TCh(c2NumRef));
-                    eState = EState_WaitRef;
+                    eState = EStates::WaitRef;
                 }
                  else if (TRawStr::bIsHexDigit(chCur))
                 {
@@ -826,10 +826,10 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                     }
 
                     // Moves us to up to the next number or to semicolon
-                    eState = EStates(eState + 1);
+                    eState = EStates(tCIDLib::c4EnumOrd(eState) + 1);
 
                     // If we got to semi-colon, go ahead and put it out
-                    if (eState == EState_WaitSemi)
+                    if (eState == EStates::WaitSemi)
                         strOut.Append(tCIDLib::TCh(c2NumRef));
                 }
                  else
@@ -839,11 +839,11 @@ THTTPClient::ExpandBodyText(const   TString&            strText
                 break;
             }
 
-            case EState_WaitSemi :
+            case EStates::WaitSemi :
             {
                 if (chCur != kCIDLib::chSemiColon)
                     ThrowBadCharRef(pszCur - pszStart);
-                eState = EState_WaitRef;
+                eState = EStates::WaitRef;
                 break;
             }
         };
@@ -867,7 +867,7 @@ THTTPClient::MakeBasicAuthStr(  const   TString&    strUserName
     strHashSrc.Append(strPassword);
 
     // Create text streams over the source and the output string
-    TTextStringInStream strmSrc(&strHashSrc);
+    TTextStringInStream strmSrc(tCIDLib::ForceMove(strHashSrc));
     TTextStringOutStream strmTar(&strOut);
     strmTar.Reset();
 
@@ -937,15 +937,15 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
     }
 
     // OK, now let's parse the rest of it as key=value pairs
-    enum EStates
+    enum class EStates
     {
-        EState_Name
-        , EState_Quote
-        , EState_Value
-        , EState_Comma
+        Name
+        , Quote
+        , Value
+        , Comma
     };
     tCIDLib::TBoolean       bInQuote = kCIDLib::False;
-    EStates                 eCurState = EState_Name;
+    EStates                 eCurState = EStates::Name;
     TString                 strName;
     TString                 strValue;
 
@@ -979,7 +979,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
             //  Otherwise we'd have to duplicate the code for storing a
             //  value. This way we can force the same code to be used.
             //
-            if (eCurState == EState_Value)
+            if (eCurState == EStates::Value)
                 chCur = kCIDLib::chComma;
             else
                 break;
@@ -987,14 +987,14 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
 
         switch(eCurState)
         {
-            case EState_Name :
+            case EStates::Name :
                 if (chCur == kCIDLib::chEquals)
-                    eCurState = EState_Quote;
+                    eCurState = EStates::Quote;
                 else
                     strName.Append(chCur);
                 break;
 
-            case EState_Quote :
+            case EStates::Quote :
                 //
                 //  If we start with a quote, then remember that, else just
                 //  store the first char of the value.
@@ -1004,10 +1004,10 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                     bInQuote = kCIDLib::True;
                 else
                     strValue.Append(chCur);
-                eCurState = EState_Value;
+                eCurState = EStates::Value;
                 break;
 
-            case EState_Value :
+            case EStates::Value :
                 //
                 //  We are either storing another character into the value,
                 //  or the value is done and we need to store it.
@@ -1018,7 +1018,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                     //  If not in a quote, then a comma ends the value. Else
                     //  it's just part of the value and wil be handled below.
                     //
-                    eCurState = EState_Name;
+                    eCurState = EStates::Name;
                 }
                  else if (chCur == kCIDLib::chQuotation)
                 {
@@ -1036,7 +1036,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                     }
 
                     // Have to see a comma now before another value
-                    eCurState = EState_Comma;
+                    eCurState = EStates::Comma;
                 }
                  else if (TRawStr::bIsSpace(chCur))
                 {
@@ -1048,7 +1048,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                     if (bInQuote)
                         strValue.Append(chCur);
                     else
-                        eCurState = EState_Comma;
+                        eCurState = EStates::Comma;
                 }
                  else
                 {
@@ -1060,7 +1060,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                 //  If not still in value state, then we got a value and
                 //  need to store it.
                 //
-                if (eCurState != EState_Value)
+                if (eCurState != EStates::Value)
                 {
                     if (strName.bCompareI(L"algorithm"))
                         strAlgorithm = strValue;
@@ -1080,11 +1080,11 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
                 }
                 break;
 
-            case EState_Comma :
+            case EStates::Comma :
                 // We have to see a comma before another non-whitespace
                 if (chCur == kCIDLib::chComma)
                 {
-                    eCurState = EState_Name;
+                    eCurState = EStates::Name;
                 }
                  else if (!TRawStr::bIsSpace(chCur))
                 {
@@ -1109,7 +1109,7 @@ THTTPClient::ParseAuthReq(  const   TString&                    strReqLine
     //  theory we shouldn't have seen any name characters at this point,
     //  but we'll ignore that.
     //
-    if ((eCurState != EState_Name) && (eCurState != EState_Comma))
+    if ((eCurState != EStates::Name) && (eCurState != EStates::Comma))
     {
         facCIDNet().ThrowErr
         (
@@ -1347,12 +1347,12 @@ THTTPClient::c4GetSrvReply(         TCIDDataSrc&            cdsSrc
                             , const tCIDLib::TEncodedTime   enctEnd
                             , const tCIDLib::TBoolean       bNoCont
                             ,       TString&                strRepType
-                            ,       tCIDNet::EHTTPCodes&    eCodeType
+                            , COP   tCIDNet::EHTTPCodes&    eCodeType
                             ,       TString&                strRepText
                             ,       tCIDLib::TKVPCollect&   colOutHdrLines
                             ,       TString&                strContType
                             ,       TMemBuf&                mbufCont
-                            ,       tCIDLib::TCard4&        c4ContLen)
+                            , COP   tCIDLib::TCard4&        c4ContLen)
 {
     tCIDLib::TCard4 c4Status = 0;
 
@@ -1391,7 +1391,7 @@ THTTPClient::c4GetSrvReply(         TCIDDataSrc&            cdsSrc
             //  as the alt text. Use some of the above strings as temps to
             //  get the output strings. The second one is the error msg text.
             //
-            tCIDLib::TCard4 c4Status = c4ReadResMsg(eRes, strFirstLn, strRepText);
+            c4Status = c4ReadResMsg(eRes, strFirstLn, strRepText);
 
             facCIDNet().ThrowErr
             (
@@ -1878,7 +1878,7 @@ c4SendPost(         TCIDDataSrc* const      pcdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrLines
             ,       TString&                strContType
@@ -1925,7 +1925,7 @@ c4SendPut(          TCIDDataSrc* const      pcdsSrc
             , const tCIDLib::TEncodedTime   enctEnd
             , const TString&                strAgent
             , const TString&                strAccept
-            ,       tCIDNet::EHTTPCodes&    eCodeType
+            , COP   tCIDNet::EHTTPCodes&    eCodeType
             ,       TString&                strRepText
             ,       tCIDLib::TKVPCollect&   colOutHdrs
             ,       TString&                strContType
@@ -2424,11 +2424,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         TString strFirstLn(strOpType);
         strFirstLn.Append(kCIDLib::chSpace);
         strFirstLn.Append(strPath);
-
-        if (pcdsSrc)
-            strFirstLn.Append(L" HTTP/1.1");
-        else
-            strFirstLn.Append(L" HTTP/1.0");
+		strFirstLn.Append(L" HTTP/1.1");
 
         //
         //  Set up the special header lines we take directly, if they are not
@@ -2437,20 +2433,20 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         tCIDLib::TKVPList colExHdrs;
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"Host") && !strHost.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"Host", strHost));
+            colExHdrs.objPlace(L"Host", strHost);
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"User-Agent") && !strAgent.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"User-Agent", strAgent));
+            colExHdrs.objPlace(L"User-Agent", strAgent);
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, L"Accept") && !strAccept.bIsEmpty())
-            colExHdrs.objAdd(TKeyValuePair(L"Accept", strAccept));
+            colExHdrs.objPlace(L"Accept", strAccept);
 
         //
         //  If 1.1, and there's no explict TE line, then we indicate we'll take
         //  chunked transfers plus trailers.
         //
         if (pcdsSrc && !TNetCoreParser::bHdrLineExists(colInHdrLines, strHdr_TE))
-            colExHdrs.objAdd(TKeyValuePair(strHdr_TE, L"trailers, chunked"));
+            colExHdrs.objPlace(strHdr_TE, L"trailers, chunked");
 
         //
         //  If outward body content have to add the content type. Either way we set
@@ -2462,7 +2458,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
             if (!TNetCoreParser::bHdrLineExists(colInHdrLines, THTTPClient::strHdr_ContType)
             &&  !strContType.bIsEmpty())
             {
-                colExHdrs.objAdd(TKeyValuePair(THTTPClient::strHdr_ContType, strContType));
+                colExHdrs.objPlace(THTTPClient::strHdr_ContType, strContType);
             }
         }
          else
@@ -2471,7 +2467,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         }
 
         if (!TNetCoreParser::bHdrLineExists(colInHdrLines, THTTPClient::strHdr_ContLen))
-            colExHdrs.objAdd(TKeyValuePair(strHdr_ContLen, c4ContLen));
+            colExHdrs.objPlace(strHdr_ContLen, c4ContLen);
 
         // They can pass us one extra one
         if (pkvalExLine)
@@ -2484,13 +2480,7 @@ THTTPClient::c4DoOp(        TCIDDataSrc* const      pcdsSrc
         //
         SendMsg
         (
-            *pcdsToUse
-            , enctEnd
-            , strFirstLn
-            , colInHdrLines
-            , colExHdrs
-            , mbufCont
-            , c4ContLen
+            *pcdsToUse, enctEnd, strFirstLn, colInHdrLines, colExHdrs, mbufCont, c4ContLen
         );
 
         //
@@ -2653,6 +2643,7 @@ TAsyncHTTPQ::TAsyncHTTPQ() :
       )
     , m_c4InContLen(0)
     , m_c4OutContLen(0)
+    , m_c4ResCode(0)
     , m_c4WaitFor(0)
     , m_eCodeType(tCIDNet::EHTTPCodes::Unknown)
     , m_OpType(EOpTypes::None)
@@ -2845,16 +2836,11 @@ tCIDLib::TVoid
 TAsyncHTTPQ::CopyInHdrLines(const   tCIDLib::TKVPCollect&   colSrc
                             ,       tCIDLib::TKVPList&      colTar)
 {
-    TColCursor<TKeyValuePair>* pcursHdrLns = colSrc.pcursNew();
-    TJanitor<TColCursor<TKeyValuePair> > janCursor(pcursHdrLns);
+    TColCursor<TKeyValuePair>& cursHdrLns = *colSrc.pcursNew();
+    TJanitor<TColCursor<TKeyValuePair>> janCursor(&cursHdrLns);
     m_colInHdrLines.RemoveAll();
-    if (pcursHdrLns->bReset())
-    {
-        do
-        {
-            colTar.objAdd(pcursHdrLns->objRCur());
-        }   while (pcursHdrLns->bNext());
-    }
+    for (; cursHdrLns; ++cursHdrLns)
+        colTar.objAdd(*cursHdrLns);
 }
 
 tCIDLib::TVoid
@@ -2888,13 +2874,19 @@ TAsyncHTTPQ::eQueryThread(TThread& thrThis, tCIDLib::TVoid*)
         if (m_OpType == EOpTypes::GETRedir)
         {
             //
-            //  Issue the operation. Let it create a one-shot socket for us by
-            //  by passing in an empty data source janitor.
+            //  Issue the operation. We have to create a persistent data source to
+            //  deal with redirection. There's a helper to do this.
             //
-            TCIDDataSrcJan janEmpty;
+            TCIDDataSrcJan janSrc
+            (
+                facCIDNet().pcdsMakeSocketSrc(m_strAgent, m_urlToGet)
+                , tCIDLib::EAdoptOpts::Adopt
+                , kCIDLib::True
+            );
+
             m_c4ResCode = m_httpcThis.c4SendGetRedir
             (
-                janEmpty
+                janSrc
                 , m_urlToGet
                 , TTime::enctNowPlusMSs(m_c4WaitFor)
                 , m_strAgent
@@ -2913,7 +2905,7 @@ TAsyncHTTPQ::eQueryThread(TThread& thrThis, tCIDLib::TVoid*)
         {
             m_c4ResCode = m_httpcThis.c4SendPost
             (
-                0
+                nullptr
                 , m_urlToGet
                 , TTime::enctNowPlusMSs(m_c4WaitFor)
                 , m_strAgent

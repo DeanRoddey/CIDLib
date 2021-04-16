@@ -71,7 +71,7 @@ TFacCIDUPnP::TFacCIDUPnP() :
     TFacility
     (
         L"CIDUPnP"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -93,7 +93,7 @@ TFacCIDUPnP::~TFacCIDUPnP()
 // Get the root device of this device
 tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
 {
-    TKrnlUPnPDevice* pkupnpdRoot;
+    TKrnlUPnPDevice* pkupnpdRoot = nullptr;
     if (!m_pkupnpdThis->bGetRootDevice(pkupnpdRoot))
     {
         facCIDUPnP().ThrowKrnlErr
@@ -105,6 +105,9 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotFound
         );
+
+        // Won't get here but makes the analyzer yappy
+        return;
     }
 
     // If the pointer is null, then we already are the root device
@@ -118,6 +121,9 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Already
         );
+
+        // Won't get here but makes the analyzer yappy
+        return;
     }
 
     // We got the device so query the basic info we store
@@ -138,23 +144,28 @@ tCIDLib::TVoid TUPnPDevice::GetRootDevice(TUPnPDevice& upnpdToSet)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
-    }
 
-    //
-    //  It all worked so set up the device object.
-    //
-    //  We pass a zero for the sequence id. The async finder uses it, but
-    //  we don't set it here.
-    //
-    upnpdToSet.SetKrnlObj
-    (
-        pkupnpdRoot
-        , kstrUID.pszValue()
-        , kstrName.pszValue()
-        , kstrModel.pszValue()
-        , kstrType.pszValue()
-        , 0
-    );
+        // Won't get here but makes the analyzer yappy
+        return;
+    }
+     else
+    {
+        //
+        //  It all worked so set up the device object.
+        //
+        //  We pass a zero for the sequence id. The async finder uses it, but
+        //  we don't set it here.
+        //
+        upnpdToSet.SetKrnlObj
+        (
+            pkupnpdRoot
+            , kstrUID.pszValue()
+            , kstrName.pszValue()
+            , kstrModel.pszValue()
+            , kstrType.pszValue()
+            , 0
+        );
+    }
 }
 
 
@@ -313,6 +324,9 @@ TFacCIDUPnP::bSetDeviceFromUID(const TString& strUID, TUPnPDevice& upnpdToSet)
             , tCIDLib::EErrClasses::NotFound
             , TString(L"general info")
         );
+
+        // Won't get here but makes the analyzer yappy
+        return kCIDLib::False;
     }
 
     #if defined(VERBOSE_LOGGING)
@@ -366,8 +380,7 @@ TFacCIDUPnP::bSetDeviceFromUID(const TString& strUID, TUPnPDevice& upnpdToSet)
 //  we get them from the kernel level object as well.
 //
 tCIDLib::TBoolean
-TFacCIDUPnP::bFindDevsByType(const  TString&                    strType
-                            ,       tCIDLib::TKValsCollect&     colFound)
+TFacCIDUPnP::bFindDevsByType(const  TString& strType, tCIDLib::TKValsCollect& colFound)
 {
     // Create a finder and try the search
     TKrnlLList<TKrnlKVPair> kllistDevs;

@@ -60,17 +60,17 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                                         , tCIDLib::TBoolean&    bExplicit)
 {
     // Scan it to make sure it's legal
-    enum EStates
+    enum class EStates
     {
-        EState_Sign
-        , EState_Initial
-        , EState_LeadingZero
-        , EState_Digits
-        , EState_Decimal
-        , EState_Fraction
-        , EState_Suffix
-        , EState_Suffix2
-        , EState_End
+        Sign
+        , Initial
+        , LeadingZero
+        , Digits
+        , Decimal
+        , Fraction
+        , Suffix
+        , Suffix2
+        , End
     };
 
     // Assume no suffix until proven otherwise
@@ -81,7 +81,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
     const tCIDLib::TCard4   c4Len = strLit.c4Length();
 
     tCIDLib::TBoolean bHasSuffix = kCIDLib::False;
-    EStates eCurState = EState_Sign;
+    EStates eCurState = EStates::Sign;
     tCIDLib::TCard4 c4Index = 0;
     tCIDLib::TCard4 c4DigitCnt = 0;
     while (c4Index < c4Len)
@@ -89,7 +89,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
         const tCIDLib::TCh chCur = strLit[c4Index];
         switch(eCurState)
         {
-            case EState_Sign :
+            case EStates::Sign :
             {
                 // If either sign, then assume Int4 until proven otherwise
                 if (chCur == kCIDLib::chHyphenMinus)
@@ -102,11 +102,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     eType = tCIDMacroEng::ENumTypes::Int4;
                     c4Index++;
                 }
-                eCurState = EState_Initial;
+                eCurState = EStates::Initial;
                 break;
             }
 
-            case EState_Initial :
+            case EStates::Initial :
             {
                 if (chCur == kCIDLib::chDigit0)
                 {
@@ -116,7 +116,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  to decimal, in case this is the only character.
                     //
                     eRadix = tCIDLib::ERadices::Dec;
-                    eCurState = EState_LeadingZero;
+                    eCurState = EStates::LeadingZero;
                     c4DigitCnt++;
                 }
                  else if ((chCur >= kCIDLib::chDigit1)
@@ -124,7 +124,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 {
                     eRadix = tCIDLib::ERadices::Dec;
                     c4DigitCnt++;
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
                 }
                  else
                 {
@@ -134,7 +134,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_LeadingZero :
+            case EStates::LeadingZero :
             {
                 if ((chCur == kCIDLib::chLatin_x) || (chCur == kCIDLib::chLatin_X))
                 {
@@ -147,7 +147,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     c4DigitCnt = 0;
 
                     // Now we can start checking actual digits
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
 
                     // Eat this character
                     c4Index++;
@@ -158,7 +158,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  Has to be a zero followed by a suffix. Keep the radix and digit
                     //  count we provsionally set above.
                     //
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
 
                     // Eat this character
                     c4Index++;
@@ -170,7 +170,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  count. We know it's dec radix now and can move on to processing
                     //  the fractional bit.
                     //
-                    eCurState = EState_Fraction;
+                    eCurState = EStates::Fraction;
                     eRadix = tCIDLib::ERadices::Dec;
                     eType = tCIDMacroEng::ENumTypes::Float8;
 
@@ -184,7 +184,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     //  checking digits. Go back to zero digits
                     //
                     eRadix = tCIDLib::ERadices::Oct;
-                    eCurState = EState_Digits;
+                    eCurState = EStates::Digits;
                     c4DigitCnt = 0;
 
                     // Don't increment index!! This is a digit we want to process below
@@ -192,7 +192,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Digits :
+            case EStates::Digits :
             {
                 if (chCur == kCIDLib::chPeriod)
                 {
@@ -204,13 +204,13 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     if (!c4DigitCnt)
                         return tCIDMacroEng::ENumTypes::None;
 
-                    eCurState = EState_Fraction;
+                    eCurState = EStates::Fraction;
                     eType = tCIDMacroEng::ENumTypes::Float8;
                 }
                  else if (chCur == kCIDLib::chPoundSign)
                 {
                     // Looks like a suffix
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
 
                     // We have to have seen at least one digit
                     if (!c4DigitCnt)
@@ -254,7 +254,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Fraction :
+            case EStates::Fraction :
             {
                 //
                 //  Watch for decimal digits until the end or possibly suffix. WE don't
@@ -267,7 +267,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 }
                  else if (chCur == kCIDLib::chPoundSign)
                 {
-                    eCurState = EState_Suffix;
+                    eCurState = EStates::Suffix;
                     c4Index++;
                 }
                  else
@@ -277,7 +277,7 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 break;
             }
 
-            case EState_Suffix :
+            case EStates::Suffix :
             {
                 //
                 //  We can see C (card), I (int), or F (float), else it cannot
@@ -293,11 +293,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                     return tCIDMacroEng::ENumTypes::None;
 
                 c4Index++;
-                eCurState = EState_Suffix2;
+                eCurState = EStates::Suffix2;
                 break;
             }
 
-            case EState_Suffix2 :
+            case EStates::Suffix2 :
             {
                 if (eType == tCIDMacroEng::ENumTypes::Card4)
                 {
@@ -365,13 +365,13 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
                 }
 
                 // Move to end state, since this is not a legal end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
                 c4Index++;
                 bHasSuffix = kCIDLib::True;
                 break;
             }
 
-            case EState_End :
+            case EStates::End :
             {
                 //
                 //  There's some trailing goop, so it's bad. Otherwise we would not
@@ -388,11 +388,11 @@ TMacroEngParser::eCheckNumericLiteral(  TString&                strLit
         return tCIDMacroEng::ENumTypes::None;
 
     // Saw a + or - sign and nothing else
-    if (eCurState == EState_Initial)
+    if (eCurState == EStates::Initial)
         return tCIDMacroEng::ENumTypes::None;
 
     // Never saw the second character of the suffix
-    if (eCurState == EState_Suffix2)
+    if (eCurState == EStates::Suffix2)
         return tCIDMacroEng::ENumTypes::None;
 
     // Remove the suffix if we found any
@@ -415,6 +415,7 @@ TMacroEngParser::TMacroEngParser(const tCIDMacroEng::EOptLevels eOpt) :
     , m_colFlowStack()
     , m_colMatches(tCIDLib::EAdoptOpts::NoAdopt, 8)
     , m_eOptLevel(eOpt)
+    , m_pitResData()
     , m_pmecmToUse(nullptr)
     , m_pmeehToUse(nullptr)
     , m_pmeTarget(nullptr)
@@ -474,7 +475,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
 
 tCIDLib::TBoolean
 TMacroEngParser::bParse(const   TString&                    strClassPath
-                        ,       TMemBuf&                    mbufSrc
+                        , const TMemBuf&                    mbufSrc
                         , const tCIDLib::TCard4             c4Bytes
                         , const TString&                    strEncoding
                         ,       TMEngClassInfo*&            pmeciMainClass
@@ -491,7 +492,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
     //  If the encoding is empty, use an ASCII converter, else try to create
     //  a converter for that encoding.
     //
-    TTextConverter* ptcvtSrc = facCIDEncode().ptcvtMakeNew(strEncoding);
+    TTextConverter* ptcvtSrc = facCIDEncode().ptcvtMake(strEncoding);
     if (!ptcvtSrc)
     {
         facCIDMacroEng().ThrowErr
@@ -543,7 +544,7 @@ TMacroEngParser::bParse(const   TString&                    strClassPath
 //  TMacroEngParser: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 TMEngClassInfo&
-TMacroEngParser::meciResolvePath(TParserSrc& psrcClass, const TString& strPath)
+TMacroEngParser::meciResolvePath(const TParserSrc& psrcClass, const TString& strPath)
 {
     //
     //  Look it up as a type name. It could be ambiguous, because the type is
@@ -595,7 +596,7 @@ TMacroEngParser::meciResolvePath(TParserSrc& psrcClass, const TString& strPath)
 
 
 TMEngClassInfo*
-TMacroEngParser::pmeciCheckClassLoad(       TParserSrc& psrcClass
+TMacroEngParser::pmeciCheckClassLoad(const  TParserSrc& psrcClass
                                     , const TString&    strClassPath)
 {
     TMEngClassInfo* pmeciRet = m_pmeTarget->pmeciFind(strClassPath);
@@ -649,7 +650,7 @@ TMacroEngParser::pmeciCheckClassLoad(       TParserSrc& psrcClass
 
 TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
 {
-    TMEngStdClassInfo* pmeciRet = 0;
+    TMEngStdClassInfo* pmeciRet = nullptr;
     const tCIDLib::TCard4 c4InitNestDepth = m_colClassStack.c4ElemCount();
     try
     {
@@ -659,8 +660,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         //  it in. We have to get the class path and the parent class path,
         //  and optionally the extension type.
         //
-        tCIDMacroEng::ETokens      eTok;
-        tCIDMacroEng::EClassExt    eExtend;
+        tCIDMacroEng::EClassExt eExtend = tCIDMacroEng::EClassExt::Final;
         TString                 strBasePath;
         TString                 strClassPath;
         TString                 strName;
@@ -673,7 +673,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         if (psrcClass.bIfPeeked(tCIDMacroEng::ETokens::OpenBracket))
         {
             // The next token must either be Final, Non-Final, or Abstract
-            eTok = psrcClass.eGetNextToken(strName);
+            const tCIDMacroEng::ETokens eTok = psrcClass.eGetNextToken(strName);
 
             if (eTok == tCIDMacroEng::ETokens::Abstract)
             {
@@ -857,7 +857,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
         //          by orders of magnitude, so it has it's own file to implement
         //          the method parsing.
         //
-        eTok = psrcClass.eGetNextToken(strName, kCIDLib::True);
+        tCIDMacroEng::ETokens eTok = psrcClass.eGetNextToken(strName, kCIDLib::True);
         while (eTok != tCIDMacroEng::ETokens::EOF)
         {
             // It's gotta be a methods block
@@ -889,13 +889,13 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
             TModule::LogEventObj(errToCatch);
         }
         IssueExcept(psrcClass, errToCatch);
-        pmeciRet = 0;
+        pmeciRet = nullptr;
     }
 
     catch(...)
     {
         IssueExcept(psrcClass);
-        pmeciRet = 0;
+        pmeciRet = nullptr;
     }
 
     // Make sure we get rid of any classes we put on the stack
@@ -1220,7 +1220,7 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  the class and get a literal from it.
                 //
                 tCIDLib::TCard4 c4LastSep;
-                const TMEngLiteralVal* pmelvFound = 0;
+                const TMEngLiteralVal* pmelvFound = nullptr;
                 if (strTmp.bLastOccurrence(kCIDLib::chPeriod, c4LastSep))
                 {
                     strTmp.CopyOutSubStr(strPath, c4LastSep + 1);
@@ -1256,6 +1256,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 {
                     IssueErr(psrcClass, kMEngErrs::errcPrs_ExpectedLitStr);
                     ThrowUnrecoverable();
+
+                    // Won't happen but makes the analyzer happy
+                    return;
                 }
 
                 strPath = pmelvFound->strValueAs();
@@ -1266,7 +1269,7 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  If it's the special type ref, then get the value that has been set
                 //  for that. Else take it as is.
                 //
-                if (strPath.bCompareI(kMacroEng::pszSpecDynTypRef))
+                if (strPath.bCompareI(kCIDMacroEng::pszSpecDynTypRef))
                 {
                     strPath = m_pmeTarget->strSpecialDynRef();
 
@@ -1275,6 +1278,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                     {
                         IssueErr(psrcClass, kMEngErrs::errcPrs_EmptySpecDynRef);
                         ThrowUnrecoverable();
+
+                        // Won't happen, but makes analyzer happy
+                        return;
                     }
                 }
             }
@@ -1303,6 +1309,9 @@ TMacroEngParser::ParseImports(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
         {
             IssueErr(psrcClass, kMEngErrs::errcEng_ClassNotFound, strPath);
             ThrowUnrecoverable();
+
+            // Won't happen, but makes analyzer hapy
+            return;
         }
 
         //
@@ -1389,7 +1398,7 @@ TMacroEngParser::ParseLiterals(TParserSrc& psrcClass, TMEngClassInfo& meciToFill
         //
         eTok = psrcClass.eGetNextToken(strText);
 
-        TMEngClassVal* pmecvLit = 0;
+        TMEngClassVal* pmecvLit = nullptr;
         switch(tCIDMacroEng::EIntrinsics(meciTarget.c2Id()))
         {
             case tCIDMacroEng::EIntrinsics::Boolean :
@@ -1652,7 +1661,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         //  of the non-code value key words. If we don't get the name, then
         //  just skip this one. The error was already issued.
         //
-        tCIDLib::TCard2 c2LocalId = kMacroEng::c2BadId;
+        tCIDLib::TCard2 c2LocalId = kCIDMacroEng::c2BadId;
         if (bGetNameToken(psrcClass, strName, kCIDLib::False))
         {
             //
@@ -1694,7 +1703,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         //  If we see an open parent, we have to parse parms and match them
         //  to an appropriate constructor. Else, look for a default.
         //
-        tCIDLib::TCard2 c2CtorToUse = kMacroEng::c2BadId;
+        tCIDLib::TCard2 c2CtorToUse = kCIDMacroEng::c2BadId;
         tCIDLib::TCard4 c4ParmCnt;
         if (psrcClass.bIfPeeked(tCIDMacroEng::ETokens::OpenParen))
         {
@@ -1721,7 +1730,7 @@ TMacroEngParser::ParseLocals(   TParserSrc&             psrcClass
         bCheckSemiColon(psrcClass);
 
         // If a match was found, then generate the call and cleanup.
-        if (c2CtorToUse == kMacroEng::c2BadId)
+        if (c2CtorToUse == kCIDMacroEng::c2BadId)
         {
             IssueErr(psrcClass, kMEngErrs::errcPrs_NoCtorMatch, strName);
         }
@@ -1856,7 +1865,7 @@ TMacroEngParser::ParseMembers(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  the class and get a literal from it.
                 //
                 tCIDLib::TCard4 c4LastSep;
-                const TMEngLiteralVal* pmelvFound = 0;
+                const TMEngLiteralVal* pmelvFound = nullptr;
                 if (strText.bLastOccurrence(kCIDLib::chPeriod, c4LastSep))
                 {
                     strText.CopyOutSubStr(strName, c4LastSep + 1);
@@ -1906,7 +1915,7 @@ TMacroEngParser::ParseMembers(TParserSrc& psrcClass, TMEngClassInfo& meciToFill)
                 //  If it's the special type ref, then get the value that has been set
                 //  for that. Else we take it as is.
                 //
-                if (strName.bCompareI(kMacroEng::pszSpecDynTypRef))
+                if (strName.bCompareI(kCIDMacroEng::pszSpecDynTypRef))
                 {
                     strName= m_pmeTarget->strSpecialDynRef();
 
@@ -2189,7 +2198,7 @@ TMacroEngParser::ParseTypes(TParserSrc& psrcClass, TMEngClassInfo& meciOwner)
             }
              else
             {
-                TMEngColBaseInfo* pmeciNew = 0;
+                TMEngColBaseInfo* pmeciNew = nullptr;
                 if (eTok == tCIDMacroEng::ETokens::VectorOf)
                 {
                     pmeciNew = new TMEngVectorInfo
@@ -2309,8 +2318,7 @@ TMacroEngParser::ValidateClass(         TParserSrc&     psrcClass
                     , methiCur.strName()
                 );
             }
-
-            if (pmethCur->c2Id() != methiCur.c2Id())
+             else if (pmethCur->c2Id() != methiCur.c2Id())
             {
                 IssueErr
                 (

@@ -43,51 +43,48 @@
 // ---------------------------------------------------------------------------
 TMemoryHandle::TMemoryHandle() :
 
-    m_phmemiThis(0)
+    m_phmemiThis(nullptr)
 {
     m_phmemiThis = new TMemoryHandleImpl;
     m_phmemiThis->hBacking = 0;
 }
 
-TMemoryHandle::TMemoryHandle(const TMemoryHandle& hevToCopy) :
+TMemoryHandle::TMemoryHandle(const TMemoryHandle& hevSrc) :
 
-    m_phmemiThis(0)
+    m_phmemiThis(nullptr)
 {
     m_phmemiThis = new TMemoryHandleImpl;
-    m_phmemiThis->hBacking = hevToCopy.m_phmemiThis->hBacking;
+    m_phmemiThis->hBacking = hevSrc.m_phmemiThis->hBacking;
 }
 
 TMemoryHandle::~TMemoryHandle()
 {
     delete m_phmemiThis;
-    m_phmemiThis = 0;
+    m_phmemiThis = nullptr;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TMemoryHandle: Public operators
 // ---------------------------------------------------------------------------
-TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hevToAssign)
+TMemoryHandle& TMemoryHandle::operator=(const TMemoryHandle& hevSrc)
 {
-    if (this == &hevToAssign)
-        return *this;
-
-    m_phmemiThis->hBacking = hevToAssign.m_phmemiThis->hBacking;
-
+    if (this != &hevSrc)
+        m_phmemiThis->hBacking = hevSrc.m_phmemiThis->hBacking;
     return *this;
 }
 
 
 tCIDLib::TBoolean
-TMemoryHandle::operator==(const TMemoryHandle& hevToCompare) const
+TMemoryHandle::operator==(const TMemoryHandle& hevSrc) const
 {
-    return (m_phmemiThis->hBacking == hevToCompare.m_phmemiThis->hBacking);
+    return (m_phmemiThis->hBacking == hevSrc.m_phmemiThis->hBacking);
 }
 
 tCIDLib::TBoolean
-TMemoryHandle::operator!=(const TMemoryHandle& hmemToCompare) const
+TMemoryHandle::operator!=(const TMemoryHandle& hmemSrc) const
 {
-    return !operator==(hmemToCompare);
+    return !operator==(hmemSrc);
 }
 
 
@@ -96,12 +93,12 @@ TMemoryHandle::operator!=(const TMemoryHandle& hmemToCompare) const
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TMemoryHandle::bIsValid() const
 {
-    return ((m_phmemiThis != 0) && (m_phmemiThis->hBacking != 0));
+    return ((m_phmemiThis != nullptr) && (m_phmemiThis->hBacking != 0));
 }
 
 tCIDLib::TVoid TMemoryHandle::Clear()
 {
-    m_phmemiThis->hBacking = 0;
+    m_phmemiThis->hBacking = nullptr;
 }
 
 tCIDLib::TVoid
@@ -138,8 +135,8 @@ TKrnlSharedMemBuf::TKrnlSharedMemBuf() :
     , m_c4MaxPages(0)
     , m_eAccess(tCIDLib::EMemAccFlags::ReadOnly)
     , m_eAllocType(tCIDLib::EAllocTypes::Commit)
-    , m_pBuffer(0)
-    , m_pszName(0)
+    , m_pBuffer(nullptr)
+    , m_pszName(nullptr)
 {
 }
 
@@ -198,7 +195,7 @@ TKrnlSharedMemBuf::bAlloc(  const   tCIDLib::TCh* const     pszName
                             , const tCIDLib::EAllocTypes    eAllocType
                             , const tCIDLib::EMemAccFlags   eAccess
                             ,       tCIDLib::TBoolean&      bCreated
-                            , const tCIDLib::ECreateActs eCreateFlags)
+                            , const tCIDLib::ECreateActs    eCreateFlags)
 {
     if (m_pBuffer)
     {
@@ -264,7 +261,7 @@ TKrnlSharedMemBuf::bAlloc(  const   tCIDLib::TCh* const     pszName
     //
     bCreated = kCIDLib::False;
     HANDLE              hFl = 0;
-    tCIDLib::TVoid*     pBuf = 0;
+    tCIDLib::TVoid*     pBuf = nullptr;
 
     hFl = ::OpenFileMapping(c4FileAccess, 0, pszName);
     if (!hFl)
@@ -409,7 +406,7 @@ TKrnlSharedMemBuf::bCommitToSize(const tCIDLib::TCard4 c4NewSize)
 
 
 tCIDLib::TBoolean
-TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
+TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbSrc)
 {
     // Can't do this if there is already a buffer in this object
     if (m_pBuffer)
@@ -426,7 +423,7 @@ TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
     if (!::DuplicateHandle
     (
         TKrnlProcess::hprocThis().hprociThis().hProcess
-        , ksmbToCopy.m_hmemThis.m_phmemiThis->hBacking
+        , ksmbSrc.m_hmemThis.m_phmemiThis->hBacking
         , TKrnlProcess::hprocThis().hprociThis().hProcess
         , &hTmp
         , 0
@@ -442,9 +439,9 @@ TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
     //  platform access flags for the mapping step.
     //
     tCIDLib::TCard4 c4FileAccess = 0;
-    if (ksmbToCopy.m_eAccess == tCIDLib::EMemAccFlags::ReadOnly)
+    if (ksmbSrc.m_eAccess == tCIDLib::EMemAccFlags::ReadOnly)
         c4FileAccess = FILE_MAP_READ;
-    else if (ksmbToCopy.m_eAccess == tCIDLib::EMemAccFlags::ReadWrite)
+    else if (ksmbSrc.m_eAccess == tCIDLib::EMemAccFlags::ReadWrite)
         c4FileAccess = FILE_MAP_WRITE;
 
     // Create a mapping for this new handle
@@ -460,14 +457,14 @@ TKrnlSharedMemBuf::bDuplicate(const TKrnlSharedMemBuf& ksmbToCopy)
 
     // It worked so store away the info
     m_pBuffer           = pBuf;
-    m_c4AllocatedPages  = ksmbToCopy.m_c4AllocatedPages;
-    m_c4MaxPages        = ksmbToCopy.m_c4MaxPages;
-    m_c4MaxSize         = ksmbToCopy.m_c4MaxSize;
-    m_eAccess           = ksmbToCopy.m_eAccess;
-    m_eAllocType        = ksmbToCopy.m_eAllocType;
+    m_c4AllocatedPages  = ksmbSrc.m_c4AllocatedPages;
+    m_c4MaxPages        = ksmbSrc.m_c4MaxPages;
+    m_c4MaxSize         = ksmbSrc.m_c4MaxSize;
+    m_eAccess           = ksmbSrc.m_eAccess;
+    m_eAllocType        = ksmbSrc.m_eAllocType;
 
     delete [] m_pszName;
-    m_pszName = TRawStr::pszReplicate(ksmbToCopy.m_pszName);
+    m_pszName = TRawStr::pszReplicate(ksmbSrc.m_pszName);
 
     // Store our handle now that we know its all happy
     m_hmemThis.m_phmemiThis->hBacking = hTmp;
@@ -480,7 +477,7 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bFree()
 {
     // If the name got allocated, then free it
     delete [] m_pszName;
-    m_pszName = 0;
+    m_pszName = nullptr;
 
     // If we got the memory allocated, then free it
     tCIDLib::TBoolean bRet = kCIDLib::True;
@@ -498,7 +495,7 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bFree()
             bRet = kCIDLib::False;
         }
 
-        m_pBuffer = 0;
+        m_pBuffer = nullptr;
         m_hmemThis.m_phmemiThis->hBacking = 0;
     }
     return bRet;
@@ -533,9 +530,7 @@ tCIDLib::TBoolean TKrnlSharedMemBuf::bZero()
     // Only do the committed part
     TRawMem::SetMemBuf
     (
-        m_pBuffer
-        , tCIDLib::TCard1(0)
-        , m_c4AllocatedPages * kCIDLib::c4MemPageSize
+        m_pBuffer, kCIDLib::c1MinCard, m_c4AllocatedPages * kCIDLib::c4MemPageSize
     );
     return kCIDLib::True;
 }

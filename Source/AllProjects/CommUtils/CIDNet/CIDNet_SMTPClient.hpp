@@ -64,6 +64,14 @@ class CIDNETEXP TEmailAttachment
 
         TEmailAttachment
         (
+            const   tCIDLib::TCard4         c4BufSz
+            ,       THeapBuf&&              mbufData
+            , const TString&                strMIMEType
+            , const TString&                strFileName
+        );
+
+        TEmailAttachment
+        (
             const   TEmailAttachment&       eattSrc
         );
 
@@ -145,7 +153,20 @@ class CIDNETEXP TEmailMsg : public TObject
 
         TEmailMsg
         (
-            const   TEmailMsg&              emsgToCopy
+            const   TString&                strFrom
+            , const TString&                strTo
+            , const TString&                strTopic
+            , const TString&                strMsg
+        );
+
+        TEmailMsg
+        (
+            const   TEmailMsg&              emsgSrc
+        );
+
+        TEmailMsg
+        (
+                    TEmailMsg&&             emsgSrc
         );
 
         ~TEmailMsg();
@@ -156,7 +177,12 @@ class CIDNETEXP TEmailMsg : public TObject
         // -------------------------------------------------------------------
         TEmailMsg& operator=
         (
-            const   TEmailMsg&              emsgToAssign
+            const   TEmailMsg&              emsgSrc
+        );
+
+        TEmailMsg& operator=
+        (
+                    TEmailMsg&&             emsgSrc
         );
 
 
@@ -167,6 +193,14 @@ class CIDNETEXP TEmailMsg : public TObject
         (
             const   tCIDLib::TCard4         c4BufSz
             , const TMemBuf&                mbufData
+            , const TString&                strMIMEType
+            , const TString&                strFileName
+        );
+
+        tCIDLib::TVoid AddAttachment
+        (
+            const   tCIDLib::TCard4         c4BufSz
+            ,       THeapBuf&&              mbufData
             , const TString&                strMIMEType
             , const TString&                strFileName
         );
@@ -299,7 +333,20 @@ class CIDNETEXP TSMTPClient : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TVoid AddMsgToQueue
         (
-                    TEmailMsg* const        pemsgToAdopt
+            const   TEmailMsg&              emsgToAdd
+        );
+
+        tCIDLib::TVoid AddMsgToQueue
+        (
+                    TEmailMsg&&             emsgToAdd
+        );
+
+        tCIDLib::TVoid AddMsgToQueue
+        (
+            const   TString&                strFrom
+            , const TString&                strTo
+            , const TString&                strTopic
+            , const TString&                strMsg
         );
 
         tCIDLib::TCard4 c4ColumnWidth() const;
@@ -559,7 +606,7 @@ class CIDNETEXP TSMTPClient : public TObject
         tCIDLib::TCard4         m_c4MaxMsgSize;
         tCIDNet::EMailAuthTypes m_eAuthType;
         tCIDLib::TIPPortNum     m_ippnToUse;
-        TRefQueue<TEmailMsg>*   m_pcolQueue;
+        TQueue<TEmailMsg>*      m_pcolQueue;
         const TString           m_strAttachEncoding;
         TString                 m_strContEncoding;
         TString                 m_strContType;

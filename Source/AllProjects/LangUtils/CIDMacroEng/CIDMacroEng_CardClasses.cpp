@@ -51,19 +51,22 @@ RTTIDecls(TMEngCard8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_CardClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strCard1(L"Card1");
-    const TString   strCard2(L"Card2");
-    const TString   strCard4(L"Card4");
-    const TString   strCard8(L"Card8");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strCard1(L"Card1");
+        const TString   strCard2(L"Card2");
+        const TString   strCard4(L"Card4");
+        const TString   strCard8(L"Card8");
 
-    const TString   strCard1ClassPath(L"MEng.Card1");
-    const TString   strCard2ClassPath(L"MEng.Card2");
-    const TString   strCard4ClassPath(L"MEng.Card4");
-    const TString   strCard8ClassPath(L"MEng.Card8");
+        const TString   strCard1ClassPath(L"MEng.Card1");
+        const TString   strCard2ClassPath(L"MEng.Card2");
+        const TString   strCard4ClassPath(L"MEng.Card4");
+        const TString   strCard8ClassPath(L"MEng.Card8");
+    }
 }
 
 
@@ -177,38 +180,39 @@ TMEngCard1Info::TMEngCard1Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_And(kMacroEng::c2BadId)
-    , m_c2MethId_AndEq(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetBit(kMacroEng::c2BadId)
-    , m_c2MethId_GetHighNibble(kMacroEng::c2BadId)
-    , m_c2MethId_GetLowNibble(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Or(kMacroEng::c2BadId)
-    , m_c2MethId_OrEq(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetBit(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftL(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftR(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Xor(kMacroEng::c2BadId)
-    , m_c2MethId_XorEq(kMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_And(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AndEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetHighNibble(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLowNibble(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Or(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OrEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftL(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftR(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Xor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XorEq(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -251,7 +255,7 @@ TMEngCard1Info::eCastFrom(          TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard1 c1New;
+    tCIDLib::TCard1 c1New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -1110,40 +1114,40 @@ TMEngCard2Info::TMEngCard2Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_And(kMacroEng::c2BadId)
-    , m_c2MethId_AndEq(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetBit(kMacroEng::c2BadId)
-    , m_c2MethId_GetHighByte(kMacroEng::c2BadId)
-    , m_c2MethId_GetLowByte(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Or(kMacroEng::c2BadId)
-    , m_c2MethId_OrEq(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetBit(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftL(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftR(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_SwapBytes(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Xor(kMacroEng::c2BadId)
-    , m_c2MethId_XorEq(kMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_And(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AndEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetHighByte(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLowByte(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Or(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OrEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftL(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftR(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SwapBytes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Xor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XorEq(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -1186,7 +1190,7 @@ TMEngCard2Info::eCastFrom(          TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard2 c2New;
+    tCIDLib::TCard2 c2New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -2055,45 +2059,45 @@ TMEngCard4Info::TMEngCard4Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_And(kMacroEng::c2BadId)
-    , m_c2MethId_AndEq(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetBit(kMacroEng::c2BadId)
-    , m_c2MethId_GetByte1(kMacroEng::c2BadId)
-    , m_c2MethId_GetByte2(kMacroEng::c2BadId)
-    , m_c2MethId_GetByte3(kMacroEng::c2BadId)
-    , m_c2MethId_GetByte4(kMacroEng::c2BadId)
-    , m_c2MethId_GetHighWord(kMacroEng::c2BadId)
-    , m_c2MethId_GetLowWord(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Or(kMacroEng::c2BadId)
-    , m_c2MethId_OrEq(kMacroEng::c2BadId)
-    , m_c2MethId_PercentOf(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetBit(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftL(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftR(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_SwapBytes(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Xor(kMacroEng::c2BadId)
-    , m_c2MethId_XorEq(kMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_And(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AndEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByte1(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByte2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByte3(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByte4(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetHighWord(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLowWord(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Or(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OrEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PercentOf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftL(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftR(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SwapBytes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Xor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XorEq(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -2136,7 +2140,7 @@ TMEngCard4Info::eCastFrom(          TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard4 c4New;
+    tCIDLib::TCard4 c4New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -3116,42 +3120,42 @@ TMEngCard8Info::TMEngCard8Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_And(kMacroEng::c2BadId)
-    , m_c2MethId_AndEq(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_GetBit(kMacroEng::c2BadId)
-    , m_c2MethId_GetByte(kMacroEng::c2BadId)
-    , m_c2MethId_GetHighDWord(kMacroEng::c2BadId)
-    , m_c2MethId_GetLowDWord(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_ModDiv(kMacroEng::c2BadId)
-    , m_c2MethId_ModDivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Or(kMacroEng::c2BadId)
-    , m_c2MethId_OrEq(kMacroEng::c2BadId)
-    , m_c2MethId_PercentOf(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetBit(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftL(kMacroEng::c2BadId)
-    , m_c2MethId_ShiftR(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_SwapBytes(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Xor(kMacroEng::c2BadId)
-    , m_c2MethId_XorEq(kMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_And(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AndEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetByte(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetHighDWord(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLowDWord(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDiv(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ModDivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Or(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OrEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PercentOf(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetBit(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftL(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ShiftR(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SwapBytes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Xor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XorEq(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -3194,7 +3198,7 @@ TMEngCard8Info::eCastFrom(          TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard8 c8New;
+    tCIDLib::TCard8 c8New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -3835,6 +3839,11 @@ TMEngCard8Info::bInvokeMethod(          TCIDMacroEngine&    meOwner
         //  then clip it to the low byte.
         //
         tCIDLib::TCard8 c8Ret = mecvActual.c8Value();
+        //
+        //  The analyzer is confused here. We aren't assigning the shipped
+        //  value to the 64 bit value. We are creating a shift count.
+        //
+        #pragma warning(suppress : 6297)
         c8Ret >>= (c4Byte << 3);
         c8Ret &= 0xFF;
         mecvRet.c1Value(tCIDLib::TCard1(c8Ret));

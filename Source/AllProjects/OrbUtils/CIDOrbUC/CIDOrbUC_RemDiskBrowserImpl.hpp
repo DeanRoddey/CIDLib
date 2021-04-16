@@ -51,6 +51,7 @@ class CIDORBUCEXP TRemDiskBrowserImpl : public TRemBrowserServerBase
         TRemDiskBrowserImpl();
 
         TRemDiskBrowserImpl(const TRemDiskBrowserImpl&) = delete;
+        TRemDiskBrowserImpl(TRemDiskBrowserImpl&&) = delete;
 
         ~TRemDiskBrowserImpl();
 
@@ -59,6 +60,7 @@ class CIDORBUCEXP TRemDiskBrowserImpl : public TRemBrowserServerBase
         //  Public operators
         // -------------------------------------------------------------------
         TRemDiskBrowserImpl& operator=(const TRemDiskBrowserImpl&) = delete;
+        TRemDiskBrowserImpl& operator=(TRemDiskBrowserImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -135,9 +137,9 @@ class CIDORBUCEXP TRemDiskBrowserImpl : public TRemBrowserServerBase
         // --------------------------------------------------------------------
         //  Protected, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

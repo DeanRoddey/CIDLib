@@ -224,45 +224,60 @@ static tCIDComm::EPortRTS eXlatRTS(const DCB& srcData)
 // ---------------------------------------------------------------------------
 TCommHandle::TCommHandle() :
 
-    m_phcommiThis(0)
+    m_phcommiThis(nullptr)
 {
     m_phcommiThis = new TCommHandleImpl;
     m_phcommiThis->hComm = 0;
 }
 
-TCommHandle::TCommHandle(const TCommHandle& hsemToCopy) :
+TCommHandle::TCommHandle(const TCommHandle& hsemSrc) :
 
-    m_phcommiThis(0)
+    m_phcommiThis(nullptr)
 {
     m_phcommiThis = new TCommHandleImpl;
-    m_phcommiThis->hComm = hsemToCopy.m_phcommiThis->hComm;
+    m_phcommiThis->hComm = hsemSrc.m_phcommiThis->hComm;
+}
+
+TCommHandle::TCommHandle(TCommHandle&& hsemSrc) :
+
+    m_phcommiThis(nullptr)
+{
+    m_phcommiThis = new TCommHandleImpl;
+    m_phcommiThis->hComm = 0;
+    *this = tCIDLib::ForceMove(hsemSrc);
 }
 
 TCommHandle::~TCommHandle()
 {
     delete m_phcommiThis;
-    m_phcommiThis = 0;
+    m_phcommiThis = nullptr;
 }
 
 
 // -------------------------------------------------------------------
 //  Public operators
 // -------------------------------------------------------------------
-TCommHandle&
-TCommHandle::operator=(const TCommHandle& hsemToAssign)
+TCommHandle& TCommHandle::operator=(const TCommHandle& hsemSrc)
 {
-    if (this == &hsemToAssign)
-        return *this;
+    if (this != &hsemSrc)
+        m_phcommiThis->hComm = hsemSrc.m_phcommiThis->hComm;
 
-    m_phcommiThis->hComm = hsemToAssign.m_phcommiThis->hComm;
+    return *this;
+}
+
+
+TCommHandle& TCommHandle::operator=(TCommHandle&& hsemSrc)
+{
+    if (this != &hsemSrc)
+        tCIDLib::Swap(m_phcommiThis, hsemSrc.m_phcommiThis);
     return *this;
 }
 
 
 tCIDLib::TBoolean
-TCommHandle::operator==(const TCommHandle& hsemToCompare) const
+TCommHandle::operator==(const TCommHandle& hsemSrc) const
 {
-    return (m_phcommiThis->hComm == hsemToCompare.m_phcommiThis->hComm);
+    return (m_phcommiThis->hComm == hsemSrc.m_phcommiThis->hComm);
 }
 
 
@@ -332,7 +347,7 @@ TKrnlCommPort::c4EnumPorts(         tCIDLib::TBoolean* const pbToFill
     tCIDLib::TCh szSrcBuf[16];
     TRawStr::CopyStr(szSrcBuf, L"COM");
 
-    const tCIDLib::TCard4 c4BufSz = 1024;
+    constexpr tCIDLib::TCard4 c4BufSz = 1024;
     tCIDLib::TCh szOutBuf[c4BufSz + 1];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
@@ -349,7 +364,7 @@ TKrnlCommPort::c4EnumPorts(         tCIDLib::TBoolean* const pbToFill
 TKrnlCommPort::TKrnlCommPort() :
 
     m_c4PortNum(0)
-    , m_pExtra(0)
+    , m_pExtra(nullptr)
 {
     m_pExtra = new TPerPlat;
     m_pExtra->c4ReadTimeout = kCIDLib::c4MaxCard;
@@ -359,11 +374,18 @@ TKrnlCommPort::TKrnlCommPort() :
 TKrnlCommPort::TKrnlCommPort(const tCIDLib::TCard4 c4PortNum) :
 
     m_c4PortNum(c4PortNum)
-    , m_pExtra(0)
+    , m_pExtra(nullptr)
 {
     m_pExtra = new TPerPlat;
     m_pExtra->c4ReadTimeout = kCIDLib::c4MaxCard;
     m_pExtra->c4WriteTimeout = kCIDLib::c4MaxCard;
+}
+
+TKrnlCommPort::TKrnlCommPort(TKrnlCommPort&& kcommSrc) :
+
+    TKrnlCommPort()
+{
+    *this = tCIDLib::ForceMove(kcommSrc);
 }
 
 TKrnlCommPort::~TKrnlCommPort()
@@ -377,6 +399,21 @@ TKrnlCommPort::~TKrnlCommPort()
     //
     if (m_hcommThis.m_phcommiThis->hComm)
         ::CloseHandle(m_hcommThis.m_phcommiThis->hComm);
+}
+
+
+// ---------------------------------------------------------------------------
+//  TKrnlCommPort: Public operators
+// ---------------------------------------------------------------------------
+TKrnlCommPort& TKrnlCommPort::operator=(TKrnlCommPort&& kcommSrc)
+{
+    if (this != &kcommSrc)
+    {
+        tCIDLib::Swap(m_c4PortNum, kcommSrc.m_c4PortNum);
+        tCIDLib::Swap(m_pExtra, kcommSrc.m_pExtra);
+        m_hcommThis = tCIDLib::ForceMove(kcommSrc.m_hcommThis);
+    }
+    return *this;
 }
 
 
@@ -1101,26 +1138,6 @@ TKrnlCommPort::bWriteRawBuf(const   tCIDLib::TVoid* const   pToWrite
         // And remember this as the current write timeout
         m_pExtra->c4WriteTimeout = c4Timeout;
     }
-
-    //
-    //  Temp code to help debug a Z-Wave driver Z-Stick virtual comm port error. It
-    //  starts always throwing a semaphore timeout (121) error because the serial port
-    //  isn't accepting data.
-    //
-    #if CID_DEBUG_ON
-    // #define FAKEBADPORT 1
-    #if defined(FAKEBADPORT)
-    static tCIDLib::TBoolean bFailIt = kCIDLib::False;
-    if (bFailIt && (c4BytesToWrite > 8))
-    {
-        // Actually block for the timeout, in case that's important
-        ::Sleep(c4Timeout);
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcComm_Write, 121);
-        return kCIDLib::False;
-    }
-    #endif
-    #endif
-
 
     if (!::WriteFile(m_hcommThis.m_phcommiThis->hComm, pToWrite, c4BytesToWrite, &c4BytesWritten, 0))
     {

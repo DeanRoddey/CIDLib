@@ -180,7 +180,7 @@ class CIDLIBEXP TGlobalThreadFunc : public TThreadFunc
 //   CLASS: TMemberFunc
 //  PREFIX: tfunc
 // ---------------------------------------------------------------------------
-template <class T> class TMemberFunc : public TThreadFunc
+template <typename T> class TMemberFunc : public TThreadFunc
 {
     public  :
         // -------------------------------------------------------------------
@@ -206,10 +206,10 @@ template <class T> class TMemberFunc : public TThreadFunc
         {
         }
 
-        TMemberFunc(const TMemberFunc<T>& tfuncToCopy) :
+        TMemberFunc(const TMemberFunc<T>& tfuncSrc) :
 
-            m_pfnMemberFunc(tfuncToCopy.m_pfnMemberFunc)
-            , m_pobjTarget(tfuncToCopy.m_pobjTarget)
+            m_pfnMemberFunc(tfuncSrc.m_pfnMemberFunc)
+            , m_pobjTarget(tfuncSrc.m_pobjTarget)
         {
         }
 
@@ -221,13 +221,13 @@ template <class T> class TMemberFunc : public TThreadFunc
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TMemberFunc& operator=(const TMemberFunc<T>& tfuncToAssign)
+        TMemberFunc& operator=(const TMemberFunc<T>& tfuncSrc)
         {
-            if (this == &tfuncToAssign)
-                return *this;
-
-            m_pfnMemberFunc = tfuncToAssign.m_pfnMemberFunc;
-            m_pobjTarget = tfuncToAssign.m_pobjTarget;
+            if (this != &tfuncSrc)
+            {
+                m_pfnMemberFunc = tfuncSrc.m_pfnMemberFunc;
+                m_pobjTarget = tfuncSrc.m_pobjTarget;
+            }
             return *this;
         }
 
@@ -323,6 +323,11 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
 
         TThread(const TThread&) = delete;
 
+        TThread
+        (
+                    TThread&&               thrSrc
+        );
+
         ~TThread();
 
 
@@ -330,6 +335,11 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TThread& operator=(const TThread&) = delete;
+
+        TThread& operator=
+        (
+                    TThread&&               thrSrc
+        );
 
 
         // -------------------------------------------------------------------
@@ -458,7 +468,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -592,7 +602,7 @@ class CIDLIBEXP TThreadPrioJan : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TThreadPrioJan& operator=(const TThreadPrioJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
     private :
@@ -646,7 +656,7 @@ class CIDLIBEXP TThreadSyncJan : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TThreadSyncJan& operator=(const TThreadSyncJan&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        tCIDLib::TVoid* operator new(size_t) = delete;
 
 
     private :

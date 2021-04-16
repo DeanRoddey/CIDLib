@@ -79,28 +79,18 @@ namespace TRawMem
         const   tCIDLib::TVoid* const   pBuf
     );
 
-    KRNLEXPORT tCIDLib::TBoolean bSafeRefAcquire
-    (
-        volatile tCIDLib::TCard4&      c4Ref
-    );
-
-    KRNLEXPORT tCIDLib::TBoolean bSafeRefRelease
-    (
-        volatile tCIDLib::TCard4&       c4Ref
-    );
-
     KRNLEXPORT tCIDLib::TCard4 c4CompareAndExchange
     (
                 tCIDLib::TCard4&        c4ToFill
         , const tCIDLib::TCard4         c4New
         , const tCIDLib::TCard4         c4Compare
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TCard4 c4Exchange
     (
                 tCIDLib::TCard4&        c4ToFill
         , const tCIDLib::TCard4         c4New
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TCard4 c4PageRounded
     (
@@ -110,6 +100,18 @@ namespace TRawMem
     KRNLEXPORT tCIDLib::TCard4 c4PagesCovered
     (
         const   tCIDLib::TCard4         c4Size
+    );
+
+    KRNLEXPORT tCIDLib::TCard4 c4SafeRefAcquire
+    (
+                tCIDLib::TCard4&        c4Ref
+        ,       tCIDLib::TBoolean&      bRes
+    );
+
+    KRNLEXPORT tCIDLib::TCard4 c4SafeRefRelease
+    (
+                tCIDLib::TCard4&        c4Ref
+        ,       tCIDLib::TBoolean&      bRes
     );
 
     KRNLEXPORT tCIDLib::ESortComps eCompareMemBuf
@@ -181,13 +183,13 @@ namespace TRawMem
                 tCIDLib::TVoid**        ppToFill
         , const tCIDLib::TVoid*         pNew
         , const tCIDLib::TVoid*         pCompare
-    );
+    )   noexcept;
 
     KRNLEXPORT tCIDLib::TVoid* pExchangeRawPtr
     (
                 tCIDLib::TVoid**        ppToFill
         , const tCIDLib::TVoid*         pNew
-    );
+    )   noexcept;
 
     KRNLEXPORT const tCIDLib::TVoid* pNextPageAdr
     (
@@ -307,23 +309,34 @@ namespace TRawMem
 
     //
     //  These are some templates that make the business of doing compare
-    //  and exchanges on pointers typesafe and convenient.
+    //  and exchanges on pointers typesafe and convenient. They just work
+    //  in terms of the per-platform, untyped ones.
     //
-    template <class T> T* pExchangePtr(T** ppToFill, const T* const pNew)
+    template <typename T> T* pExchangePtr(T** ppToFill, const T* const pNew) noexcept
     {
+        //
+        //  Sometimes this is going to be void* return, which will get an analysis
+        //  warning that reinterpret is not required.
+        //
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
-            pExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew)
+            pExchangeRawPtr(tCIDLib::pToVoidPP(ppToFill), pNew)
         );
     }
 
-    template <class T> T* pCompareAndExchangePtr(       T**         ppToFill
+    template <typename T> T* pCompareAndExchangePtr(    T**         ppToFill
                                                 , const T* const    pNew
-                                                , const T* const    pCompare)
+                                                , const T* const    pCompare) noexcept
     {
+        //
+        //  Sometimes this is going to be void* return, which will get an analysis
+        //  warning that reinterpret is not required.
+        //
+        CIDLib_Suppress(26471)
         return reinterpret_cast<T*>
         (
-            pCompareAndExchangeRawPtr((tCIDLib::TVoid**)ppToFill, pNew, pCompare)
+            pCompareAndExchangeRawPtr(tCIDLib::pToVoidPP(ppToFill), pNew, pCompare)
         );
     }
 
@@ -333,7 +346,7 @@ namespace TRawMem
     //  to do the casting. p2 should be higher in memory.
     // ---------------------------------------------------------------------------
     inline tCIDLib::TCard4 c4AdrDiff(const  tCIDLib::TVoid* const p1
-                                    , const tCIDLib::TVoid* const p2)
+                                    , const tCIDLib::TVoid* const p2) noexcept
     {
         return ((tCIDLib::TCard1*)p2) - ((tCIDLib::TCard1*)p1);
     }

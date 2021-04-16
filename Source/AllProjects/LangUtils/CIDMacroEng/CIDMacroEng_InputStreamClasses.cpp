@@ -49,10 +49,13 @@ RTTIDecls(TMEngStringInStreamInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_InputStreamClasses
 {
-    const TString   strTextInStreamClassPath(L"MEng.System.Runtime.TextInStream");
-    const TString   strConsoleInStreamClassPath(L"MEng.System.Runtime.ConsoleInStream");
-    const TString   strFileInStreamClassPath(L"MEng.System.Runtime.FileInStream");
-    const TString   strStringInStreamClassPath(L"MEng.System.Runtime.StringInStream");
+    namespace
+    {
+        const TString   strTextInStreamClassPath(L"MEng.System.Runtime.TextInStream");
+        const TString   strConsoleInStreamClassPath(L"MEng.System.Runtime.ConsoleInStream");
+        const TString   strFileInStreamClassPath(L"MEng.System.Runtime.FileInStream");
+        const TString   strStringInStreamClassPath(L"MEng.System.Runtime.StringInStream");
+    }
 }
 
 
@@ -121,14 +124,14 @@ const TString& TMEngTextInStreamVal::strExtra(const TString& strToSet)
 
 // Provide access to the source stream
 const TTextInStream&
-TMEngTextInStreamVal::strmSrc(TCIDMacroEngine& meOwner) const
+TMEngTextInStreamVal::strmSrc(const TCIDMacroEngine& meOwner) const
 {
     // If not set up yet, then that's an error
     CheckStreamSet(meOwner);
     return *m_pstrmSrc;
 }
 
-TTextInStream& TMEngTextInStreamVal::strmSrc(TCIDMacroEngine& meOwner)
+TTextInStream& TMEngTextInStreamVal::strmSrc(const TCIDMacroEngine& meOwner)
 {
     // If not set up yet, then that's an error
     CheckStreamSet(meOwner);
@@ -169,7 +172,7 @@ TMEngTextInStreamVal::SetStream(TTextInStream* const pstrmToAdopt)
     //  not expose it, so we it would fail if they tried to read the mode
     //  at any point.
     //
-    m_pstrmSrc->tcvtThis().eErrorAction(tCIDLib::ETCvtActions::Throw);
+    m_pstrmSrc->tcvtThis().eErrorAction(tCIDLib::ETCvtActs::Throw);
 }
 
 
@@ -226,14 +229,14 @@ TMEngTextInStreamInfo::TMEngTextInStreamInfo(TCIDMacroEngine& meOwner) :
         , L"MEng.Object"
 
     )
-    , m_c2MethId_EndOfStream(kMacroEng::c2BadId)
-    , m_c2MethId_GetLine(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
-    , m_c2MethId_SetErrAction(kMacroEng::c2BadId)
-    , m_c2MethId_SetRepChar(kMacroEng::c2BadId)
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
-    , m_c2TypeId_InErrActs(kMacroEng::c2BadId)
-    , m_c4ErrId_Configure(kMacroEng::c2BadId)
+    , m_c2MethId_EndOfStream(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetErrAction(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetRepChar(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_InErrActs(kCIDMacroEng::c2BadId)
+    , m_c4ErrId_Configure(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Internalize(kCIDLib::c4MaxCard)
     , m_c4ErrId_Reset(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
@@ -279,8 +282,8 @@ tCIDLib::TVoid TMEngTextInStreamInfo::Init(TCIDMacroEngine& meOwner)
             , L"MEng.Enum"
             , 2
         );
-        m_pmeciInErrActs->c4AddEnumItem(L"Throw", L"Throw on Error", tCIDLib::ETCvtActions::Throw);
-        m_pmeciInErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActions::Replace);
+        m_pmeciInErrActs->c4AddEnumItem(L"Throw", L"Throw on Error", tCIDLib::ETCvtActs::Throw);
+        m_pmeciInErrActs->c4AddEnumItem(L"RepChar", L"Use replacement character", tCIDLib::ETCvtActs::Replace);
         m_pmeciInErrActs->BaseClassInit(meOwner);
         m_c2TypeId_InErrActs = meOwner.c2AddClass(m_pmeciInErrActs);
         bAddNestedType(m_pmeciInErrActs->strClassPath());
@@ -458,7 +461,7 @@ TMEngTextInStreamInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
             TMEngEnumVal& mecvAct = meOwner.mecvStackAtAs<TMEngEnumVal>(c4FirstInd);
             mecvActual.strmSrc(meOwner).tcvtThis().eErrorAction
             (
-                tCIDLib::ETCvtActions(m_pmeciInErrActs->c4MapValue(mecvAct))
+                tCIDLib::ETCvtActs(m_pmeciInErrActs->c4MapValue(mecvAct))
             );
         }
 
@@ -545,7 +548,7 @@ TMEngConInStreamInfo::TMEngConInStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextInStream"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -647,11 +650,11 @@ TMEngFileInStreamInfo::TMEngFileInStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextInStream"
     )
-    , m_c2MethId_Close(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_EncCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetFileName(kMacroEng::c2BadId)
-    , m_c2MethId_Open(kMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EncCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFileName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Open(kCIDMacroEng::c2BadId)
     , m_strDotDot(L"..")
 {
     // Add imports for any non-intrinsic classes we use in our signatures
@@ -805,7 +808,7 @@ TMEngFileInStreamInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         //  attempts to .. themselves up above the controlled root imposed
         //  by the macro engine.
         //
-        tCIDLib::TCard4 c4Pos;
+        tCIDLib::TCard4 c4Pos = 0;
         if ((strPath.chFirst() != L'\\')
         ||  strPath.bFirstOccurrence(m_strDotDot, c4Pos))
         {
@@ -832,7 +835,7 @@ TMEngFileInStreamInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
                     , tCIDLib::EFilePerms::Default
                     , tCIDLib::EFileFlags::None
                     , tCIDLib::EAccessModes::Read
-                    , facCIDEncode().ptcvtMakeNew(mecvActual.strEncoding())
+                    , facCIDEncode().ptcvtMake(mecvActual.strEncoding())
                 )
             );
 
@@ -891,10 +894,10 @@ TMEngStringInStreamInfo::TMEngStringInStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextInStream"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_SetText(kMacroEng::c2BadId)
-    , m_c2MethId_SyncCtor(kMacroEng::c2BadId)
-    , m_c2MethId_StrCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SyncCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_StrCtor(kCIDMacroEng::c2BadId)
 {
 }
 

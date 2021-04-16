@@ -185,24 +185,32 @@ class TWndMapItemKeyOps
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_Window
 {
-    // ------------------------------------------------------------------------
-    //  We have to be able to map from window handles (which we get in the window proc) and
-    //  our window objects. Storing a pointer in the window's window's extra data is kludgey
-    //  and can't tell the difference between non-CIDLib windows and CIDLib windows until
-    //  its too late. So we need a mapping mechanism.
-    //
-    //  So we just use a keyed hash set.
-    //
-    //  Syncrhonization is not required since this map is only accessed from window messages
-    //  and they are serialized within a single process.
-    // ------------------------------------------------------------------------
-    TRefKeyedHashSet<TWndMapItem, TWndMapItemH, TWndMapItemKeyOps> colWndItemMap
-    (
-        tCIDLib::EAdoptOpts::Adopt
-        , 1024
-        , TWndMapItemKeyOps()
-        , &TWndMapItem::wmihKey
-    );
+    namespace
+    {
+        // ------------------------------------------------------------------------
+        //  We have to be able to map from window handles (which we get in the window proc) and
+        //  our window objects. Storing a pointer in the window's window's extra data is kludgey
+        //  and can't tell the difference between non-CIDLib windows and CIDLib windows until
+        //  its too late. So we need a mapping mechanism.
+        //
+        //  So we just use a keyed hash set.
+        //
+        //  Syncrhonization is not required since this map is only accessed from window messages
+        //  and they are serialized within a single process.
+        // ------------------------------------------------------------------------
+        using TWndItemMap = TRefKeyedHashSet<TWndMapItem, TWndMapItemH, TWndMapItemKeyOps>;
+        TWndItemMap& colWndItemMap()
+        {
+            static TWndItemMap* pcolMap = new TWndItemMap
+            (
+                tCIDLib::EAdoptOpts::Adopt
+                , 1024
+                , TWndMapItemKeyOps()
+                , &TWndMapItem::wmihKey
+            );
+            return *pcolMap;
+        }
+    }
 }
 
 
@@ -331,7 +339,7 @@ mresCIDCtrlsDispatch(const  tCIDCtrls::TWndHandle   hwndThis
             pwmiData->m_pwndWnd->SetIsDialog();
         }
 
-        CIDCtrls_Window::colWndItemMap.Add(pwmiData);
+        CIDCtrls_Window::colWndItemMap().Add(pwmiData);
 
         // And store the window handle on the window object
         pwmiData->m_pwndWnd->StoreHandle(hwndThis);
@@ -464,7 +472,7 @@ mresCIDCtrlsDispatch(const  tCIDCtrls::TWndHandle   hwndThis
             //  NOT delete the window itself. This window may not be dynamically allocated.
             //  Each window that creates children is responsible for cleaning them up.
             //
-            if (!CIDCtrls_Window::colWndItemMap.bRemoveKey(hwndThis, kCIDLib::False))
+            if (!CIDCtrls_Window::colWndItemMap().bRemoveKey(hwndThis, kCIDLib::False))
             {
                 #if CID_DEBUG_ON
                 TAudio::Beep(880, 50);
@@ -533,22 +541,6 @@ TCtrlNotify::TCtrlNotify(const TWindow& wndSrc) :
 {
 }
 
-TCtrlNotify::TCtrlNotify(const TCtrlNotify& wnotSrc) :
-
-    m_widSource(wnotSrc.m_widSource)
-    , m_strSrcName(wnotSrc.m_strSrcName)
-{
-}
-
-TCtrlNotify& TCtrlNotify::operator=(const TCtrlNotify& wnotSrc)
-{
-    if (this != &wnotSrc)
-    {
-        m_widSource = wnotSrc.m_widSource;
-        m_strSrcName = wnotSrc.m_strSrcName;
-    }
-    return *this;
-}
 
 
 
@@ -608,14 +600,8 @@ TWindow::CheckHandlerRegParms(  const   TWindow* const  pwndSrc
 // Lazy eval for the null window object
 TWindow& TWindow::Nul_TWindow()
 {
-    static TWindow* pwndNull = nullptr;
-    if (!pwndNull)
-    {
-        TBaseLock lockInit;
-        if (!pwndNull)
-            TRawMem::pExchangePtr(&pwndNull, new TWindow(kCIDLib::False));
-    }
-    return *pwndNull;
+    static TWindow wndNull(kCIDLib::False);
+    return wndNull;
 }
 
 
@@ -624,7 +610,7 @@ TWindow& TWindow::Nul_TWindow()
 //
 TWindow* TWindow::pwndGetWndLinkPtr(const tCIDCtrls::TWndHandle hwndSrc)
 {
-    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap.pobjFindByKey
+    TWndMapItem* pwmiCur = CIDCtrls_Window::colWndItemMap().pobjFindByKey
     (
         hwndSrc, kCIDLib::False
     );
@@ -647,21 +633,22 @@ const TString& TWindow::strExtractName(const TWindow& wndSrc)
 TFrameWnd& TWindow::wndDesktop()
 {
     static TFrameWnd* m_pwndDesktop = nullptr;
-    if (!m_pwndDesktop)
+    if (!TAtomic::pFencedGet<TFrameWnd>(&m_pwndDesktop))
     {
         TBaseLock lockInit;
-        if (!m_pwndDesktop)
+        if (!TAtomic::pFencedGet<TFrameWnd>(&m_pwndDesktop))
         {
-            TRawMem::pExchangePtr(&m_pwndDesktop, new TFrameWnd);
+            TFrameWnd* pwndNew = new TFrameWnd;
 
             //
             //  Note that this adds it to the window list. We tell it not to
             //  adopt the handle.
             //
-            m_pwndDesktop->UseHandle
+            pwndNew->UseHandle
             (
                 ::GetDesktopWindow(), kCIDLib::False, kCIDLib::False
             );
+            TAtomic::FencedSet<TFrameWnd>(&m_pwndDesktop, pwndNew);
         }
     }
     return *m_pwndDesktop;
@@ -809,10 +796,7 @@ TArea TWindow::areaClient() const
         );
     }
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     return areaRet;
 }
 
@@ -855,10 +839,7 @@ TArea TWindow::areaWnd() const
     }
 
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     return areaRet;
 }
 
@@ -884,10 +865,7 @@ TArea TWindow::areaWndSize() const
         );
     }
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
     areaRet.ZeroOrg();
     return areaRet;
 }
@@ -1076,11 +1054,11 @@ tCIDLib::TVoid
 TWindow::AutoAdjustChildren(const TArea& areaPrev, const TArea& areaNew)
 {
     //
-    //  If not in a restored position, don't do anything. Or, if the previous size
+    //  If in a minimized position, don't do anything. Or, if the previous size
     //  is zero, then we are getting called from the initial size change, so we
     //  don't want to do anything.
     //
-    if ((ePosState() != tCIDCtrls::EPosStates::Restored)
+    if ((ePosState() == tCIDCtrls::EPosStates::Minimized)
     ||  areaPrev.szArea().bAllZero())
     {
         return;
@@ -2162,7 +2140,7 @@ tCIDLib::TVoid TWindow::Destroy()
         if (m_bOwnsHandle)
             ::DestroyWindow(m_hwndThis);
         else
-            CIDCtrls_Window::colWndItemMap.bRemoveKey(m_hwndThis, kCIDLib::False);
+            CIDCtrls_Window::colWndItemMap().bRemoveKey(m_hwndThis, kCIDLib::False);
     }
 }
 
@@ -2677,7 +2655,6 @@ tCIDCtrls::EPosStates TWindow::ePosState(TArea& areaNormal) const
     areaNormal.FromRectl
     (
         *reinterpret_cast<tCIDLib::THostRectl*>(&WndPlace.rcNormalPosition)
-        , tCIDLib::ERectlTypes::NonInclusive
     );
 
     return eRet;
@@ -2808,7 +2785,7 @@ TWindow::InvalidateArea(const   TArea&              areaToInvalidate
                         , const tCIDLib::TBoolean   bEraseBgn)
 {
     tCIDLib::THostRectl rectlInvalidate;
-    areaToInvalidate.ToRectl(rectlInvalidate, tCIDLib::ERectlTypes::NonInclusive);
+    areaToInvalidate.ToRectl(rectlInvalidate);
     if (!::InvalidateRect(m_hwndThis, (RECT*)&rectlInvalidate, bEraseBgn))
     {
         TKrnlError::SetLastHostError(::GetLastError());
@@ -2835,6 +2812,7 @@ TWindow::InvalidateArea(const   tCIDCtrls::TWndId   widChild
     pwndChild->InvalidateArea(areaToInvalidate, bEraseBgn);
 }
 
+// We assume non-inclusive points
 tCIDLib::TVoid
 TWindow::InvalidateArea(const   TPoint&             pntUL
                         , const TPoint&             pntLR
@@ -3164,7 +3142,7 @@ TWindow* TWindow::pwndFindNamed(const TString& strToFind) const
 {
     // If the collection isn't faulted in yet, just say no
     if (!m_pcolNamedWnds)
-        return kCIDLib::False;
+        return nullptr;
 
     return m_pcolNamedWnds->pobjFindByKey(strToFind, kCIDLib::False);
 }
@@ -3461,10 +3439,7 @@ TWindow::QueryClientArea(       TArea&              areaToFill
     RECT rectCur;
     ::GetClientRect(hwndUs, &rectCur);
 
-    areaToFill.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
 
     //
     //  If asked for only the available area, then iterate all of the child windows
@@ -3488,11 +3463,7 @@ TWindow::QueryClientArea(       TArea&              areaToFill
                 //
                 ::GetWindowRect(hwndCur, &rectCur);
                 ::MapWindowPoints(0, hwndUs, (POINT*)&rectCur, 2);
-                areaCur.FromRectl
-                (
-                    *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-                );
-
+                areaCur.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
                 areaToFill -= areaCur;
             }
 
@@ -3523,10 +3494,7 @@ TWindow::QueryClientArea(       TArea&                  areaToFill
     RECT rectCur;
     ::GetClientRect(hwndUs, &rectCur);
 
-    areaToFill.FromRectl
-    (
-        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaToFill.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
 
     //
     //  If asked for only the available area, then iterate all of the child windows
@@ -3565,11 +3533,7 @@ TWindow::QueryClientArea(       TArea&                  areaToFill
                     //
                     ::GetWindowRect(hwndCur, &rectCur);
                     ::MapWindowPoints(0, hwndUs, (POINT*)&rectCur, 2);
-                    areaCur.FromRectl
-                    (
-                        *(tCIDLib::THostRectl*)&rectCur, tCIDLib::ERectlTypes::NonInclusive
-                    );
-
+                    areaCur.FromRectl(*(tCIDLib::THostRectl*)&rectCur);
                     areaToFill -= areaCur;
                 }
             }
@@ -3667,7 +3631,7 @@ tCIDLib::TVoid TWindow::Redraw( const   TArea&                  areaToRedraw
                                 , const tCIDCtrls::ERedrawFlags eFlags)
 {
     tCIDLib::THostRectl rectlRedraw;
-    areaToRedraw.ToRectl(rectlRedraw, tCIDLib::ERectlTypes::NonInclusive);
+    areaToRedraw.ToRectl(rectlRedraw);
 
     tCIDLib::TCard4 c4Flags = RDW_INVALIDATE;
     if (tCIDLib::bAllBitsOn(eFlags, tCIDCtrls::ERedrawFlags::Erase))
@@ -3927,10 +3891,10 @@ TWindow::Scroll(const   TArea&              areaToScroll
                 , const tCIDLib::TBoolean   bInvalidate)
 {
     tCIDLib::THostRectl  rectScroll;
-    areaToScroll.ToRectl(rectScroll, tCIDLib::ERectlTypes::NonInclusive);
+    areaToScroll.ToRectl(rectScroll);
 
     tCIDLib::THostRectl  rectClip;
-    areaClip.ToRectl(rectClip, tCIDLib::ERectlTypes::NonInclusive);
+    areaClip.ToRectl(rectClip);
 
     tCIDLib::THostRectl  rectInvalid;
 
@@ -3959,7 +3923,7 @@ TWindow::Scroll(const   TArea&              areaToScroll
         );
     }
 
-    areaInvalid.FromRectl(rectInvalid, tCIDLib::ERectlTypes::NonInclusive);
+    areaInvalid.FromRectl(rectInvalid);
 }
 
 
@@ -3972,12 +3936,7 @@ TWindow::Scroll(const   TArea&              areaToScroll
 {
     Scroll
     (
-        areaToScroll
-        , areaToScroll
-        , areaInvalid
-        , i4HorzAmount
-        , i4VertAmount
-        , bInvalidate
+        areaToScroll, areaToScroll, areaInvalid, i4HorzAmount, i4VertAmount, bInvalidate
     );
 }
 
@@ -4604,7 +4563,7 @@ tCIDLib::TVoid TWindow::ToBottom()
 //
 //  NOTE: We are converting from client coordinates, so you should call this on the
 //  containing window with the coordinates of things inside that window. Don't call
-//  it on a window using it's own coordinates, i.e. don't try to translate the origin
+//  it on a window using its own coordinates, i.e. don't try to translate the origin
 //  of child control X by calling this on X. Call it on X's parent.
 //
 tCIDLib::TVoid
@@ -4763,7 +4722,7 @@ tCIDLib::TVoid
 TWindow::XlatCoordinates(TArea& areaToXlat, const TWindow& wndSrc) const
 {
     tCIDLib::THostRectl rectlXlat;
-    areaToXlat.ToRectl(rectlXlat, tCIDLib::ERectlTypes::Inclusive);
+    areaToXlat.ToRectl(rectlXlat);
     ::SetLastError(0);
     if (!::MapWindowPoints(wndSrc.m_hwndThis, m_hwndThis, (POINT*)&rectlXlat, 2))
     {
@@ -4783,7 +4742,7 @@ TWindow::XlatCoordinates(TArea& areaToXlat, const TWindow& wndSrc) const
             );
         }
     }
-    areaToXlat.FromRectl(rectlXlat, tCIDLib::ERectlTypes::Inclusive);
+    areaToXlat.FromRectl(rectlXlat);
 }
 
 tCIDLib::TVoid
@@ -5680,7 +5639,10 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
         }
 
         // Call the underlying control procedure and return his return
-        return ::CallWindowProc(m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam);
+        return ::CallWindowProc
+        (
+            (WNDPROC)m_pfOrgProc, wndThis.hwndSafe(), wmsgCur, wParam, lParam
+        );
     }
 
 
@@ -5832,11 +5794,7 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
             if (pDraw->itemState & ODS_FOCUS)
                 eFlags |= tCIDCtrls::ECustDrFlags::Focus;
 
-            TArea areaTar
-            (
-                *(tCIDLib::THostRectl*)&pDraw->rcItem, tCIDLib::ERectlTypes::NonInclusive
-            );
-
+            TArea areaTar(*(tCIDLib::THostRectl*)&pDraw->rcItem);
             CustomDraw(gdevTar, pDraw->itemID, eFlags, areaTar);
             return 1;
         };
@@ -6409,11 +6367,7 @@ TWindow::mresDispatch(  const   TWindow&            wndThis
             }
 
             // Convert the update rect to an area structure
-            areaUpdate.FromRectl
-            (
-                *(tCIDLib::THostRectl*)&PaintStruct.rcPaint
-                , tCIDLib::ERectlTypes::NonInclusive
-            );
+            areaUpdate.FromRectl(*(tCIDLib::THostRectl*)&PaintStruct.rcPaint);
 
             // Create a device object for the device
             TGraphPaintDev gdevPaint(hdevPaint, PaintStruct);
@@ -7276,11 +7230,11 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
     //  Init the common controls if not done yet, register our two custom window classes,
     //  and initialize our window mapping data.
     //
-    static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    if (!bInitDone)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             INITCOMMONCONTROLSEX Init = {0};
             Init.dwSize = sizeof(Init);
@@ -7313,7 +7267,7 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
                 , kCIDLib::False
             );
 
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
 
@@ -7436,7 +7390,7 @@ TWindow::CreateWnd( const   tCIDCtrls::TWndHandle   hwndParOwner
     {
         // Store a pointer to our window structure in the extra window data
         TWndMapItem* pwmiNew = new TWndMapItem(hwndTmp, this);
-        CIDCtrls_Window::colWndItemMap.Add(pwmiNew);
+        CIDCtrls_Window::colWndItemMap().Add(pwmiNew);
 
         // Store the handle before we do anything else
         m_hwndThis = hwndTmp;
@@ -7857,7 +7811,7 @@ TWindow::mresCallSubClass(  const   tCIDCtrls::TWndMsg  wmsgCur
                             , const tCIDCtrls::TWParam  wParam
                             , const tCIDCtrls::TLParam  lParam)
 {
-    return ::CallWindowProc(m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
+    return ::CallWindowProc((WNDPROC)m_pfOrgProc, hwndSafe(), wmsgCur, wParam, lParam);
 }
 
 
@@ -7996,7 +7950,7 @@ TWindow::RegWndClass(const  tCIDLib::TCh* const pszName
 
     // This is done the same regardless of the above
     wcData.lpszClassName = pszName;
-    wcData.lpfnWndProc = mresCIDCtrlsDispatch;
+    wcData.lpfnWndProc = (WNDPROC)mresCIDCtrlsDispatch;
     wcData.hInstance = hInstance;
 
     if (bDblClicks)
@@ -8156,7 +8110,7 @@ TWindow::UseHandle(         tCIDCtrls::TWndHandle   hwndToUse
 
     // Store a pointer to our window structure in the extra window data
     TWndMapItem* pwmiNew = new TWndMapItem(hwndToUse, this);
-    CIDCtrls_Window::colWndItemMap.Add(pwmiNew);
+    CIDCtrls_Window::colWndItemMap().Add(pwmiNew);
 
     if (bSubClass)
         SetSubclass();

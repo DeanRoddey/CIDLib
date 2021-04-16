@@ -42,11 +42,13 @@
         <NVirtMeths>
             <Method Name="c4ConvertFrom" RetType="tCIDLib::TCard4">
                 <Desc>
-                    <P>Converts up to c4MaxChars charactres from the incoming source data buffer, which must be at least c4SrcBytes in size. It will convert as many characters as it can, until it runs out of full bytes in the source or maxes out the target capacity. The number of bytes eaten is the return value and the number of characters stored to the output is put into c4OutChars.</P>
+                    <P>Converts up to c4MaxChars characters from the incoming source data buffer, which must be at least c4SrcBytes in size. It will convert as many characters as it can, until it runs out of full characters in the source or maxes out the target capacity. The number of bytes eaten is the return value. The number of characters stored to the output is put into c4OutChars (or is implicitly indicated when using a string object as the output.)</P>
 
                     <P>You can convert from a raw buffer, or a <ClassRef Ref="TMemBuf"/> object, and you can convert to a raw buffer or a <ClassRef Ref="TString"/> object.</P>
 
-                    <P>When using a raw character buffers of course you must be careful that they at least as big as you say they are or bad things will happen! When converting to a string, you have an append/overwrite option so that you can either let successive chunks accumulate or you can reset the target string so that it only contains the output of that call.</P>
+                    <P>When using a raw character buffers of course you must be careful that they are at least as big as you say they are or bad things will happen!</P>
+
+                    <P>When converting to a string, you have an append/overwrite option so that you can either let successive chunks accumulate or the target string can be reset so that it only contains the output of that call.</P>
 
                     <Note>Not all of the source bytes may be consumed. If either the max output chars is hit, or the source contains a final, partial character, there will be remaining source bytes that need to be carried forward to the next pass.</Note>
                 </Desc>
@@ -86,7 +88,7 @@
 
             <Method Name="c4ConvertTo" RetType="tCIDLib::TCard4">
                 <Desc>
-                    <P>Converts internal, wide characters to the target encoding and puts the results in the provided output buffer. The number of characters processed is returned, and the number of bytes stored to the output buffer is put into c4OutBytes.</P>
+                    <P>Converts internal, wide characters to the target encoding and puts the results in the provided output buffer. The number of characters processed is returned, and the number of bytes stored to the output buffer is put into c4OutBytes (or implied if using a TExpByteBuf object as a target.)</P>
 
                     <P>The issue of partial characters doesn't occur here as it does the in 'From' versions. But it's always possible that all of the source characters are not consumed because the target output became full. So you still have to be prepared to carry those source characters over to a next pass.</P>
 
@@ -128,35 +130,25 @@
                 </MethVar>
             </Method>
 
-            <Method Name="chRepChar" RetType="tCIDLib::TCh">
-                <Desc>
-                    <P>Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-                <MethVar><MethParam  Name="chToSet" Type="tCIDLib::TCh"/></MethVar>
-            </Method>
+            <GetSet Name="chRepChar" RetType="tCIDLib::TCh" Dir="Both">
+                Gets or sets the replacement character. This is used when a bad or unrepresentable character is encountered. See eErrorAction() below for more details. It's legal to change the replacement character at any time
+            </GetSet>
 
-            <Method Name="eErrorAction" RetType="tCIDLib::ETCvtActions">
-                <Desc>
-                    <P>Gets or sets the error action. This is used when converting text and bad or unrepresentable character is encountered. The possibilities are: </P>
-                    <List>
-                        <LItem Ref="Throw">Just give up immediately and throw an exception.</LItem>
-                        <LItem Ref="StopThenThrow">Deliver the successfully converted text up to that point, then throw next time.</LItem>
-                        <LItem Ref="Replace">Replace the bad character with the replacement character.</LItem>
-                    </List>
+            <GetSet Name="eErrorAction" RetType="tCIDLib::ETCvtActions" Dir="Both">
+                <P>Gets or sets the error action. This is used when converting text and bad or unrepresentable character is encountered. The possibilities are: </P>
 
-                    <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-                <MethVar><MethParam  Name="eToSet" Type="tCIDLib::ETCvtActions"/></MethVar>
-            </Method>
+                <List>
+                    <LItem Ref="Throw">Just give up immediately and throw an exception.</LItem>
+                    <LItem Ref="StopThenThrow">Deliver the successfully converted text up to that point, then throw next time.</LItem>
+                    <LItem Ref="Replace">Replace the bad character with the replacement character.</LItem>
+                </List>
 
-            <Method Name="strEncoding" RetType="TString" RetBy="CRef">
-                <Desc>
-                    <P>Provides access to the encoding that this converter supports.</P>
-                </Desc>
-                <MethVar Attrs="const"></MethVar>
-            </Method>
+                <P>Note that replace is only used for converting encoded data to the internal wide character format. For outgoing, an error will occur if data cannot be successfully converted.</P>
+            </GetSet>
+
+            <GetSet Name="strEncoding" RetType="TString" RetBy="CRef">
+                Provides access to the encoding that this converter supports.
+            </GetSet>
 
         </NVirtMeths>
     </PubIntf>

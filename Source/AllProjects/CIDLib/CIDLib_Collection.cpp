@@ -67,16 +67,6 @@ TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const tCIDLib::TCard4 c4Ind
 }
 
 
-TColPubSubInfo::TColPubSubInfo(const EEvents eEvent, const TString& strKey) :
-
-    m_c4Index1(0)
-    , m_c4Index2(0)
-    , m_eEvent(eEvent)
-    , m_strKey(strKey)
-{
-}
-
-
 TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
                                 , const tCIDLib::TCard4 c4Index1
                                 , const tCIDLib::TCard4 c4Index2) :
@@ -88,33 +78,130 @@ TColPubSubInfo::TColPubSubInfo( const   EEvents         eEvent
 }
 
 
-TColPubSubInfo::~TColPubSubInfo()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TColPubSubInfo: Public operators
-// ---------------------------------------------------------------------------
-TColPubSubInfo& TColPubSubInfo::operator=(const TColPubSubInfo& colpsiSrc)
-{
-    if (&colpsiSrc != this)
-    {
-        m_c4Index1  = colpsiSrc.m_c4Index1;
-        m_c4Index2  = colpsiSrc.m_c4Index2;
-        m_eEvent    = colpsiSrc.m_eEvent;
-        m_strKey    = colpsiSrc.m_strKey;
-    }
-    return *this;
-}
-
-
 
 
 // ---------------------------------------------------------------------------
 //   CLASS: TCollectionBaseBase
 //  PREFIX: col
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TCollectionBase: Public, static methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TCollectionBase::BadStoredCount(const TClass& clsCol)
+{
+    facCIDLib().ThrowErr
+    (
+        CID_FILE
+        , CID_LINE
+        , kCIDErrs::errcCol_BadStoredCount
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Format
+        , clsCol
+    );
+}
+
+
+// ---------------------------------------------------------------------------
+//  TCollectionBase: Constructors and Destructor
+// ---------------------------------------------------------------------------
+TCollectionBase::~TCollectionBase()
+{
+    if (m_pmtxLock)
+        delete m_pmtxLock;
+
+    // If we registered a pub/sub topic, then clean that up
+    if (m_ppstopReport)
+    {
+        try
+        {
+            delete m_ppstopReport;
+        }
+
+        catch(TError& errToCatch)
+        {
+            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+            TModule::LogEventObj(errToCatch);
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+//  TCollectionBase: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TCard4 TCollectionBase::c4SerialNum() const
+{
+    if (bIsMTSafe())
+    {
+        TLocker lockrCol(this);
+        tCIDLib::TCard4 c4Ret = m_c4SerialNum;
+        return c4Ret;
+    }
+    return m_c4SerialNum;
+}
+
+
+//
+//  If we are at or beyond the limit, throw. Unlike the protected ones, this
+//  is for client code to do checks.
+//
+tCIDLib::TVoid
+TCollectionBase::CheckIsFull(   const   tCIDLib::TCard4     c4Limit
+                                , const tCIDLib::TCh* const pszDescr)
+{
+    if (c4ElemCount() >= c4Limit)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcCol_Full
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::OutResource
+            , TString(pszDescr)
+        );
+    }
+}
+
+
+//
+//  Sometimes we cannot know when the containing code has modified an element, since
+//  it did so directly on the object. So this is public, allowing that containing code
+//  to force a publish msg.
+//
+tCIDLib::TVoid
+TCollectionBase::PublishBlockChanged(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
+{
+    if (m_ppstopReport)
+    {
+        m_ppstopReport->Publish
+        (
+            new TColPubSubInfo(TColPubSubInfo::EEvents::BlockChanged, c4At, c4Count)
+        );
+    }
+}
+
+tCIDLib::TVoid TCollectionBase::PublishElemChanged(const  tCIDLib::TCard4 c4At)
+{
+    if (m_ppstopReport)
+        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemChanged, c4At));
+}
+
+
+//
+//  Sometimes the containing code may make direct changes en masse and then want to
+//  force any subscribers to do a full reload, so we make this public. It's also used
+//  by deratives when they do copy/assign.
+//
+tCIDLib::TVoid TCollectionBase::PublishReloaded()
+{
+    if (m_ppstopReport)
+        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::Reloaded));
+}
+
+
+
 
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Public, static methods
@@ -137,7 +224,7 @@ TColPubSubInfo& TColPubSubInfo::operator=(const TColPubSubInfo& colpsiSrc)
 //  any type of collection.
 //
 tCIDLib::TBoolean
-TCollectionBase::bWaitForData(          TMtxLocker&         lockQueue
+TCollectionBase::bWaitForData(          TLocker&            lockrQueue
                                 , const TCollectionBase&    colSrc
                                 , const tCIDLib::TCard4     c4WaitMSs
                                 ,       TThreadWaitList&    twlWaitList
@@ -191,7 +278,7 @@ TCollectionBase::bWaitForData(          TMtxLocker&         lockQueue
         //
         twlWaitList.bWaitOnList
         (
-            lockQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
+            lockrQueue, kCIDLib::c4TWLReason_WaitData, c4MillisLeft
         );
 
         //
@@ -228,149 +315,6 @@ TCollectionBase::bWaitForData(          TMtxLocker&         lockQueue
 }
 
 
-tCIDLib::TVoid TCollectionBase::BadStoredCount(const TClass& clsCol)
-{
-    facCIDLib().ThrowErr
-    (
-        CID_FILE
-        , CID_LINE
-        , kCIDErrs::errcCol_BadStoredCount
-        , tCIDLib::ESeverities::Failed
-        , tCIDLib::EErrClasses::Format
-        , clsCol
-    );
-}
-
-
-// ---------------------------------------------------------------------------
-//  TCollectionBase: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TCollectionBase::~TCollectionBase()
-{
-    if (m_pmtxLock)
-        delete m_pmtxLock;
-
-    // If we registered a pub/sub topic, then clean that up
-    if (m_ppstopReport)
-    {
-        try
-        {
-            delete m_ppstopReport;
-        }
-
-        catch(TError& errToCatch)
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-    }
-}
-
-
-// We don't lock since we are called from derived versions that do that already
-TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
-{
-    if (this != &colSrc)
-    {
-        //
-        //  If we are in block mode, the have to just clear it. This shouldn't
-        //  happen, but if it does there's not much else we can do.
-        //
-        if (m_bInBlockMode)
-            m_bInBlockMode = kCIDLib::False;
-    }
-    return *this;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TCollectionBase: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean TCollectionBase::bIsMTSafe() const
-{
-    return (m_pmtxLock != 0);
-}
-
-tCIDLib::TCard4 TCollectionBase::c4SerialNum() const
-{
-    if (m_pmtxLock)
-    {
-        TMtxLocker lockCol(m_pmtxLock);
-        tCIDLib::TCard4 c4Ret = m_c4SerialNum;
-        return c4Ret;
-    }
-    return m_c4SerialNum;
-}
-
-
-//
-//  If we are at or beyond the limit, throw. Unlike the protected ones, this
-//  is for client code to do checks.
-//
-tCIDLib::TVoid
-TCollectionBase::CheckIsFull(   const   tCIDLib::TCard4     c4Limit
-                                , const tCIDLib::TCh* const pszDescr)
-{
-    if (c4ElemCount() >= c4Limit)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcCol_Full
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::OutResource
-            , TString(pszDescr)
-        );
-    }
-}
-
-
-tCIDLib::EMTStates TCollectionBase::eMTState() const
-{
-    if (m_pmtxLock)
-        return tCIDLib::EMTStates::Safe;
-    return tCIDLib::EMTStates::Unsafe;
-}
-
-
-//
-//  Sometimes we cannot know when the containing code has modified an element, since
-//  it did so directly on the object. So this is public, allowing that containing code
-//  to force a publish msg. If the collection knows it can call these itself.
-//
-tCIDLib::TVoid
-TCollectionBase::PublishBlockChanged(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
-{
-    if (m_ppstopReport)
-    {
-        m_ppstopReport->Publish
-        (
-            new TColPubSubInfo(TColPubSubInfo::EEvents::BlockChanged, c4At, c4Count)
-        );
-    }
-}
-
-tCIDLib::TVoid TCollectionBase::PublishElemChanged(const  tCIDLib::TCard4 c4At)
-{
-    if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemChanged, c4At));
-}
-
-
-//
-//  Sometimes the containing code may make direct changes en masse and then want to
-//  force nay subscribers to do a full reload, so we make this public. We just send
-//  a reorder event.
-//
-tCIDLib::TVoid TCollectionBase::PublishReload()
-{
-    if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::Reordered));
-}
-
-
-
 
 // ---------------------------------------------------------------------------
 //  TCollectionBase: Hidden constructors and operators
@@ -389,7 +333,9 @@ TCollectionBase::TCollectionBase(const tCIDLib::EMTStates eMTSafe) :
 
 //
 //  We don't copy any pub/sub topic if the source has one. The derived class has to
-//  enable it for this instance if he wants reporting.
+//  enable it for this instance if he wants reporting. If the source is thread safe
+//  we make this one thread safe, so that we get the right results if a collection is
+//  a member of a containing class that is copied.
 //
 TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
 
@@ -398,16 +344,50 @@ TCollectionBase::TCollectionBase(const TCollectionBase& colSrc) :
     , m_pmtxLock(nullptr)
     , m_ppstopReport(nullptr)
 {
+    // The source cannot be in a block operation
+    CIDAssert(!colSrc.m_bInBlockMode, L"Collection was constructed from while in a block operation");
+
+    // If the source is safe, make us safe
     if (colSrc.m_pmtxLock)
         m_pmtxLock = new TMutex;
 }
 
 
-// The caller should have locked. We bump both guy's serial numbers
+//
+//  The derived class should have locked the source if it is thread safe. We
+//  bump our serial number. Neither can be in a block operation.
+//
+TCollectionBase& TCollectionBase::operator=(const TCollectionBase& colSrc)
+{
+    if (this != &colSrc)
+    {
+        // Neither cannot be in the middle of a block mode operation
+        CIDAssert(!m_bInBlockMode, L"Collection was assigned to while in a block operation");
+        CIDAssert(!colSrc.m_bInBlockMode, L"Collection was assigned from while in a block operation");
+
+        m_c4SerialNum++;
+    }
+    return *this;
+}
+
+
+//
+//  All we do here is make sure we are not in block mode. If not, then we just bump
+//  our and the source's serial number, since both of us are going to change.
+//
+//  The derived class should have locked both of us (if we are lockable)
+//
 TCollectionBase& TCollectionBase::operator=(TCollectionBase&& colSrc)
 {
-    m_c4SerialNum++;
-    colSrc.m_c4SerialNum++;
+    if (this != &colSrc)
+    {
+        // Neither cannot be in the middle of a block mode operation
+        CIDAssert(!m_bInBlockMode, L"Collection was moved to while in a block operation");
+        CIDAssert(!colSrc.m_bInBlockMode, L"Collection was moved from while in a block operation");
+
+        m_c4SerialNum++;
+        colSrc.m_c4SerialNum++;
+    }
     return *this;
 }
 
@@ -506,7 +486,7 @@ tCIDLib::TVoid TCollectionBase::BlockModeStart()
 //
 tCIDLib::TCard4 TCollectionBase::c4IncSerialNum()
 {
-    TMtxLocker lockCol(m_pmtxLock);
+    TLocker lockrCol(this);
     m_c4SerialNum++;
     return m_c4SerialNum;
 }
@@ -700,29 +680,6 @@ TCollectionBase::DuplicateKey(  const   TObject&            objKey
 }
 
 
-tCIDLib::EMTStates TCollectionBase::eMTState(const tCIDLib::EMTStates eState)
-{
-    if (eState == tCIDLib::EMTStates::Safe)
-    {
-        if (!m_pmtxLock)
-        {
-            m_pmtxLock = new TMutex;
-            m_c4SerialNum++;
-        }
-    }
-     else
-    {
-        if (m_pmtxLock)
-        {
-            delete m_pmtxLock;
-            m_pmtxLock = nullptr;
-            m_c4SerialNum++;
-        }
-    }
-    return eState;
-}
-
-
 //
 //  If not already enabled, we enable our publishing topic. They provide a topic path
 //  they want us to use.
@@ -736,8 +693,8 @@ tCIDLib::EMTStates TCollectionBase::eMTState(const tCIDLib::EMTStates eState)
 tCIDLib::TVoid
 TCollectionBase::EnablePublish(const TString& strDesired, TString& strActual)
 {
-    // Lock if we have a mutex
-    TMtxLocker lockCol(m_pmtxLock);
+    // Lock if we are lockable
+    TLocker lockrCol(this);
 
     if (m_ppstopReport)
     {
@@ -794,6 +751,22 @@ TCollectionBase::HashChanged(const  tCIDLib::TCh* const     pszFile
         , tCIDLib::EErrClasses::NotSupported
     );
 }
+
+
+tCIDLib::TVoid
+TCollectionBase::MovedAdopted(  const   tCIDLib::TCh* const pszFile
+                                , const tCIDLib::TCard4     c4Line) const
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcCol_MovedAdopted
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::NotSupported
+    );
+}
+
 
 
 tCIDLib::TVoid
@@ -905,12 +878,6 @@ tCIDLib::TVoid TCollectionBase::PublishAdd(const  tCIDLib::TCard4 c4At)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, c4At));
 }
 
-tCIDLib::TVoid TCollectionBase::PublishAdd(const  TString& strKey)
-{
-    if (m_ppstopReport && !m_bInBlockMode)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemAdded, strKey));
-}
-
 tCIDLib::TVoid
 TCollectionBase::PublishBlockAdded(const  tCIDLib::TCard4 c4At, const tCIDLib::TCard4 c4Count)
 {
@@ -961,12 +928,6 @@ tCIDLib::TVoid TCollectionBase::PublishRemove(const tCIDLib::TCard4 c4At)
         m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, c4At));
 }
 
-tCIDLib::TVoid TCollectionBase::PublishRemove(const  TString& strKey)
-{
-    if (m_ppstopReport)
-        m_ppstopReport->Publish(new TColPubSubInfo(TColPubSubInfo::EEvents::ElemRemoved, strKey));
-}
-
 tCIDLib::TVoid TCollectionBase::PublishReorder()
 {
     if (m_ppstopReport)
@@ -983,6 +944,28 @@ TCollectionBase::PublishSwap(const  tCIDLib::TCard4 c4At1
         (
             new TColPubSubInfo(TColPubSubInfo::EEvents::Swapped, c4At1, c4At2)
         );
+    }
+}
+
+
+tCIDLib::TVoid TCollectionBase::SetMTState(const tCIDLib::EMTStates eState)
+{
+    if (eState == tCIDLib::EMTStates::Safe)
+    {
+        if (!m_pmtxLock)
+        {
+            m_pmtxLock = new TMutex;
+            m_c4SerialNum++;
+        }
+    }
+     else
+    {
+        if (m_pmtxLock)
+        {
+            delete m_pmtxLock;
+            m_pmtxLock = nullptr;
+            m_c4SerialNum++;
+        }
     }
 }
 

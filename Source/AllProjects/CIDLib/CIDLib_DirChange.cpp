@@ -41,11 +41,14 @@ RTTIDecls(TDirChangeInfo, TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_DirChange
 {
-    //
-    //  The max changes we will accumulate at a time. If the client doesn't read
-    //  them before then, we post an outof sync error.
-    //
-    const tCIDLib::TCard4 c4MaxChangeBlock = 4096;
+    namespace
+    {
+        //
+        //  The max changes we will accumulate at a time. If the client doesn't read
+        //  them before then, we post an outof sync error.
+        //
+        constexpr tCIDLib::TCard4 c4MaxChangeBlock = 4096;
+    }
 }
 
 
@@ -406,7 +409,7 @@ tCIDLib::TBoolean TDirChangeMon::bReadChanges(tCIDLib::TDirChanges& colToFill)
     colToFill.RemoveAll();
 
     // We need to sync this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If in overflow state, clear that. There will be an out of sync event
@@ -451,7 +454,7 @@ tCIDLib::TBoolean
 TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChanges
                                     , const tCIDLib::TCard4         c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // IF the overflow flag is already on, just ignore these
     if (m_bOverflow)
@@ -464,7 +467,7 @@ TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChange
     if ((m_colChanges.c4ElemCount() + c4Count) > CIDLib_DirChange::c4MaxChangeBlock)
     {
         m_colChanges.RemoveAll();
-        m_colChanges.objAdd(TDirChangeInfo(tCIDLib::EDirChanges::OutOfSync));
+        m_colChanges.objPlace(tCIDLib::EDirChanges::OutOfSync);
         m_bOverflow = kCIDLib::True;
 
         return kCIDLib::True;
@@ -485,11 +488,11 @@ TDirChangeMon::bProcessDirChanges(  const   tCIDLib::TDirChanges&   colNewChange
 //
 tCIDLib::TVoid TDirChangeMon::DirChangeOutOfSync()
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     if (!m_bOverflow)
     {
         m_colChanges.RemoveAll();
-        m_colChanges.objAdd(TDirChangeInfo(tCIDLib::EDirChanges::OutOfSync));
+        m_colChanges.objPlace(tCIDLib::EDirChanges::OutOfSync);
         m_bOverflow = kCIDLib::True;
     }
 }

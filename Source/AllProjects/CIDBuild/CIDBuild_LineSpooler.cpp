@@ -70,7 +70,8 @@ tCIDLib::TBoolean TLineSpooler::bEndOfFile() const
 }
 
 
-tCIDLib::TBoolean TLineSpooler::bReadLine(TBldStr& strTarget)
+tCIDLib::TBoolean
+TLineSpooler::bReadLine(TBldStr& strTarget, const tCIDLib::TBoolean bDisableMacros)
 {
     while (1)
     {
@@ -93,8 +94,8 @@ tCIDLib::TBoolean TLineSpooler::bReadLine(TBldStr& strTarget)
         }
     }
 
-    // Expand any keywords, unless its disabled
-    if (!m_bDisableMacros)
+    // Expand any keywords, unless its disabled (globally or for this read)
+    if (!m_bDisableMacros && !bDisableMacros)
         ExpandKeywords(strTarget);
 
     return kCIDLib::True;
@@ -219,7 +220,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     if (chCur == kCIDLib::chDollarSign)
                         eState = EState_OpenParen;
                      else
-                        strToExpand.AppendCh(chCur);
+                        strToExpand.Append(chCur);
                     break;
 
                 case EState_OpenParen :
@@ -234,7 +235,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     if (chCur == kCIDLib::chDollarSign)
                     {
                         eState = EState_Input;
-                        strToExpand.AppendCh(chCur);
+                        strToExpand.Append(chCur);
                     }
                      else if (chCur == kCIDLib::chOpenParen)
                     {
@@ -290,7 +291,7 @@ tCIDLib::TVoid TLineSpooler::ExpandKeywords(TBldStr& strToExpand)
                     }
                      else
                     {
-                        strMacroName.AppendCh(chCur);
+                        strMacroName.Append(chCur);
                     }
                     break;
             }

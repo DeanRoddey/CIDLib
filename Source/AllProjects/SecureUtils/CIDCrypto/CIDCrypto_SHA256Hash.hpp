@@ -60,11 +60,7 @@ class CIDCRYPTEXP TSHA256Hash : public TMsgHash
         );
 
         TSHA256Hash(const TSHA256Hash&) = default;
-
-        TSHA256Hash
-        (
-                    TSHA256Hash&&           mhashSrc
-        );
+        TSHA256Hash(TSHA256Hash&&) = default;
 
         ~TSHA256Hash();
 
@@ -73,6 +69,7 @@ class CIDCRYPTEXP TSHA256Hash : public TMsgHash
         //  Public operators
         // -------------------------------------------------------------------
         TSHA256Hash& operator=(const TSHA256Hash&) = default;
+        TSHA256Hash& operator=(TSHA256Hash&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -84,11 +81,6 @@ class CIDCRYPTEXP TSHA256Hash : public TMsgHash
             const   TSHA256Hash&            mhashSrc
         )   const;
 
-        TSHA256Hash& operator=
-        (
-                    TSHA256Hash&&           mhashSrc
-        );
-
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -97,7 +89,7 @@ class CIDCRYPTEXP TSHA256Hash : public TMsgHash
         (
                     TString&                strToFill
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------

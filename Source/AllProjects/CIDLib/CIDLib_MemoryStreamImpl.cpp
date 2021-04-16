@@ -60,7 +60,7 @@ TMemStreamImplInfo::~TMemStreamImplInfo()
     if (eAdopted == tCIDLib::EAdoptOpts::Adopt)
     {
         delete pmbufData;
-        pmbufData = 0;
+        pmbufData = nullptr;
     }
 }
 
@@ -80,13 +80,17 @@ TMemInStreamImpl::TMemInStreamImpl( const   TMemBuf* const      pmbufToStream
     m_c4Index(0)
     , m_pmbufSrc(pmbufToStream)
 {
+    CIDAssert(pmbufToStream != nullptr, L"Passed buffer cannot be null")
+
     //
     //  Make sure the initial logical end is not beyond the allocation size
     //  of the memory buffer.
     //
+    CIDLib_Suppress(6011)  // We null checked above
     if (c4InitLogicalEnd > pmbufToStream->c4Size())
     {
-        // If we were to adopt, then clean up the buffer
+        // If we were to adopt, then clean up the buffer. Get the size out first for below
+        const tCIDLib::TCard4 c4Size = pmbufToStream->c4Size();
         if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
             delete pmbufToStream;
 
@@ -98,16 +102,51 @@ TMemInStreamImpl::TMemInStreamImpl( const   TMemBuf* const      pmbufToStream
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
             , TCardinal(c4InitLogicalEnd)
-            , TCardinal(pmbufToStream->c4Size())
+            , TCardinal(c4Size)
         );
     }
 
     // Looks ok, so create the info object and store it
+    CIDLib_Suppress(6001)  // We null checked above
     m_cptrInfo.SetPointer
     (
         new TMemStreamImplInfo(pmbufToStream, eAdopt, c4InitLogicalEnd)
     );
 }
+
+
+// In this one we can just take the contents of the source and save a copy
+TMemInStreamImpl::TMemInStreamImpl(         THeapBuf&&          mbufToTake
+                                    , const tCIDLib::TCard4     c4InitLogicalEnd) :
+    m_c4Index(0)
+    , m_pmbufSrc(nullptr)
+{
+    //
+    //  Make sure the initial logical end is not beyond the allocation size
+    //  of the memory buffer.
+    //
+    if (c4InitLogicalEnd > mbufToTake.c4Size())
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrm_BadEnd
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::AppError
+            , TCardinal(c4InitLogicalEnd)
+            , TCardinal(mbufToTake.c4Size())
+        );
+    }
+
+    // Looks ok, so create the info object and store it
+    m_pmbufSrc = new THeapBuf(tCIDLib::ForceMove(mbufToTake));
+    m_cptrInfo.SetPointer
+    (
+        new TMemStreamImplInfo(m_pmbufSrc, tCIDLib::EAdoptOpts::Adopt, c4InitLogicalEnd)
+    );
+}
+
 
 TMemInStreamImpl::TMemInStreamImpl(const TMemOutStreamImpl& strmiToSyncWith) :
 

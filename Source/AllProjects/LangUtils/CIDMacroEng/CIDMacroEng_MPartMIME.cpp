@@ -119,8 +119,9 @@ TMEngMPartMIMEInfo::TMEngMPartMIMEInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_ParseBuf(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseBuf(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Parse(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
 {

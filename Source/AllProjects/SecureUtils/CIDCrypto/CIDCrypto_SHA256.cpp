@@ -59,7 +59,7 @@
            | ((tCIDLib::TCard4) *((str) + 0) << 24);   \
 }
 
-static const tCIDLib::TCard4 ac4K[kCIDCrypto::c4SHA256BlockSize] =
+static constexpr tCIDLib::TCard4 ac4K[kCIDCrypto::c4SHA256BlockSize] =
 {
       0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5
     , 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5
@@ -122,7 +122,8 @@ tCIDLib::TVoid TSHA256Hasher::Complete(TMsgHash& mhashToFill)
     // Process any trailing bytes and pad it out
     PadMsg();
 
-    // And now we can get the hash out.
+    // And now we can get the hash out
+    CIDLib_Suppress(26494)
     tCIDLib::TCard1 ac1Buf[kCIDCrypto::c4SHA256HashBytes];
 
     //
@@ -374,10 +375,11 @@ tCIDLib::TVoid TSHA256Hasher::PadMsg()
 //
 tCIDLib::TVoid TSHA256Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Block)
 {
+    // Suppress uninit warning since are filling these below
+    CIDLib_Suppress(26494)
     tCIDLib::TCard4 ac4W[kCIDCrypto::c4SHA256BlockSize];
+    CIDLib_Suppress(26494)
     tCIDLib::TCard4 ac4WV[c4BufCnt];
-    tCIDLib::TCard4 c4T1, c4T2;
-
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < 16; c4Ind++)
     {
         SHA2_PACK32(&pc1Block[c4Ind << 2], &ac4W[c4Ind]);
@@ -394,9 +396,9 @@ tCIDLib::TVoid TSHA256Hasher::ProcessMsgBlock(const tCIDLib::TCard1* const pc1Bl
 
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < kCIDCrypto::c4SHA256BlockSize; c4Ind++)
     {
-        c4T1 = ac4WV[7] + SHA256_F2(ac4WV[4]) + SHA2_CH(ac4WV[4], ac4WV[5], ac4WV[6])
-            + ac4K[c4Ind] + ac4W[c4Ind];
-        c4T2 = SHA256_F1(ac4WV[0]) + SHA2_MAJ(ac4WV[0], ac4WV[1], ac4WV[2]);
+        const tCIDLib::TCard4 c4T1 = ac4WV[7] + SHA256_F2(ac4WV[4]) + SHA2_CH(ac4WV[4], ac4WV[5], ac4WV[6])
+                               + ac4K[c4Ind] + ac4W[c4Ind];
+        const tCIDLib::TCard4 c4T2 = SHA256_F1(ac4WV[0]) + SHA2_MAJ(ac4WV[0], ac4WV[1], ac4WV[2]);
         ac4WV[7] = ac4WV[6];
         ac4WV[6] = ac4WV[5];
         ac4WV[5] = ac4WV[4];

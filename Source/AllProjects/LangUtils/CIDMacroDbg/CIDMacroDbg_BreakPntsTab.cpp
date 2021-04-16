@@ -526,7 +526,6 @@ tCIDCtrls::EEvResponses TBreakPntsTab::eLBHandler(TListChangeInfo& wnotEvent)
         }
          else
         {
-            tCIDLib::TCard4 c4LineNum;
             if (strLine.bToCard4(c4LineNum, tCIDLib::ERadices::Dec) && (c4LineNum > 0))
                 m_pwndMain->Goto(strClass, c4LineNum);
         }

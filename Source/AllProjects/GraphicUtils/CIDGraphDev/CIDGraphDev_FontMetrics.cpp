@@ -184,14 +184,8 @@ TFontMetrics::c4EnumAllFonts(const  TGraphDrawDev&              gdevTarget
 
 TFontMetrics& TFontMetrics::Nul_TFontMetrics()
 {
-    static TFontMetrics* pfmtrNull = nullptr;
-    if (!pfmtrNull)
-    {
-        TBaseLock lockInit;
-        if (!pfmtrNull)
-            TRawMem::pExchangePtr(&pfmtrNull, new TFontMetrics);
-    }
-    return *pfmtrNull;
+    static TFontMetrics fmtrNull;
+    return fmtrNull;
 }
 
 
@@ -204,7 +198,7 @@ TFontMetrics::TFontMetrics() :
     m_pHostInfo(nullptr)
 {
     m_pHostInfo = new TEXTMETRIC;
-    TRawMem::SetMemBuf(m_pHostInfo, tCIDLib::TCard1(0), sizeof(TEXTMETRIC));
+    TRawMem::SetMemBuf(m_pHostInfo, kCIDLib::c1MinCard, sizeof(TEXTMETRIC));
 }
 
 TFontMetrics::TFontMetrics(const TGraphDrawDev& gdevSource)

@@ -33,9 +33,6 @@
 
 // ----------------------------------------------------------------------------
 //  CIDLib includes
-//
-//  We bring in the special memory checking class here. Its not normally
-//  included since its only for use in debugging programs.
 // ----------------------------------------------------------------------------
 #include    "CIDKernel.hpp"
 
@@ -202,12 +199,16 @@ class TOutStrm
 
         int setf(int iFlags)
         {
-            return std::cout.setf(iFlags);
+            return std::cout.setf(std::ios::basic_ios::fmtflags(iFlags));
         }
 
         int setf(int iFlags, int iMask)
         {
-            return std::cout.setf(iFlags, iMask);
+            return std::cout.setf
+            (
+                std::ios::basic_ios::fmtflags(iFlags)
+                , std::ios::basic_ios::fmtflags(iMask)
+            );
         }
 };
 
@@ -229,8 +230,7 @@ extern  TOutStrm    strmOut;
 //  of test functions and their names. We have to provide a function
 //  prototype that all of the test functions use.
 // ----------------------------------------------------------------------------
-typedef tCIDLib::TVoid (*TTestFunction)(const tCIDLib::TCard4 c4RunNumber);
-
+using TTestFunction = tCIDLib::TVoid (*)(const tCIDLib::TCard4 c4RunNumber);
 struct TTestFuncRecord
 {
     TTestFunction           pfnTester;

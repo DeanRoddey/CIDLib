@@ -47,15 +47,18 @@ RTTIDecls(TMEngFloat8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_FloatClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strFloat4(L"Float4");
-    const TString   strFloat8(L"Float8");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strFloat4(L"Float4");
+        const TString   strFloat8(L"Float8");
 
-    const TString   strFloat4ClassPath(L"MEng.Float4");
-    const TString   strFloat8ClassPath(L"MEng.Float8");
+        const TString   strFloat4ClassPath(L"MEng.Float4");
+        const TString   strFloat8ClassPath(L"MEng.Float8");
+    }
 }
 
 
@@ -166,37 +169,37 @@ TMEngFloat4Info::TMEngFloat4Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_Abs(kMacroEng::c2BadId)
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_ArcCosine(kMacroEng::c2BadId)
-    , m_c2MethId_ArcSine(kMacroEng::c2BadId)
-    , m_c2MethId_ArcTangent(kMacroEng::c2BadId)
-    , m_c2MethId_Ceiling(kMacroEng::c2BadId)
-    , m_c2MethId_Cosine(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_Floor(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_NLog(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Power(kMacroEng::c2BadId)
-    , m_c2MethId_Round(kMacroEng::c2BadId)
-    , m_c2MethId_Sine(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_Split(kMacroEng::c2BadId)
-    , m_c2MethId_SqrRoot(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2MethId_Abs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcCosine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcSine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcTangent(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Ceiling(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Cosine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Floor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_NLog(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Power(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Round(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Split(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SqrRoot(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
 {
     // Add imports for any non-intrinsic classes we use in our signatures
     bAddClassImport(TMEngBaseInfoInfo::strPath());
@@ -241,7 +244,7 @@ TMEngFloat4Info::eCastFrom(         TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TFloat4 f4New;
+    tCIDLib::TFloat4 f4New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -1068,37 +1071,37 @@ TMEngFloat8Info::TMEngFloat8Info(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_Abs(kMacroEng::c2BadId)
-    , m_c2MethId_Add(kMacroEng::c2BadId)
-    , m_c2MethId_ArcCosine(kMacroEng::c2BadId)
-    , m_c2MethId_ArcSine(kMacroEng::c2BadId)
-    , m_c2MethId_ArcTangent(kMacroEng::c2BadId)
-    , m_c2MethId_Ceiling(kMacroEng::c2BadId)
-    , m_c2MethId_Cosine(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Div(kMacroEng::c2BadId)
-    , m_c2MethId_DivEq(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_Floor(kMacroEng::c2BadId)
-    , m_c2MethId_GtThan(kMacroEng::c2BadId)
-    , m_c2MethId_GtThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_LsThan(kMacroEng::c2BadId)
-    , m_c2MethId_LsThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_MaxVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinVal(kMacroEng::c2BadId)
-    , m_c2MethId_MinusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Mul(kMacroEng::c2BadId)
-    , m_c2MethId_MulEq(kMacroEng::c2BadId)
-    , m_c2MethId_Negate(kMacroEng::c2BadId)
-    , m_c2MethId_NLog(kMacroEng::c2BadId)
-    , m_c2MethId_PlusEq(kMacroEng::c2BadId)
-    , m_c2MethId_Power(kMacroEng::c2BadId)
-    , m_c2MethId_Round(kMacroEng::c2BadId)
-    , m_c2MethId_Sine(kMacroEng::c2BadId)
-    , m_c2MethId_SqrRoot(kMacroEng::c2BadId)
-    , m_c2MethId_Split(kMacroEng::c2BadId)
-    , m_c2MethId_Sub(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2MethId_Abs(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Add(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcCosine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcSine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ArcTangent(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Ceiling(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Cosine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Div(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DivEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Floor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GtThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LsThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MaxVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MinusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Mul(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MulEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Negate(kCIDMacroEng::c2BadId)
+    , m_c2MethId_NLog(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PlusEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Power(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Round(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SqrRoot(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Split(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Sub(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
 {
     // Add imports for any non-intrinsic classes we use in our signatures
     bAddClassImport(TMEngBaseInfoInfo::strPath());
@@ -1143,7 +1146,7 @@ TMEngFloat8Info::eCastFrom(         TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TFloat8 f8New;
+    tCIDLib::TFloat8 f8New = 0;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :

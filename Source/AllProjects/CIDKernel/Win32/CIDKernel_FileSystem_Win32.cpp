@@ -30,6 +30,10 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #include    <devguid.h>
 #include    <shlwapi.h>
 #include    <shlobj.h>
@@ -37,6 +41,7 @@
 #include    <process.h>
 #include    <Aclapi.h>
 #include    <Winnetwk.h>
+#pragma     warning(pop)
 
 
 // ---------------------------------------------------------------------------
@@ -44,72 +49,75 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_FileSystem
 {
-    //
-    //  We need a critical section to protect our list of volumes, which
-    //  are only updated when changes have occured in the volume list. The
-    //  current thread calling into bQueryVolumeList() will update the
-    //  list if the flag is set by the background thread to indicate that
-    //  changes have been seen.
-    //
-    TKrnlCritSec*   pkcrsLock;
-
-    //
-    //  Our list of volumes and failures. And a list of volume statuses to
-    //  indicate which volumes should be found in which lists.
-    //
-    enum EVolStatuses
+    namespace
     {
-        EVolStat_NotUsed
-        , EVolStat_Used
-        , EVolStat_Error
-    };
+        //
+        //  We need a critical section to protect our list of volumes, which
+        //  are only updated when changes have occured in the volume list. The
+        //  current thread calling into bQueryVolumeList() will update the
+        //  list if the flag is set by the background thread to indicate that
+        //  changes have been seen.
+        //
+        TKrnlCritSec*   pkcrsLock;
 
-    const tCIDLib::TCard4   c4MaxVolumes = 64;
-    EVolStatuses            aeVolStatuses[c4MaxVolumes];
-    TKrnlVolumeInfo         akvoliCur[c4MaxVolumes];
-    TKrnlVolFailureInfo     akvolfiCur[c4MaxVolumes];
+        //
+        //  Our list of volumes and failures. And a list of volume statuses to
+        //  indicate which volumes should be found in which lists.
+        //
+        enum EVolStatuses
+        {
+            EVolStat_NotUsed
+            , EVolStat_Used
+            , EVolStat_Error
+        };
 
-    // The name of the local window class we register
-    const tCIDLib::TCh* const   pszVolNotClass = L"CIDKrnlVolNot";
+        constexpr tCIDLib::TCard4   c4MaxVolumes = 64;
+        EVolStatuses                aeVolStatuses[c4MaxVolumes];
+        TKrnlVolumeInfo             akvoliCur[c4MaxVolumes];
+        TKrnlVolFailureInfo         akvolfiCur[c4MaxVolumes];
 
-    // The thread handle and id of the volume notification thread
-    HANDLE              hthrVolNot;
-    tCIDLib::TThreadId  tidVolNot;
+        // The name of the local window class we register
+        const tCIDLib::TCh* const   pszVolNotClass = L"CIDKrnlVolNot";
 
-    // Our notification window handle
-    HWND                hwndVolNot;
+        // The thread handle and id of the volume notification thread
+        HANDLE              hthrVolNot;
+        tCIDLib::TThreadId  tidVolNot;
 
-    //
-    //  We have to do an initial full scan, so whichever thread get around
-    //  to it first needs to do this. Usually it'll be our background thread
-    //  but not always, so we need to know if it's already been done.
-    //
-    tCIDLib::TBoolean   bFirstScan = kCIDLib::False;
+        // Our notification window handle
+        HWND                hwndVolNot;
 
-    //
-    //  A change counter that gets bumped each time we get a notification
-    //  that volumes have changed. The next time anyone asks for the info
-    //  that will force an update of the lists above, and this will be
-    //  zeroed out.
-    //
-    tCIDLib::TCard4     c4VolChangeCnt = 1;
+        //
+        //  We have to do an initial full scan, so whichever thread get around
+        //  to it first needs to do this. Usually it'll be our background thread
+        //  but not always, so we need to know if it's already been done.
+        //
+        tCIDLib::TBoolean   bFirstScan = kCIDLib::False;
 
-    //
-    //  We also need an ongoing serial number that we just keep incrementing
-    //  each time we change the volume list. This is required for some special
-    //  case scenarios where client code may need to take actions that it
-    //  only wants to do if it knows the list has changed. So they can store
-    //  this value and watch for a new value to show up.
-    //
-    tCIDLib::TCard4     c4VolListSerialNum = 1;
+        //
+        //  A change counter that gets bumped each time we get a notification
+        //  that volumes have changed. The next time anyone asks for the info
+        //  that will force an update of the lists above, and this will be
+        //  zeroed out.
+        //
+        tCIDLib::TCard4     c4VolChangeCnt = 1;
 
-    //
-    //  For general debugging purposes we keep a counter of how many times we have to do
-    //  retries of file system operations. We make this available to the application.
-    //  No sync, it's just a basic type and even if we missed a bump once in a while it
-    //  wouldn't matter.
-    //
-    tCIDLib::TCard4     c4FSRetryCount = 0;
+        //
+        //  We also need an ongoing serial number that we just keep incrementing
+        //  each time we change the volume list. This is required for some special
+        //  case scenarios where client code may need to take actions that it
+        //  only wants to do if it knows the list has changed. So they can store
+        //  this value and watch for a new value to show up.
+        //
+        tCIDLib::TCard4     c4VolListSerialNum = 1;
+
+        //
+        //  For general debugging purposes we keep a counter of how many times we have to do
+        //  retries of file system operations. We make this available to the application.
+        //  No sync, it's just a basic type and even if we missed a bump once in a while it
+        //  wouldn't matter.
+        //
+        tCIDLib::TCard4     c4FSRetryCount = 0;
+    }
 }
 
 
@@ -154,7 +162,13 @@ bCheckSearchCriteria(   const   WIN32_FIND_DATA&            toCheck
 
     if (toCheck.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     {
-        if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs))
+        //
+        //  We don't return the current/parent directory entries, so filter those out
+        //  always.
+        //
+        if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::FindDirs)
+        &&  !TRawStr::bCompareStrI(toCheck.cFileName, L".")
+        &&  !TRawStr::bCompareStrI(toCheck.cFileName, L".."))
         {
             //
             //  It was a directory and they want see directories. So now check
@@ -163,9 +177,7 @@ bCheckSearchCriteria(   const   WIN32_FIND_DATA&            toCheck
             //
             if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::EDirSearchFlags::NormalDirsOnly))
             {
-                if (!TRawStr::bCompareStrI(toCheck.cFileName, L".")
-                &&  !TRawStr::bCompareStrI(toCheck.cFileName, L"..")
-                &&  !(toCheck.dwFileAttributes & TKrnlWin32::c4NonNormalAttrs))
+                if (!(toCheck.dwFileAttributes & TKrnlWin32::c4NonNormalAttrs))
                 {
                     bMatches = kCIDLib::True;
                 }
@@ -439,219 +451,6 @@ bConvertFindBuf(const   WIN32_FIND_DATA&            FileData
 
 
 //
-//  This is a (potentially) recursive function to delete an entire directory tree. See
-//  the ETreeDelModes enum comments for what the modes mean.
-//
-//  In order to avoid a lot of wierdness, this guy throws its errors and catches them at
-//  the bottom to clean up before rethrowing. The public calling method will catch it
-//  and set it as the last error.
-//
-static tCIDLib::TVoid TreeDelete(const  tCIDLib::TCh* const     pszStartDir
-                                , const tCIDLib::ETreeDelModes  eMode
-                                , const tCIDLib::TBoolean       bRemoveStartDir)
-{
-    //
-    //  Note that we allocate both the file find data and the search
-    //  spec string in order to minimize stack usage in case of heavily
-    //  nested paths.
-    //
-    WIN32_FIND_DATA*    pFileData = 0;
-    HANDLE              hFind = 0;
-    tCIDLib::TCh*       pszSubSearch = 0;
-    try
-    {
-        //
-        //  Create a string that consists of the passed path and with an
-        //  appended extension to find everything in this directory.
-        //
-        const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszStartDir);
-        pszSubSearch = new tCIDLib::TCh[kCIDLib::c4MaxPathLen + 1];
-
-        TRawStr::CopyCatStr
-        (
-            pszSubSearch
-            , kCIDLib::c4MaxPathLen
-            , pszStartDir
-            , L"\\"
-            , kCIDLib::pszAllFilesSpec
-        );
-
-        //
-        //  Allocate the buffer so we don't eat up stack space on a
-        //  large disk with deep directory structure. We have a catch
-        //  block in place.
-        //
-        pFileData = new WIN32_FIND_DATA;
-        hFind = ::FindFirstFile(pszSubSearch, pFileData);
-        if (hFind == INVALID_HANDLE_VALUE)
-            TKrnlError::ThrowHostError(::GetLastError());
-
-        {
-            // Insure the handle gets cleaned up
-            TFindJanitor janFind(hFind);
-
-            tCIDLib::TBoolean bDone = kCIDLib::False;
-            while (!bDone)
-            {
-                //
-                //  If its a directory, and we are not in shallow mode, lets recurse
-                //  into the underlying dir. Otherwise, we remove the file, overriding
-                //  attrs if needed.
-                //
-                if (pFileData->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-                {
-                    if (eMode != tCIDLib::ETreeDelModes::Shallow)
-                    {
-                        // Recurse on this path if not one of the special ones
-                        if (!TRawStr::bCompareStr(pFileData->cFileName, L".")
-                        &&  !TRawStr::bCompareStr(pFileData->cFileName, L".."))
-                        {
-                            //
-                            //  For nested invocations we always indicate that it
-                            //  should remove the start dir. We have to build up
-                            //  the full path name, and can reuse the buffer we
-                            //  built the initial search spec in above.
-                            //
-                            TRawStr::CopyStr
-                            (
-                                &pszSubSearch[c4SrcLen + 1]
-                                , pFileData->cFileName
-                                , kCIDLib::c4MaxPathLen
-                            );
-                            TreeDelete(pszSubSearch, eMode, kCIDLib::True);
-                        }
-                    }
-                }
-                 else
-                {
-                    const tCIDLib::TCard4 c4Override =  FILE_ATTRIBUTE_HIDDEN
-                                                        | FILE_ATTRIBUTE_READONLY
-                                                        | FILE_ATTRIBUTE_SYSTEM;
-
-                    // Build up the full name
-                    TRawStr::CopyStr
-                    (
-                        &pszSubSearch[c4SrcLen + 1]
-                        , pFileData->cFileName
-                        , kCIDLib::c4MaxPathLen
-                    );
-
-                    //
-                    //  If any attributes are on that we have to override in
-                    //  order to delete the file, then lets set it back to
-                    //  normal.
-                    //
-                    if ((pFileData->dwFileAttributes & c4Override)
-                    &&  !::SetFileAttributes(pszSubSearch, FILE_ATTRIBUTE_NORMAL))
-                    {
-                        TKrnlError::ThrowHostError(::GetLastError());
-                    }
-
-                    //
-                    //  And now try to delete the file. We can reuse the buffer
-                    //  we created above to make the initial search string. We
-                    //  saved the original source len, so we can just copy at
-                    //  that point (plus 1 for the separator) in order to append.
-                    //
-                    if (!::DeleteFile(pszSubSearch))
-                        TKrnlError::ThrowHostError(::GetLastError());
-                }
-
-                // Now find the next file/directory
-                if (!::FindNextFile(hFind, pFileData))
-                {
-                    //
-                    //  If the reason is no more files, that's cool and its
-                    //  not an error, i.e. we just return. Otherwise its an
-                    //  error and we throw it to unwind.
-                    //
-                    tCIDLib::TOSErrCode errcRes = ::GetLastError();
-                    if (errcRes == ERROR_NO_MORE_FILES)
-                        break;
-
-                    TKrnlError::ThrowHostError(errcRes);
-                }
-            }
-        }
-
-        //
-        //  Ok, we've cleaned out everything under the starting directory that
-        //  we are going to, so lets remove it now if we were told to. If we get
-        //  a sharing violation, it may be because we are in it, so lets move to
-        //  the root and try again. If the mode is clean or shallow we leave the
-        //  directories in place. And we also look at the remove start dir flag
-        //  to see if we should remove it. This flag is used to support keeping
-        //  the top level directory (i.e. just getting rid of its contents) or
-        //  removing the top level dir, too.
-        //
-        if (bRemoveStartDir && (eMode == tCIDLib::ETreeDelModes::Remove))
-        {
-            //
-            //  We do this because sometimes there are programs
-            //  that will immediately change to a directory that is
-            //  changing, so they will have their current directory
-            //  there until they see it's empty. So we can fail
-            //  until they go away.
-            //
-            const tCIDLib::TCard4 c4MaxTries = 8;
-            tCIDLib::TCard4 c4Err = 0;
-            tCIDLib::TCard4 c4Tries = 0;
-            while (c4Tries < c4MaxTries)
-            {
-                // Try the remove. If it works, break out
-                if (::RemoveDirectory(pszStartDir))
-                    break;
-
-                // It didn't, so get the last error
-                c4Err = ::GetLastError();
-
-                //
-                //  If a sharing violation or dir not empty, we'll
-                //  pause a bit and try again. Else give up now.
-                //
-                if ((c4Err == ERROR_SHARING_VIOLATION)
-                ||  (c4Err == ERROR_DIR_NOT_EMPTY))
-                {
-                    //
-                    //  If the first time, make sure it's not us in
-                    //  this directory, by moving to the root of the
-                    //  current drive or volume.
-                    //
-                    if (!c4Tries)
-                    {
-                        if (!::SetCurrentDirectory(L"\\"))
-                            TKrnlError::ThrowHostError(c4Err);
-                    }
-                    ::Sleep(500);
-                }
-                 else
-                {
-                    TKrnlError::ThrowHostError(c4Err);
-                }
-                c4Tries++;
-            }
-
-            // If max tries, we failed
-            if (c4Tries == c4MaxTries)
-                TKrnlError::ThrowHostError(c4Err);
-        }
-    }
-
-    catch(...)
-    {
-        // Clean up the buffers we allocated
-        delete pFileData;
-        delete [] pszSubSearch;
-        throw;
-    }
-
-    // Clean up the buffers we allocated
-    delete pFileData;
-    delete [] pszSubSearch;
-}
-
-
-//
 //  A helper to iterate the network and load up any network shares into the
 //  passed list of volumes. This is called when they ask to iterate volumes
 //  and want to include network shares.
@@ -676,7 +475,7 @@ LoadNetShares(  NETRESOURCE*                    pRes
         return;
     }
 
-    const tCIDLib::TCard4 c4BufSz(16 * 1024);
+    constexpr tCIDLib::TCard4 c4BufSz(16 * 1024);
     void* pBuf = ::GlobalAlloc(GPTR, c4BufSz);
     NETRESOURCE* pInfo = reinterpret_cast<NETRESOURCE*>(pBuf);
 
@@ -685,7 +484,7 @@ LoadNetShares(  NETRESOURCE*                    pRes
     TKrnlVolumeInfo kvoliCur;
     while (kCIDLib::True)
     {
-        TRawMem::SetMemBuf(pBuf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(pBuf, kCIDLib::c1MinCard, c4BufSz);
         Size = c4BufSz;
         Count = kCIDLib::c4MaxCard;
         ErrCode = ::WNetEnumResource(hCont, &Count, pBuf, &Size);
@@ -1364,7 +1163,7 @@ TKrnlDirChangeInfo& TKrnlDirChangeInfo::operator=(const TKrnlDirChangeInfo& kdch
 // ---------------------------------------------------------------------------
 //  TKrnlDirChangeMon: Public data
 // ---------------------------------------------------------------------------
-const tCIDLib::TCard4 c4DirMonBufSz = 32 * 1024;
+constexpr tCIDLib::TCard4 c4DirMonBufSz = 32 * 1024;
 struct TKrnlDirChangeMon::TDirChangeMonitorData
 {
     tCIDLib::TVoid* m_pBuffer;
@@ -1555,7 +1354,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
                 }
 
                 m_kdchiOwedRename.m_eChange = tCIDLib::EDirChanges::Renamed;
-                m_kdchiOwedRename.m_kstrName.Set
+                m_kdchiOwedRename.m_kstrName.SetUnterminated
                 (
                     pNotifyInfo->FileName
                     , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -1605,7 +1404,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
                     m_kdchiOwedRename.m_eChange = tCIDLib::EDirChanges::None;
 
                     // And now add in the new name
-                    pkdchiCur->m_kstrNew.Set
+                    pkdchiCur->m_kstrNew.SetUnterminated
                     (
                         pNotifyInfo->FileName
                         , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -1622,7 +1421,7 @@ TKrnlDirChangeMon::bReadChanges(TChangeList& kllstToFill, tCIDLib::TCard4& c4Val
 
                     // Nothing special so set it
                     pkdchiCur->m_eChange = eChange;
-                    pkdchiCur->m_kstrName.Set
+                    pkdchiCur->m_kstrName.SetUnterminated
                     (
                         pNotifyInfo->FileName
                         , pNotifyInfo->FileNameLength / kCIDLib::c4UniBytes
@@ -1871,7 +1670,6 @@ TKrnlFileSys::bHasWildCards(const tCIDLib::TCh* const pszToSearch)
 }
 
 
-
 tCIDLib::TBoolean
 TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
 {
@@ -1920,7 +1718,10 @@ TKrnlFileSys::bIsDirectory(const tCIDLib::TCh* const pszDirToCheck)
 }
 
 
-
+//
+//  We don't return these, but if they should get directory info from another
+//  source we want to be able to let them test those paths.
+//
 tCIDLib::TBoolean
 TKrnlFileSys::bIsNormalDir(const tCIDLib::TCh* const pszDirToCheck)
 {
@@ -2021,7 +1822,7 @@ TKrnlFileSys::bMakeDirectory(const  tCIDLib::TCh* const pszToCreate
             , NULL
             , &pOldDACL
             , NULL
-            , (void**)&pSD
+            , tCIDLib::pToVoidPP(&pSD)
         );
 
         // Set up new access info for the Users group
@@ -2181,6 +1982,66 @@ TKrnlFileSys::bMakePath(const tCIDLib::TCh* const pszToCreate)
         // Now move up for the next part
         pszEnd++;
     }
+    return kCIDLib::True;
+}
+
+
+//
+//  Normalize a path and return the adjusted path. This gets rid of . and ..
+//  type entries and such.
+//
+tCIDLib::TBoolean
+TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
+                            ,       tCIDLib::TCh* const pszResult
+                            , const tCIDLib::TCard4     c4MaxChars)
+{
+    // And canonicalize it to the local output
+    tCIDLib::TCh szOut[MAX_PATH + 1];
+    if (!::PathCanonicalize(szOut, pszToNormalize))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
+        return kCIDLib::False;
+    }
+
+    //
+    //  The system call is kind of dumb on a couple of special cases, so
+    //  watch for them ourself.
+    //
+    if (TRawStr::bCompareStr(&szOut[1], L":..")
+    ||  TRawStr::bCompareStr(&szOut[1], L":."))
+    {
+        szOut[2] = kCIDLib::chNull;
+    }
+
+    // Ok, copy back to the caller's buffer
+    TRawStr::CopyStr(pszResult, szOut, c4MaxChars);
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
+                            ,       TKrnlString&        kstrToFill)
+{
+    // And canonicalize it to the local output
+    tCIDLib::TCh szOut[MAX_PATH + 1];
+    if (!::PathCanonicalize(szOut, pszToNormalize))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
+        return kCIDLib::False;
+    }
+
+    //
+    //  The system call is kind of dumb on a couple of special cases, so
+    //  watch for them ourself.
+    //
+    if (TRawStr::bCompareStr(&szOut[1], L":..")
+    ||  TRawStr::bCompareStr(&szOut[1], L":."))
+    {
+        szOut[2] = kCIDLib::chNull;
+    }
+
+    // Ok, copy back to the caller's buffer
+    kstrToFill = szOut;
     return kCIDLib::True;
 }
 
@@ -2710,43 +2571,11 @@ tCIDLib::TBoolean TKrnlFileSys
 }
 
 
-//
-//  Normalize a path and return the adjusted path. This gets rid of . and ..
-//  type entries and such.
-//
-tCIDLib::TBoolean
-TKrnlFileSys::bNormalizePath(const  tCIDLib::TCh* const pszToNormalize
-                            ,       tCIDLib::TCh* const pszResult
-                            , const tCIDLib::TCard4     c4MaxChars)
-{
-    // And canonicalize it to the local output
-    tCIDLib::TCh szOut[MAX_PATH + 1];
-    if (!::PathCanonicalize(szOut, pszToNormalize))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcFl_Normalize);
-        return kCIDLib::False;
-    }
-
-    //
-    //  The system call is kind of dumb on a couple of special cases, so
-    //  watch for them ourself.
-    //
-    if (TRawStr::bCompareStr(&szOut[1], L":..")
-    ||  TRawStr::bCompareStr(&szOut[1], L":."))
-    {
-        szOut[2] = kCIDLib::chNull;
-    }
-
-    // Ok, copy back to the caller's buffer
-    TRawStr::CopyStr(pszResult, szOut, c4MaxChars);
-    return kCIDLib::True;
-}
-
 
 tCIDLib::TBoolean
 TKrnlFileSys::bRemoveDir(const tCIDLib::TCh* const pszToDelete)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
     while (kCIDLib::True)
     {
@@ -2784,55 +2613,59 @@ TKrnlFileSys::bRemoveDir(const tCIDLib::TCh* const pszToDelete)
 tCIDLib::TBoolean
 TKrnlFileSys::bRemoveFile(const tCIDLib::TCh* const pszToDelete)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     while (kCIDLib::True)
     {
         // Try it. If it works, break out and return true
         if (::DeleteFile(pszToDelete))
-            break;
-
-        // Indicate we've made another try
-        c4Tries++;
-
-        // It didn't, so get the last error
-        tCIDLib::TCard4 c4Err = ::GetLastError();
-
-        //
-        //  If a sharing violation or dir not empty, we'll
-        //  pause a bit and try again.
-        //
-        if ((c4Err == ERROR_SHARING_VIOLATION) && (c4Tries < c4MaxTries))
         {
-            CIDKernel_FileSystem::c4FSRetryCount++;
-            ::Sleep(200);
-            continue;
+            bRet = kCIDLib::True;
+            break;
         }
 
-        // Not one of our special cases or we've timed out
-        TKrnlError::SetLastHostError(c4Err);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
+        c4Tries++;
+        tCIDLib::TCard4 c4Err = ::GetLastError();
+        if (c4Err == ERROR_ACCESS_DENIED)
+        {
+            //
+            //  It's read only, so try to remove that. If we can't, then we have
+            //  failed. If we can, go back around and try again.
+            //
+            //  If tries is > 1, then something is wrong since we already had to
+            //  have removed the read-only attribute.
+            //
+            if (!::SetFileAttributes(pszToDelete, FILE_ATTRIBUTE_NORMAL)
+            || (c4Tries > 1))
+            {
+                TKrnlError::SetLastHostError(c4Err);
+                break;
+            }
+        }
+         else if (c4Err == ERROR_SHARING_VIOLATION)
+        {
+            //
+            //  Someone has it open, If we are maxed out on retries, we have to
+            //  give up. Else sleep a little and go back to the top.
+            //
+            if (c4Tries >= c4MaxTries)
+            {
+                TKrnlError::SetLastHostError(c4Err);
+                break;
+            }
 
-
-tCIDLib::TBoolean
-TKrnlFileSys::bRemovePath(  const   tCIDLib::TCh* const     pszStartDir
-                            , const tCIDLib::ETreeDelModes  eMode
-                            , const tCIDLib::TBoolean       bRemoveStartDir)
-{
-    try
-    {
-        TreeDelete(pszStartDir, eMode, bRemoveStartDir);
+            CIDKernel_FileSystem::c4FSRetryCount++;
+            ::Sleep(200);
+        }
+         else
+        {
+            // Anything else, just consider it an error
+            TKrnlError::SetLastHostError(c4Err);
+            break;
+        }
     }
-
-    catch(const TKrnlError& kerrToCatch)
-    {
-        TKrnlError::SetLastError(kerrToCatch);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
+    return bRet;
 }
 
 
@@ -2846,7 +2679,7 @@ tCIDLib::TBoolean
 TKrnlFileSys::bRename(  const   tCIDLib::TCh* const pszOldName
                         , const tCIDLib::TCh* const pszNewName)
 {
-    const tCIDLib::TCard4 c4MaxTries = 15;
+    constexpr tCIDLib::TCard4 c4MaxTries = 15;
     tCIDLib::TCard4 c4Tries = 0;
     while (kCIDLib::True)
     {

@@ -173,6 +173,17 @@ TObjListTab::IPEValChanged( const   tCIDCtrls::TWndId   widSrc
      else
     {
         CIDAssert2(L"Unknown object list mode");
+
+        // Won't happen, but makes analyzer happy
+        return;
+    }
+
+    if (pmecvVal == nullptr)
+    {
+        CIDAssert2(L"Couldn't get parameter");
+
+        // Won't happen but makes the analyzer happy
+        return;
     }
 
 

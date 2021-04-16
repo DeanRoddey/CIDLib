@@ -14,20 +14,22 @@
 
         <P>There are various scenarios to consider, and CIDLib deals with this by defining a logging framework and a pluggable logger interface that you can use to implement various types of loggers. CIDLib comes with a common set that will typically serve your needs, but you can create others if required. Just plug the desired one in and all logged messages will be sent to it.</P>
 
-        <P>All loggers derive from the <ClassRef Ref="TLogger"/> class, so see that for more details on how loggers are implemented.</P>
+        <P>All loggers must implement the <ClassRef Ref="MLogger"/> interface, so see that for more details on how loggers are implemented.</P>
 
         <SecTitle>Logging and Facilities</SecTitle>
 
         <P>As discussed in Logging/Exceptions, both are already tied to the facility system for various reasons. Therefore the logging framework is also handled in the same way, though using the underlying <ClassRef Ref="TModule"/> class from which all facility classes derive. There are static methods on that class that allow you to install a logger object. And there are others that the facility classes call to pass on logging and exception objects that they have built at your request. The TModule class will see if a logger is installed and, if so, pass the objects on to it to be processed.</P>
 
-        <P>Here is an example from the CQC Admin Interface program, which creates a logger that logs to the CIDLib Log Server (see Logging and the ORB below) and installs it.</P>
+        <P>Here is an example from the CQC Admin Interface program, which creates a logger that logs to the CIDLib Log Server (see Logging and the ORB below) and installs it. Since it a dynamically allocated object, we just tell him to adopt it so he will become responsible for it and clean it up when appropriate.</P>
 
         <Code>
         plgrLogSrv = new TLogSrvLogger(facCQCKit().strLocalLogDir());
-        TModule::InstallLogger(plgrLogSrv);
+        TModule::InstallLogger(plgrLogSrv, tCIDLib::EAdoptOpts::Adopt);
         </Code>
 
         <P>It takes a local file path as a backup to store data to if the Log Server is not available. When it becomes available again, it will spool up the stored information.</P>
+
+        <Note>If we were to, say, implement MLogger in our main program facility object and register it as the logger, we would obviously tell it <Italic>not</Italic> to adopt, since we don't want him trying to delete our facility object.</Note>
 
         <SecTitle>Logging and the ORB</SecTitle>
 

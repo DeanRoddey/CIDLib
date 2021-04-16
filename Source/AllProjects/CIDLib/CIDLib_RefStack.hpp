@@ -41,9 +41,16 @@
 //   CLASS: TRefStack
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Public class types
+        // -------------------------------------------------------------------
+        using TMyType = TRefStack<TElem>;
+        using TParType = TBasicDLinkedRefCol<TElem>;
+
+
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -52,12 +59,13 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         TRefStack(  const   tCIDLib::EAdoptOpts eAdopt
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TBasicDLinkedRefCol<TElem>(eAdopt, eMTSafe)
+            TParType(eAdopt, eMTSafe)
         {
         }
 
+        // Not copyable, only movable
         TRefStack(const TRefStack&) = delete;
-        TRefStack(TRefStack&&) = delete;
+        TRefStack(TRefStack&&) = default;
 
         ~TRefStack()
         {
@@ -67,14 +75,16 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only movable
         TRefStack& operator=(const TRefStack&) = delete;
-        TRefStack& operator=(TRefStack&&) = delete;
+        TRefStack& operator=(TRefStack&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjNew) override
+        tCIDLib::TVoid Add(TElem* const pobjNew) final
         {
             this->AddAtBottom(pobjNew);
         }
@@ -108,23 +118,23 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 
         [[nodiscard]] TRefStack* pcolMakeNewOf() const
         {
-            TMtxLocker lockStack(this->pmtxLock());
+            TLocker lockrStack(this);
 
             // Make a new one with the same basic state, but not content!
-            return new TRefStack(this->eAdopt(), this->eMTState());
+            return new TRefStack(this->eAdopt(), this->eMTSafe());
         }
 
-        const TElem* pobjPeek() const
+        [[nodiscard]] const TElem* pobjPeek() const
         {
             return this->pobjPeekAtBottom();
         }
 
-        TElem* pobjPeek()
+        [[nodiscard]] TElem* pobjPeek()
         {
             return this->pobjPeekAtBottom();
         }
 
-        TElem* pobjPop()
+        [[nodiscard]] TElem* pobjPop()
         {
             return this->pobjGetFromBottom();
         }
@@ -142,8 +152,8 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 
         tCIDLib::TVoid TrashTop()
         {
-            // Get the top but don't return it, just delete it
-            delete this->pobjGetFromBottom();
+            // Just pass on to our parent
+            this->DiscardBottom();
         }
 
 
@@ -155,12 +165,11 @@ template <class TElem> class TRefStack : public TBasicDLinkedRefCol<TElem>
 };
 
 
-
 // ---------------------------------------------------------------------------
 //   CLASS: TRefStackJan
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefStackJan
+template <typename TElem> class TRefStackJan
 {
     public  :
         // -------------------------------------------------------------------
@@ -177,6 +186,7 @@ template <class TElem> class TRefStackJan
         }
 
         TRefStackJan(const TRefStackJan&) = delete;
+        TRefStackJan(TRefStackJan&&) = delete;
 
         ~TRefStackJan()
         {
@@ -190,6 +200,7 @@ template <class TElem> class TRefStackJan
         //  Public operators
         // -------------------------------------------------------------------
         TRefStackJan& operator=(const TRefStackJan&) = delete;
+        TRefStackJan& operator=(TRefStackJan&&) = delete;
 
 
         // -------------------------------------------------------------------

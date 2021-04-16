@@ -737,9 +737,9 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                 case tCIDMacroEng::EOpCodes::CallStack :
                 case tCIDMacroEng::EOpCodes::CallThis :
                 {
-                    TMEngClassVal*  pmecvTarget;
-                    const TMEngClassInfo* pmeciTarget;
-                    tCIDLib::TCard2 c2MethId;
+                    TMEngClassVal*  pmecvTarget = nullptr;
+                    const TMEngClassInfo* pmeciTarget = nullptr;
+                    tCIDLib::TCard2 c2MethId = kCIDMacroEng::c2BadId;
 
                     if (meopCur.eOpCode() == tCIDMacroEng::EOpCodes::CallExcept)
                     {
@@ -797,8 +797,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                             // It's a parm already on the stack
                             pmecvTarget = &meOwner.mecvStackAt
                             (
-                                (c4BasePointer - (methiThis.c4ParmCount() + 1))
-                                + meopCur[0]
+                                (c4BasePointer - (methiThis.c4ParmCount() + 1)) + meopCur[0]
                             );
                         }
                          else
@@ -813,6 +812,9 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                                 , tCIDLib::EErrClasses::Unknown
                                 , TInteger(tCIDLib::i4EnumOrd(meopCur.eOpCode()))
                             );
+
+                            // Won't happen but makes analyzer happy
+                            break;
                         }
 
                         // Get the class info for the class of the target
@@ -855,19 +857,11 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                         //  dispatch, else do polymorphic to go to the most
                         //  derived.
                         //
-                        tCIDMacroEng::EDispatch eDispatch;
+                        tCIDMacroEng::EDispatch eDispatch = tCIDMacroEng::EDispatch::Poly;
                         if (meopCur.eOpCode() == tCIDMacroEng::EOpCodes::CallParent)
                             eDispatch = tCIDMacroEng::EDispatch::Mono;
-                        else
-                            eDispatch = tCIDMacroEng::EDispatch::Poly;
 
-                        pmeciTarget->Invoke
-                        (
-                            meOwner
-                            , *pmecvTarget
-                            , c2MethId
-                            , eDispatch
-                        );
+                        pmeciTarget->Invoke(meOwner, *pmecvTarget, c2MethId, eDispatch);
 
                         //
                         //  We clean off the call item, since we pushed it,
@@ -937,7 +931,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                         //  have a handler. If so, jump to the catch block,
                         //  else, rethrow.
                         //
-                        tCIDLib::TCard4 c4New;
+                        tCIDLib::TCard4 c4New = 0;
                         const tCIDLib::TCard4 c4Tmp = meOwner.c4FindNextTry(c4New);
                         if ((c4Tmp < c4BasePointer) || (c4Tmp == kCIDLib::c4MaxCard))
                             throw;
@@ -1040,7 +1034,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     catch(const TExceptException&)
                     {
                         // Do the macro level try/catch handling
-                        tCIDLib::TCard4 c4New;
+                        tCIDLib::TCard4 c4New = 0;
                         const tCIDLib::TCard4 c4Tmp = meOwner.c4FindNextTry(c4New);
                         if ((c4Tmp < c4BasePointer) || (c4Tmp == kCIDLib::c4MaxCard))
                             throw;
@@ -1597,7 +1591,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     //  been extracted at this point, so there should only be
                     //  tries above the current base pointer.
                     //
-                    tCIDLib::TCard4 c4New;
+                    tCIDLib::TCard4 c4New = 0;
                     while (kCIDLib::True)
                     {
                         const tCIDLib::TCard4 c4PopTo = meOwner.c4FindNextTry(c4New);
@@ -1804,18 +1798,15 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                     // Push a temp pool value of the target type
                     meOwner.PushPoolValue
                     (
-                        meopCur.c2Immediate()
-                        , tCIDMacroEng::EConstTypes::Const
+                        meopCur.c2Immediate(), tCIDMacroEng::EConstTypes::Const
                     );
                     TMEngClassVal& mecvTmp = meOwner.mecvStackAtTop();
 
                     // And ask the temp object to cast from the stack top value
-                    TMEngClassInfo& meciTarget = meOwner.meciFind(meopCur.c2Immediate());
-                    const tCIDMacroEng::ECastRes eRes = meciTarget.eCastFrom
+                    TMEngClassInfo& meciTarType = meOwner.meciFind(meopCur.c2Immediate());
+                    const tCIDMacroEng::ECastRes eRes = meciTarType.eCastFrom
                     (
-                        meOwner
-                        , mecvToCast
-                        , mecvTmp
+                        meOwner, mecvToCast, mecvTmp
                     );
 
                     if (eRes == tCIDMacroEng::ECastRes::Incompatible)
@@ -1829,7 +1820,7 @@ TMEngOpMethodImpl::Invoke(          TMEngClassVal&      mecvInstance
                             , tCIDLib::ESeverities::Failed
                             , tCIDLib::EErrClasses::Internal
                             , meOwner.strClassPathForId(mecvToCast.c2ClassId())
-                            , meciTarget.strClassPath()
+                            , meciTarType.strClassPath()
                         );
                     }
 

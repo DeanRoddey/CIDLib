@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -26,27 +26,6 @@
 //  $_CIDLib_Log_$
 //
 
-
-#include <errno.h>
-#include <fcntl.h>
-#include <glob.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <wchar.h>
-#include <wctype.h>
-
-// ---------------------------------------------------------------------------
-//  Define our endianness
-// ---------------------------------------------------------------------------
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#define CIDBUILD_LITTLEENDIAN
-#else
-#define CIDBUILD_BIGENDIAN
-#endif
 
 // ---------------------------------------------------------------------------
 //  Define the packing mechanism
@@ -108,15 +87,19 @@ namespace kCIDBuild
     //      program. The input extensions are predestined by what we named
     //      the files, so the are not a portability problem.
     // -----------------------------------------------------------------------
-    const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h*";
+    const tCIDBuild::TCh         chExtSep           = L'.';
+    const tCIDBuild::TCh         chPathCompSep      = L':';
+    const tCIDBuild::TCh         chPathSep          = L'/';
+    const tCIDBuild::TCh* const  pszAllHFiles       = L"*.h";
+    const tCIDBuild::TCh* const  pszAllHppFiles     = L"*.hpp";
+    const tCIDBuild::TCh* const  pszAllCFiles       = L"*.c";
     const tCIDBuild::TCh* const  pszAllCppFiles     = L"*.cpp";
     const tCIDBuild::TCh* const  pszDllExt          = L".so";
     const tCIDBuild::TCh* const  pszExeExt          = L"";
     const tCIDBuild::TCh* const  pszHppExt          = L".hpp";
     const tCIDBuild::TCh* const  pszLibExt          = L".a";
     const tCIDBuild::TCh* const  pszObjExt          = L".o";
-    const tCIDBuild::TCh         chExtSep           = L'.';
-
+    const tCIDBuild::TCh* const  pszPathSep         = L"/";
 
 
     // -----------------------------------------------------------------------
@@ -127,13 +110,8 @@ namespace kCIDBuild
     //      is. If a project indicates that it has a per-platform sub-
     //      directory, then there will be a sub-directory with this name
     //      under the project directory.
-    //
-    //  pszTargetPlatform
-    //      This is a constant string that contains the text of the target
-    //      platform define. This saves from doing this work in all the
-    //      places we might need it. Its passed to all compiled code as well
-    //      as displayed in some places.
     // -----------------------------------------------------------------------
     const tCIDBuild::TCh* const  pszPlatformDir     = L"Linux";
-    const tCIDBuild::TCh* const  pszTargetPlatform  = L"PLATFORM_LINUX";
+    const tCIDBuild::TCh* const  pszBasePlatform    = L"Linux_*";
+    const tCIDBuild::TCh* const  pszFullPlatform    = L"Linux_Generic";
 }

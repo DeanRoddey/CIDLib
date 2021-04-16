@@ -46,17 +46,20 @@ class CIDREGXEXP TFacCIDRegX : public TFacility
         // -------------------------------------------------------------------
         TFacCIDRegX();
 
+        TFacCIDRegX(const TFacCIDRegX&) = delete;
+        TFacCIDRegX(TFacCIDRegX&&) = delete;
+
         ~TFacCIDRegX();
 
 
-    private :
         // -------------------------------------------------------------------
         //  Unimplemented constructors and operators
         // -------------------------------------------------------------------
-        TFacCIDRegX(const TFacCIDRegX&);
-        tCIDLib::TVoid operator=(const TFacCIDRegX&);
+        TFacCIDRegX& operator=(const TFacCIDRegX&) = delete;
+        TFacCIDRegX& operator=(TFacCIDRegX&&) = delete;
 
 
+    private :
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

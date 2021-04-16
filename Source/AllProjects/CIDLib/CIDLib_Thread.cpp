@@ -48,7 +48,7 @@
 // ---------------------------------------------------------------------------
 //  Forward prototypes
 // ---------------------------------------------------------------------------
-static TMutex * pmtxListAccess();
+
 
 
 // ---------------------------------------------------------------------------
@@ -61,65 +61,73 @@ RTTIDecls(TThreadPrioJan,TObject)
 RTTIDecls(TThreadSyncJan,TObject)
 
 
-
-// ---------------------------------------------------------------------------
-//  Local data types
-//
-//  TThreadItem
-//      An array of these is use to keep track of all of the running threads.
-//      It is a small associative array so the .tidThread field is used to
-//      find the right entry, and the other field is the thread object. This
-//      prevents having to dereference each object to get to the id during the
-//      search. If pthrThis is zero, then that entry is not used. Otherwise,
-//      the id is kCIDLib::tidInvalid if the thread is inactive, and some
-//      other number if it is active.
-//
-//      The thread list is faulted in lazily because we have no way to force
-//      it to be already allocated and initialized. Making it a global array
-//      would set the tidThread to zero, which might not be the right value
-//      for kCIDLib::tidInvalid on some platforms.
-// ---------------------------------------------------------------------------
-struct  TThreadItem
-{
-    TThread*                pthrThis;
-    tCIDLib::TThreadId      tidThread;
-};
-
-
-
 namespace CIDLib_Thread
 {
-    // ---------------------------------------------------------------------------
-    //  Constant data for local use
-    //
-    //  c4MaxThreads
-    //      The maximum number of threads supported per-process.
-    // ---------------------------------------------------------------------------
-    const tCIDLib::TCard4    c4MaxThreads   = 1024;
+    namespace
+    {
+        // ---------------------------------------------------------------------------
+        //  An array of these is use to keep track of all of the running threads.
+        //  It is a small associative array so the .tidThread field is used to
+        //  find the right entry, and the other field is the thread object. This
+        //  prevents having to dereference each object to get to the id during the
+        //  search. If pthrThis is zero, then that entry is not used. Otherwise,
+        //  the id is kCIDLib::tidInvalid if the thread is inactive, and some
+        //  other number if it is active.
+        //
+        //  The thread list is faulted in lazily because we have no way to force
+        //  it to be already allocated and initialized. Making it a global array
+        //  would set the tidThread to zero, which might not be the right value
+        //  for kCIDLib::tidInvalid on some platforms.
+        // ---------------------------------------------------------------------------
+        struct  TThreadItem
+        {
+            TThread*                pthrThis;
+            tCIDLib::TThreadId      tidThread;
+        };
 
 
-    // ---------------------------------------------------------------------------
-    //  Variables for local use
-    //
-    //  c4ThreadCount
-    //      The count of thread objects currently defined, i.e. the number of
-    //      active entries in the thread list. They are not all necessarily
-    //      running, just created and added to the list.
-    //
-    //  pthrPrimary
-    //      This is set to the first thread started by the user's Exe. When
-    //      this thread is seen exiting (even normally), then the program is
-    //      ended. The magic start up code (see CIDLib.Hpp) macros will call into
-    //      here to set this to the primary thread object.
-    // ---------------------------------------------------------------------------
-    tCIDLib::TCard4      c4ThreadCount;
-    TThread*             pthrPrimary;
+        // ---------------------------------------------------------------------------
+        //  A mtex to protect access to the thread list
+        // ---------------------------------------------------------------------------
+        static TMutex* pmtxListAccess()
+        {
+            static TMutex mtxListAccess;
+            return &mtxListAccess;
+        }
 
 
-    // -----------------------------------------------------------------------
-    //  Some stats cache items we maintain
-    // -----------------------------------------------------------------------
-    TStatsCacheItem     m_sciThreadCnt;
+        // ---------------------------------------------------------------------------
+        //  Constant data for local use
+        //
+        //  c4MaxThreads
+        //      The maximum number of threads supported per-process.
+        // ---------------------------------------------------------------------------
+        const tCIDLib::TCard4    c4MaxThreads   = 1024;
+
+
+        // ---------------------------------------------------------------------------
+        //  Variables for local use
+        //
+        //  c4ThreadCount
+        //      The count of thread objects currently defined, i.e. the number of
+        //      active entries in the thread list. They are not all necessarily
+        //      running, just created and added to the list.
+        //
+        //  pthrPrimary
+        //      This is set to the first thread started by the user's Exe. When
+        //      this thread is seen exiting (even normally), then the program is
+        //      ended. The magic start up code (see CIDLib.Hpp) macros will call into
+        //      here to set this to the primary thread object.
+        // ---------------------------------------------------------------------------
+        tCIDLib::TCard4      c4ThreadCount;
+        TThread*             pthrPrimary;
+
+
+        // -----------------------------------------------------------------------
+        //  Some stats cache items we maintain
+        // -----------------------------------------------------------------------
+        TStatsCacheItem     m_sciThreadCnt;
+    }
 }
 
 
@@ -136,18 +144,18 @@ namespace CIDLib_Thread
 //  WE also use it to fault in our stats cache item for the number of threads,
 //  since it could never change until the thread list is created anyway.
 //
-static TThreadItem* athriList()
+static CIDLib_Thread::TThreadItem* athriList()
 {
-    static TThreadItem                  athriList[CIDLib_Thread::c4MaxThreads];
-    static volatile tCIDLib::TBoolean   bInitDone = kCIDLib::False;
+    static CIDLib_Thread::TThreadItem   athriList[CIDLib_Thread::c4MaxThreads];
+    static TAtomicFlag                  atomDone;
 
-    if (!bInitDone)
+    if (!atomDone)
     {
         // Lock the list first
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Always check again to make sure we weren't beat to the punch
-        if (!bInitDone)
+        if (!atomDone)
         {
             // Zero the pointer and invalidate the thread id for each entry
             for (tCIDLib::TCard4 c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
@@ -165,7 +173,7 @@ static TThreadItem* athriList()
             , CIDLib_Thread::m_sciThreadCnt
         );
 
-        bInitDone = kCIDLib::True;
+        atomDone.Set();
     }
     return athriList;
 }
@@ -179,12 +187,10 @@ static TThreadItem* athriList()
 //
 tCIDLib::TVoid AddThreadAt(TThread* const pthrNew, const tCIDLib::TCard4 c4Index)
 {
-    //
-    //  Get a pointer to the indicated index. Note that we assume our own
-    //  code will not call with bad indexes, i.e. they they've already checked
-    //  any incoming indexes from the outside world.
-    //
-    TThreadItem* pthriCur = &athriList()[c4Index];
+    CIDAssert(c4Index < CIDLib_Thread::c4MaxThreads, L"Invalid thread index");
+
+    // Get a pointer to the indicated index.
+    CIDLib_Thread::TThreadItem* pthriCur = &athriList()[c4Index];
 
     // If debugging, make sure its not already in use
     #if CID_DEBUG_ON
@@ -247,7 +253,7 @@ tCIDLib::TVoid AddThread(TThread* const pthrNew)
     //  count how many are taken while we look. If it exceeds
     //  CIDLib_Thread::c4ThreadCount, then that is an error too.
     //
-    tCIDLib::TCard4  c4Ind, c4Count = 0;
+    tCIDLib::TCard4  c4Ind = 0, c4Count = 0;
     for (c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
     {
         if (!athriList()[c4Ind].pthrThis)
@@ -302,7 +308,7 @@ static tCIDLib::TBoolean bRemoveName(const TString& strName)
     }
 
     // Get the list pointer and search it for this id
-    TThreadItem* pthriCur = athriList();
+    CIDLib_Thread::TThreadItem* pthriCur = athriList();
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
     {
         if (pthriCur->pthrThis)
@@ -329,25 +335,6 @@ static tCIDLib::TBoolean bRemoveName(const TString& strName)
 
 
 //
-//  This method handles the lazy initialization of the critical section used
-//  to synchronize access to the thread list. There is no other way to insure
-//  its gets done in time otherwise.
-//
-static TMutex* pmtxListAccess()
-{
-    static TMutex* pmtxListAccess = 0;
-
-    if (!pmtxListAccess)
-    {
-        TBaseLock lockInit;
-        if (!pmtxListAccess)
-            TRawMem::pExchangePtr(&pmtxListAccess, new TMutex);
-    }
-    return pmtxListAccess;
-}
-
-
-//
 //  This method will find the thread in the list with the passed id. It will
 //  return the TThread object if found, else a null pointer.
 //
@@ -367,7 +354,7 @@ static TThread* pthrFindId(const tCIDLib::TThreadId tidThread)
     }
 
     // Get a pointer to the list and search it
-    TThreadItem* pthriCur = athriList();
+    CIDLib_Thread::TThreadItem* pthriCur = athriList();
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
     {
         if (pthriCur->tidThread == tidThread)
@@ -375,7 +362,7 @@ static TThread* pthrFindId(const tCIDLib::TThreadId tidThread)
 
         pthriCur++;
     }
-    return (TThread*)0;
+    return nullptr;
 }
 
 
@@ -385,7 +372,7 @@ static TThread* pthrFindId(const tCIDLib::TThreadId tidThread)
 //
 static TThread* pthrFindName(const TString& strName)
 {
-    TThreadItem* pthriCur = athriList();
+    CIDLib_Thread::TThreadItem* pthriCur = athriList();
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
     {
         if (pthriCur->pthrThis)
@@ -408,6 +395,10 @@ static TThread* pthrFindName(const TString& strName)
 //
 tCIDLib::EExitCodes eThreadStart(TThread* const pthrStarting, tCIDLib::TVoid* pData)
 {
+    // It won't actually return false, it'll throw, but this is for code analysis purposes
+    if (!bCIDPreCond(pthrStarting != nullptr))
+        return tCIDLib::EExitCodes::InitFailed;
+
     //
     //  Add a new node to the thread list. We can't add us to the list until
     //  we are running, since our thread id isn't set until then. We don't
@@ -420,10 +411,10 @@ tCIDLib::EExitCodes eThreadStart(TThread* const pthrStarting, tCIDLib::TVoid* pD
     //  since it would have to be the same object literally.
     //
     {
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // See if this thread object is already in the list
-        TThreadItem* pthriCur = athriList();
+        CIDLib_Thread::TThreadItem* pthriCur = athriList();
         TThread* pthrOld = nullptr;
         for (tCIDLib::TCard4 c4Ind = 0; c4Ind < CIDLib_Thread::c4MaxThreads; c4Ind++)
         {
@@ -588,7 +579,7 @@ TThread* pthrCurrent()
     // Dummy scope so we don't stay locked if popup occurs below!
     {
         // Get access to the thread list
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Look for this thread id
         pthrRet = pthrFindId(tidCaller);
@@ -728,9 +719,9 @@ TGlobalThreadFunc::TGlobalThreadFunc(const tCIDLib::TThreadFuncPtr pfnThreadFunc
 {
 }
 
-TGlobalThreadFunc::TGlobalThreadFunc(const TGlobalThreadFunc& tfuncToCopy) :
+TGlobalThreadFunc::TGlobalThreadFunc(const TGlobalThreadFunc& tfuncSrc) :
 
-    m_pfnThreadFunc(tfuncToCopy.m_pfnThreadFunc)
+    m_pfnThreadFunc(tfuncSrc.m_pfnThreadFunc)
 {
 }
 
@@ -741,12 +732,11 @@ TGlobalThreadFunc::~TGlobalThreadFunc()
 // ---------------------------------------------------------------------------
 //  TGlobalThreadFunc: Public operators
 // ---------------------------------------------------------------------------
-TGlobalThreadFunc&
-TGlobalThreadFunc::operator=(const TGlobalThreadFunc& tfuncToAssign)
+TGlobalThreadFunc& TGlobalThreadFunc::operator=(const TGlobalThreadFunc& tfuncSrc)
 {
-    if (this != &tfuncToAssign)
+    if (this != &tfuncSrc)
     {
-        m_pfnThreadFunc = tfuncToAssign.m_pfnThreadFunc;
+        m_pfnThreadFunc = tfuncSrc.m_pfnThreadFunc;
     }
     return *this;
 }
@@ -915,6 +905,13 @@ TThread::TThread(   const   TString&            strName
     CommonInit();
 }
 
+TThread::TThread(TThread&& thrSrc) :
+
+    TThread()
+{
+    *this = tCIDLib::ForceMove(thrSrc);
+}
+
 TThread::~TThread()
 {
     //
@@ -995,7 +992,7 @@ TThread::~TThread()
     //
     {
         // Get access to the thread list
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
         bRemoveName(m_strName);
     }
 
@@ -1040,6 +1037,45 @@ tCIDLib::TThreadId TThread::tidCaller()
     return TKrnlThread::tidCaller();
 }
 
+
+// ---------------------------------------------------------------------------
+//  TThread: Public operators
+// ---------------------------------------------------------------------------
+
+TThread& TThread::operator=(TThread&& thrSrc)
+{
+    if (this != &thrSrc)
+    {
+        // The source cannot be running
+        if (thrSrc.bIsRunning())
+        {
+            facCIDLib().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kCIDErrs::errcPrc_ThrIsRunning
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::CantDo
+                , thrSrc.m_strName
+            );
+        }
+
+        tCIDLib::Swap(m_bSelfPrio, thrSrc.m_bSelfPrio);
+        tCIDLib::Swap(m_bShutdownRequest, thrSrc.m_bShutdownRequest);
+        tCIDLib::Swap(m_bSyncRequest, thrSrc.m_bSyncRequest);
+        tCIDLib::Swap(m_c4ListInd, thrSrc.m_c4ListInd);
+        tCIDLib::Swap(m_c4StackSz, thrSrc.m_c4StackSz);
+        tCIDLib::Swap(m_pfnOnExit, thrSrc.m_pfnOnExit);
+        tCIDLib::Swap(m_ptfuncToRun, thrSrc.m_ptfuncToRun);
+        tCIDLib::Swap(m_tidSyncReq, thrSrc.m_tidSyncReq);
+
+        m_kevSync = tCIDLib::ForceMove(thrSrc.m_kevSync);
+        m_kevResponse = tCIDLib::ForceMove(thrSrc.m_kevResponse);
+        m_kthrThis = tCIDLib::ForceMove(thrSrc.m_kthrThis);
+        m_strName = tCIDLib::ForceMove(thrSrc.m_strName);
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -1375,7 +1411,7 @@ tCIDLib::TVoid TThread::Release()
     //  mutex in every thread object just for this stuff.
     //
     {
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Make sure the caller is the one that did the sync
         #if CID_DEBUG_ON
@@ -1747,7 +1783,7 @@ tCIDLib::TVoid TThread::Start(          tCIDLib::TVoid* const   pData
     if (!m_kthrThis.bWaitEvOrDeath(m_kevResponse, bDied, c4TimeOut))
     {
         // Something has gone fundamentally wrong, bu tlet's try to clean up
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         m_bSyncRequest = kCIDLib::False;
         m_tidSyncReq = kCIDLib::tidInvalid;
@@ -1817,7 +1853,7 @@ tCIDLib::TVoid TThread::Sync()
     //
     if (m_bSyncRequest)
     {
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
         if (!m_bSyncRequest)
             return;
 
@@ -1846,7 +1882,7 @@ tCIDLib::TVoid TThread::Sync()
     tCIDLib::TBoolean bDied;
     if (!m_kthrThis.bWaitEvOrDeath(m_kevSync, bDied, 60000))
     {
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         const TKrnlError& kerrLast = TKrnlError::kerrLast();
         tCIDLib::TErrCode errcLog = kCIDErrs::errcEv_Wait;
@@ -1955,7 +1991,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
     // A faux block to minimize thread list lock time
     try
     {
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // If there is already a request, then we can't do it
         if (m_bSyncRequest)
@@ -2019,7 +2055,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
     {
         // Lock and clean up then rethrow
         {
-            TMtxLocker mtxlAccess(pmtxListAccess());
+            TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
             m_bSyncRequest = kCIDLib::False;
             m_tidSyncReq = kCIDLib::tidInvalid;
             m_kevResponse.bTrigger();
@@ -2043,7 +2079,7 @@ tCIDLib::TVoid TThread::WaitSync(const tCIDLib::TCard4 c4Timeout)
         TKrnlError kerrLast = TKrnlError::kerrLast();
 
         // Lock again so we can clean up
-        TMtxLocker mtxlAccess(pmtxListAccess());
+        TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
         // Clear the flags back out
         m_bSyncRequest = kCIDLib::False;
@@ -2124,10 +2160,12 @@ TThread::TThread() :
     m_bSelfPrio(kCIDLib::True)
     , m_bShutdownRequest(kCIDLib::False)
     , m_bSyncRequest(kCIDLib::False)
+    , m_c4ListInd(CIDLib_Thread::c4MaxThreads)
     , m_c4StackSz(0)
     , m_kthrThis()
     , m_ptfuncToRun(0)
     , m_pfnOnExit(0)
+    , m_tidSyncReq(kCIDLib::tidInvalid)
     , m_strName(kCIDLib::pszPrimaryThrdName)
 {
     if (!m_kthrThis.bAdoptCaller())
@@ -2184,7 +2222,7 @@ TThread::CheckCallerIsSelf(const   tCIDLib::TCard4     c4LineNum
 tCIDLib::TVoid TThread::ShutdownProcessing()
 {
     // Lock while we clean up
-    TMtxLocker mtxlAccess(pmtxListAccess());
+    TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
     //
     //  Call the on-exit function to let the thread object clean up. This
@@ -2205,10 +2243,8 @@ tCIDLib::TVoid TThread::ShutdownProcessing()
     //  removed from the list until the thread object is destroyed (since
     //  it might just be restarted.)
     //
+    CIDAssert(m_c4ListInd < CIDLib_Thread::c4MaxThreads, L"Thread index is invalid");
     athriList()[m_c4ListInd].tidThread = kCIDLib::tidInvalid;
-
-    // Clean up any per-thread data for this thread
-    TKrnlPerThreadData::CleanUpThreadData();
 }
 
 
@@ -2272,7 +2308,7 @@ tCIDLib::TVoid TThread::FormatTo(TTextOutStream& strmToWriteTo) const
 tCIDLib::TVoid TThread::CommonInit()
 {
     // Get access to the thread list
-    TMtxLocker mtxlAccess(pmtxListAccess());
+    TLocker lockrAccess(CIDLib_Thread::pmtxListAccess());
 
     //
     //  Check the thread list and see if there is already a thread with

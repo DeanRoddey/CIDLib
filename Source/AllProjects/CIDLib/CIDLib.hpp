@@ -49,6 +49,15 @@
 // ---------------------------------------------------------------------------
 class MFormattable;
 class TString;
+class TFacCIDLib;
+
+
+// ---------------------------------------------------------------------------
+//  Export the lazy evalution method for the facility object. We forward ref
+//  above so that it's visible to templatized classes that must be defined before
+//  the actual facility class header.
+// ---------------------------------------------------------------------------
+extern CIDLIBEXP TFacCIDLib& facCIDLib();
 
 
 // ---------------------------------------------------------------------------
@@ -58,16 +67,19 @@ class TString;
 #include    "CIDLib_RTTI.hpp"
 #include    "CIDLib_Duplicable.hpp"
 #include    "CIDLib_Formattable.hpp"
-#include    "CIDLib_RefCounted.hpp"
 #include    "CIDLib_Streamable.hpp"
+#include    "CIDLib_Lockable.hpp"
 #include    "CIDLib_Type.hpp"
 
 //
 //  These may need to be seen by templated stuff below, and don't need to see any
 //  streams headers, so we can put them up here.
 //
-StdEnumTricks(tCIDLib::ECorners)
-StdEnumTricks(tCIDLib::ELogFlags)
+namespace tCIDLib
+{
+    StdEnumTricks(tCIDLib::ECorners)
+    StdEnumTricks(tCIDLib::ELogFlags)
+}
 
 #include    "CIDLib_Object.hpp"
 #include    "CIDLib_Class.hpp"
@@ -82,14 +94,34 @@ StdEnumTricks(tCIDLib::ELogFlags)
 #include    "CIDLib_ModuleInfo.hpp"
 #include    "CIDLib_Module.hpp"
 #include    "CIDLib_KeyValuePair.hpp"
+#include    "CIDLib_Atomic.hpp"
 #include    "CIDLib_SmartPointer.hpp"
+#include    "CIDLib_ObjLocker.hpp"
 #include    "CIDLib_SearchNSort.hpp"
 #include    "CIDLib_PubSub.hpp"
 #include    "CIDLib_ExpByteBuf.hpp"
 #include    "CIDLib_TextConverter.hpp"
 #include    "CIDLib_UTFConverter.hpp"
+
+#include    "CIDLib_DLinkedList.hpp"
+#include    "CIDLib_SLinkedList.hpp"
+#include    "CIDLib_CollectionBase.hpp"
+#include    "CIDLib_CollectCursor.hpp"
+#include    "CIDLib_Collection.hpp"
+
+#include    "CIDLib_Time.hpp"
+#include    "CIDLib_LogEvent.hpp"
+
 #include    "CIDLib_BinInStream.hpp"
 #include    "CIDLib_BinOutStream.hpp"
+
+#include    "CIDLib_CircularBuf.hpp"
+#include    "CIDLib_FundArray.hpp"
+#include    "CIDLib_FundDeque.hpp"
+#include    "CIDLib_FundQueue.hpp"
+#include    "CIDLib_FundStack.hpp"
+#include    "CIDLib_FundVector.hpp"
+
 
 
 // ---------------------------------------------------------------------------
@@ -103,7 +135,6 @@ StdEnumTricks(tCIDLib::ELogFlags)
 EnumStreamMacros(tCIDLib::EAngleTypes)
 EnumStreamMacros(tCIDLib::EAudioCues)
 EnumStreamMacros(tCIDLib::EAutoModes)
-EnumStreamMacros(tCIDLib::ECPUTypes)
 EnumStreamMacros(tCIDLib::ECreateActs)
 EnumStreamMacros(tCIDLib::EDelModes)
 EnumStreamMacros(tCIDLib::EEndianModes)
@@ -170,10 +201,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #endif
 
-#include    "CIDLib_DLinkedList.hpp"
-#include    "CIDLib_SLinkedList.hpp"
-#include    "CIDLib_CollectCursor.hpp"
-#include    "CIDLib_Collection.hpp"
 #include    "CIDLib_BasicDLinkedCol.hpp"
 
 #include    "CIDLib_StreamFmt.hpp"
@@ -182,13 +209,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 
 #include    "CIDLib_StringTokenizer.hpp"
 #include    "CIDLib_BasicTreeCol.hpp"
-
-#include    "CIDLib_CircularBuf.hpp"
-#include    "CIDLib_FundArray.hpp"
-#include    "CIDLib_FundDeque.hpp"
-#include    "CIDLib_FundQueue.hpp"
-#include    "CIDLib_FundStack.hpp"
-#include    "CIDLib_FundVector.hpp"
 
 #include    "CIDLib_Enum.hpp"
 #include    "CIDLib_StatsCache.hpp"
@@ -206,14 +226,12 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_Cardinal.hpp"
 #include    "CIDLib_Float.hpp"
 #include    "CIDLib_Integer.hpp"
-#include    "CIDLib_Time.hpp"
 #include    "CIDLib_Random.hpp"
 #include    "CIDLib_BitSeq.hpp"
 #include    "CIDLib_PathString.hpp"
 #include    "CIDLib_FileBase.hpp"
 #include    "CIDLib_BinaryFile.hpp"
 #include    "CIDLib_FileStreamImpl.hpp"
-#include    "CIDLib_LogEvent.hpp"
 #include    "CIDLib_VolumeInfo.hpp"
 #include    "CIDLib_Locale.hpp"
 #include    "CIDLib_Logger.hpp"
@@ -228,7 +246,6 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_Pointer.hpp"
 #include    "CIDLib_Process.hpp"
 #include    "CIDLib_SafeCounter.hpp"
-#include    "CIDLib_Semaphore.hpp"
 #include    "CIDLib_SharedMemory.hpp"
 #include    "CIDLib_Signals.hpp"
 #include    "CIDLib_StatusController.hpp"
@@ -241,31 +258,25 @@ EnumBinStreamMacros(tCIDCtrls::EExtKeys)
 #include    "CIDLib_UniqueName.hpp"
 #include    "CIDLib_DataSrc.hpp"
 
+#include    "CIDLib_KeyedHashSet.hpp"
+#include    "CIDLib_PolyStreamer.hpp"
+
 #include    "CIDLib_BinaryFileStream.hpp"
 #include    "CIDLib_BinaryMBufStream.hpp"
 #include    "CIDLib_Console.hpp"
 #include    "CIDLib_TextFileStream.hpp"
 #include    "CIDLib_TextMBufStream.hpp"
 #include    "CIDLib_TextStringStream.hpp"
-#include    "CIDLib_PolyStreamer.hpp"
 #include    "CIDLib_StreamLexer.hpp"
 
 #include    "CIDLib_BackFileMgr.hpp"
 
 #include    "CIDLib_ThreadWaitList.hpp"
 #include    "CIDLib_EventTimer.hpp"
-#include    "CIDLib_MediaChanger.hpp"
-#include    "CIDLib_PerThreadData.hpp"
 #include    "CIDLib_TypedMBuf.hpp"
 #include    "CIDLib_USB.hpp"
 
 #include    "CIDLib_ThisFacility.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  Export the lazy evalution method for the facility object.
-// ---------------------------------------------------------------------------
-extern CIDLIBEXP TFacCIDLib& facCIDLib();
 
 
 // ---------------------------------------------------------------------------
@@ -281,7 +292,6 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 #include    "CIDLib_Queue.hpp"
 #include    "CIDLib_Stack.hpp"
 #include    "CIDLib_HashSet.hpp"
-#include    "CIDLib_KeyedHashSet.hpp"
 #include    "CIDLib_HashMap.hpp"
 #include    "CIDLib_SortedBag.hpp"
 #include    "CIDLib_FindBuf.hpp"
@@ -313,40 +323,41 @@ extern CIDLIBEXP TFacCIDLib& facCIDLib();
 // ---------------------------------------------------------------------------
 namespace tCIDLib
 {
-    using TKVPTree      = TBasicTreeCol<TKeyValuePair>;
-    using TStrArray     = TObjArray<TString>;
-    using TStrBag       = TBag<TString>;
-    using TStrCollect   = TCollection<TString>;
-    using TKVPCollect   = TCollection<TKeyValuePair>;
-    using TKVPFCollect  = TCollection<TKeyValFPair>;
-    using TKValsCollect = TCollection<TKeyValues>;
-    using TStrList      = TVector<TString>;
-    using TStrIdList    = TVector<TStringId>;
-    using TKVPList      = TVector<TKeyValuePair>;
-    using TKVPFList     = TVector<TKeyValFPair>;
-    using TKValsList    = TVector<TKeyValues>;
-    using TKNumList     = TVector<TKeyNumPair>;
-    using TDirChanges   = TVector<TDirChangeInfo>;
-    using TThreadList   = TRefVector<TThread>;
-    using TLogEventQ    = TQueue<TLogEvent>;
-    using TStringQ      = TQueue<TString>;
-    using TKVPairQ      = TQueue<TKeyValuePair>;
-    using TBoolArray    = TFundArray<tCIDLib::TBoolean>;
-    using TCardArray    = TFundArray<tCIDLib::TCard4>;
-    using TFloatArray   = TFundArray<tCIDLib::TFloat8>;
-    using TIntArray     = TFundArray<tCIDLib::TInt4>;
-    using TBoolList     = TFundVector<tCIDLib::TBoolean>;
-    using TByteList     = TFundVector<tCIDLib::TCard1>;
-    using TCardList     = TFundVector<tCIDLib::TCard4>;
-    using TCard8List    = TFundVector<tCIDLib::TCard8>;
-    using TFloat4List   = TFundVector<tCIDLib::TFloat4>;
-    using TFloat8List   = TFundVector<tCIDLib::TFloat8>;
-    using TChangeList   = TFundVector<tCIDLib::EChangeRes>;
-    using TBoolStack    = TFundStack<tCIDLib::TBoolean>;
-    using TCardStack    = TFundStack<tCIDLib::TCard4>;
-    using TKVHashSet    = TKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
-    using TStrHashSet   = THashSet<TString,TStringKeyOps>;
-    using TGenCache     = TKeyedHashSet<TCIDGenCacheItem, TString, TStringKeyOps>;
+    using TKVPTree          = TBasicTreeCol<TKeyValuePair>;
+    using TStrArray         = TObjArray<TString>;
+    using TStrBag           = TBag<TString>;
+    using TStrCollect       = TCollection<TString>;
+    using TKVPCollect       = TCollection<TKeyValuePair>;
+    using TKVPFCollect      = TCollection<TKeyValFPair>;
+    using TKValsCollect     = TCollection<TKeyValues>;
+    using TStrList          = TVector<TString>;
+    using TStrIdList        = TVector<TStringId>;
+    using TKVPList          = TVector<TKeyValuePair>;
+    using TKVPFList         = TVector<TKeyValFPair>;
+    using TKValsList        = TVector<TKeyValues>;
+    using TKNumList         = TVector<TKeyNumPair>;
+    using TDirChanges       = TVector<TDirChangeInfo>;
+    using TThreadList       = TRefVector<TThread>;
+    using TLogEventQ        = TQueue<TLogEvent>;
+    using TStringQ          = TQueue<TString>;
+    using TKVPairQ          = TQueue<TKeyValuePair>;
+    using TBoolArray        = TFundArray<tCIDLib::TBoolean>;
+    using TCardArray        = TFundArray<tCIDLib::TCard4>;
+    using TFloatArray       = TFundArray<tCIDLib::TFloat8>;
+    using TIntArray         = TFundArray<tCIDLib::TInt4>;
+    using TBoolList         = TFundVector<tCIDLib::TBoolean>;
+    using TByteList         = TFundVector<tCIDLib::TCard1>;
+    using TCardList         = TFundVector<tCIDLib::TCard4>;
+    using TCard8List        = TFundVector<tCIDLib::TCard8>;
+    using TFloat4List       = TFundVector<tCIDLib::TFloat4>;
+    using TFloat8List       = TFundVector<tCIDLib::TFloat8>;
+    using TChangeList       = TFundVector<tCIDLib::EChangeRes>;
+    using TBoolStack        = TFundStack<tCIDLib::TBoolean>;
+    using TByteStack        = TFundStack<tCIDLib::TCard1>;
+    using TCardStack        = TFundStack<tCIDLib::TCard4>;
+    using TKVHashSet        = TKeyedHashSet<TKeyValuePair,TString,TStringKeyOps>;
+    using TStrHashSet       = THashSet<TString,TStringKeyOps>;
+    using TGenCache         = TKeyedHashSet<TCIDGenCacheItem, TString, TStringKeyOps>;
 }
 
 
@@ -390,6 +401,7 @@ extern template class TFundVector<tCIDLib::TFloat4>;
 extern template class TFundVector<tCIDLib::TFloat8>;
 
 extern template class TFundStack<tCIDLib::TBoolean>;
+extern template class TFundStack<tCIDLib::TCard1>;
 extern template class TFundStack<tCIDLib::TCard4>;
 
 extern template class TObjArray<TString>;

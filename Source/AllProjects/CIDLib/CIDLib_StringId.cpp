@@ -64,15 +64,6 @@ TStringId::TStringId(const  tCIDLib::TCh* const     pszText
 {
 }
 
-TStringId::TStringId(const TStringId& stridSrc) :
-
-    m_bFlag(stridSrc.m_bFlag)
-    , m_c4Id(stridSrc.m_c4Id)
-    , m_strText(stridSrc.m_strText)
-{
-
-}
-
 TStringId::~TStringId()
 {
 }
@@ -81,18 +72,6 @@ TStringId::~TStringId()
 // ---------------------------------------------------------------------------
 //  TStringId: Public operators
 // ---------------------------------------------------------------------------
-TStringId& TStringId::operator=(const TStringId& stridSrc)
-{
-    if (&stridSrc != this)
-    {
-        m_bFlag   = stridSrc.m_bFlag;
-        m_c4Id    = stridSrc.m_c4Id;
-        m_strText = stridSrc.m_strText;
-    }
-    return *this;
-}
-
-
 tCIDLib::TBoolean TStringId::operator==(const TStringId& stridSrc) const
 {
     if (&stridSrc == this)

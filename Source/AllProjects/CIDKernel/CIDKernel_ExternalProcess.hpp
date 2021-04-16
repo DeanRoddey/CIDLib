@@ -42,6 +42,12 @@ class KRNLEXPORT TKrnlExtProcess
 {
     public  :
         // -------------------------------------------------------------------
+        //  Forward declare our per-platform internal structure
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
+        // -------------------------------------------------------------------
         //  Public, static methods
         //
         //  This method understands how to parse a standard CIDLib command
@@ -160,10 +166,8 @@ class KRNLEXPORT TKrnlExtProcess
         (
             const   tCIDLib::TCh* const     pszPath
             , const tCIDLib::TCh* const     pszInitPath
-            ,       tCIDLib::TCh**          apszParms
-            , const tCIDLib::TCard4         c4ParmCount
-            ,       tCIDLib::TCh**          apszEnviron
-            , const tCIDLib::TCard4         c4EnvironCount
+            ,       tCIDKernel::TStrList&   klistParms
+            ,       tCIDKernel::TStrList&   klistEnviron
             , const tCIDLib::EExtProcFlags  eFlag
             , const tCIDLib::EExtProcShows  eShow
         );
@@ -172,8 +176,7 @@ class KRNLEXPORT TKrnlExtProcess
         (
             const   tCIDLib::TCh* const     pszStartString
             , const tCIDLib::TCh* const     pszInitPath
-            ,       tCIDLib::TCh**          apszEnviron
-            , const tCIDLib::TCard4         c4EnvironCount
+            ,       tCIDKernel::TStrList&   klistEnviron
             , const tCIDLib::EExtProcFlags  eFlag
             , const tCIDLib::EExtProcShows  eShow
         );
@@ -227,12 +230,12 @@ class KRNLEXPORT TKrnlExtProcess
         //  m_hprocThis
         //      This is the handle to the process.
         //
-        //  m_pExtra
+        //  m_pPlatData
         //      This can be used by per-platform drivers to hold extra info
         //      if they need to.
         // -------------------------------------------------------------------
         TProcessHandle  m_hprocThis;
-        tCIDLib::TVoid* m_pExtra;
+        TPlatData*      m_pPlatData;
 };
 
 #pragma CIDLIB_POPPACK

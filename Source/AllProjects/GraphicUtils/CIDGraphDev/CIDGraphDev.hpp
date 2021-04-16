@@ -46,6 +46,7 @@
 // ---------------------------------------------------------------------------
 //  Include the needed underlying headers.
 // ---------------------------------------------------------------------------
+#include    "CIDLib.hpp"
 #include    "CIDMath.hpp"
 #include    "CIDImgFact.hpp"
 
@@ -64,6 +65,7 @@ class TGraphDrawDev;
 //  Now subinclude our other headers, in the needed order.
 // ---------------------------------------------------------------------------
 #include    "CIDGraphDev_Shared.hpp"
+
 #include    "CIDGraphDev_Type.hpp"
 #include    "CIDGraphDev_ErrorIds.hpp"
 #include    "CIDGraphDev_ResourceIds.hpp"

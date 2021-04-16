@@ -73,7 +73,7 @@ tCIDLib::TVoid
 TResCompiler::ProcessDialog(TBinFile& bflBinOut, TTextFile& tflResHpp)
 {
     static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    static TBlkField ablkfDlgInfo[EDlgFlds::Count] =
+    static TBlkField ablkfDlgInfo[tCIDLib::TCard4(EDlgFlds::Count)] =
     {
         TBlkField(L"SYMBOL"         , kCIDLib::True     , 2, 2 )
         , TBlkField(L"AREA"         , kCIDLib::True     , 4, 4 )
@@ -180,7 +180,7 @@ TResCompiler::ProcessDialog(TBinFile& bflBinOut, TTextFile& tflResHpp)
                 // Write out the the symbol to the header, if needed
                 if (m_bGenHeaders)
                 {
-                    tflResHpp   << L"    const tCIDLib::TResId  "
+                    tflResHpp   << L"    constexpr tCIDLib::TResId  "
                                 << blkfCur.strField(0)
                                 << L" = " << blkfCur.strField(1) << L";\n";
                 }
@@ -600,7 +600,7 @@ ProcessDialogWidget(const   TBldStr&                    strDlgName
             // Write out the the symbol to the header, if needed
             if (m_bGenHeaders)
             {
-                tflResHpp   << L"    const tCIDLib::TResId  "
+                tflResHpp   << L"    constexpr tCIDLib::TResId  "
                             << blkfCur.strField(0)
                             << L" = " << rdlgiToFill.ridThis << L";\n";
             }

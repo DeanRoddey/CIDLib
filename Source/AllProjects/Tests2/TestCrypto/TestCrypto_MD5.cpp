@@ -140,7 +140,7 @@ TTest_MD51::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Modify a byte and do another, making sure they are not different
-        mbufMsg[1]++;
+        mbufMsg.PutCard1(mbufMsg[1] + 1, 1UL);
         TMD5Hash mhashTest3;
         mdigTest.StartNew();
         mdigTest.DigestBuf(mbufMsg);

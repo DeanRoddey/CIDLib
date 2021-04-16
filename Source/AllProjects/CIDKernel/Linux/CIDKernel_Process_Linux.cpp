@@ -43,36 +43,39 @@
 //  TProcessHandle: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TProcessHandle::TProcessHandle() :
-    __phprociThis(0)
+
+    m_phprociThis(nullptr)
 {
-    __phprociThis = new TProcessHandleImpl;
-    __phprociThis->pidThis = 0;
-    __phprociThis->eExit = tCIDLib::EExitCodes::Normal;
-    __phprociThis->bAlreadyClean = kCIDLib::False;
+    m_phprociThis = new TProcessHandleImpl;
+    m_phprociThis->pidThis = 0;
+    m_phprociThis->eExit = tCIDLib::EExitCodes::Normal;
+    m_phprociThis->bAlreadyClean = kCIDLib::False;
 }
 
-TProcessHandle::TProcessHandle(const TProcessHandle& hprocToCopy) :
-    __phprociThis(0)
+TProcessHandle::TProcessHandle(const TProcessHandle& hprocSrc) :
+
+    m_phprociThis(nullptr)
 {
-    __phprociThis = new TProcessHandleImpl;
-    __phprociThis->pidThis = hprocToCopy.__phprociThis->pidThis;
-    __phprociThis->eExit = hprocToCopy.__phprociThis->eExit;
-    __phprociThis->bAlreadyClean = hprocToCopy.__phprociThis->bAlreadyClean;
+    m_phprociThis = new TProcessHandleImpl;
+    m_phprociThis->pidThis = hprocSrc.m_phprociThis->pidThis;
+    m_phprociThis->eExit = hprocSrc.m_phprociThis->eExit;
+    m_phprociThis->bAlreadyClean = hprocSrc.m_phprociThis->bAlreadyClean;
 }
 
 TProcessHandle::TProcessHandle(const TProcessHandleImpl& hprociSrc) :
-    __phprociThis(0)
+
+    m_phprociThis(nullptr)
 {
-    __phprociThis = new TProcessHandleImpl;
-    __phprociThis->pidThis = hprociSrc.pidThis;
-    __phprociThis->eExit = hprociSrc.eExit;
-    __phprociThis->bAlreadyClean = hprociSrc.bAlreadyClean;
+    m_phprociThis = new TProcessHandleImpl;
+    m_phprociThis->pidThis = hprociSrc.pidThis;
+    m_phprociThis->eExit = hprociSrc.eExit;
+    m_phprociThis->bAlreadyClean = hprociSrc.bAlreadyClean;
 }
 
 TProcessHandle::~TProcessHandle()
 {
-    delete __phprociThis;
-    __phprociThis = 0;
+    delete m_phprociThis;
+    m_phprociThis = nullptr;
 }
 
 
@@ -84,9 +87,9 @@ TProcessHandle& TProcessHandle::operator=(const TProcessHandle& hprocToAssign)
     if (this == &hprocToAssign)
         return *this;
 
-    __phprociThis->pidThis = hprocToAssign.__phprociThis->pidThis;
-    __phprociThis->eExit = hprocToAssign.__phprociThis->eExit;
-    __phprociThis->bAlreadyClean = hprocToAssign.__phprociThis->bAlreadyClean;
+    m_phprociThis->pidThis = hprocToAssign.m_phprociThis->pidThis;
+    m_phprociThis->eExit = hprocToAssign.m_phprociThis->eExit;
+    m_phprociThis->bAlreadyClean = hprocToAssign.m_phprociThis->bAlreadyClean;
 
     return *this;
 }
@@ -95,7 +98,7 @@ TProcessHandle& TProcessHandle::operator=(const TProcessHandle& hprocToAssign)
 tCIDLib::TBoolean
 TProcessHandle::operator==(const TProcessHandle& hprocToCompare) const
 {
-    return (__phprociThis->pidThis == hprocToCompare.__phprociThis->pidThis);
+    return (m_phprociThis->pidThis == hprocToCompare.m_phprociThis->pidThis);
 }
 
 
@@ -103,33 +106,33 @@ TProcessHandle::operator==(const TProcessHandle& hprocToCompare) const
 // -------------------------------------------------------------------
 //  Public, non-virtual methods
 // -------------------------------------------------------------------
-tCIDLib::TBoolean TProcessHandle::bValid() const
+tCIDLib::TBoolean TProcessHandle::bIsValid() const
 {
-    return (__phprociThis->pidThis != 0);
+    return (m_phprociThis->pidThis != 0);
 }
 
 tCIDLib::TVoid TProcessHandle::Clear()
 {
-    __phprociThis->pidThis = 0;
-    __phprociThis->eExit = tCIDLib::EExitCodes::Normal;
-    __phprociThis->bAlreadyClean = kCIDLib::False;
+    m_phprociThis->pidThis = 0;
+    m_phprociThis->eExit = tCIDLib::EExitCodes::Normal;
+    m_phprociThis->bAlreadyClean = kCIDLib::False;
 }
 
 tCIDLib::TProcessId TProcessHandle::pidThis() const
 {
-    return __phprociThis->pidThis;
+    return m_phprociThis->pidThis;
 }
 
 tCIDLib::TVoid
 TProcessHandle::FormatToStr(        tCIDLib::TCh* const pszToFill
                             , const tCIDLib::TCard4     c4MaxChars) const
 {
-    TRawStr::bFormatVal
-    (
-        tCIDLib::TCard4(__phprociThis->pidThis)
-        , pszToFill
-        , c4MaxChars
-    );
+    TRawStr::bFormatVal(tCIDLib::TCard4(m_phprociThis->pidThis), pszToFill, c4MaxChars);
+}
+
+const TProcessHandleImpl& TProcessHandle::hprociThis() const
+{
+    return *m_phprociThis;
 }
 
 
@@ -175,7 +178,7 @@ TKrnlProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eClass)
 
 tCIDLib::TVoid TKrnlProcess::ExitProcess(const tCIDLib::EExitCodes eExitCode)
 {
-    ::exit(eExitCode);
+    ::exit(tCIDLib::c4EnumOrd(eExitCode));
 }
 
 
@@ -195,9 +198,9 @@ const TProcessHandle& TKrnlProcess::hprocThis()
             TProcessHandleImpl hprociTmp;
             hprociTmp.pidThis = ::getpid();
 
-            ::InterlockedExchange
+            TRawMem::pExchangeRawPtr
             (
-                &phprocThis, new TProcessHandle(hprociTmp)
+                reinterpret_cast<void**>(&phprocThis), new TProcessHandle(hprociTmp)
             );
         }
     }

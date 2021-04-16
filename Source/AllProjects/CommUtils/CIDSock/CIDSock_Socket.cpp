@@ -47,8 +47,8 @@ namespace CIDSock_Socket
     // -----------------------------------------------------------------------
     //  Some stats cache items we maintain
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   m_bInitDone = kCIDLib::False;
-    TStatsCacheItem     m_sciSockCnt;
+    TAtomicFlag         atomInitDone;
+    TStatsCacheItem     sciSockCnt;
 }
 
 
@@ -152,10 +152,12 @@ TSocket::bMultiReadSel(         TRefVector<TMSockSelItem>&  colList
     }
 
     // We have to translate to a list of kernel sockets for our call
+    CIDLib_Suppress(26494)
     TKrnlSocket* apksockList[kCIDSock::c4MaxSelect];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         apksockList[c4Index] = &colList[c4Index]->m_psockSel->ksockImpl();
 
+    CIDLib_Suppress(26494)
     tCIDSock::EMSelFlags    aeFlags[kCIDSock::c4MaxSelect];
     tCIDLib::TCard4         c4Changes = c4Count;
     if (!TKrnlSocket::bMultiReadSel(apksockList, aeFlags, c4Changes, enctWait))
@@ -238,10 +240,12 @@ TSocket::bMultiSel(         TRefVector<TMSockSelItem>&  colList
     }
 
     // We have to translate to a list of kernel sockets for our call
+    CIDLib_Suppress(26494)
     TKrnlSocket* apksockList[kCIDSock::c4MaxSelect];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         apksockList[c4Index] = &colList[c4Index]->m_psockSel->ksockImpl();
 
+    CIDLib_Suppress(26494)
     tCIDSock::EMSelFlags    aeFlags[kCIDSock::c4MaxSelect];
     tCIDLib::TCard4         c4Changes = c4Count;
     if (!TKrnlSocket::bMultiSel(apksockList, aeFlags, c4Changes, enctWait))
@@ -316,7 +320,7 @@ TSocket::~TSocket()
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
     {
         // Dec the open socket stat
-        TStatsCache::c8DecCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8DecCounter(CIDSock_Socket::sciSockCnt);
 
         if (!m_ksockImpl.bClose())
         {
@@ -448,7 +452,7 @@ tCIDLib::TBoolean TSocket::bIsOpen() const
 tCIDLib::TBoolean TSocket::bLinger() const
 {
     tCIDLib::TBoolean bRet;
-    if (!m_ksockImpl.bGetSockOpt(TKrnlSocket::EBSockOpts::Linger, bRet))
+    if (!m_ksockImpl.bLinger(bRet))
     {
         facCIDSock().ThrowKrnlErr
         (
@@ -589,7 +593,7 @@ TSocket::bWaitForSendReady(const tCIDLib::TEncodedTime enctWait) const
     if (enctWait > kCIDLib::enctOneSecond)
     {
         tCIDLib::TEncodedTime enctCur = TKrnlTimeStamp::enctNow();
-        tCIDLib::TEncodedTime enctCurWait;
+        tCIDLib::TEncodedTime enctCurWait = 0;
         tCIDLib::TEncodedTime enctEnd;
         if (enctWait == kCIDLib::enctMaxWait)
             enctEnd = kCIDLib::enctMaxWait;
@@ -670,8 +674,8 @@ TSocket::bWaitForDataReady(const tCIDLib::TEncodedTime enctWait) const
     if (enctWait > kCIDLib::enctOneSecond)
     {
         tCIDLib::TEncodedTime enctCur = TKrnlTimeStamp::enctNow();
-        tCIDLib::TEncodedTime enctCurWait;
-        tCIDLib::TEncodedTime enctEnd;
+        tCIDLib::TEncodedTime enctCurWait = 0;
+        tCIDLib::TEncodedTime enctEnd = 0;
         if (enctWait == kCIDLib::enctMaxWait)
             enctEnd = kCIDLib::enctMaxWait;
         else
@@ -933,7 +937,7 @@ tCIDLib::TVoid TSocket::Close()
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
     {
         // Dec the open socket stat
-        TStatsCache::c8DecCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8DecCounter(CIDSock_Socket::sciSockCnt);
 
         if (!m_ksockImpl.bClose())
         {
@@ -1028,19 +1032,19 @@ TSocket::TSocket() :
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
 
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 }
@@ -1054,19 +1058,19 @@ TSocket::TSocket(const  tCIDSock::ESocketTypes  eType
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
 
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 
@@ -1084,7 +1088,7 @@ TSocket::TSocket(const  tCIDSock::ESocketTypes  eType
     }
 
     // Bump the open socket stat
-    TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+    TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 
@@ -1099,26 +1103,25 @@ TSocket::TSocket(const TSocketHandle& hsockToAdopt) :
     , m_bUserFlag(kCIDLib::False)
 {
     // Initialize our stats cache item if needed
-    if (!CIDSock_Socket::m_bInitDone)
+    if (!CIDSock_Socket::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDSock_Socket::m_bInitDone)
+        if (!CIDSock_Socket::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
                 kCIDSock::pszStat_Net_OpenSockCnt
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDSock_Socket::m_sciSockCnt
+                , CIDSock_Socket::sciSockCnt
             );
-
-            CIDSock_Socket::m_bInitDone = kCIDLib::True;
+            CIDSock_Socket::atomInitDone.Set();
         }
     }
 
     // If it's open, then bump the stat
     tCIDLib::TBoolean bOpen;
     if (m_ksockImpl.bIsOpen(bOpen) && bOpen)
-        TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+        TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 
@@ -1150,7 +1153,7 @@ tCIDLib::TVoid TSocket::Create( const   tCIDSock::ESocketTypes  eType
     }
 
     // Bump the open socket stat
-    TStatsCache::c8IncCounter(CIDSock_Socket::m_sciSockCnt);
+    TStatsCache::c8IncCounter(CIDSock_Socket::sciSockCnt);
 }
 
 
@@ -1158,7 +1161,7 @@ tCIDLib::TVoid TSocket::Create( const   tCIDSock::ESocketTypes  eType
 tCIDLib::EErrClasses
 TSocket::eXlatKrnlErrClass(const TKrnlError& kerrToXlat) const
 {
-    tCIDLib::EErrClasses eRet;
+    tCIDLib::EErrClasses eRet = tCIDLib::EErrClasses::Unknown;
     switch(kerrToXlat.errcId())
     {
         // These all indicate a loss of the connection
@@ -1216,7 +1219,6 @@ TSocket::eXlatKrnlErrClass(const TKrnlError& kerrToXlat) const
             break;
 
         default :
-            eRet = tCIDLib::EErrClasses::Unknown;
             break;
     }
     return eRet;
@@ -1227,7 +1229,7 @@ tCIDLib::TErrCode
 TSocket::errcXlatKrnlErr(   const   TKrnlError&         kerrToXlat
                             , const tCIDLib::TErrCode   errcDefault) const
 {
-    tCIDLib::TErrCode errcRet;
+    tCIDLib::TErrCode errcRet = errcDefault;
     switch(kerrToXlat.errcId())
     {
         case kKrnlErrs::errcGen_NotSupported :
@@ -1275,7 +1277,6 @@ TSocket::errcXlatKrnlErr(   const   TKrnlError&         kerrToXlat
             break;
 
         default :
-            errcRet = errcDefault;
             break;
     }
     return errcRet;

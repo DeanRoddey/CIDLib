@@ -86,10 +86,19 @@ TStringInStreamImpl::TStringInStreamImpl(const  TString* const      pstrToUse
     m_cptrInfo.SetPointer(new TStringStreamImplInfo(pstrToUse, eAdopt));
 }
 
+TStringInStreamImpl::TStringInStreamImpl(TString&& strToTake) :
+
+    m_c4CurPos(0)
+    , m_pstrIn(new TString(tCIDLib::ForceMove(strToTake)))
+{
+    // Looks ok, so create the info object and store it
+    m_cptrInfo.SetPointer(new TStringStreamImplInfo(m_pstrIn, tCIDLib::EAdoptOpts::Adopt));
+}
+
 TStringInStreamImpl::TStringInStreamImpl(const tCIDLib::TCard4 c4InitSize) :
 
     m_c4CurPos(0)
-    , m_pstrIn(0)
+    , m_pstrIn(nullptr)
 {
     // Create the new string and store our own pointer to it
     m_pstrIn = new TString(c4InitSize);
@@ -106,7 +115,7 @@ TStringInStreamImpl(const TStringOutStreamImpl& strmiToSyncWith) :
 
     m_c4CurPos(0)
     , m_cptrInfo(strmiToSyncWith.m_cptrInfo)
-    , m_pstrIn(0)
+    , m_pstrIn(nullptr)
 {
     // Get a pointer to the string string
     m_pstrIn = m_cptrInfo->pstrData;
@@ -246,7 +255,7 @@ TStringOutStreamImpl::TStringOutStreamImpl(         TString* const      pstrToUs
 TStringOutStreamImpl::TStringOutStreamImpl(const tCIDLib::TCard4 c4InitSize) :
 
     m_c4CurPos(0)
-    , m_pstrOut(0)
+    , m_pstrOut(nullptr)
 {
     // Create the string and store our pointer to it
     m_pstrOut = new TString(kCIDLib::pszEmptyZStr, c4InitSize);
@@ -318,10 +327,7 @@ TStringOutStreamImpl::c4WriteBytes( const   tCIDLib::TVoid* const pToWrite
     //  Calc the actual bytes to write and copy the text into the string
     //  object's raw buffer.
     //
-    m_pstrOut->AppendSubStr
-    (
-        reinterpret_cast<const tCIDLib::TCh*>(pToWrite), 0, c4ActualChars
-    );
+    m_pstrOut->AppendSubStr(static_cast<const tCIDLib::TCh*>(pToWrite), 0, c4ActualChars);
 
     // Bump up the current position by the chars written
     m_c4CurPos += c4ActualChars;

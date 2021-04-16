@@ -59,13 +59,23 @@ class CIDXMLEXP TFileEntitySrc : public TXMLEntitySrc
             , const TString&                strPublicId
         );
 
+        TFileEntitySrc(const TFileEntitySrc&) = default;
+        TFileEntitySrc(TFileEntitySrc&&) = default;
+
         ~TFileEntitySrc();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFileEntitySrc& operator=(const TFileEntitySrc&) = default;
+        TFileEntitySrc& operator=(TFileEntitySrc&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        [[nodiscard]] TBinInStream* pstrmMakeNew() const;
+        [[nodiscard]] TBinInStream* pstrmMakeNew() const final;
 
 
     private :

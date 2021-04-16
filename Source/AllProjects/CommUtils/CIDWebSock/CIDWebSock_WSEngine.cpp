@@ -840,7 +840,7 @@ TCIDWebSockThread::bGetFragment(tCIDLib::TCard1&        c1Type
 
                 // We run the return length value up as well, as we covert
                 for (tCIDLib::TCard4 c4Index = 0; c4Index < c4DataLen; c4Index++)
-                    mbufToFill[c4Index] = m_mbufRead[c4Index] ^ ac1Mask[c4Index % 4];
+                    mbufToFill.PutCard1(m_mbufRead[c4Index] ^ ac1Mask[c4Index % 4], c4Index);
             }
              else
             {
@@ -858,7 +858,7 @@ TCIDWebSockThread::bGetFragment(tCIDLib::TCard1&        c1Type
     catch(TError& errToCatch)
     {
         // If the source is not connected, we have lost him
-        if (!m_pcdsServer->bConnected())
+        if (!m_pcdsServer->bIsConnected())
         {
             LogStateInfo(L"Socket connection lost, terminating...");
 

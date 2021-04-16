@@ -60,6 +60,7 @@ TFacCIDNameSrv::TFacCIDNameSrv() :
     )
     , m_bNoLease(kCIDLib::False)
     , m_c4MaxClients(0)
+    , m_eReturn(tCIDLib::EExitCodes::InitFailed)
     , m_ippnListen(kCIDOrbUC::ippnNameSrvDefPort)
     , m_pevWait(nullptr)
     , m_porbsCache(nullptr)
@@ -69,13 +70,14 @@ TFacCIDNameSrv::TFacCIDNameSrv() :
 TFacCIDNameSrv::~TFacCIDNameSrv()
 {
     delete m_pevWait;
+    m_pevWait = nullptr;
 
     // NOTE: We don't own the cache object, the Orb does!
 }
 
 
 // ---------------------------------------------------------------------------
-//  TFacCIDNameSrv: Public, non-virtual methods
+//  TFacCIDNameSrv: Public, inherited virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TFacCIDNameSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 {
@@ -93,6 +95,9 @@ tCIDLib::TBoolean TFacCIDNameSrv::bHandleSignal(const tCIDLib::ESignals eSig)
 }
 
 
+// ---------------------------------------------------------------------------
+//  TFacCIDNameSrv: Public, non-virtual methods
+// ---------------------------------------------------------------------------
 tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid*)
 {
     // Let our caller go
@@ -173,7 +178,7 @@ tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid
             , L"TCIDNameSrvClientProxy"
         );
         m_porbsCache = new TCIDNameServerImpl(ooidNS, m_bNoLease);
-        facCIDOrb().RegisterObject(m_porbsCache);
+        facCIDOrb().RegisterObject(m_porbsCache, tCIDLib::EAdoptOpts::Adopt);
 
         // Register an instance of our core admin implementation
         m_porbsCache->CreateScopePath
@@ -187,7 +192,7 @@ tCIDLib::EExitCodes TFacCIDNameSrv::eMainThread(TThread& thrThis, tCIDLib::TVoid
         //  landlord thread.
         //
         TCIDCoreAdminImpl* porbsAdmin = new TCIDCoreAdminImpl();
-        facCIDOrb().RegisterObject(porbsAdmin);
+        facCIDOrb().RegisterObject(porbsAdmin, tCIDLib::EAdoptOpts::Adopt);
         m_porbsCache->BindObj
         (
             TCIDNameSrvServerBase::strAdminBinding

@@ -33,7 +33,8 @@ END CTRL
 ;  Error ids
 ; ----------------------------------------------------------------------------
 ERRORS=
-    errcNoError                        0    No error
+    errcNoError                        0    No error \
+                                            was found
     errcUnknown                     7998    An unknown error occured
     errcHostErr                     7999    An error occured in a host API
 
@@ -169,7 +170,7 @@ ERRORS=
     errcData_NameTooLong             218    The name is too long
     errcData_EndOfData               219    The end of the available data has been reached
     errcData_BadRadix                220    The passed radix is invalid at this time
-
+    errcData_NullParm                221    The parameter cannot be null
 
     ; Device errors
     errcDev_NotSameDevice            257    Not the same device
@@ -229,6 +230,7 @@ ERRORS=
     errcFl_NotFullyQualified         647    The path must be fully qualified
     errcFl_Normalize                 648    The path could not be normalized
     errcFl_Complete                  650    The path could not be completed
+    errcFl_PathTooLong               651    The resulting path is too long
 
     ; Formatting errors
     errcFmt_InvalidJustification     660    Invalid justification
@@ -276,7 +278,6 @@ ERRORS=
     errcMem_BadRefCntRel             810    A reference count cannot be > i4MaxInt
 
 
-
     ; Module errors
     errcMod_MsgNotFound              826    The requested message was not attached to this module
     errcMod_ResNotFound              827    The requested resource was not attached to this module
@@ -287,7 +288,10 @@ ERRORS=
     errcMod_LoadMsgs                 826    Cannot the load the facility's message file (though it did exist)
     errcMod_BadMsgFileFormat         827    The message file for the facility was malformed
     errcMod_NotAllMsgFile            828    Could not read all of the facility's message file
-
+    errcMod_BadModType               829    The passed module type enum is invalid
+    errcMod_NoModPath                830    The module path was not available
+    errcMod_NoPathAllowed            831    The passed module name must be just the base name
+    errcMod_NoModName                832    The module name was not available
 
     ; Metrics system errors
     errcMtr_InvalidMetricCount       925    Invalid metric count
@@ -346,6 +350,7 @@ ERRORS=
     errcNet_BadSockOpt              1047    An uknown socket option was passed
     errcNet_SelListTooBig           1048    The passed socket select list is to large
     errcNet_GetLocalAddr            1049    Could not get local binding for target address
+    errcNet_BadAddrType             1050    Unknown socket address type
 
     ; Printing errors
     errcPrn_OutOfPaper              1200    Out of paper
@@ -422,11 +427,7 @@ ERRORS=
     ; Socket pinger related errors
     errcSPing_AlreadyInit           5425    The socket pinger is already initialized
     errcSPing_NotReqReady           5426    The socket pinger is not ready to make a request
-    errcSPing_InitSocket            5427    Could not initialize the ICMP socket
-    errcSPing_NoCtxInfo             5428    The socket pinger context has not been set
     errcSPing_NotWaiting            5429    The socket pinger is not currently waiting for a reply
-    errcSPing_Bind                  5430    Could not locally bind the ping socket
-    errcSPing_GetTarAddr            5431    Could not get target IP address bytes
     errcSPing_SendReq               5432    An error occurred while sending the ping request
     errcSPing_ReadRep               5433    An error occurred while reading the ping reply
     errcSPing_BadCntRecv            5434    The received ping byte count is not the same as that sent

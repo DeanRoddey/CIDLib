@@ -160,12 +160,22 @@ class CIDXMLEXP TXMLAttrDef : public TObject
 
         TXMLAttrDef
         (
-            const   TXMLAttrDef&             xadToCopy
+            const   TXMLAttrDef&            xadSrc
+        );
+
+        TXMLAttrDef
+        (
+                    TXMLAttrDef&&           xwdSrc
         );
 
         TXMLAttrDef& operator=
         (
-            const   TXMLAttrDef&             xadToAssign
+            const   TXMLAttrDef&            xadSrc
+        );
+
+        TXMLAttrDef& operator=
+        (
+                    TXMLAttrDef&&           xadsrc
         );
 
 
@@ -181,7 +191,9 @@ class CIDXMLEXP TXMLAttrDef : public TObject
         //
         //  m_c4Id
         //      This is the pool id for the attribute. This is only unique
-        //      within the owning element.
+        //      within the owning element. We don't copy or assign this since it
+        //      must be reset by the new container. It is set to max card until it
+        //      is actually set.
         //
         //  m_eDefType
         //      This is the default type for this attribute, which indicates

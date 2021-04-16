@@ -29,15 +29,17 @@
 
 
 // ---------------------------------------------------------------------------
-//  Include the Windows headers for internal use.
-// ---------------------------------------------------------------------------
-#include    <windows.h>
-
-
-// ---------------------------------------------------------------------------
 //  Include our own public header
 // ---------------------------------------------------------------------------
 #include    "CIDGraphDev.hpp"
+
+
+// ---------------------------------------------------------------------------
+//  Include the Windows headers for internal use. HAS TO BE after the main header
+//  above ecause that brings in the platform headers which define the Unicode
+//  vs ASCII defines that force this guy to use the Unicode versions.
+// ---------------------------------------------------------------------------
+#include    <windows.h>
 
 
 // ---------------------------------------------------------------------------

@@ -49,6 +49,7 @@ class CIDCTRLSEXP TSeparatorWnd : public TCtrlWnd
         TSeparatorWnd();
 
         TSeparatorWnd(const TSeparatorWnd&) = delete;
+        TSeparatorWnd(TSeparatorWnd&&) = delete;
 
         ~TSeparatorWnd();
 
@@ -57,6 +58,7 @@ class CIDCTRLSEXP TSeparatorWnd : public TCtrlWnd
         //  Public oeprators
         // -------------------------------------------------------------------
         TSeparatorWnd& operator=(const TSeparatorWnd&) = delete;
+        TSeparatorWnd& operator=( TSeparatorWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -143,6 +145,7 @@ class CIDCTRLSEXP TVSeparatorWnd : public TCtrlWnd
         TVSeparatorWnd();
 
         TVSeparatorWnd(const TVSeparatorWnd&) = delete;
+        TVSeparatorWnd(TVSeparatorWnd&&) = delete;
 
         ~TVSeparatorWnd();
 
@@ -151,6 +154,7 @@ class CIDCTRLSEXP TVSeparatorWnd : public TCtrlWnd
         //  Public oeprators
         // -------------------------------------------------------------------
         TVSeparatorWnd& operator=(const TVSeparatorWnd&) = delete;
+        TVSeparatorWnd& operator=(TVSeparatorWnd&) = delete;
 
 
         // -------------------------------------------------------------------

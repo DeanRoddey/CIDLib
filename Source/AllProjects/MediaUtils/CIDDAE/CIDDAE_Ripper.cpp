@@ -43,42 +43,51 @@ RTTIDecls(TCIDDAERipper,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_Ripper
 {
-    // -----------------------------------------------------------------------
-    //  We need to be able to provide unique thread names for our read/write
-    //  threads.
-    // -----------------------------------------------------------------------
-    TUniqueName unamInstance(L"CIDDAEThread%(1)");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We need to be able to provide unique thread names for our read/write
+        //  threads.
+        // -----------------------------------------------------------------------
+        TUniqueName unamInstance(L"CIDDAEThread%(1)");
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum number of buffers we can have outstanding at once. This
-    //  is how many buffers the buffer pool objects are set up for. The read
-    //  thread will stop and wait for the write thread to catch up.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxBufs(12);
+        // -----------------------------------------------------------------------
+        //  The maximum number of buffers we can have outstanding at once. This
+        //  is how many buffers the buffer pool objects are set up for. The read
+        //  thread will stop and wait for the write thread to catch up.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxBufs = 12;
 
 
-    // -----------------------------------------------------------------------
-    //  The number of sectors we read per pass. We may actually read more if
-    //  jitter is enabled. The buffer size below is big enough to adjust for
-    //  the jitter overlap.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SectorsPerRead(20);
+        // -----------------------------------------------------------------------
+        //  The number of sectors we read per pass. We may actually read more if
+        //  jitter is enabled. The buffer size below is big enough to adjust for
+        //  the jitter overlap.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4SectorsPerRead = 20;
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes we try to read per pass, and the size of the buffers. We
-    //  make the buffer size larger by the jitter overlap we do.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4BytesPerRead(c4SectorsPerRead * TKrnlRemMedia::c4CDRawSectorSz);
-    const tCIDLib::TCard4   c4BufSz((c4SectorsPerRead + 2) * TKrnlRemMedia::c4CDRawSectorSz);
+        // -----------------------------------------------------------------------
+        //  The bytes we try to read per pass, and the size of the buffers. We
+        //  make the buffer size larger by the jitter overlap we do.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4BytesPerRead
+        (
+            c4SectorsPerRead * TKrnlRemMedia::c4CDRawSectorSz
+        );
+        constexpr tCIDLib::TCard4   c4BufSz
+        (
+            (c4SectorsPerRead + 2) * TKrnlRemMedia::c4CDRawSectorSz
+        );
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes and blocks in our overlap area.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4OverlapBlocks(2);
-    const tCIDLib::TCard4   c4OverlapBytes(TKrnlRemMedia::c4CDRawSectorSz * 2);
+        // -----------------------------------------------------------------------
+        //  The bytes and blocks in our overlap area.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4OverlapBlocks(2);
+        constexpr tCIDLib::TCard4   c4OverlapBytes(TKrnlRemMedia::c4CDRawSectorSz * 2);
+    }
 }
 
 
@@ -96,29 +105,29 @@ class TDAEBufPool : public TFixedSizePool<TDAEBuf>
 
             TFixedSizePool
             (
-                CIDDAE_Ripper::c4MaxBufs * 2
-                , L"DAE Buffer Pool"
-                , tCIDLib::EMTStates::Safe
+                CIDDAE_Ripper::c4MaxBufs * 2, L"DAE Buffer Pool", tCIDLib::EMTStates::Safe
             )
         {
         }
 
         TDAEBufPool(const TDAEBufPool&) = delete;
+        TDAEBufPool(TDAEBufPool&&) = delete;
 
-        ~TDAEBufPool() {}
+        ~TDAEBufPool() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TDAEBufPool& operator=(const TDAEBufPool&) = delete;
+        TDAEBufPool& operator=(TDAEBufPool&&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        TDAEBuf* pelemMakeNew() override
+        [[nodiscard]] TDAEBuf* pelemMakeNew() override
         {
             return new TDAEBuf(CIDDAE_Ripper::c4BufSz);
         }
@@ -158,14 +167,19 @@ TCIDDAERipper::TCIDDAERipper() :
     , m_c4Stitches(0)
     , m_c4StartBlk(0)
     , m_c4TrackNum(0)
-    , m_colWorkQ(tCIDLib::EAdoptOpts::NoAdopt, tCIDLib::EMTStates::Safe)
+    , m_colWorkQ(tCIDLib::EAdoptOpts::NoAdopt)
     , m_eJitterOpt(tCIDDAE::EJitterOpts::None)
     , m_pbBreakFlag(nullptr)
     , m_pdaeeToUse(nullptr)
     , m_prmmdToUse(nullptr)
+    , m_psplBuffers(new TDAEBufPool)
     , m_pthrRead(nullptr)
     , m_pthrWrite(nullptr)
-    , m_psplBuffers(new TDAEBufPool)
+    , m_strCodecName()
+    , m_strFmtName()
+    , m_strOutFile()
+    , m_TOCData()
+    , m_c4Year(0)
 {
     m_pthrRead = new TThread
     (
@@ -290,7 +304,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
                         , const tCIDLib::TCard4     c4TrackNum
                         ,       TCIDDAEEncoder&     daeeToUse
                         , const TString&            strTrackName
-                        ,       tCIDLib::TBoolean&  bBreakFlag)
+                        , CIOP  tCIDLib::TBoolean&  bBreakFlag)
 {
     RipTrack
     (
@@ -317,7 +331,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
                         , const tCIDLib::TCard4     c4TrackNum
                         ,       TCIDDAEEncoder&     daeeToUse
                         , const TString&            strTrackName
-                        ,       tCIDLib::TBoolean&  bBreakFlag
+                        , CIOP  tCIDLib::TBoolean&  bBreakFlag
                         , const TString&            strAlbumTitle
                         , const TString&            strTrackTitle
                         , const TString&            strArtist
@@ -425,7 +439,7 @@ TCIDDAERipper::RipTrack(        TKrnlRemMediaDrv&   rmmdToUse
     //  write thread to end.
     //
     TThread* pthrUs = TThread::pthrCaller();
-    tCIDLib::EExitCodes eExit;
+    tCIDLib::EExitCodes eExit = tCIDLib::EExitCodes::Normal;
     while (kCIDLib::True)
     {
         // Wait a while for it to end
@@ -886,7 +900,7 @@ tCIDLib::EExitCodes TCIDDAERipper::eWriteThread(TThread& thrThis, tCIDLib::TVoid
 //  We return a null pointer when the end is reached, which will tell the
 //  read thread he's done and he'll exit.
 //
-TDAEBuf* TCIDDAERipper::pdaebGetChunk(TDAEBuf* const pdaebPrev)
+TDAEBuf* TCIDDAERipper::pdaebGetChunk(const TDAEBuf* const pdaebPrev)
 {
     //
     //  If we are at the end, then done so return null pointer. This

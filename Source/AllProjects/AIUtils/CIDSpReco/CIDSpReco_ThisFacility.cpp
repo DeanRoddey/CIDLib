@@ -54,7 +54,7 @@ TFacCIDSpReco::TFacCIDSpReco() :
     TFacility
     (
         L"CIDSpReco"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -140,7 +140,7 @@ TFacCIDSpReco::CompileGrammarTo(const   TString& strGrammarFile
         , NULL
         , CLSCTX_INPROC_SERVER
         , __uuidof(ISpGrammarCompiler)
-        , (void**)&pCompiler
+        , tCIDLib::pToVoidPP(&pCompiler)
     );
 
     if (FAILED(hRes))

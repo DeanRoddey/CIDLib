@@ -50,14 +50,8 @@ RTTIDecls(TRGBClr,TObject)
 // ---------------------------------------------------------------------------
 TRGBClr& TRGBClr::Nul_TRGBClr()
 {
-    static TRGBClr* prgbNull = nullptr;
-    if (!prgbNull)
-    {
-        TBaseLock lockInit;
-        if (!prgbNull)
-            TRawMem::pExchangePtr(&prgbNull, new TRGBClr);
-    }
-    return *prgbNull;
+    static TRGBClr rgbNull;
+    return rgbNull;
 }
 
 
@@ -301,9 +295,9 @@ TRGBClr::bParseFromText(const   TString&            strText
         return kCIDLib::False;
     }
 
-    tCIDLib::TCard4 c4R;
-    tCIDLib::TCard4 c4G;
-    tCIDLib::TCard4 c4B;
+    tCIDLib::TCard4 c4R = 0;
+    tCIDLib::TCard4 c4G = 0;
+    tCIDLib::TCard4 c4B = 0;
     tCIDLib::TCard4 c4A = 0;
 
     // We can have an alpha value, but it's optional

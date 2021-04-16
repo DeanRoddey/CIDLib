@@ -89,9 +89,9 @@ tCIDLib::EExitCodes eWorkerThreadFunc(TThread&, tCIDLib::TVoid*);
 //  evWait
 //      We hold the threads back until they are all created.
 // ---------------------------------------------------------------------------
-static TQueue<TString>  colTest(tCIDLib::EMTStates::Safe);
-static TOutConsole      conOut;
-static TEvent           evWait(tCIDLib::EEventStates::Reset);
+static TQueue<TString>      colTest(tCIDLib::EMTStates::Safe);
+static TOutConsole          conOut;
+static TEvent               evWait(tCIDLib::EEventStates::Reset);
 
 
 // ---------------------------------------------------------------------------
@@ -195,7 +195,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
             //  got one. If we provided a timeout, we'd have to check the
             //  return.
             //
-            colTest.bGetNext(strNextElem);
+            colTest.bGetNextMv(strNextElem);
             conOut  << L"    Got element from thread: " << strNextElem
                     << kCIDLib::EndLn;
             c4Count++;

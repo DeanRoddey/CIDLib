@@ -35,13 +35,7 @@
 // ---------------------------------------------------------------------------
 TFacCIDAudStream& facCIDAudStream()
 {
-    static TFacCIDAudStream* pfacCIDAudStream = nullptr;
-    if (!pfacCIDAudStream)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDAudStream)
-            pfacCIDAudStream = new TFacCIDAudStream;
-    }
-    return *pfacCIDAudStream;
+    static TFacCIDAudStream* pfacThis = new TFacCIDAudStream();
+    return *pfacThis;
 }
 

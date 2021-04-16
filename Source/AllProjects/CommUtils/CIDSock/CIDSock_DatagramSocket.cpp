@@ -124,7 +124,7 @@ TDatagramSocket::c4ReceiveRawFrom(          TIPEndPoint&            ipepFrom
                                     , const tCIDLib::TBoolean       bPeek)
 {
     TKrnlIPAddr         kipaFrom;
-    tCIDLib::TIPPortNum ippnFrom;
+    tCIDLib::TIPPortNum ippnFrom = 0;
 
     //
     //  Wait for up to the timeout period for a datagram packet to arrive.
@@ -393,7 +393,7 @@ tCIDLib::TVoid TClientDatagramSocket::SendWOLBroadcast(const TString& strMACAddr
     //  cheapo cast-based transcoding of the MAC address since we know that
     //  they are all hex digits.
     //
-    tCIDLib::TCard1 ac1MAC[c4BinMACLen];
+    tCIDLib::TCard1 ac1MAC[c4BinMACLen] = {0, };
     TString strTmp;
     for (c4Index = 0; c4Index < c4MACLen; c4Index += 2)
     {
@@ -410,12 +410,12 @@ tCIDLib::TVoid TClientDatagramSocket::SendWOLBroadcast(const TString& strMACAddr
     THeapBuf mbufData(c4Len, c4Len);
 
     for (c4Index = 0; c4Index < c4BinMACLen; c4Index++)
-        mbufData[c4Index] = 0xFF;
+        mbufData.PutCard1(0xFF, c4Index);
 
     for (tCIDLib::TCard4 c4RepInd = 0; c4RepInd < c4MACRep; c4RepInd++)
     {
         for (tCIDLib::TCard4 c4MACInd = 0; c4MACInd < c4BinMACLen; c4MACInd++)
-            mbufData[c4Index++] = ac1MAC[c4MACInd];
+            mbufData.PutCard1(ac1MAC[c4MACInd], c4Index++);
     }
 
     //

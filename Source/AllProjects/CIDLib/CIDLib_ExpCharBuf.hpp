@@ -52,7 +52,17 @@ class CIDLIBEXP TExpCharBuf : public TObject
             const   tCIDLib::TCard4         c4InitAlloc = 8
         );
 
-        TExpCharBuf(const TExpCharBuf&) = delete;
+        TExpCharBuf
+        (
+            const   TExpCharBuf&            expbSrc
+        );
+
+        TExpCharBuf(TExpCharBuf&& expbSrc) :
+
+            TExpCharBuf(1)
+        {
+            operator=(tCIDLib::ForceMove(expbSrc));
+        }
 
         ~TExpCharBuf();
 
@@ -60,7 +70,15 @@ class CIDLIBEXP TExpCharBuf : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TExpCharBuf& operator=(const TExpCharBuf&) = delete;
+        TExpCharBuf& operator=
+        (
+            const   TExpCharBuf&            expbSrc
+        );
+
+        TExpCharBuf& operator=
+        (
+                    TExpCharBuf&&           expbSrc
+        );
 
 
         // -------------------------------------------------------------------
@@ -75,7 +93,7 @@ class CIDLIBEXP TExpCharBuf : public TObject
 
         const tCIDLib::TCh* pszBuffer() const;
 
-        tCIDLib::TCh* pszReplicateBuffer() const;
+        [[nodiscard]] tCIDLib::TCh* pszReplicateBuffer() const;
 
         tCIDLib::TVoid RemoveTrailingSpace();
 

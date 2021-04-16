@@ -40,9 +40,9 @@
 // ---------------------------------------------------------------------------
 namespace kDVDTypes
 {
-    const   tCIDLib::TCard4     c4MaxTitles     = 99;
-    const   tCIDLib::TCard4     c4MaxChapters   = 999;
-    const   tCIDLib::TCard4     c4SectorSz      = 2048;
+    constexpr   tCIDLib::TCard4     c4MaxTitles     = 99;
+    constexpr   tCIDLib::TCard4     c4MaxChapters   = 999;
+    constexpr   tCIDLib::TCard4     c4SectorSz      = 2048;
 };
 
 

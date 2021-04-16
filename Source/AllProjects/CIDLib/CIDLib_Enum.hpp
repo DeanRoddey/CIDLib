@@ -107,6 +107,7 @@ class CIDLIBEXP TEnumMap
         );
 
         TEnumMap(const TEnumMap&) = delete;
+        TEnumMap(TEnumMap&&) = delete;
 
         ~TEnumMap();
 
@@ -115,6 +116,7 @@ class CIDLIBEXP TEnumMap
         //  Public operators
         // -------------------------------------------------------------------
         TEnumMap& operator=(const TEnumMap&) = delete;
+        TEnumMap& operator=(TEnumMap&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -123,13 +125,13 @@ class CIDLIBEXP TEnumMap
         tCIDLib::TBoolean bIsValidEnum
         (
             const   tCIDLib::TInt4          i4ToFind
-        );
+        )   const;
 
         tCIDLib::TCard4 c4MapEnumVal
         (
             const tCIDLib::TInt4            i4ToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
 
         tCIDLib::TCard4 c4MapEnumText
@@ -137,13 +139,13 @@ class CIDLIBEXP TEnumMap
             const TString&                  strToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TInt4 eMapEnumAltNum
         (
             const   tCIDLib::TInt4          i4ToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TVoid FormatValues
         (
@@ -151,50 +153,54 @@ class CIDLIBEXP TEnumMap
             , const TString&                strPrefix
             , const tCIDLib::TCh            chSepChar
             , const ETextVals               eTextVal
-        );
+        )   const;
 
         tCIDLib::TInt4 i4MapEnumAltNum
         (
             const  tCIDLib::TInt4           i4EnumToFind
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         tCIDLib::TInt4 i4MapEnumText
         (
             const   TString&                strToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
         const TString& strMapEnumVal
         (
             const   tCIDLib::TInt4          i4ToFind
             , const ETextVals               eTextVal
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   const;
 
 
     private :
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid LoadResText();
+        tCIDLib::TVoid LoadResText() const;
 
         tCIDLib::TVoid ThrowBadEnumAltNum
         (
             const   TString&                strTypeName
             , const tCIDLib::TInt4          i4Val
-        );
+        )   const;
 
         tCIDLib::TVoid ThrowBadEnumText
         (
             const   TString&                strTypeName
             , const TString&                strVal
-        );
+        )   const;
 
 
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_atomLoad
+        //      If the enum defines loadable text values, they must be faulted in and
+        //      we need an atomic flag to deal with that.
         //
         //  m_bNonContig
         //      The enum has non-contiguous values. So finding a value by its enum
@@ -205,9 +211,8 @@ class CIDLIBEXP TEnumMap
         //
         //  m_pfacLoad
         //      If the _Text value comes from loadable text, this will be the pointer
-        //      to the facility to load from. It will be loaded and then this will be
-        //      cleared so we don't try to do it again. If its inline, this will be null
-        //      from the start.
+        //      to the facility to load from. It will faulted in using the m_atomLoad
+        //      flag.
         //
         //  m_aitemValues
         //      The IDL compiler generates a static initialized list of these and passes
@@ -218,6 +223,7 @@ class CIDLIBEXP TEnumMap
         //  m_strTypeName
         //      The name of the enum type, for error messages and debugging.
         // -------------------------------------------------------------------
+        mutable TAtomicFlag     m_atomLoad;
         tCIDLib::TBoolean       m_bNonContig;
         tCIDLib::TCard4         m_c4ValCount;
         tCIDLib::TInt4          m_i4NotFoundVal;
@@ -225,21 +231,6 @@ class CIDLIBEXP TEnumMap
         const TFacility*        m_pfacLoad;
         const TString&          m_strTypeName;
 };
-
-
-//
-//  A couple macros to get the min/max values for an enum by type. This is generally
-//  useful, but definitely helps in that it works for both hand created and IDL
-//  generated enums as long as they have the standard three magic values, without
-//  any extra overhead.
-//
-#define eMinEnumVal(E) E##::Min
-#define eMaxEnumVal(E) E##::Max
-#define eEnumValCount(E) E##::Count
-
-#define c4MinEnumVal(E) tCIDLib::TCard4(E##::Min)
-#define c4MaxEnumVal(E) tCIDLib::TCard4(E##::Max)
-#define c4EnumValCount(E) tCIDLib::TCard4(E##::Count)
 
 
 //
@@ -255,13 +246,13 @@ namespace tCIDLib
     //
     template
     <
-        typename E
-        , E eStart = eMinEnumVal(E)
-        , E eEnd = eMaxEnumVal(E)
-        , typename IterCB = tCIDLib::TVoid (*IterCB)(const E)
+        typename EnumType
+        , EnumType eStart = EnumType::Min
+        , EnumType eEnd = EnumType::Max
+        , typename IterCB = tCIDLib::TVoid (*)(const typename EnumType)
     > tCIDLib::TVoid ForEachE(IterCB iterCB)
     {
-        for (E eInd = eStart; eInd <= eEnd; eInd++)
+        for (EnumType eInd = eStart; eInd <= eEnd; eInd++)
             iterCB(eInd);
     }
 
@@ -270,17 +261,18 @@ namespace tCIDLib
     //  A variation that can be broken out of, and returns the value it stopped on.
     //  If it goes to the end, the return will be the ::Count value.
     //
-    template<typename E, typename IterCB = tCIDLib::TBoolean (*IterCB)(const E)>
-    E eForEachE(IterCB iterCB)
+    template<typename EnumType, typename IterCB = tCIDLib::TBoolean (*)(const typename EnumType)>
+    typename EnumType eForEachE(IterCB iterCB)
     {
-        E eInd = eMinEnumVal(E);
-        for (; eInd <= eMaxEnumVal(E); eInd++)
+        EnumType eInd = EnumType::Min;
+        for (; eInd <= EnumType::Max; eInd++)
         {
             if (!iterCB(eInd))
                 break;
         }
         return eInd;
     }
+
 }
 
 #pragma CIDLIB_POPPACK

@@ -43,7 +43,7 @@
 //      class now. There would no way for it to know if it is reading in one of the
 //      old ones or a new one.
 //
-//      The templatized version can have its ownstuff , though if any old code before
+//      The templatized version can have its own stuff , though if any old code before
 //      we refactored wants to use it to replace previously persisted ones, they will
 //      have to handle that changeover by reading in an old one and writing out a
 //      new templatized one.
@@ -154,13 +154,13 @@ class CIDLIBEXP TBitsetBase : public TObject, public MStreamable, public MFormat
         // -------------------------------------------------------------------
         tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const override;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (

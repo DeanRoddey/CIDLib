@@ -486,6 +486,11 @@ class CIDCTRLSEXP TFacCIDCtrls : public TGUIFacility
                     TPoint&                 pntToVal
         );
 
+        tCIDCtrls::TWndId widFromHandle
+        (
+            const   tCIDCtrls::TWndHandle   hwndSrc
+        );
+
 
     private :
         // -------------------------------------------------------------------

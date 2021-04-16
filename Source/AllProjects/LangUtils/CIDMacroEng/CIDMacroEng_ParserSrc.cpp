@@ -37,62 +37,65 @@
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_ParserSrc
 {
-    //
-    //  The list of special chars that always, if not in a quoted string,
-    //  will stop parsing of the current token, beceause these are always
-    //  considered tokens themselves otherwise.
-    //
-    const tCIDLib::TCh aszSpecialChars[] =
+    namespace
     {
-        kCIDLib::chAmpersand
-        , kCIDLib::chApostrophe
-        , kCIDLib::chAsterisk
-        , kCIDLib::chCircumflex
-        , kCIDLib::chCloseBracket
-        , kCIDLib::chCloseParen
-        , kCIDLib::chColon
-        , kCIDLib::chComma
-        , kCIDLib::chEquals
-        , kCIDLib::chExclamation
-        , kCIDLib::chForwardSlash
-        , kCIDLib::chGreaterThan
-        , kCIDLib::chHyphenMinus
-        , kCIDLib::chLessThan
-        , kCIDLib::chOpenBracket
-        , kCIDLib::chOpenParen
-        , kCIDLib::chPercentSign
-        , kCIDLib::chPeriod
-        , kCIDLib::chPlusSign
-        , kCIDLib::chQuotation
-        , kCIDLib::chSemiColon
-        , kCIDLib::chVerticalBar
-        , kCIDLib::chNull
-    };
+        //
+        //  The list of special chars that always, if not in a quoted string,
+        //  will stop parsing of the current token, beceause these are always
+        //  considered tokens themselves otherwise.
+        //
+        constexpr tCIDLib::TCh aszSpecialChars[] =
+        {
+            kCIDLib::chAmpersand
+            , kCIDLib::chApostrophe
+            , kCIDLib::chAsterisk
+            , kCIDLib::chCircumflex
+            , kCIDLib::chCloseBracket
+            , kCIDLib::chCloseParen
+            , kCIDLib::chColon
+            , kCIDLib::chComma
+            , kCIDLib::chEquals
+            , kCIDLib::chExclamation
+            , kCIDLib::chForwardSlash
+            , kCIDLib::chGreaterThan
+            , kCIDLib::chHyphenMinus
+            , kCIDLib::chLessThan
+            , kCIDLib::chOpenBracket
+            , kCIDLib::chOpenParen
+            , kCIDLib::chPercentSign
+            , kCIDLib::chPeriod
+            , kCIDLib::chPlusSign
+            , kCIDLib::chQuotation
+            , kCIDLib::chSemiColon
+            , kCIDLib::chVerticalBar
+            , kCIDLib::chNull
+        };
 
-    // Used to do the one time calc of the hashes of the lookup table
-    volatile tCIDLib::TBoolean  bInitDone = kCIDLib::False;
+        // Used to do the one time calc of the hashes of the lookup table
+        TAtomicFlag                 atomInitDone;
 
-    // The modulus that we use for hashing the strings
-    tCIDLib::TCard4             c4Modulus = 19;
+        // The modulus that we use for hashing the strings
+        constexpr tCIDLib::TCard4   c4Modulus = 19;
 
-    // We have an array of these items to do token matching
-    struct TMapItem
-    {
-        const   tCIDLib::TCh*   pszName;
-        tCIDLib::THashVal       hshName;
-        tCIDMacroEng::ETokens   eToken;
-    };
+        // We have an array of these items to do token matching
+        struct TMapItem
+        {
+            const   tCIDLib::TCh*   pszName;
+            tCIDLib::THashVal       hshName;
+            tCIDMacroEng::ETokens   eToken;
+        };
 
-    //
-    //  This maps to the ETokens enum value. We look up the string in here and,
-    //  if found, cast that index to the enum value.
-    //
-    //  NOTE:   Keep this in sync with the enum of course!
-    //
-    //  Also note that, because of it's size, we put it in a separate header
-    //  and include it here.
-    //
-    #include "CIDMacroEng_ParserTokenMap_.hpp"
+        //
+        //  This maps to the ETokens enum value. We look up the string in here and,
+        //  if found, cast that index to the enum value.
+        //
+        //  NOTE:   Keep this in sync with the enum of course!
+        //
+        //  Also note that, because of it's size, we put it in a separate header
+        //  and include it here.
+        //
+        #include "CIDMacroEng_ParserTokenMap_.hpp"
+    }
 }
 
 
@@ -124,10 +127,10 @@ TParserSrc::TParserSrc(         TTextInStream* const    pstrmToAdopt
     //  If we haven't initialized the hash table, do it. We have to calc the
     //  hashes for the strings in the map.
     //
-    if (!CIDMacroEng_ParserSrc::bInitDone)
+    if (!CIDMacroEng_ParserSrc::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDMacroEng_ParserSrc::bInitDone)
+        if (!CIDMacroEng_ParserSrc::atomInitDone)
         {
             tCIDLib::TInt4 i4Index = 0;
             for (; i4Index < tCIDLib::i4EnumOrd(tCIDMacroEng::ETokens::Count); i4Index++)
@@ -143,7 +146,7 @@ TParserSrc::TParserSrc(         TTextInStream* const    pstrmToAdopt
             }
 
             // And mark us done now
-            CIDMacroEng_ParserSrc::bInitDone = kCIDLib::True;
+            CIDMacroEng_ParserSrc::atomInitDone.Set();
         }
     }
 }
@@ -583,7 +586,7 @@ tCIDLib::TVoid TParserSrc::EatWhitespace()
     {
         chCur = chGetNextChar();
         while (TRawStr::bIsSpace(chCur)
-        ||     (chCur == kCIDLib::chLF)
+        ||     (chCur == kCIDLib::chCR)
         ||     (chCur == kCIDLib::chLF)
         ||     (chCur == kCIDLib::chTab))
         {
@@ -711,13 +714,13 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
             //
             if (bOweEscape)
             {
-                strToEscape[c4TarIndex++] = chCur;
+                strToEscape.PutAt(c4TarIndex++, chCur);
                 bOweEscape = kCIDLib::False;
             }
              else
             {
-                strToEscape[c4TarIndex++] = kCIDLib::chBackSlash;
-                strToEscape[c4TarIndex++] = chCur;
+                strToEscape.PutAt(c4TarIndex++, kCIDLib::chBackSlash);
+                strToEscape.PutAt(c4TarIndex++, chCur);
             }
         }
          else
@@ -730,7 +733,7 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
              else
             {
                 if (c4SrcIndex != c4TarIndex)
-                    strToEscape[c4TarIndex] = strToEscape[c4SrcIndex];
+                    strToEscape.PutAt(c4TarIndex, strToEscape[c4SrcIndex]);
                 c4TarIndex++;
             }
         }
@@ -744,7 +747,7 @@ tCIDLib::TVoid TParserSrc::EscapeStr(TString& strToEscape)
     //  slash, so put it on.
     //
     if (bOweEscape)
-        strToEscape[c4TarIndex++] = kCIDLib::chBackSlash;
+        strToEscape.PutAt(c4TarIndex++, kCIDLib::chBackSlash);
 
     // And cap us on the target index
     strToEscape.CapAt(c4TarIndex);

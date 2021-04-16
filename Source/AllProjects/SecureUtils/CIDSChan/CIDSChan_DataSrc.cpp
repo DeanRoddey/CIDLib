@@ -138,20 +138,23 @@ TCIDSChanClDataSrc::~TCIDSChanClDataSrc()
 // Pass this on to our internal data source
 tCIDLib::TVoid TCIDSChanClDataSrc::AssociateReadEvent(TEvent& evToSet)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_pcdsRawData->AssociateReadEvent(evToSet);
 }
 
 
 // Just pass it on to our internal data source
-tCIDLib::TBoolean TCIDSChanClDataSrc::bConnected() const
+tCIDLib::TBoolean TCIDSChanClDataSrc::bIsConnected() const
 {
-    return m_pcdsRawData->bConnected();
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+    return m_pcdsRawData->bIsConnected();
 }
 
 
 // Just pass on to our internal data source
 tCIDSock::ESockEvs TCIDSChanClDataSrc::eEnumEvents(TEvent& evReset)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     return m_pcdsRawData->eEnumEvents(evReset);
 }
 
@@ -159,6 +162,7 @@ tCIDSock::ESockEvs TCIDSChanClDataSrc::eEnumEvents(TEvent& evReset)
 // Just pass it on to the internal data source
 tCIDLib::TVoid TCIDSChanClDataSrc::FormatSrcInfo(TString& strToFill)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_pcdsRawData->FormatSrcInfo(strToFill);
 }
 
@@ -180,6 +184,7 @@ TCIDSChanClDataSrc::c4GetData(          TMemBuf&                mbufTar
                                 , const tCIDLib::TCard4         c4MaxBytes
                                 , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     return m_schanSec.c4ReadData
     (
         *m_pcdsRawData, mbufTar, c4MaxBytes, enctEnd, tCIDLib::EAllData::OkIfNotAll
@@ -196,6 +201,7 @@ TCIDSChanClDataSrc::PutData(const   TMemBuf&                mbufSrc
                             , const tCIDLib::TCard4         c4ToSend
                             , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_schanSec.WriteData(*m_pcdsRawData, mbufSrc, c4ToSend);
 }
 
@@ -207,6 +213,8 @@ TCIDSChanClDataSrc::PutData(const   TMemBuf&                mbufSrc
 //
 tCIDLib::TVoid TCIDSChanClDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+
     //
     //  Recursively initalize our own data source first. If it's already initialized
     //  this will throw.
@@ -242,7 +250,8 @@ tCIDLib::TVoid
 TCIDSChanClDataSrc::TerminateSrc(const  tCIDLib::TEncodedTime   enctEnd
                                 , const tCIDLib::TBoolean       bClose)
 {
-    // Terminate the secure channel
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+
     try
     {
         m_schanSec.Terminate(*m_pcdsRawData, enctEnd);
@@ -313,20 +322,23 @@ TCIDSChanSrvDataSrc::~TCIDSChanSrvDataSrc()
 // Pass this on to our internal data source
 tCIDLib::TVoid TCIDSChanSrvDataSrc::AssociateReadEvent(TEvent& evToSet)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_pcdsRawData->AssociateReadEvent(evToSet);
 }
 
 
 // Just pass it on to our internal data source
-tCIDLib::TBoolean TCIDSChanSrvDataSrc::bConnected() const
+tCIDLib::TBoolean TCIDSChanSrvDataSrc::bIsConnected() const
 {
-    return m_pcdsRawData->bConnected();
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+    return m_pcdsRawData->bIsConnected();
 }
 
 
 // Just pass on to our internal data source
 tCIDSock::ESockEvs TCIDSChanSrvDataSrc::eEnumEvents(TEvent& evReset)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     return m_pcdsRawData->eEnumEvents(evReset);
 }
 
@@ -334,6 +346,7 @@ tCIDSock::ESockEvs TCIDSChanSrvDataSrc::eEnumEvents(TEvent& evReset)
 // Just pass it on to the internal data source
 tCIDLib::TVoid TCIDSChanSrvDataSrc::FormatSrcInfo(TString& strToFill)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_pcdsRawData->FormatSrcInfo(strToFill);
 }
 
@@ -354,6 +367,7 @@ TCIDSChanSrvDataSrc::c4GetData(         TMemBuf&                mbufTar
                                 , const tCIDLib::TCard4         c4MaxBytes
                                 , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     return m_schanSec.c4ReadData
     (
         *m_pcdsRawData, mbufTar, c4MaxBytes, enctEnd, tCIDLib::EAllData::OkIfNotAll
@@ -370,6 +384,7 @@ TCIDSChanSrvDataSrc::PutData(const  TMemBuf&                mbufSrc
                             , const tCIDLib::TCard4         c4ToSend
                             , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
     m_schanSec.WriteData(*m_pcdsRawData, mbufSrc, c4ToSend);
 }
 
@@ -381,6 +396,8 @@ TCIDSChanSrvDataSrc::PutData(const  TMemBuf&                mbufSrc
 //
 tCIDLib::TVoid TCIDSChanSrvDataSrc::SetupSrc(const tCIDLib::TEncodedTime enctEnd)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+
     // Recursively initalize our own data source first
     m_pcdsRawData->Initialize(enctEnd);
 
@@ -400,6 +417,8 @@ tCIDLib::TVoid
 TCIDSChanSrvDataSrc::TerminateSrc(  const   tCIDLib::TEncodedTime   enctEnd
                                     , const tCIDLib::TBoolean       bClose)
 {
+    CIDAssert(m_pcdsRawData != nullptr, L"Src not set");
+
     // Terminate the secure channel
     try
     {

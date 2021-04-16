@@ -59,8 +59,10 @@ TFacCIDLogSrv::TFacCIDLogSrv() :
         , tCIDLib::EModFlags::HasMsgFile
     )
     , m_c4MaxClients(0)
+    , m_eReturn(tCIDLib::EExitCodes::NotFound)
     , m_ippnListen(kCIDOrbUC::ippnLogSrvDefPort)
     , m_pevWait(nullptr)
+    , m_porbsImpl(nullptr)
 {
 }
 

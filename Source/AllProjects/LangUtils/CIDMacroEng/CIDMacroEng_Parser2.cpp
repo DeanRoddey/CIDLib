@@ -795,12 +795,12 @@ TMacroEngParser::eGetOpInfo(const   TMEngClassInfo&     meciTarget
     switch(eToken)
     {
         case tCIDMacroEng::ETokens::Add :
-            pszOpName = kMacroEng::pszOp_Add;
+            pszOpName = kCIDMacroEng::pszOp_Add;
             eRet = tCIDMacroEng::EOpResults::Mathematical;
             break;
 
         case tCIDMacroEng::ETokens::And :
-            pszOpName = kMacroEng::pszOp_And;
+            pszOpName = kCIDMacroEng::pszOp_And;
             eRet = tCIDMacroEng::EOpResults::Bitwise;
             break;
 
@@ -809,42 +809,42 @@ TMacroEngParser::eGetOpInfo(const   TMEngClassInfo&     meciTarget
             break;
 
         case tCIDMacroEng::ETokens::AndEq :
-            pszOpName = kMacroEng::pszOp_AndEq;
+            pszOpName = kCIDMacroEng::pszOp_AndEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::Dec :
-            pszOpName = kMacroEng::pszOp_Dec;
+            pszOpName = kCIDMacroEng::pszOp_Dec;
             eRet = tCIDMacroEng::EOpResults::Unary;
             break;
 
         case tCIDMacroEng::ETokens::Divide :
-            pszOpName = kMacroEng::pszOp_Divide;
+            pszOpName = kCIDMacroEng::pszOp_Divide;
             eRet = tCIDMacroEng::EOpResults::Mathematical;
             break;
 
         case tCIDMacroEng::ETokens::DivideEq :
-            pszOpName = kMacroEng::pszOp_DivideEq;
+            pszOpName = kCIDMacroEng::pszOp_DivideEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::EqualSign :
-            pszOpName = kMacroEng::pszOp_Equal;
+            pszOpName = kCIDMacroEng::pszOp_Equal;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::GtThan :
-            pszOpName = kMacroEng::pszOp_GtThan;
+            pszOpName = kCIDMacroEng::pszOp_GtThan;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::GtThanEq :
-            pszOpName = kMacroEng::pszOp_GtThanEq;
+            pszOpName = kCIDMacroEng::pszOp_GtThanEq;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::Inc :
-            pszOpName = kMacroEng::pszOp_Inc;
+            pszOpName = kCIDMacroEng::pszOp_Inc;
             eRet = tCIDMacroEng::EOpResults::Unary;
             break;
 
@@ -861,72 +861,72 @@ TMacroEngParser::eGetOpInfo(const   TMEngClassInfo&     meciTarget
             break;
 
         case tCIDMacroEng::ETokens::LsThan :
-            pszOpName = kMacroEng::pszOp_LsThan;
+            pszOpName = kCIDMacroEng::pszOp_LsThan;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::LsThanEq :
-            pszOpName = kMacroEng::pszOp_LsThanEq;
+            pszOpName = kCIDMacroEng::pszOp_LsThanEq;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::ModDiv :
-            pszOpName = kMacroEng::pszOp_ModDiv;
+            pszOpName = kCIDMacroEng::pszOp_ModDiv;
             eRet = tCIDMacroEng::EOpResults::Mathematical;
             break;
 
         case tCIDMacroEng::ETokens::ModDivEq :
-            pszOpName = kMacroEng::pszOp_ModDivEq;
+            pszOpName = kCIDMacroEng::pszOp_ModDivEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::MinusEq :
-            pszOpName = kMacroEng::pszOp_MinusEq;
+            pszOpName = kCIDMacroEng::pszOp_MinusEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::Multiply :
-            pszOpName = kMacroEng::pszOp_Multiply;
+            pszOpName = kCIDMacroEng::pszOp_Multiply;
             eRet = tCIDMacroEng::EOpResults::Mathematical;
             break;
 
         case tCIDMacroEng::ETokens::MultiplyEq :
-            pszOpName = kMacroEng::pszOp_MultiplyEq;
+            pszOpName = kCIDMacroEng::pszOp_MultiplyEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::NotEqual :
-            pszOpName = kMacroEng::pszOp_Equal;
+            pszOpName = kCIDMacroEng::pszOp_Equal;
             eRet = tCIDMacroEng::EOpResults::Binary;
             break;
 
         case tCIDMacroEng::ETokens::Or :
-            pszOpName = kMacroEng::pszOp_Or;
+            pszOpName = kCIDMacroEng::pszOp_Or;
             eRet = tCIDMacroEng::EOpResults::Bitwise;
             break;
 
         case tCIDMacroEng::ETokens::OrEq :
-            pszOpName = kMacroEng::pszOp_OrEq;
+            pszOpName = kCIDMacroEng::pszOp_OrEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::PlusEq :
-            pszOpName = kMacroEng::pszOp_PlusEq;
+            pszOpName = kCIDMacroEng::pszOp_PlusEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
         case tCIDMacroEng::ETokens::Subtract :
-            pszOpName = kMacroEng::pszOp_Subtract;
+            pszOpName = kCIDMacroEng::pszOp_Subtract;
             eRet = tCIDMacroEng::EOpResults::Mathematical;
             break;
 
         case tCIDMacroEng::ETokens::Xor :
-            pszOpName = kMacroEng::pszOp_Xor;
+            pszOpName = kCIDMacroEng::pszOp_Xor;
             eRet = tCIDMacroEng::EOpResults::Bitwise;
             break;
 
         case tCIDMacroEng::ETokens::XorEq :
-            pszOpName = kMacroEng::pszOp_XorEq;
+            pszOpName = kCIDMacroEng::pszOp_XorEq;
             eRet = tCIDMacroEng::EOpResults::Assign;
             break;
 
@@ -942,12 +942,12 @@ TMacroEngParser::eGetOpInfo(const   TMEngClassInfo&     meciTarget
     if (pszOpName)
     {
         c2MethId = meciTarget.c2FindMethod(pszOpName);
-        if (c2MethId == kMacroEng::c2BadId)
+        if (c2MethId == kCIDMacroEng::c2BadId)
             eRet = tCIDMacroEng::EOpResults::NotSupported;
     }
      else
     {
-        c2MethId = kMacroEng::c2BadId;
+        c2MethId = kCIDMacroEng::c2BadId;
     }
     return eRet;
 }

@@ -99,16 +99,15 @@ class KRNLEXPORT TKrnlSafeCard4Counter
         // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pc4Counter
-        //      This is the counter member that is incremented and decremented. It is a
-        //      pointer because it may have alignment requirements for a given platform.
+        //  m_c4Counter
+        //      This is the counter member that is incremented and decremented.
         //
         //  m_pLockData
         //      This is the per-platform locking data for this counter. Its just an
         //      anonymous pointer here so that it can be anything required internally.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4*    m_pc4Counter;
-        tCIDLib::TVoid*     m_pLockData;
+        alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4  m_c4Counter;
+        tCIDLib::TVoid*                                 m_pLockData;
 };
 
 
@@ -181,15 +180,14 @@ class KRNLEXPORT TKrnlSafeInt4Counter
         //  Private data members
         //
         //  m_pi4Counter
-        //      This is the counter member that is incremented and decremented. It
-        //      is a pointer because a given platform may have alignment requirements.
+        //      This is the counter member that is incremented and decremented.
         //
         //  m_pLockData
         //      This is the per-platform locking data for this counter. Its just an
         //      anonymous pointer here so that it can be anything required internally.
         // -------------------------------------------------------------------
-        tCIDLib::TInt4*     m_pi4Counter;
-        tCIDLib::TVoid*     m_pLockData;
+        alignas(kCIDLib::c4CacheAlign) tCIDLib::TInt4   m_i4Counter;
+        tCIDLib::TVoid*                                 m_pLockData;
 };
 
 #pragma CIDLIB_POPPACK

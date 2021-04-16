@@ -65,7 +65,7 @@ TCIDObjStore::~TCIDObjStore()
     // If we ever got the object store allocated, then let's clean up
     if (m_postCache)
     {
-        TMtxLocker lockStore(&m_mtxSync);
+        TLocker lockrStore(&m_mtxSync);
 
         // If its currently opened, then close it
         if (m_bReady)
@@ -89,7 +89,7 @@ TCIDObjStore::AddObject(const   TString&        strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Flatten the object
     m_strmOut.Reset();
@@ -124,7 +124,7 @@ TCIDObjStore::AddObjectDirect(  const   TString&        strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // And flatten the key
     m_strmKey.Reset();
@@ -155,7 +155,7 @@ TCIDObjStore::bAddOrUpdate( const   TString&            strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Flatten the object
     m_strmOut.Reset();
@@ -192,7 +192,7 @@ TCIDObjStore::bAddOrUpdateDirect(const  TString&            strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // And flatten the key
     m_strmKey.Reset();
@@ -221,7 +221,7 @@ TCIDObjStore::bAllObjectsUnder( const   TString&            strStartScope
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
     return m_postCache->bAllObjectsUnder(strStartScope, colToFill);
 }
 
@@ -233,7 +233,7 @@ tCIDLib::TBoolean TCIDObjStore::bDeleteObjectIfExists(const TString& strKey)
     ValidatePath(strKey, kCIDLib::True, CID_LINE, kCIDLib::True);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->bDeleteObjectIfExists(strKey);
@@ -244,7 +244,7 @@ tCIDLib::TBoolean
 TCIDObjStore::bInitialize(const TString& strPath, const TString& strStoreName)
 {
     // Lock while we initialize
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Make sure we aren't already initialized
     if (m_bReady)
@@ -285,7 +285,7 @@ tCIDLib::TBoolean TCIDObjStore::bKeyExists(const TString& strKey) const
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     return m_postCache->bKeyExists(strKey);
 }
@@ -297,7 +297,7 @@ TCIDObjStore::bKeyExists(const TString& strKey, tCIDLib::TCard4& c4Version) cons
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     return m_postCache->bKeyExists(strKey);
 }
@@ -312,7 +312,7 @@ TCIDObjStore::bFindNameUnder(const  TString&            strName
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
     return m_postCache->bFindNameUnder(strName, strStartScope, colToFill);
 }
 
@@ -327,7 +327,7 @@ TCIDObjStore::bReadObject(  const   TString&            strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE, kCIDLib::True);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     tCIDLib::TCard4 c4Size;
@@ -352,7 +352,7 @@ tCIDLib::TVoid TCIDObjStore::BackupStore()
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     m_postCache->BackupStore();
 }
@@ -364,10 +364,26 @@ tCIDLib::TCard4 TCIDObjStore::c4ObjectsInStore() const
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->c4ObjectsInStore();
+}
+
+
+tCIDLib::TCard4
+TCIDObjStore::c4QueryKeysInScope(const  TString&                strScope
+                                ,       tCIDLib::TStrCollect&   colToFill)
+{
+    if (!m_bReady)
+        ThrowNotReady(CID_LINE);
+    ValidatePath(strScope, kCIDLib::False, CID_LINE);
+
+    // Lock while we do this
+    TLocker lockrStore(&m_mtxSync);
+
+    // Delegate to the cache object
+    return m_postCache->c4QueryKeysInScope(strScope, colToFill);
 }
 
 
@@ -380,7 +396,7 @@ TCIDObjStore::c4QueryObjectsInScope(const   TString&                strScope
     ValidatePath(strScope, kCIDLib::False, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->c4QueryObjectsInScope(strScope, colToFill);
@@ -396,7 +412,7 @@ TCIDObjStore::c4QuerySubScopes( const   TString&                strScope
     ValidatePath(strScope, kCIDLib::False, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->c4QuerySubScopes(strScope, colToFill);
@@ -412,7 +428,7 @@ TCIDObjStore::c4UpdateObject(const  TString&        strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Flatten the object
     m_strmOut.Reset();
@@ -440,7 +456,7 @@ TCIDObjStore::c4UpdateObjectDirect( const   TString&        strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->c4UpdateObject(strKey, mbufToWrite, c4Bytes);
@@ -450,7 +466,7 @@ TCIDObjStore::c4UpdateObjectDirect( const   TString&        strKey
 tCIDLib::TVoid TCIDObjStore::Close()
 {
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // If initialized, then close it
     if (m_bReady)
@@ -464,7 +480,7 @@ tCIDLib::TVoid TCIDObjStore::Close()
 tCIDLib::TVoid TCIDObjStore::DebugDump(TTextOutStream& strmOut)
 {
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the implementation
     m_postCache->ValidateStore(&strmOut);
@@ -479,7 +495,7 @@ tCIDLib::TVoid TCIDObjStore::DeleteObject(const TString& strKey)
     ValidatePath(strKey, kCIDLib::True, CID_LINE, kCIDLib::True);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->DeleteObject(strKey);
@@ -494,7 +510,7 @@ tCIDLib::TVoid TCIDObjStore::DeleteScope(const TString& strScopeName)
     ValidatePath(strScopeName, kCIDLib::False, CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     return m_postCache->DeleteScope(strScopeName);
@@ -515,17 +531,13 @@ TCIDObjStore::eReadObject(  const   TString&            strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE, kCIDLib::True);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     tCIDLib::TCard4 c4Size;
     const tCIDLib::ELoadRes eRes = m_postCache->eReadObject
     (
-        strKey
-        , c4Version
-        , m_mbufRead
-        , c4Size
-        , bThrowIfNot
+        strKey, c4Version, m_mbufRead, c4Size, bThrowIfNot
     );
 
     if (eRes == tCIDLib::ELoadRes::NewData)
@@ -542,9 +554,9 @@ TCIDObjStore::eReadObject(  const   TString&            strKey
 //
 tCIDLib::ELoadRes
 TCIDObjStore::eReadObjectDirect(const   TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 ,       THeapBuf&           mbufToFill
-                                ,       tCIDLib::TCard4&    c4BytesRead
+                                , COP   tCIDLib::TCard4&    c4BytesRead
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     if (!m_bReady)
@@ -552,7 +564,7 @@ TCIDObjStore::eReadObjectDirect(const   TString&            strKey
     ValidatePath(strKey, kCIDLib::True, CID_LINE, kCIDLib::True);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     const tCIDLib::ELoadRes eRes = m_postCache->eReadObject
@@ -574,7 +586,7 @@ tCIDLib::TVoid TCIDObjStore::FlushToDisk()
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     m_postCache->FlushStore();
@@ -597,7 +609,7 @@ tCIDLib::TVoid TCIDObjStore::QueryAllKeys(tCIDLib::TStrCollect& colToFill)
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     m_postCache->QueryAllKeys(colToFill);
@@ -611,7 +623,7 @@ TTime TCIDObjStore::tmLastBackup() const
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     return TTime(m_postCache->enctLastBackup());
 }
@@ -624,7 +636,7 @@ tCIDLib::TVoid TCIDObjStore::ValidateStore()
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     m_postCache->ValidateStore(0);
@@ -636,7 +648,7 @@ tCIDLib::TVoid TCIDObjStore::ValidateStore(TTextOutStream& strmTar)
         ThrowNotReady(CID_LINE);
 
     // Lock while we do this
-    TMtxLocker lockStore(&m_mtxSync);
+    TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
     m_postCache->ValidateStore(&strmTar);

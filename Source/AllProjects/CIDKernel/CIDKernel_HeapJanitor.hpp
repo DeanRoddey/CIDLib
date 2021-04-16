@@ -34,7 +34,7 @@
 //   CLASS: TJanitor
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class T> class TJanitor
+template <typename T> class TJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -42,21 +42,30 @@ template <class T> class TJanitor
         // -------------------------------------------------------------------
         TJanitor() :
 
-            m_pobjToSanitize(nullptr)
+            m_bAdopt(kCIDLib::False)
+            , m_pobjToSanitize(nullptr)
         {
         }
 
-        TJanitor(T* const pToDelete) :
+        //
+        //  Allows for optional clean, which is useful in many cases because of
+        //  the fact that janitors cannot be conditional. They are there or not.
+        //
+        TJanitor(       T* const            pToDelete
+                , const tCIDLib::TBoolean   bAdopt = kCIDLib::True) :
 
-            m_pobjToSanitize(pToDelete)
+            m_bAdopt(bAdopt)
+            , m_pobjToSanitize(pToDelete)
         {
         }
 
         TJanitor(const TJanitor&) = delete;
+        TJanitor(TJanitor&&) = delete;
 
         ~TJanitor()
         {
-            delete m_pobjToSanitize;
+            if (m_bAdopt)
+                delete m_pobjToSanitize;
             m_pobjToSanitize = nullptr;
         }
 
@@ -65,43 +74,68 @@ template <class T> class TJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TJanitor& operator=(const TJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TJanitor& operator=(TJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
+
+        operator bool() const
+        {
+            return (m_pobjToSanitize != nullptr);
+        }
+
+        T* operator->()
+        {
+            return m_pobjToSanitize;
+        }
+
+        const T* operator->() const
+        {
+            return m_pobjToSanitize;
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+
+        // Adoption status doesn't matter, caller is responsible
         tCIDLib::TVoid Orphan()
         {
+            m_bAdopt = kCIDLib::False;
             m_pobjToSanitize = nullptr;
         }
 
-        T* pobjOrphan()
+        // Adoption status doesn't matter, caller is responsible
+        [[nodiscard]] T* pobjOrphan()
         {
             T* pobjRet = m_pobjToSanitize;
+            m_bAdopt = kCIDLib::False;
             m_pobjToSanitize = nullptr;
             return pobjRet;
         }
 
-        T* pobjThis()
+        [[nodiscard]] T* pobjThis()
         {
             return m_pobjToSanitize;
         }
 
-        const T* pobjThis() const
+        [[nodiscard]] const T* pobjThis() const
         {
             return m_pobjToSanitize;
         }
 
-        tCIDLib::TVoid Set(T* const pToSet)
+        tCIDLib::TVoid
+        Set(T* const pToSet, const tCIDLib::TBoolean bAdopt = kCIDLib::True)
         {
-            //
-            //  Delete the current and store the new. Make sure the new one gets stored,
-            //  even if deleting the old one causes an exception.
-            //
+            // Store old stuff away first, so we can set new stuff before we delete
+            const tCIDLib::TBoolean bOldAdopt = m_bAdopt;
             T* pOld = m_pobjToSanitize;
+
+            // Now store new stuff, then we can delete the old if we adopted it
+            m_bAdopt = bAdopt;
             m_pobjToSanitize = pToSet;
-            delete pOld;
+
+            if (bOldAdopt)
+                delete pOld;
         }
 
 
@@ -109,11 +143,17 @@ template <class T> class TJanitor
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bAdopt
+        //      Because janitors cannot be condition, they are either in the path
+        //      or not, we need a way to allow the janitor to conditionally do its
+        //      thing or not.
+        //
         //  m_pobjToSanitize
         //      This is the pointer to the object or structure that must be
         //      destroyed when this object is destroyed.
         // -------------------------------------------------------------------
-        T*  m_pobjToSanitize;
+        tCIDLib::TBoolean   m_bAdopt;
+        T*                  m_pobjToSanitize;
 };
 
 
@@ -121,7 +161,7 @@ template <class T> class TJanitor
 //   CLASS: TArrayJanitor
 //  PREFIX: jan
 // ---------------------------------------------------------------------------
-template <class T> class TArrayJanitor
+template <typename T> class TArrayJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -146,6 +186,7 @@ template <class T> class TArrayJanitor
         }
 
         TArrayJanitor(const TArrayJanitor&) = delete;
+        TArrayJanitor(TArrayJanitor&&) = delete;
 
         ~TArrayJanitor()
         {
@@ -158,6 +199,7 @@ template <class T> class TArrayJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TArrayJanitor& operator=(const TArrayJanitor&) = delete;
+        TArrayJanitor& operator=(TArrayJanitor&&) = delete;
         tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
 
 
@@ -169,19 +211,19 @@ template <class T> class TArrayJanitor
             m_paToSanitize = nullptr;
         }
 
-        T* paOrphan()
+        [[nodiscard]] T* paOrphan()
         {
             T* paRet = m_paToSanitize;
             m_paToSanitize = nullptr;
             return paRet;
         }
 
-        const T* paThis() const
+        [[nodiscard]] const T* paThis() const
         {
             return m_paToSanitize;
         }
 
-        T* paThis()
+        [[nodiscard]] T* paThis()
         {
             return m_paToSanitize;
         }

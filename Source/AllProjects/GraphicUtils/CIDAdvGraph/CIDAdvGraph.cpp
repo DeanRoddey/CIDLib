@@ -44,13 +44,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDAdvGraph& facCIDAdvGraph()
 {
-    static TFacCIDAdvGraph* pfacCIDAdvGraph = nullptr;
-    if (!pfacCIDAdvGraph)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDAdvGraph)
-            pfacCIDAdvGraph = new TFacCIDAdvGraph;
-    }
-    return *pfacCIDAdvGraph;
+    static TFacCIDAdvGraph* pfacThis = new TFacCIDAdvGraph();
+    return *pfacThis;
 }
-

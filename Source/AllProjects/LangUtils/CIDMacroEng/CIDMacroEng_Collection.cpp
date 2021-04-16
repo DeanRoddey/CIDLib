@@ -45,12 +45,15 @@ RTTIDecls(TMEngColBaseInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_Collection
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strName(L"Collection");
-    const TString   strClassPath(L"MEng.System.Runtime.Collection");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strName(L"Collection");
+        const TString   strClassPath(L"MEng.System.Runtime.Collection");
+    }
 }
 
 
@@ -119,7 +122,7 @@ TMEngCollectInfo::TMEngCollectInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Abstract
         , L"MEng.Object"
     )
-    , m_c2ErrId(kMacroEng::c2BadId)
+    , m_c2ErrId(kCIDMacroEng::c2BadId)
     , m_c4ErrBadInd(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)
 {

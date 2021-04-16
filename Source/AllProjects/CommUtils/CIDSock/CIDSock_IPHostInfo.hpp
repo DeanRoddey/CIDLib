@@ -54,7 +54,21 @@ class CIDSOCKEXP TIPHostInfo : public TObject, public MDuplicable
             , const tCIDLib::TBoolean       bIncludeLoopbacks
         );
 
-        TIPHostInfo(const TIPHostInfo&) = default;
+        TIPHostInfo(const TIPHostInfo& iphiSrc) :
+
+            m_colAddrs(iphiSrc.m_colAddrs)
+            , m_strHostName(iphiSrc.m_strHostName)
+        {
+        }
+
+        // Set up basic non-broken content then move
+        TIPHostInfo(TIPHostInfo&& iphiSrc) :
+
+            m_colAddrs(1)
+            , m_strHostName()
+        {
+
+        }
 
         ~TIPHostInfo();
 
@@ -62,7 +76,25 @@ class CIDSOCKEXP TIPHostInfo : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TIPHostInfo& operator=(const TIPHostInfo&) = default;
+        TIPHostInfo& operator=(const TIPHostInfo& iphiSrc)
+        {
+            if (&iphiSrc != this)
+            {
+                m_colAddrs = iphiSrc.m_colAddrs;
+                m_strHostName = iphiSrc.m_strHostName;
+            }
+            return *this;
+        }
+
+        TIPHostInfo& operator=(TIPHostInfo&& iphiSrc)
+        {
+            if (&iphiSrc != this)
+            {
+                m_colAddrs = tCIDLib::ForceMove(iphiSrc.m_colAddrs);
+                m_strHostName = tCIDLib::ForceMove(iphiSrc.m_strHostName);
+            }
+            return *this;
+        }
 
 
         // -------------------------------------------------------------------

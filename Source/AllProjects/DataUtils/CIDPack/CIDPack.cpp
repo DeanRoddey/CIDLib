@@ -37,13 +37,6 @@
 // ---------------------------------------------------------------------------
 TFacCIDPack& facCIDPack()
 {
-    static TFacCIDPack* pfacCIDPack = nullptr;
-    if (!pfacCIDPack)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDPack)
-            pfacCIDPack = new TFacCIDPack;
-    }
-    return *pfacCIDPack;
+    static TFacCIDPack* pfacThis = new TFacCIDPack();
+    return *pfacThis;
 }
-

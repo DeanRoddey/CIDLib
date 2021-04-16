@@ -669,7 +669,7 @@ TColHeader::bMouseMove( const   TPoint&             pntAt
                         if(i4NewSlotsEndX >= areaUs.i4Right())
                         {
                             areaUpdate.i4X(areaUs.i4Right() - (i4OrgSlotsEndX - i4NewSlotsEndX));
-                            areaUpdate.i4Right(areaUs.i4Right() + 1);
+                            areaUpdate.i4Right(areaUs.i4Right());
                         }
                          else
                         {
@@ -774,9 +774,10 @@ TColHeader::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
             }
 
             //
-            //  Draw a a separator line to the right. It doesn't include the final point so
-            //  we have to adjust it.
+            //  Draw a a separator line to the right. We ahve to adjust for the exclusive
+            //  native of the area points.
             //
+            areaSlot.AdjustSize(-1, -1);
             gdevToUse.DrawLine(areaSlot.pntUR(), areaSlot.pntLR(0, 1), facCIDGraphDev().rgbPaleGrey);
         }
 
@@ -802,9 +803,13 @@ TColHeader::bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate)
         }
     }
 
-    // Draw a divider line along bottom if needed
+    //
+    //  Draw a divider line along bottom if needed, adjutsing the lower/right for the
+    //  the exclusive nature of the area points but also for the fact that the last pixel
+    //  is not drawn.
+    //
     if (areaUpdate.i4Bottom() == areaUs.i4Bottom())
-        gdevToUse.DrawLine(areaUs.pntLL(), areaUs.pntLR(1, 0), facCIDGraphDev().rgbPaleGrey);
+        gdevToUse.DrawLine(areaUs.pntLL(), areaUs.pntLR(0, -1), facCIDGraphDev().rgbPaleGrey);
 
     // Say we did it
     return kCIDLib::True;

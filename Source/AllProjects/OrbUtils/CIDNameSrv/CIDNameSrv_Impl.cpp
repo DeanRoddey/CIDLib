@@ -63,11 +63,7 @@ TCIDNameServerImpl::TCIDNameServerImpl( const   TOrbObjId&          ooidToUse
     , m_thrLandlord
       (
         L"CIDNameSrvLandLordThread"
-        , TMemberFunc<TCIDNameServerImpl>
-          (
-            this
-            , &TCIDNameServerImpl::eLandlordThread
-          )
+        , TMemberFunc<TCIDNameServerImpl>(this, &TCIDNameServerImpl::eLandlordThread)
       )
 {
 }
@@ -92,7 +88,7 @@ TCIDNameServerImpl::bBindingExists( const   TString&            strToCheck
     tCIDLib::ETreeNodes eType;
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Give back the current cookie. Do it NOW in case we return early
     c4CurNSCookie = m_c8Cookie;
@@ -117,7 +113,7 @@ TCIDNameServerImpl::bGetObject( const   TString&            strBinding
     try
     {
         // Lock the cache
-        TMtxLocker lockCache(&m_mtxSync);
+        TLocker lockrCache(&m_mtxSync);
 
         // Give back the current cookie. Do it NOW in case we throw!
         c4CurNSCookie = m_c8Cookie;
@@ -169,7 +165,7 @@ TCIDNameServerImpl::bQueryNameInfo( const   TString&    strNameToQuery
     try
     {
         // Lock the cache and do the query
-        TMtxLocker lockCache(&m_mtxSync);
+        TLocker lockrCache(&m_mtxSync);
         m_colCache.QueryNameAndDesc(strNameToQuery, strName, strDescr);
     }
 
@@ -208,7 +204,7 @@ TCIDNameServerImpl::bQueryNameInfo2(const   TString&    strNameToQuery
     try
     {
         // Lock the cache and do the query
-        TMtxLocker lockCache(&m_mtxSync);
+        TLocker lockrCache(&m_mtxSync);
         const TNSNode& nodeInfo = m_colCache.objAt(strNameToQuery, strName, strDescr);
 
         // The extra user values are in the node data
@@ -246,7 +242,7 @@ TCIDNameServerImpl::bQueryScopeKeys(        tCIDLib::TCard4&    c4SerialNum
                                     , const tCIDLib::TBoolean   bThrowIfNot)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     //
     //  This could throw if the node is not in the tree, so lets catch it and
@@ -271,11 +267,17 @@ TCIDNameServerImpl::bQueryScopeKeys(        tCIDLib::TCard4&    c4SerialNum
                 , tCIDLib::EErrClasses::TypeMatch
                 , strScopePath
             );
+
+            // Won't happen but makes analyzer happy
+            return kCIDLib::False;
         }
 
         const TNSCache::TNodeNT* pnodeNT = static_cast<const TNSCache::TNodeNT*>(pnodeSrc);
         if (pnodeNT->c4SerialNum() == c4SerialNum)
             return kCIDLib::False;
+
+        // Give back the serial number we have
+        c4SerialNum = pnodeNT->c4SerialNum();
     }
 
     catch(TError& errToCatch)
@@ -285,7 +287,7 @@ TCIDNameServerImpl::bQueryScopeKeys(        tCIDLib::TCard4&    c4SerialNum
         //  need the lock anymore now, so others can get in while we are
         //  off doing error reporting.
         //
-        lockCache.Release();
+        lockrCache.Release();
 
         //
         //  Watch for the node just not existing. If not, we either throw
@@ -353,7 +355,7 @@ bRebindObjs(const   TVector<TNSRebindInfo>&             colBindings
             ,       tCIDLib::TCard8&                    c8CurCookie)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Save the incoming cookie and store ours in the return
     tCIDLib::TCard8 c8InCookie = c8CurCookie;
@@ -463,7 +465,7 @@ TCIDNameServerImpl::bRenewLeases(const  tCIDLib::TStrList&      colPaths
                                 ,       tCIDLib::TCard8&        c8CurCookie)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Save the incoming cookie and store ours in the return
     tCIDLib::TCard8 c8InCookie = c8CurCookie;
@@ -511,7 +513,7 @@ TCIDNameServerImpl::bScopeExists(const  TString&            strToCheck
     tCIDLib::ETreeNodes eType;
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Give back the current cookie. Do it NOW in case we return early
     c4CurNSCookie = m_c8Cookie;
@@ -552,7 +554,7 @@ TCIDNameServerImpl::BindObj(const   TString&    strBinding
     facCIDOrbUC().ParseNSBindingPath(strBinding, strScope, strName);
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Make sure the scope exists
     m_colCache.pnodeCreateNTPath(strScope, TString::strEmpty());
@@ -581,7 +583,7 @@ TCIDNameServerImpl::BindObj2(const  TString&    strParentNode
     facCIDOrbUC().ValidateNSScopePath(strParentNode);
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Make sure the scope exists
     m_colCache.pnodeCreateNTPath(strParentNode, TString::strEmpty());
@@ -603,7 +605,7 @@ TCIDNameServerImpl::BindObj2(const  TString&    strParentNode
 tCIDLib::TVoid TCIDNameServerImpl::BindObj3(const TNSRebindInfo& nsrbiToBind)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Make sure the scope exists
     m_colCache.pnodeCreateNTPath(nsrbiToBind.strParentPath(), TString::strEmpty());
@@ -636,7 +638,7 @@ TCIDNameServerImpl::c4EnumObjects(  const   TString&                strScopeToEn
                                     , const tCIDLib::TBoolean       bThrowIfNot)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     //
     //  This could throw if the node is not in the tree, so lets catch it and
@@ -666,7 +668,7 @@ TCIDNameServerImpl::c4EnumObjects(  const   TString&                strScopeToEn
         //  need the lock anymore now, so others can get in while we are
         //  off doing error reporting.
         //
-        lockCache.Release();
+        lockrCache.Release();
 
         //
         //  Watch for the node just not existing. If not, we either throw
@@ -711,18 +713,15 @@ TCIDNameServerImpl::c4EnumObjects(  const   TString&                strScopeToEn
         if (cursEnum.eCurType() == tCIDLib::ETreeNodes::Terminal)
         {
             const TNSNode& nodeCur = cursEnum.objRCur();
-            colResults.objAdd
+            colResults.objPlace
             (
-                TNameServerInfo
-                (
-                    nodeCur.ooidThis()
-                    , cursEnum.strCurName()
-                    , cursEnum.strCurDescription()
-                    , nodeCur.strExtra1()
-                    , nodeCur.strExtra2()
-                    , nodeCur.strExtra3()
-                    , nodeCur.strExtra4()
-                )
+                nodeCur.ooidThis()
+                , cursEnum.strCurName()
+                , cursEnum.strCurDescription()
+                , nodeCur.strExtra1()
+                , nodeCur.strExtra2()
+                , nodeCur.strExtra3()
+                , nodeCur.strExtra4()
             );
             c4Count++;
         }
@@ -741,7 +740,7 @@ TCIDNameServerImpl::c4EnumSubScopes(const   TString&            strScopeToEnum
                                     , const tCIDLib::TBoolean   bThrowIfNot)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Make sure the passed name is a non-terminal
     try
@@ -767,7 +766,7 @@ TCIDNameServerImpl::c4EnumSubScopes(const   TString&            strScopeToEnum
         //  need it now, and others can get in while we are off doing
         //  error reporting.
         //
-        lockCache.Release();
+        lockrCache.Release();
 
         //
         //  Watch for the node just not existing. If not, we either throw
@@ -814,10 +813,7 @@ TCIDNameServerImpl::c4EnumSubScopes(const   TString&            strScopeToEnum
         //
         if (cursEnum.eCurType() == tCIDLib::ETreeNodes::NonTerminal)
         {
-            colResults.objAdd
-            (
-                TKeyValuePair(cursEnum.strCurName(), cursEnum.strCurDescription())
-            );
+            colResults.objPlace(cursEnum.strCurName(), cursEnum.strCurDescription());
             c4Count++;
         }
     }   while (cursEnum.bNext());
@@ -848,7 +844,7 @@ tCIDLib::TVoid TCIDNameServerImpl::ClearScope(const TString& strToClear)
     }
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // See if exists, and what type it is
     tCIDLib::ETreeNodes eType;
@@ -885,14 +881,60 @@ tCIDLib::TVoid TCIDNameServerImpl::ClearScope(const TString& strToClear)
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::CreateScope(const   TString&    strParentNode
-                                , const TString&    strNodeName
-                                , const TString&    strDescription)
+TCIDNameServerImpl::CreateScope(const   TString&            strParentNode
+                                , const TString&            strNodeName
+                                , const TString&            strDescription
+                                , const tCIDLib::TBoolean   bThrowIfExists)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
-    // Just pass it on to the tree collection
+    // See if this scope exists
+    TString strFullPath(strParentNode);
+    if (strFullPath.chLast() != kCIDLib::chForwardSlash)
+        strFullPath.Append(kCIDLib::chForwardSlash);
+    strFullPath.Append(strNodeName);
+
+    //
+    //  If it does, then we either throw or just return. If it does and it's
+    //  not a scope we have to throw a different error.
+    //
+    tCIDLib::ETreeNodes eType;
+    if (m_colCache.bNodeExists(strFullPath, eType))
+    {
+        // We can release the lock early in this case
+        lockrCache.Release();
+
+        // If it's not a non-terminal, then this is an error
+        if (eType != tCIDLib::ETreeNodes::NonTerminal)
+        {
+            facCIDOrbUC().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kOrbUCErrs::errcNSP_NotAScope
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::TypeMatch
+                , strFullPath
+            );
+        }
+
+        if (bThrowIfExists)
+        {
+            facCIDOrbUC().ThrowErr
+            (
+                CID_FILE
+                , CID_LINE
+                , kOrbUCErrs::errcNS_ScopeExists
+                , strFullPath
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::Already
+            );
+        }
+        return;
+    }
+
+    // We need to create it, so pass that on
     m_colCache.pnodeAddNonTerminal(strParentNode, strNodeName, strDescription);
 }
 
@@ -905,7 +947,7 @@ TCIDNameServerImpl::CreateScopePath(const   TString&    strScopePath
     facCIDOrbUC().ValidateNSScopePath(strScopePath);
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Just pass this on to the cache
     m_colCache.pnodeCreateNTPath(strScopePath, strDescription);
@@ -915,7 +957,7 @@ tCIDLib::TVoid
 TCIDNameServerImpl::CreateScopePath(const tCIDLib::TKVPList& colPathParts)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // Just pass this on to the cache
     m_colCache.pnodeCreateNTPath(colPathParts);
@@ -931,7 +973,7 @@ TCIDNameServerImpl::Dump(       TString&                strToFill
     TTextStringOutStream strmFill(&strToFill);
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     if (eFormat == tCIDOrbUC::EDumpFmts::PlainText)
     {
@@ -983,7 +1025,7 @@ TCIDNameServerImpl::QueryNameInfo(  const   TString&    strNameToQuery
     try
     {
         // Lock the cache and do the query
-        TMtxLocker lockCache(&m_mtxSync);
+        TLocker lockrCache(&m_mtxSync);
         m_colCache.QueryNameAndDesc(strNameToQuery, strName, strDescr);
     }
 
@@ -1028,7 +1070,7 @@ TCIDNameServerImpl::QueryNameInfo2( const   TString&    strNameToQuery
     try
     {
         // Lock the cache and do the query
-        TMtxLocker lockCache(&m_mtxSync);
+        TLocker lockrCache(&m_mtxSync);
         const TNSNode& nodeInfo = m_colCache.objAt(strNameToQuery, strName, strDescr);
 
         // The extra user values are in the node data
@@ -1074,7 +1116,7 @@ TCIDNameServerImpl::RemoveBinding(  const   TString&            strToRemove
                                     , const tCIDLib::TBoolean   bThrowIfNot)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // See if exists, and what type it is
     tCIDLib::ETreeNodes eType;
@@ -1130,7 +1172,7 @@ tCIDLib::TVoid TCIDNameServerImpl::RemoveScope(const TString& strToRemove)
     }
 
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     // See if exists, and what type it is
     tCIDLib::ETreeNodes eType;
@@ -1176,7 +1218,7 @@ TCIDNameServerImpl::UpdateExtraVal( const   TString&        strBinding
                                     , const TString&        strNewValue)
 {
     // Lock the cache
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     //
     //  This will return us a pointer to the node if it exists. It will
@@ -1260,7 +1302,7 @@ tCIDLib::TVoid TCIDNameServerImpl::Initialize()
     //      /CIDLib
     //      /CIDLib/CIDLogSrv
     //
-    TMtxLocker lockCache(&m_mtxSync);
+    TLocker lockrCache(&m_mtxSync);
 
     m_colCache.pnodeAddNonTerminal
     (
@@ -1358,7 +1400,7 @@ TCIDNameServerImpl::eLandlordThread(TThread& thrThis, tCIDLib::TVoid*)
             //  of events the cache is never locked more than fractions of
             //  a millisecond.
             //
-            TMtxLocker lockCache(&m_mtxSync, 2000UL);
+            TLocker lockrCache(&m_mtxSync, 2000UL);
 
             //
             //  Calculate the cutoff time, which would be now minus the
@@ -1423,9 +1465,9 @@ TCIDNameServerImpl::eLandlordThread(TThread& thrThis, tCIDLib::TVoid*)
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
-                                        ,       TTextOutStream&         strmOut
-                                        , const tCIDLib::TCard4         c4Depth)
+TCIDNameServerImpl::RecursiveDumpText(  const   TImplNTNode* const  pnodeParent
+                                        ,       TTextOutStream&     strmOut
+                                        , const tCIDLib::TCard4     c4Depth)
 {
     // Output this scope's start tab
     strmOut << TTextOutStream::Spaces(c4Depth * 3)
@@ -1435,7 +1477,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
             << L"{\n";
 
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    const TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1443,9 +1485,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
             // Just recurse on this non-terminal node, with a depth of one more
             RecursiveDumpText
             (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeNT*>(pnodeChild)
-                , strmOut
-                , c4Depth + 1
+                static_cast<const TImplNTNode*>(pnodeChild), strmOut, c4Depth + 1
             );
         }
          else
@@ -1457,10 +1497,7 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
                     << L"Binding=" << pnodeChild->strName()
                     << L"  '" << pnodeChild->strDescription() << L"'\n";
 
-            const TNSNode& nodeCur
-            (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeT*>(pnodeChild)->objData()
-            );
+            const TNSNode& nodeCur = pnodeChild->objData();;
 
             // If any extra values, display them
             if (!nodeCur.strExtra1().bIsEmpty())
@@ -1496,9 +1533,9 @@ TCIDNameServerImpl::RecursiveDumpText(  TBasicTreeCol<TNSNode>::TNodeNT* const p
 
 
 tCIDLib::TVoid
-TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
-                                    ,       TTextOutStream&         strmOut
-                                    , const tCIDLib::TCard4         c4Depth)
+TCIDNameServerImpl::RecursiveDumpXML(const  TImplNTNode* const  pnodeParent
+                                    ,       TTextOutStream&     strmOut
+                                    , const tCIDLib::TCard4     c4Depth)
 {
     // Output this scope's start tab
     strmOut << TTextOutStream::Spaces(c4Depth * 3)
@@ -1521,7 +1558,7 @@ TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnod
             << L"</CIDNS:Desc>\n";
 
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    const TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1529,9 +1566,7 @@ TCIDNameServerImpl::RecursiveDumpXML(TBasicTreeCol<TNSNode>::TNodeNT* const pnod
             // Just recurse on this non-terminal node, with a depth of one more
             RecursiveDumpXML
             (
-                static_cast<TBasicTreeCol<TNSNode>::TNodeNT*>(pnodeChild)
-                , strmOut
-                , c4Depth + 1
+                static_cast<const TImplNTNode*>(pnodeChild), strmOut, c4Depth + 1
             );
         }
          else
@@ -1562,7 +1597,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
                     , const tCIDLib::TEncodedTime                   enctNow)
 {
     // Do this node's children, if any
-    TBasicTreeCol<TNSNode>::TNode* pnodeChild = pnodeParent->pnodeFirstChild();
+    TImplNode* pnodeChild = pnodeParent->pnodeFirstChild();
     while (pnodeChild)
     {
         if (pnodeChild->eType() == tCIDLib::ETreeNodes::NonTerminal)
@@ -1578,10 +1613,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
          else
         {
             // Get a ref to our own node object out of the tree node
-            TNSNode& nodeCur = static_cast<TBasicTreeCol<TNSNode>::TNodeT*>
-            (
-                pnodeChild
-            )->objData();
+            TNSNode& nodeCur = pnodeChild->objData();
 
             //
             //  Note that, if this node is marked as permanent, this will
@@ -1606,7 +1638,7 @@ RecursiveLeaseCheck(        TBasicTreeCol<TNSNode>::TNodeNT* const  pnodeParent
                     );
                 }
 
-                TBasicTreeCol<TNSNode>::TNode* pnodeTmp = pnodeChild->pnodeNext();
+                TImplNode* pnodeTmp = pnodeChild->pnodeNext();
                 pnodeParent->RemoveChild(pnodeChild);
                 pnodeChild = pnodeTmp;
             }

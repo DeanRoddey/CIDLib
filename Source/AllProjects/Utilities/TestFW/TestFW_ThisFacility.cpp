@@ -58,6 +58,7 @@ TFacTestFW::TFacTestFW() :
         , kCIDLib::c4Revision
         , tCIDLib::EModFlags::None
     )
+    , m_bNoLong(kCIDLib::False)
     , m_c4LineNum(0)
     , m_c4MaxLevel(kTestFWLib::c4MaxTestLevel)
     , m_c4NextGroupId(1)
@@ -310,7 +311,7 @@ tCIDLib::TVoid TFacTestFW::InvokeGroups()
             //  Set up the connection object with the info that we pass in
             //  to the tests.
             //
-            tfwcnToUse.SetTestData(m_eVerbosity, m_c4MaxLevel);
+            tfwcnToUse.SetTestData(m_eVerbosity, m_c4MaxLevel, m_bNoLong);
 
             // Ok, invoke this test and get the results back
             tCIDLib::TBoolean bException = kCIDLib::False;
@@ -329,11 +330,21 @@ tCIDLib::TVoid TFacTestFW::InvokeGroups()
                 //  then we make it relative to the directory where the test
                 //  config file was found.
                 //
-                TPathStr pathWD = tfwtpiCur.strWorkDir();
-                if (!pathWD.bIsFullyQualified())
+                TPathStr pathWD;
+                if (tfwtpiCur.strWorkDir().bIsEmpty())
                 {
-                    pathWD.AddToBasePath(m_pathTestBaseDir);
-                    pathWD.Normalize();
+                    // Use the project's actual path
+                    pathWD = tfwtpiCur.strPath();
+                    pathWD.bRemoveNameExt();
+                }
+                 else
+                {
+                    pathWD = tfwtpiCur.strWorkDir();
+                    if (!pathWD.bIsFullyQualified())
+                    {
+                        pathWD.AddToBasePath(m_pathTestBaseDir);
+                        pathWD.Normalize();
+                    }
                 }
 
                 // Start it and wait for it to end

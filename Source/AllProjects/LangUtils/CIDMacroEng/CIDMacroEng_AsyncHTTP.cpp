@@ -45,12 +45,15 @@ RTTIDecls(TMEngAsyncHTTPClInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strAsyncHTTP(L"AsyncHTTPCl");
-    const TString   strAsyncHTTPPath(L"MEng.System.Runtime.AsyncHTTPCl");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strAsyncHTTP(L"AsyncHTTPCl");
+        const TString   strAsyncHTTPPath(L"MEng.System.Runtime.AsyncHTTPCl");
+    }
 }
 
 
@@ -176,16 +179,17 @@ TMEngAsyncHTTPClInfo::TMEngAsyncHTTPClInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_CancelOp(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetOutput(kMacroEng::c2BadId)
-    , m_c2MethId_GetStatus(kMacroEng::c2BadId)
-    , m_c2MethId_StartGETRedir(kMacroEng::c2BadId)
-    , m_c2MethId_StartPOST(kMacroEng::c2BadId)
-    , m_c2TypeId_HdrList(kMacroEng::c2BadId)
-    , m_c2TypeId_KVPair(kMacroEng::c2BadId)
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
-    , m_c2TypeId_States(kMacroEng::c2BadId)
+    , m_c2MethId_CancelOp(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetOutput(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetStatus(kCIDMacroEng::c2BadId)
+    , m_c2MethId_StartGETRedir(kCIDMacroEng::c2BadId)
+    , m_c2MethId_StartPOST(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_HdrList(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_KVPair(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_States(kCIDMacroEng::c2BadId)
+    , m_c4ErrId_Busy(kCIDLib::c4MaxCard)
     , m_c4ErrId_Cancel(kCIDLib::c4MaxCard)
     , m_c4ErrId_Output(kCIDLib::c4MaxCard)
     , m_c4ErrId_Start(kCIDLib::c4MaxCard)
@@ -413,9 +417,9 @@ TMEngAsyncHTTPClInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
         if (mecvActual.ahttpqValue().eState() == tCIDLib::EAsyncWaitRes::Waiting)
             ThrowAnErr(meOwner, m_c4ErrId_Busy);
 
-        tCIDLib::TCard4     c4ContLen;
-        tCIDLib::TCard4     c4ResCode;
-        tCIDNet::EHTTPCodes eCodeType;
+        tCIDLib::TCard4     c4ContLen = 0;
+        tCIDLib::TCard4     c4ResCode = 0;
+        tCIDNet::EHTTPCodes eCodeType = tCIDNet::EHTTPCodes::Count;
         tCIDLib::TKVPList   colOutHdrLines;
 
         TMEngStringVal& mecvRepText = meOwner.mecvStackAtAs<TMEngStringVal>(c4FirstInd);

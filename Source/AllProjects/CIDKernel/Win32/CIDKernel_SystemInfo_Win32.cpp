@@ -35,10 +35,14 @@
 #include    "CIDKernel_InternalHelpers_.hpp"
 #include    "CIDKernel_ServiceWin32.hpp"
 
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
 #define     SECURITY_WIN32
 #include    <Security.h>
 #include    <shlobj.h>
 #include    <Iphlpapi.h>
+#pragma     warning(pop)
 
 
 // -----------------------------------------------------------------------
@@ -90,10 +94,6 @@
 //  c8TotalPhysicalMem
 //      The amount of memory installed in the machine.
 //
-//  eCPUType
-//      The type of CPUs in this machine. I don't know what will happen
-//      if NT ever supports dissimilar CPU types in the same machine.
-//
 //  szNodeName
 //      The name assigned to this machine in the system setup. This size should be
 //      grotesquely overkill for any node name. This cannot be a kernel string since
@@ -120,7 +120,6 @@ struct TCachedInfo
     tCIDLib::TCard4     c4OSServicePack;
     tCIDLib::TCard4     c4SSELevel;
     tCIDLib::TCard8     c8TotalPhysicalMem;
-    tCIDLib::ECPUTypes  eCPUType;
     tCIDLib::TZStr128   szNodeName;
     tCIDLib::TZStr512   szProcessName;
 };
@@ -129,13 +128,16 @@ struct TCachedInfo
 
 namespace CIDKernel_SystemInfo_Win32
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  CachedInfo
-    //      The cached system info that we cache up init and hang onto.
-    // -----------------------------------------------------------------------
-    TCachedInfo      CachedInfo;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  CachedInfo
+        //      The cached system info that we cache up init and hang onto.
+        // -----------------------------------------------------------------------
+        TCachedInfo      CachedInfo;
+    }
 }
 
 
@@ -183,15 +185,6 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //
         CIDKernel_SystemInfo_Win32::CachedInfo.c4CPUCount = SystemInfo.dwNumberOfProcessors;
         CIDKernel_SystemInfo_Win32::CachedInfo.c2ProcRev = SystemInfo.wProcessorRevision;
-
-        if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel32;
-        else if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel64;
-        else if (SystemInfo.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Intel64;
-        else
-            CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType = tCIDLib::ECPUTypes::Unknown;
 
         //
         //  Confirm that our page size constant matches that of the system,
@@ -241,7 +234,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //  Query the module name for the 0 module, which will get us the
         //  main process Exe module's file name.
         //
-        const tCIDLib::TCard4 c4Len = c4MaxBufChars
+        constexpr tCIDLib::TCard4 c4Len = c4MaxBufChars
         (
             CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName
         );
@@ -283,7 +276,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
             , kCIDLib::chPeriod
         );
         if (pszTmp)
-            *pszTmp = 0;
+            *pszTmp = kCIDLib::chNull;
 
 
         // Get a pointer to the command line parms. If none, then we are done
@@ -304,7 +297,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         // Iterate the IP adapters and create the MAC address hash
         {
             CIDKernel_SystemInfo_Win32::CachedInfo.c4MACAddrHash = 0;
-            const tCIDLib::TCard4 c4MaxAdaptors = 16;
+            constexpr tCIDLib::TCard4 c4MaxAdaptors = 16;
             IP_ADAPTER_INFO AdapterInfo[c4MaxAdaptors];
             DWORD dwBufLen = sizeof(AdapterInfo);
 
@@ -397,15 +390,14 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
 //  TKrnlSysInfo functions
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TKrnlSysInfo::bCmdLineArg(  const   tCIDLib::TCard4 c4Index
-                            , const tCIDLib::TCh*&  pszToFill)
+TKrnlSysInfo::bCmdLineArg(const tCIDLib::TCard4 c4Index, TKrnlString& kstrToFill)
 {
     if (c4Index >= CIDKernel_SystemInfo_Win32::CachedInfo.c4ArgCnt)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_IndexError);
         return kCIDLib::False;
     }
-    pszToFill = CIDKernel_SystemInfo_Win32::CachedInfo.apszArgList[c4Index];
+    kstrToFill = CIDKernel_SystemInfo_Win32::CachedInfo.apszArgList[c4Index];
     return kCIDLib::True;
 }
 
@@ -457,8 +449,7 @@ TKrnlSysInfo::bQueryMachineID(          tCIDLib::TCh* const pchBuffer
 
 
 tCIDLib::TBoolean
-TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
-                                , const tCIDLib::TCard4         c4MaxChars
+TKrnlSysInfo::bQuerySpecialPath(        TKrnlString&            kstrToFill
                                 , const tCIDLib::ESpecialPaths  ePath)
 {
     tCIDLib::TSInt iFolder;
@@ -530,15 +521,7 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
     };
 
     tCIDLib::TCh szBuf[kCIDLib::c4MaxPathLen + 1];
-    HRESULT hRes = ::SHGetFolderPathW
-    (
-        0
-        , iFolder
-        , 0
-        , SHGFP_TYPE_CURRENT
-        , szBuf
-    );
-
+    HRESULT hRes = ::SHGetFolderPathW(0, iFolder, 0, SHGFP_TYPE_CURRENT, szBuf);
     if (!SUCCEEDED(hRes))
     {
         TKrnlError::SetLastHostError(::GetLastError());
@@ -546,22 +529,26 @@ TKrnlSysInfo::bQuerySpecialPath(        tCIDLib::TCh* const     pszBuffer
     }
 
     // Normalize it to the caller's buffer
-    return TKrnlFileSys::bNormalizePath(szBuf, pszBuffer, c4MaxChars);
+    if (!TKrnlFileSys::bNormalizePath(szBuf, kstrToFill))
+        return kCIDLib::False;
+
+    // Make sure it ends with a separator
+    kstrToFill.AppendIfNotAlready(kCIDLib::chPathSep);
+    return kCIDLib::True;
 }
 
 
-tCIDLib::TBoolean
-TKrnlSysInfo::bQueryUserName(       tCIDLib::TCh* const pszBuffer
-                            , const tCIDLib::TCard4     c4MaxChars)
+tCIDLib::TBoolean TKrnlSysInfo::bQueryUserName(TKrnlString& kstrToFill)
 {
-    tCIDLib::TCard4 c4Chars = c4MaxChars;
+    tCIDLib::TCh szTmp[UNLEN + 1];
 
-    if (!::GetUserName(pszBuffer, &c4Chars))
+    tCIDLib::TCard4 c4Chars = UNLEN;
+    if (!::GetUserName(szTmp, &c4Chars))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-    pszBuffer[c4Chars] = 0;
+    kstrToFill.Set(szTmp);
     return kCIDLib::True;
 }
 
@@ -689,12 +676,6 @@ tCIDLib::TCard4 TKrnlSysInfo::c4SSELevel()
 tCIDLib::TCard8 TKrnlSysInfo::c8TotalPhysicalMem()
 {
     return CIDKernel_SystemInfo_Win32::CachedInfo.c8TotalPhysicalMem;
-}
-
-
-tCIDLib::ECPUTypes TKrnlSysInfo::eCPUType()
-{
-    return CIDKernel_SystemInfo_Win32::CachedInfo.eCPUType;
 }
 
 

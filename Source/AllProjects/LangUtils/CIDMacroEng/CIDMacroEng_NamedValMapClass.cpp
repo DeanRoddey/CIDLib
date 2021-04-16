@@ -49,8 +49,8 @@ namespace CIDMacroEng_NamedValMapClass
     //  The names for the types that we support here. Each derivative has to
     //  be able to return strings that contain its name and full name.
     // -----------------------------------------------------------------------
-    const TString   strNamedValMap(L"NamedValMap");
-    const TString   strNamedValMapClassPath(L"MEng.System.Runtime.NamedValMap");
+    static const TString   strNamedValMap(L"NamedValMap");
+    static const TString   strNamedValMapClassPath(L"MEng.System.Runtime.NamedValMap");
 }
 
 
@@ -172,20 +172,21 @@ TMEngNamedValMapInfo::TMEngNamedValMapInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_AddItem(kMacroEng::c2BadId)
-    , m_c2MethId_AddValue(kMacroEng::c2BadId)
-    , m_c2MethId_ClearMap(kMacroEng::c2BadId)
-    , m_c2MethId_ClearItem(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetValue(kMacroEng::c2BadId)
-    , m_c2MethId_IsEmpty(kMacroEng::c2BadId)
-    , m_c2MethId_ItemExists(kMacroEng::c2BadId)
-    , m_c2MethId_ItemIsEmpty(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveItem(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveSubKey(kMacroEng::c2BadId)
-    , m_c2MethId_SetValue(kMacroEng::c2BadId)
-    , m_c2MethId_SubKeyExists(kMacroEng::c2BadId)
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
+    , m_c2MethId_AddItem(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AddValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ClearMap(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ClearItem(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetValueIfExists(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsEmpty(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ItemExists(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ItemIsEmpty(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveItem(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveSubKey(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetValue(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SubKeyExists(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
     , m_c4ErrId_AddItem(kCIDLib::c4MaxCard)
     , m_c4ErrId_AddValue(kCIDLib::c4MaxCard)
     , m_c4ErrId_ClearItem(kCIDLib::c4MaxCard)

@@ -51,6 +51,7 @@ TCIDRTPRec::TCIDRTPRec() :
     m_c2LastSeqId(0)
     , m_c4LastTime(0)
     , m_c4Stat_BadPackets(0)
+    , m_c4Stat_MediaFmt(0)
     , m_c4Stat_MissingPackets(0)
     , m_c4Stat_OutSeqPackets(0)
     , m_c4Stat_TotalPackets(0)
@@ -466,10 +467,7 @@ tCIDLib::EExitCodes TCIDRTPRec::eReadThread(TThread& thrThis, tCIDLib::TVoid*)
     //  The select items don't own the sockets, so we can safely pass in pointers
     //  to our socket members.
     //
-    TRefVector<TMSockSelItem> colSelList
-    (
-        tCIDLib::EAdoptOpts::Adopt, 2, tCIDLib::EMTStates::Unsafe
-    );
+    TRefVector<TMSockSelItem> colSelList(tCIDLib::EAdoptOpts::Adopt, 2);
     colSelList.Add(new TMSockSelItem(m_psockRTP));
     colSelList.Add(new TMSockSelItem(m_psockRTCP));
 

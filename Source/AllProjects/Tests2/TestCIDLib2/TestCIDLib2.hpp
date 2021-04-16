@@ -45,7 +45,43 @@
 // ---------------------------------------------------------------------------
 //  Include our own internally used headers
 // ---------------------------------------------------------------------------
+#include    "TestCIDLib2_BinStreams.hpp"
+#include    "TestCIDLib2_TextStreams.hpp"
 #include    "TestCIDLib2_IDLGen.hpp"
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_Atomics
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_Atomics : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_Atomics();
+
+        ~TTest_Atomics();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_Atomics,TTestFWTest)
+};
 
 
 
@@ -288,6 +324,73 @@ class TTest_Area3 : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_BagMove
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_BagMove : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_BagMove();
+
+        ~TTest_BagMove();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_BagMove,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_BagPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_BagPlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_BagPlace();
+
+        ~TTest_BagPlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_BagPlace,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_Base641
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -493,10 +596,20 @@ class TTest_ColAlgo1 : public TTestFWTest
         // -------------------------------------------------------------------
         TTest_ColAlgo1();
 
+        TTest_ColAlgo1(const TTest_ColAlgo1&) = delete;
+        TTest_ColAlgo1(TTest_ColAlgo1&&) = delete;
+
         ~TTest_ColAlgo1();
 
 
         // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TTest_ColAlgo1& operator=(const TTest_ColAlgo1&) = delete;
+        TTest_ColAlgo1& operator=(TTest_ColAlgo1&&) = delete;
+
+
+        // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
         tTestFWLib::ETestRes eRunTest
@@ -507,144 +620,19 @@ class TTest_ColAlgo1 : public TTestFWTest
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-const methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bTestConstMap
+        (
+            const   TVector<TCardinal>&     colTest
+        );
+
+
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_ColAlgo1,TTestFWTest)
-};
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinInStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedBinInStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedBinInStream();
-
-        ~TTest_ChunkedBinInStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedBinInStream,TTestFWTest)
-};
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedBinOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedBinOutStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedBinOutStream();
-
-        ~TTest_ChunkedBinOutStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedBinOutStream,TTestFWTest)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextInStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedTextInStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedTextInStream();
-
-        ~TTest_ChunkedTextInStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedTextInStream,TTestFWTest)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_ChunkedTextOutStream
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_ChunkedTextOutStream : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_ChunkedTextOutStream();
-
-        ~TTest_ChunkedTextOutStream();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_ChunkedTextOutStream,TTestFWTest)
 };
 
 
@@ -885,6 +873,39 @@ class TTest_DequeMoveSem : public TTestFWTest
 };
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_DequePlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_DequePlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_DequePlace();
+
+        ~TTest_DequePlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_DequePlace,TTestFWTest)
+};
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -983,6 +1004,73 @@ class TTest_FixedSizePool : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_FixedSizePool,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_FixedSizePoolPtr
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_FixedSizePoolPtr : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_FixedSizePoolPtr();
+
+        ~TTest_FixedSizePoolPtr();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_FixedSizePoolPtr,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_FundArrayMove
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_FundArrayMove : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_FundArrayMove();
+
+        ~TTest_FundArrayMove();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_FundArrayMove, TTestFWTest)
 };
 
 
@@ -1190,6 +1278,106 @@ class TTest_FlagJanitor : public TTestFWTest
 };
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_HashSetMove
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_HashSetMove : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_HashSetMove();
+
+        ~TTest_HashSetMove();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_HashSetMove,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_HashSetPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_HashSetPlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_HashSetPlace();
+
+        ~TTest_HashSetPlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_HashSetPlace,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_LambdaJan
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_LambdaJan : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_LambdaJan();
+
+        ~TTest_LambdaJan();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_LambdaJan,TTestFWTest)
+};
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_LogLimiter
 // PREFIX: tfwt
@@ -1288,6 +1476,121 @@ class TTest_MemBufExp : public TTestFWTest
         RTTIDefs(TTest_MemBufExp,TTestFWTest)
 };
 
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_MemberPtr1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_MemberPtr1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_MemberPtr1();
+
+        ~TTest_MemberPtr1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data types
+        // -------------------------------------------------------------------
+        struct TTestData
+        {
+            TTestData()
+            {
+                s_c4Count++;
+            }
+
+            TTestData(const TTestData& tdSrc)
+            {
+                s_c4Count++;
+            }
+
+            ~TTestData()
+            {
+                s_c4Count--;
+            }
+
+            TTestData& operator=(const TTestData&)
+            {
+            }
+
+            static tCIDLib::TCard4 s_c4Count;
+        };
+
+        using TTestPtr = TMemberPtr<TTestData>;
+        struct TTestWrapper
+        {
+            TTestWrapper() :
+
+                m_mbptrTest1(new TTestData())
+                , m_mbptrTest2(new TTestData())
+            {
+            }
+
+            TTestWrapper(const TTestWrapper&) = default;
+            TTestWrapper& operator=(const TTestWrapper&) = default;
+            ~TTestWrapper() = default;
+
+            TTestPtr    m_mbptrTest1;
+            TTestPtr    m_mbptrTest2;
+        };
+
+        struct TCopyOp
+        {
+            TTestData* operator()(TTestData* pData) { return new TTestData(*pData); }
+        };
+        struct TDelOp
+        {
+            tCIDLib::TVoid operator()(TTestData* pData) { delete pData; }
+        };
+        struct TTestWrapperCD
+        {
+            TTestWrapperCD() :
+
+                m_mbptrTest1(new TTestData(), TCopyOp(), TDelOp())
+                , m_mbptrTest2(new TTestData(), TCopyOp(), TDelOp())
+            {
+            }
+
+            TTestWrapperCD(const TTestWrapperCD&) = default;
+            TTestWrapperCD& operator=(const TTestWrapperCD&) = default;
+            ~TTestWrapperCD() = default;
+
+            TTestPtr    m_mbptrTest1;
+            TTestPtr    m_mbptrTest2;
+        };
+
+
+
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eTestThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_MemberPtr1,TTestFWTest)
+};
 
 
 // ---------------------------------------------------------------------------
@@ -1425,18 +1728,18 @@ class TTest_ObjArrayMoveSem : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_UniquePtr
+//  CLASS: TTest_ObjLocker1
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_UniquePtr : public TTestFWTest
+class TTest_ObjLocker1 : public TTestFWTest
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructor and Destructor
         // -------------------------------------------------------------------
-        TTest_UniquePtr();
+        TTest_ObjLocker1();
 
-        ~TTest_UniquePtr();
+        ~TTest_ObjLocker1();
 
 
         // -------------------------------------------------------------------
@@ -1453,8 +1756,43 @@ class TTest_UniquePtr : public TTestFWTest
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_UniquePtr,TTestFWTest)
+        RTTIDefs(TTest_ObjLocker1,TTestFWTest)
 };
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_MetaProg1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_MetaProg1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_MetaProg1();
+
+        ~TTest_MetaProg1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_MetaProg1,TTestFWTest)
+};
+
 
 
 
@@ -1462,7 +1800,7 @@ class TTest_UniquePtr : public TTestFWTest
 //  CLASS: TTest_PubSub
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
+class TTest_PubSub1 : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -1517,7 +1855,7 @@ class TTest_PubSub1 : public TTestFWTest, public MPubSubscription
 //  CLASS: TTest_PubSubVector
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
+class TTest_PubSubVector : public TTestFWTest, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -1584,6 +1922,73 @@ class TTest_PubSubVector : public TTestFWTest, public MPubSubscription
         // -------------------------------------------------------------------
         RTTIDefs(TTest_PubSubVector,TTestFWTest)
 };
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_RawBits
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_RawBits : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_RawBits();
+
+        ~TTest_RawBits();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_RawBits, TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_RefVectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_RefVectorBasic : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_RefVectorBasic();
+
+        ~TTest_RefVectorBasic();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_RefVectorBasic,TTestFWTest)
+};
+
 
 
 // ---------------------------------------------------------------------------
@@ -1880,6 +2285,40 @@ class TTest_String3 : public TTestFWTest
 };
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringCat
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_StringCat : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_StringCat();
+
+        ~TTest_StringCat();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_StringCat,TTestFWTest)
+};
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_StringMove
 // PREFIX: tfwt
@@ -1914,18 +2353,18 @@ class TTest_StringMove : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_StringCat
+//  CLASS: TTest_StringTokens
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
-class TTest_StringCat : public TTestFWTest
+class TTest_StringTokens : public TTestFWTest
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructor and Destructor
         // -------------------------------------------------------------------
-        TTest_StringCat();
+        TTest_StringTokens();
 
-        ~TTest_StringCat();
+        ~TTest_StringTokens();
 
 
         // -------------------------------------------------------------------
@@ -1940,9 +2379,90 @@ class TTest_StringCat : public TTestFWTest
 
     private :
         // -------------------------------------------------------------------
+        //  Private data types
+        // -------------------------------------------------------------------
+        struct TTestRes
+        {
+            TString::ETokenFind     eFindRes;
+            const tCIDLib::TCh*     pszText;
+            tCIDLib::TCh            chToken = kCIDLib::chNull;
+            tCIDLib::TCard4         c4Width = 0;
+            tCIDLib::EHJustify      eJustify = tCIDLib::EHJustify::Right;
+            tCIDLib::TCh            chFill = kCIDLib::chSpace;
+            tCIDLib::TCard4         c4Precision = 0;
+        };
+
+        // -------------------------------------------------------------------
+        //
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bRunOneTest
+        (
+                    TTextStringOutStream&   strmOutput
+            , const tCIDLib::TCh* const     pszFormat
+            , const TTestRes* const         apRes
+            , const tCIDLib::TCard4         c4ResCount
+            , const tCIDLib::TCh* const     pszTestName
+        );
+
+
+        // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TTest_StringCat,TTestFWTest)
+        RTTIDefs(TTest_StringTokens,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_StringTokenRep
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_StringTokenRep : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_StringTokenRep();
+
+        ~TTest_StringTokenRep();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        template <typename T> tCIDLib::TBoolean
+        bTestOne(       TTextOutStream&         strmOut
+                , const TTFWCurLn&              tfwCurLine
+                , const tCIDLib::TCh* const     pszFmt
+                , const T                       tVal
+                , const tCIDLib::TCh* const     pszRes
+                ,       TString&                strTmp)
+        {
+            strTmp.Format(pszFmt, tVal);
+            if (strTmp != pszRes)
+            {
+                strmOut << tfwCurLine << L"Result should have been '"
+                        << pszRes << L"'\n";
+                return kCIDLib::False;
+            }
+            return kCIDLib::True;
+        }
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_StringTokenRep,TTestFWTest)
 };
 
 
@@ -2049,7 +2569,7 @@ class TTest_Time3 : public TTestFWTest
             ,       tTestFWLib::ETestRes&   eRes
             , const TTFWCurLn&              twclAt
             , const tCIDLib::TCh* const     pszSrc
-            , const TTime::TCompList&       fcolComps
+            , const TTimeCompList&          fcolComps
             , const tCIDLib::TCh            chDateSep
             , const tCIDLib::TCh            chTimeSep
             , const tCIDLib::TCh            chTZSep
@@ -2096,6 +2616,40 @@ class TTest_Time4 : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_Time4,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_Time5
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_Time5 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_Time5();
+
+        ~TTest_Time5();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_Time5,TTestFWTest)
 };
 
 
@@ -2169,6 +2723,72 @@ class TTest_SimplePool : public TTestFWTest
 
 
 // ---------------------------------------------------------------------------
+//  CLASS: TTest_UniquePtr
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_UniquePtr : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_UniquePtr();
+
+        ~TTest_UniquePtr();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_UniquePtr,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorBasic
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_VectorBasic : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_VectorBasic();
+
+        ~TTest_VectorBasic();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_VectorBasic,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
 //  CLASS: TTest_VectorLambda
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
@@ -2232,6 +2852,166 @@ class TTest_VectorMoveSem : public TTestFWTest
         // -------------------------------------------------------------------
         RTTIDefs(TTest_VectorMoveSem,TTestFWTest)
 };
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_VectorPlace
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_VectorPlace : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_VectorPlace();
+
+        ~TTest_VectorPlace();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_VectorPlace,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr1 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr1();
+
+        ~TTest_WeakPtr1();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr1,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr2
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr2 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr2();
+
+        ~TTest_WeakPtr2();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr2,TTestFWTest)
+};
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_WeakPtr3
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_WeakPtr3 : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_WeakPtr3();
+
+        ~TTest_WeakPtr3();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::EExitCodes eTestThread
+        (
+                    TThread&                thrThis
+            ,       tCIDLib::TVoid*         pData
+        );
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colThreads
+        //      A list of threads we start up to do the testing. They are all started
+        //      on eTestThread.
+        //
+        //  m_cptrTest
+        //      A weak pointer that the threads will convert to strongs and update the
+        //      value and back again, and we'll copy/assign in various ways to insure
+        //      the ref count management is correct.
+        // -------------------------------------------------------------------
+        TRefVector<TThread>         m_colThreads;
+        TWeakPtr<TSafeCard4Counter> m_wptrTest;
+
+
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_WeakPtr3,TTestFWTest)
+};
+
 
 
 // ---------------------------------------------------------------------------

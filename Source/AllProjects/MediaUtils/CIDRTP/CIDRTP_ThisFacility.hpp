@@ -42,6 +42,7 @@ class CIDRTPEXP TFacCIDRTP : public TFacility
         TFacCIDRTP();
 
         TFacCIDRTP(const TFacCIDRTP&) = delete;
+        TFacCIDRTP(TFacCIDRTP&&) = delete;
 
         ~TFacCIDRTP();
 
@@ -50,6 +51,7 @@ class CIDRTPEXP TFacCIDRTP : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDRTP& operator=(const TFacCIDRTP&) = delete;
+        TFacCIDRTP& operator=(TFacCIDRTP&&) = delete;
 
 
         // -------------------------------------------------------------------

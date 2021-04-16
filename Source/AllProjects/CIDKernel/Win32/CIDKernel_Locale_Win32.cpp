@@ -63,63 +63,66 @@ struct TLangXlat
 
 namespace CIDKernel_Locale_Win32
 {
-    // ---------------------------------------------------------------------------
-    //  Local, static data
-    //
-    //  alxTable
-    //  c4LangXlatCount
-    //      A table to translate the CIDLib languag ids into local platform
-    //      language ids, and vice versa, and its size.
-    //
-    //  lcidUser
-    //      The locale id of the user locale that we load up info about. Its
-    //      set up during module init.
-    // ---------------------------------------------------------------------------
-    static TLangXlat alxlTable[] =
+    namespace
     {
-            { tCIDLib::ELanguages::Afrikaans  , 0x36 }
-        ,   { tCIDLib::ELanguages::Albanian   , 0x1c }
-        ,   { tCIDLib::ELanguages::Arabic     , 0x01 }
-        ,   { tCIDLib::ELanguages::Basque     , 0x2d }
-        ,   { tCIDLib::ELanguages::Belarusian , 0x23 }
-        ,   { tCIDLib::ELanguages::Bulgarian  , 0x02 }
-        ,   { tCIDLib::ELanguages::Catalan    , 0x03 }
-        ,   { tCIDLib::ELanguages::Chinese    , 0x04 }
-        ,   { tCIDLib::ELanguages::Croatian   , 0x1a }
-        ,   { tCIDLib::ELanguages::Czech      , 0x05 }
-        ,   { tCIDLib::ELanguages::Danish     , 0x06 }
-        ,   { tCIDLib::ELanguages::Dutch      , 0x13 }
-        ,   { tCIDLib::ELanguages::English    , 0x09 }
-        ,   { tCIDLib::ELanguages::Farsi      , 0x29 }
-        ,   { tCIDLib::ELanguages::Finnish    , 0x0b }
-        ,   { tCIDLib::ELanguages::French     , 0x0c }
-        ,   { tCIDLib::ELanguages::German     , 0x07 }
-        ,   { tCIDLib::ELanguages::Greek      , 0x08 }
-        ,   { tCIDLib::ELanguages::Hebrew     , 0x0d }
-        ,   { tCIDLib::ELanguages::Hungarian  , 0x0e }
-        ,   { tCIDLib::ELanguages::Icelandic  , 0x0f }
-        ,   { tCIDLib::ELanguages::Indonesian , 0x21 }
-        ,   { tCIDLib::ELanguages::Italian    , 0x10 }
-        ,   { tCIDLib::ELanguages::Japanese   , 0x11 }
-        ,   { tCIDLib::ELanguages::Korean     , 0x12 }
-        ,   { tCIDLib::ELanguages::Latvian    , 0x26 }
-        ,   { tCIDLib::ELanguages::Lithuanian , 0x27 }
-        ,   { tCIDLib::ELanguages::Norwegian  , 0x14 }
-        ,   { tCIDLib::ELanguages::Polish     , 0x15 }
-        ,   { tCIDLib::ELanguages::Portuguese , 0x16 }
-        ,   { tCIDLib::ELanguages::Romanian   , 0x18 }
-        ,   { tCIDLib::ELanguages::Russian    , 0x19 }
-        ,   { tCIDLib::ELanguages::Serbian    , 0x1a }
-        ,   { tCIDLib::ELanguages::Slovak     , 0x1b }
-        ,   { tCIDLib::ELanguages::Slovenian  , 0x24 }
-        ,   { tCIDLib::ELanguages::Spanish    , 0x0a }
-        ,   { tCIDLib::ELanguages::Swedish    , 0x1d }
-        ,   { tCIDLib::ELanguages::Turkish    , 0x1f }
-        ,   { tCIDLib::ELanguages::Ukrainian  , 0x22 }
-        ,   { tCIDLib::ELanguages::Vietnamese , 0x2a }
-    };
-    static tCIDLib::TCard4  c4LangXlatCount = tCIDLib::c4ArrayElems(alxlTable);
-    static LCID             lcidUser;
+        // ---------------------------------------------------------------------------
+        //  Local, static data
+        //
+        //  alxTable
+        //  c4LangXlatCount
+        //      A table to translate the CIDLib languag ids into local platform
+        //      language ids, and vice versa, and its size.
+        //
+        //  lcidUser
+        //      The locale id of the user locale that we load up info about. Its
+        //      set up during module init.
+        // ---------------------------------------------------------------------------
+        static TLangXlat alxlTable[] =
+        {
+                { tCIDLib::ELanguages::Afrikaans  , 0x36 }
+            ,   { tCIDLib::ELanguages::Albanian   , 0x1c }
+            ,   { tCIDLib::ELanguages::Arabic     , 0x01 }
+            ,   { tCIDLib::ELanguages::Basque     , 0x2d }
+            ,   { tCIDLib::ELanguages::Belarusian , 0x23 }
+            ,   { tCIDLib::ELanguages::Bulgarian  , 0x02 }
+            ,   { tCIDLib::ELanguages::Catalan    , 0x03 }
+            ,   { tCIDLib::ELanguages::Chinese    , 0x04 }
+            ,   { tCIDLib::ELanguages::Croatian   , 0x1a }
+            ,   { tCIDLib::ELanguages::Czech      , 0x05 }
+            ,   { tCIDLib::ELanguages::Danish     , 0x06 }
+            ,   { tCIDLib::ELanguages::Dutch      , 0x13 }
+            ,   { tCIDLib::ELanguages::English    , 0x09 }
+            ,   { tCIDLib::ELanguages::Farsi      , 0x29 }
+            ,   { tCIDLib::ELanguages::Finnish    , 0x0b }
+            ,   { tCIDLib::ELanguages::French     , 0x0c }
+            ,   { tCIDLib::ELanguages::German     , 0x07 }
+            ,   { tCIDLib::ELanguages::Greek      , 0x08 }
+            ,   { tCIDLib::ELanguages::Hebrew     , 0x0d }
+            ,   { tCIDLib::ELanguages::Hungarian  , 0x0e }
+            ,   { tCIDLib::ELanguages::Icelandic  , 0x0f }
+            ,   { tCIDLib::ELanguages::Indonesian , 0x21 }
+            ,   { tCIDLib::ELanguages::Italian    , 0x10 }
+            ,   { tCIDLib::ELanguages::Japanese   , 0x11 }
+            ,   { tCIDLib::ELanguages::Korean     , 0x12 }
+            ,   { tCIDLib::ELanguages::Latvian    , 0x26 }
+            ,   { tCIDLib::ELanguages::Lithuanian , 0x27 }
+            ,   { tCIDLib::ELanguages::Norwegian  , 0x14 }
+            ,   { tCIDLib::ELanguages::Polish     , 0x15 }
+            ,   { tCIDLib::ELanguages::Portuguese , 0x16 }
+            ,   { tCIDLib::ELanguages::Romanian   , 0x18 }
+            ,   { tCIDLib::ELanguages::Russian    , 0x19 }
+            ,   { tCIDLib::ELanguages::Serbian    , 0x1a }
+            ,   { tCIDLib::ELanguages::Slovak     , 0x1b }
+            ,   { tCIDLib::ELanguages::Slovenian  , 0x24 }
+            ,   { tCIDLib::ELanguages::Spanish    , 0x0a }
+            ,   { tCIDLib::ELanguages::Swedish    , 0x1d }
+            ,   { tCIDLib::ELanguages::Turkish    , 0x1f }
+            ,   { tCIDLib::ELanguages::Ukrainian  , 0x22 }
+            ,   { tCIDLib::ELanguages::Vietnamese , 0x2a }
+        };
+        static tCIDLib::TCard4  c4LangXlatCount = tCIDLib::c4ArrayElems(alxlTable);
+        static LCID             lcidUser;
+    }
 }
 
 
@@ -129,9 +132,9 @@ namespace CIDKernel_Locale_Win32
 // ---------------------------------------------------------------------------
 static tCIDLib::TCard4 c4GetDecValue(const tCIDLib::TCard4 c4Index)
 {
-    tCIDLib::TBoolean       bValid;
-    const tCIDLib::TCard4   c4TmpChars = 128;
-    tCIDLib::TCh            szTmp[c4TmpChars + 1];
+    tCIDLib::TBoolean           bValid;
+    constexpr tCIDLib::TCard4   c4TmpChars = 128;
+    tCIDLib::TCh                szTmp[c4TmpChars + 1];
 
     if (!::GetLocaleInfo(CIDKernel_Locale_Win32::lcidUser, c4Index, szTmp, c4TmpChars))
         TKrnlError::ThrowHostError(::GetLastError());
@@ -146,9 +149,9 @@ static tCIDLib::TCard4 c4GetDecValue(const tCIDLib::TCard4 c4Index)
 
 static tCIDLib::TCard4 c4GetHexValue(const tCIDLib::TCard4 c4Index)
 {
-    tCIDLib::TBoolean       bValid;
-    const tCIDLib::TCard4   c4TmpChars = 128;
-    tCIDLib::TCh            szTmp[c4TmpChars + 1];
+    tCIDLib::TBoolean           bValid;
+    constexpr tCIDLib::TCard4   c4TmpChars = 128;
+    tCIDLib::TCh                szTmp[c4TmpChars + 1];
 
     if (!::GetLocaleInfo(CIDKernel_Locale_Win32::lcidUser, c4Index, szTmp, c4TmpChars))
         TKrnlError::ThrowHostError(::GetLastError());
@@ -163,8 +166,8 @@ static tCIDLib::TCard4 c4GetHexValue(const tCIDLib::TCard4 c4Index)
 
 static tCIDLib::TCh chGetCharValue(const tCIDLib::TCard4 c4Index)
 {
-    const tCIDLib::TCard4   c4TmpChars = 127;
-    tCIDLib::TCh            szTmp[c4TmpChars + 1];
+    constexpr tCIDLib::TCard4   c4TmpChars = 127;
+    tCIDLib::TCh                szTmp[c4TmpChars + 1];
 
     if (!::GetLocaleInfo(CIDKernel_Locale_Win32::lcidUser, c4Index, szTmp, c4TmpChars))
         TKrnlError::ThrowHostError(::GetLastError());
@@ -253,7 +256,7 @@ ConvertDateTimeFormat(          tCIDLib::TCh* const pszInOut
                         , const tCIDLib::TCh* const pszSeparators)
 {
     // Strings to build up tokens and the output
-    const tCIDLib::TCard4 c4TmpChars = 127;
+    constexpr tCIDLib::TCard4 c4TmpChars = 127;
     tCIDLib::TCh szToken[c4TmpChars+1];
     tCIDLib::TCh szOutput[c4TmpChars+1];
 
@@ -627,11 +630,11 @@ TKrnlLocale::bQueryStrField(const   EStrFlds            eField
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
 {
-    tCIDLib::TBoolean       bValid;
-    tCIDLib::TCard4         c4Tmp;
-    const tCIDLib::TCard4   c4BufSize = 1023;
-    tCIDLib::TCh            szTmp[c4BufSize+1];
-    tCIDLib::TCh*           pszTmp;
+    constexpr tCIDLib::TCard4   c4BufSize = 1023;
+    tCIDLib::TBoolean           bValid;
+    tCIDLib::TCard4             c4Tmp;
+    tCIDLib::TCh                szTmp[c4BufSize + 1];
+    tCIDLib::TCh*               pszTmp;
 
     try
     {
@@ -673,7 +676,7 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
         //  Now query and convert the date/time formatting strings and
         //  store them.
         //
-        const tCIDLib::TCard4 c4DTBufChars = c4MaxBufChars(s_szTimeFmt);
+        constexpr tCIDLib::TCard4 c4DTBufChars = c4MaxBufChars(s_szTimeFmt);
         GetStringValue(LOCALE_STIMEFORMAT, s_szTimeFmt, c4DTBufChars);
         ConvertDateTimeFormat(s_szTimeFmt, c4DTBufChars, szDTSeps);
 

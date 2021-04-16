@@ -50,6 +50,7 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
         TRXMatcher() {}
 
         TRXMatcher(const TRXMatcher&) = delete;
+        TRXMatcher(TRXMatcher&&) = delete;
 
         ~TRXMatcher() {}
 
@@ -58,6 +59,7 @@ class CIDREGXEXP TRXMatcher : public TObject, public MFormattable
         //  Public operators
         // --------------------------------------------------------------------
         TRXMatcher& operator=(const TRXMatcher&) = delete;
+        TRXMatcher& operator=(TRXMatcher&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -99,6 +101,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         );
 
         TRegExNFA(const TRegExNFA&) = delete;
+        TRegExNFA(TRegExNFA&&) = delete;
 
         ~TRegExNFA();
 
@@ -107,6 +110,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         //  Public operators
         // --------------------------------------------------------------------
         TRegExNFA& operator==(const TRegExNFA&) = delete;
+        TRegExNFA& operator==(TRegExNFA&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -141,7 +145,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
             const   tCIDLib::TCard4         c4MaxStates
         );
 
-        tCIDLib::TCard4 c4StateCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4StateCount() const;
 
         tCIDLib::TCard4 c4LastState() const;
 
@@ -231,7 +235,7 @@ class CIDREGXEXP TRegExNFA : public TObject, public MFormattable
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
 
     private :

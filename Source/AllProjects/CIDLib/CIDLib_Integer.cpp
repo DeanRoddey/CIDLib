@@ -54,14 +54,8 @@ AdvRTTIDecls(TLocInteger64,TInteger64)
 // ---------------------------------------------------------------------------
 TInteger& TInteger::Nul_TInteger()
 {
-    static TInteger* piNull = nullptr;
-    if (!piNull)
-    {
-        TBaseLock lockInit;
-        if (!piNull)
-            TRawMem::pExchangePtr(&piNull, new TInteger);
-    }
-    return *piNull;
+    static TInteger iNull;
+    return iNull;
 }
 
 
@@ -255,14 +249,8 @@ tCIDLib::TVoid TInteger::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 TInteger64& TInteger64::Nul_TInteger64()
 {
-    static TInteger64* piNull = nullptr;
-    if (!piNull)
-    {
-        TBaseLock lockInit;
-        if (!piNull)
-            TRawMem::pExchangePtr(&piNull, new TInteger64);
-    }
-    return *piNull;
+    static TInteger64 iNull;
+    return iNull;
 }
 
 

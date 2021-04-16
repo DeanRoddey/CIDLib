@@ -44,12 +44,15 @@ RTTIDecls(TMEngSpeechInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_SpeechClass
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strSpeech(L"Speech");
-    const TString   strSpeechClassPath(L"MEng.System.Runtime.Speech");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strSpeech(L"Speech");
+        const TString   strSpeechClassPath(L"MEng.System.Runtime.Speech");
+    }
 }
 
 
@@ -128,12 +131,12 @@ TMEngSpeechInfo::TMEngSpeechInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
-    , m_c2TypeId_Flags(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_SetVoice(kMacroEng::c2BadId)
-    , m_c2MethId_Speak(kMacroEng::c2BadId)
-    , m_c2MethId_WaitTillDone(kMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Flags(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetVoice(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Speak(kCIDMacroEng::c2BadId)
+    , m_c2MethId_WaitTillDone(kCIDMacroEng::c2BadId)
     , m_c4ErrId_SetVoice(kCIDLib::c4MaxCard)
     , m_c4ErrId_Speak(kCIDLib::c4MaxCard)
     , m_c4ErrId_WaitTillDone(kCIDLib::c4MaxCard)

@@ -50,39 +50,14 @@ RTTIDecls(TMemBuf,TObject)
 // ---------------------------------------------------------------------------
 TMemBuf& TMemBuf::Nul_TMemBuf()
 {
-    static TMemBuf* pmbufNull = 0;
-    if (!pmbufNull)
-    {
-        TBaseLock lockInit;
-        if (!pmbufNull)
-        {
-            TRawMem::pExchangePtr
-            (
-                &pmbufNull, static_cast<TMemBuf*>(new THeapBuf(1))
-            );
-        }
-    }
-    return *pmbufNull;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TMemBuf: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TMemBuf::~TMemBuf()
-{
+    static THeapBuf mbufNull(1);
+    return mbufNull;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TMemBuf: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TCard1& TMemBuf::operator[](const tCIDLib::TCard4 c4Ind)
-{
-    tCIDLib::TCard1* pc1Buf = pc1CheckIndex(CID_LINE, c4Ind);
-    return pc1Buf[c4Ind];
-}
-
 tCIDLib::TCard1 TMemBuf::operator[](const tCIDLib::TCard4 c4Ind) const
 {
     const tCIDLib::TCard1* pc1Buf = pc1CheckIndex(CID_LINE, c4Ind);
@@ -115,30 +90,6 @@ tCIDLib::TBoolean TMemBuf::operator!=(const TMemBuf& mbufToTest) const
 // ---------------------------------------------------------------------------
 //  TMemBuf: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMemBuf::AppendFrom( const   TMemBuf&        mbufSrc
-                                    , const tCIDLib::TCard4 c4AppendAt
-                                    , const tCIDLib::TCard4 c4SrcBytes)
-{
-    if (!c4SrcBytes)
-        return;
-
-    // Check our buffer to append the indicated bytes at the index given
-    tCIDLib::TCard1* pc1Buf = pc1CheckRange
-    (
-        CID_LINE
-        , c4AppendAt
-        , c4SrcBytes
-    );
-
-    //
-    //  Verify that the source buffer has the bytes indicated, and then copy
-    //  them over.
-    //
-    const tCIDLib::TCard1* pc1SrcBuf = mbufSrc.pc1CheckRange(CID_LINE, 0, c4SrcBytes);
-    TRawMem::CopyMemBuf(&pc1Buf[c4AppendAt], pc1SrcBuf, c4SrcBytes);
-}
-
-
 tCIDLib::TBoolean TMemBuf::bAt(const tCIDLib::TCard4 c4Ind) const
 {
     const tCIDLib::TCard1* pc1Buf = pc1CheckRange
@@ -290,7 +241,7 @@ tCIDLib::TCard4 TMemBuf::c4MaxSize() const
 {
     tCIDLib::TCard4 c4CurSize;
     tCIDLib::TCard4 c4MaxSize;
-    pc1QueryBufInfo(c4CurSize, c4MaxSize);
+    QueryBufInfo(c4CurSize, c4MaxSize);
     return c4MaxSize;
 }
 
@@ -300,7 +251,7 @@ tCIDLib::TCard4 TMemBuf::c4Size() const
 {
     tCIDLib::TCard4 c4CurSize;
     tCIDLib::TCard4 c4MaxSize;
-    pc1QueryBufInfo(c4CurSize, c4MaxSize);
+    QueryBufInfo(c4CurSize, c4MaxSize);
     return c4CurSize;
 }
 
@@ -468,8 +419,8 @@ TMemBuf::HexEncode(const    tCIDLib::TCard4     c4Bytes
 
     const tCIDLib::TCard4 c4Count = c4Bytes ? c4Bytes : c4Size();
     const tCIDLib::TCard1* pc1Cur = pc1CheckRange(CID_LINE, 0, c4Count);
-    tCIDLib::TCh   ch1;
-    tCIDLib::TCh   ch2;
+    tCIDLib::TCh   ch1 = kCIDLib::chNull;
+    tCIDLib::TCh   ch2 = kCIDLib::chNull;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         // If they want a sep char, then add one if time to
@@ -568,7 +519,10 @@ TMemBuf::MakeSpace( const   tCIDLib::TCard4     c4At
     //
     //  Make sure there's enough space in the whole buffer, expanding if needed
     //  to hold all the content the caller says is of interest plus the extra
-    //  space
+    //  space.
+	//
+	//	WE HAVE TO call the pc1 version, since it will reallocate if required, even
+	//	though we aren't using the return value here!
     //
     pc1CheckRange(CID_LINE, 0, c4OrgCnt + c4SpaceSz);
 
@@ -623,13 +577,13 @@ TMemBuf::MoveToStart(const  tCIDLib::TCard4 c4StartInd
 }
 
 
-// Returns readable or writeable straems over this buffer
+// Returns readable or writeable streams over this buffer
 TBinInStream* TMemBuf::pstrmMakeReadable()
 {
     return new TBinInStream(new TMemInStreamImpl(this));
 }
 
-TBinOutStream* TMemBuf::pstrmMakeWriteable()
+TBinOutStream* TMemBuf::pstrmMakeWritable()
 {
     return new TBinOutStream(new TMemOutStreamImpl(this));
 }
@@ -934,7 +888,7 @@ TMemBuf::TMemBuf()
 
 //
 //  These are here just so that they can be called by derived classes. So, if we
-//  ever do add any members here, these will be in placed and called.
+//  ever do add any members here, these will be in place and called.
 //
 TMemBuf::TMemBuf(const TMemBuf&)
 {
@@ -959,6 +913,11 @@ TMemBuf& TMemBuf::operator=(TMemBuf&&)
 // ---------------------------------------------------------------------------
 //  TMemBuf: Protected, inherited methods
 // ---------------------------------------------------------------------------
+
+//
+//  Not really used, but if we are called, we should be called symmetrically so we
+//  issue a marker and check for it.
+//
 tCIDLib::TVoid TMemBuf::StreamFrom(TBinInStream& strmToReadFrom)
 {
     strmToReadFrom.CheckForStartMarker(CID_FILE, CID_LINE);
@@ -1022,6 +981,7 @@ TMemBuf::ValidateExpInc(const   tCIDLib::TCard4 c4Size
     }
 }
 
+
 tCIDLib::TVoid
 TMemBuf::ValidateSizes( const   tCIDLib::TCard4 c4Size
                         , const tCIDLib::TCard4 c4MaxSize)
@@ -1076,6 +1036,12 @@ TMemBuf::ValidateSizes( const   tCIDLib::TCard4 c4Size
 // ---------------------------------------------------------------------------
 //  TMemBuf: Private, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  These are called to get the buffer pointer and check indices and counts
+//  to make sure they are valid. If so, the buffer is returned. It may be faulted
+//  in or reallocated if needed, up to the max size.
+//
 const tCIDLib::TCard1*
 TMemBuf::pc1CheckIndex( const   tCIDLib::TCard4 c4Line
                         , const tCIDLib::TCard4 c4Index) const

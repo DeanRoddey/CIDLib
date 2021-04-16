@@ -32,26 +32,22 @@
 #include    "CIDXML_CMNodes_.hpp"
 
 
-
-// ---------------------------------------------------------------------------
-//  Magic RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TXMLChildCM,TXMLContentModel)
-
-
 namespace CIDXML_ChildCM
 {
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  c4EOCId
-    //  c4EpsilonId
-    //      There are a couple of special case values that are used here,
-    //      which are used like element ids but which are not real element
-    //      decls. So we provide these very large fake ids for that.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
-    const tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  c4EOCId
+        //  c4EpsilonId
+        //      There are a couple of special case values that are used here,
+        //      which are used like element ids but which are not real element
+        //      decls. So we provide these very large fake ids for that.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4EOCId       = kCIDLib::c4MaxCard - 1;
+        constexpr tCIDLib::TCard4    c4EpsilonId   = kCIDLib::c4MaxCard - 2;
+    }
 }
 
 
@@ -88,6 +84,7 @@ static tCIDLib::TVoid FormatCS(         TTextOutStream&         strmDest
     //  there. If the left is a leaf, we just display the leaf and there will
     //  not be any right child.
     //
+    CIDLib_Suppress(6011); // We null checked above
     const tCIDXML::ECMNodeTypes eType = pxcsnCur->eNodeType();
 
     switch(eType)
@@ -113,7 +110,10 @@ static tCIDLib::TVoid FormatCS(         TTextOutStream&         strmDest
                     , facCIDXML().strMsg(kXMLMsgs::midGen_element)
                 );
             }
-            strmDest << pxdeclLeaf->strFullName();
+             else
+            {
+                strmDest << pxdeclLeaf->strFullName();
+            }
             break;
         }
 
@@ -229,8 +229,8 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
     // Lets call a private method to build the DFA data structures
     BuildDFA();
 
-// A little debug code to print the transition table
-#if 0
+    // A little debug code to print the transition table
+    #if 0
     TOutConsole strmDest;
     for (tCIDLib::TCard4 c4Outer = 0; c4Outer < m_c4TransTableSize; c4Outer++)
     {
@@ -247,7 +247,7 @@ TXMLChildCM::TXMLChildCM(TXMLCMSpecNode* const pxcsnToAdopt) :
         }
         strmDest << kCIDLib::NewLn;
     }
-#endif
+    #endif
 }
 
 TXMLChildCM::~TXMLChildCM()
@@ -361,8 +361,6 @@ TXMLChildCM::FormatTo(          TTextOutStream& strmDest
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TXMLChildCM::BuildDFA()
 {
-    tCIDLib::TCard4 c4Index;
-
     //
     //  The first step we must take is to rewrite the original content spec
     //  node tree into a new tree which is more amenable to the NFA to DFA
@@ -421,8 +419,9 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //  the lists. Like the other ones, its recursive and works its way
     //  through the tree.
     //
+    tCIDLib::TCard4 c4Index = 0;
     m_pbtsFollowLists = new TBitset[m_c4LeafCount];
-    for (c4Index = 0; c4Index < m_c4LeafCount; c4Index++)
+    for (; c4Index < m_c4LeafCount; c4Index++)
         m_pbtsFollowLists[c4Index].ChangeBitCount(m_c4LeafCount);
     BuildFollowLists(m_pxcmnRoot);
 
@@ -440,7 +439,7 @@ tCIDLib::TVoid TXMLChildCM::BuildDFA()
     //
     m_pc4ElemList = new tCIDLib::TCard4[m_c4LeafCount];
     m_c4ElemListSize = 0;
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4LeafCount; c4Index++)
+    for (c4Index = 0; c4Index < m_c4LeafCount; c4Index++)
     {
         // Get the element id of the current leaf node
         const tCIDLib::TCard4 c4ElemId = m_pxcmnLeaves[c4Index]->c4ElemId();
@@ -668,6 +667,7 @@ tCIDLib::TVoid TXMLChildCM::BuildFollowLists(TXMLCMNode* const pxcmnCur)
     #endif
 
     // For convenience, get the node type out
+    CIDLib_Suppress(6011) // We null checked above
     const tCIDXML::ECMNodeTypes eType = pxcmnCur->eNodeType();
 
     switch(eType)
@@ -756,7 +756,9 @@ tCIDLib::TCard4
 TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
                             , const tCIDLib::TCard4     c4CurIndex)
 {
-    #if CID_DEBUG_ON
+    // Get a copy of the index so we can bump it up during our child processing
+    tCIDLib::TCard4 c4LocalIndex = c4CurIndex;
+
     if (!pxcmnCur)
     {
         facCIDXML().ThrowErr
@@ -768,59 +770,71 @@ TXMLChildCM::c4InitLeaves(          TXMLCMNode* const   pxcmnCur
             , tCIDLib::EErrClasses::Internal
         );
     }
-    #endif
-
-    // Tell this node the leaf count
-    pxcmnCur->c4MaxStates(m_c4LeafCount);
-
-    // Get a copy of the index so we can bump it up during our child processing
-    tCIDLib::TCard4 c4LocalIndex = c4CurIndex;
-
-    // For convenience, get the node type out
-    const tCIDXML::ECMNodeTypes eType = pxcmnCur->eNodeType();
-
-    switch(eType)
+    else if (c4CurIndex >= m_c4LeafCount)
     {
-        case tCIDXML::ECMNodeTypes::Alternation :
-        case tCIDXML::ECMNodeTypes::Sequence :
-        {
-            TXMLCMBinOp* pxcmnBin = static_cast<TXMLCMBinOp*>(pxcmnCur);
-            TXMLCMNode* pxcmnLeft = pxcmnBin->pxcmnLeft();
-            TXMLCMNode* pxcmnRight = pxcmnBin->pxcmnRight();
-            c4LocalIndex = c4InitLeaves(pxcmnLeft, c4LocalIndex);
-            c4LocalIndex = c4InitLeaves(pxcmnRight, c4LocalIndex);
-            break;
-        }
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Index
+            , TCardinal(c4CurIndex)
+            , TString(L"TXMLChildCM")
+            , TCardinal(m_c4LeafCount)
+        );
+    }
+     else
+    {
+        // Tell this node the leaf count
+        pxcmnCur->c4MaxStates(m_c4LeafCount);
 
-        case tCIDXML::ECMNodeTypes::ZeroOrMore :
-        {
-            TXMLCMUnaryOp* pxcmnUnary = static_cast<TXMLCMUnaryOp*>(pxcmnCur);
-            c4LocalIndex = c4InitLeaves(pxcmnUnary->pxcmnChild(), c4LocalIndex);
-            break;
-        }
+        // For convenience, get the node type out
+        const tCIDXML::ECMNodeTypes eType = pxcmnCur->eNodeType();
 
-        case tCIDXML::ECMNodeTypes::Leaf :
+        switch(eType)
         {
-            // If its a non-epsilon node, save it away
-            TXMLCMLeaf* pxcmnLeaf = static_cast<TXMLCMLeaf*>(pxcmnCur);
-            if (pxcmnLeaf->c4ElemId() != CIDXML_ChildCM::c4EpsilonId)
-                m_pxcmnLeaves[c4LocalIndex++] = pxcmnLeaf;
-            break;
-        }
+            case tCIDXML::ECMNodeTypes::Alternation :
+            case tCIDXML::ECMNodeTypes::Sequence :
+            {
+                TXMLCMBinOp* pxcmnBin = static_cast<TXMLCMBinOp*>(pxcmnCur);
+                TXMLCMNode* pxcmnLeft = pxcmnBin->pxcmnLeft();
+                TXMLCMNode* pxcmnRight = pxcmnBin->pxcmnRight();
+                c4LocalIndex = c4InitLeaves(pxcmnLeft, c4LocalIndex);
+                c4LocalIndex = c4InitLeaves(pxcmnRight, c4LocalIndex);
+                break;
+            }
 
-        default :
-            #if CID_DEBUG_ON
-            facCIDXML().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kXMLErrs::errcCM_BadCMTypeHere
-                , tCIDLib::ESeverities::ProcFatal
-                , tCIDLib::EErrClasses::Internal
-                , TInteger(tCIDLib::i4EnumOrd(eType))
-            );
-            #endif
-            break;
+            case tCIDXML::ECMNodeTypes::ZeroOrMore :
+            {
+                TXMLCMUnaryOp* pxcmnUnary = static_cast<TXMLCMUnaryOp*>(pxcmnCur);
+                c4LocalIndex = c4InitLeaves(pxcmnUnary->pxcmnChild(), c4LocalIndex);
+                break;
+            }
+
+            case tCIDXML::ECMNodeTypes::Leaf :
+            {
+                // If its a non-epsilon node, save it away
+                TXMLCMLeaf* pxcmnLeaf = static_cast<TXMLCMLeaf*>(pxcmnCur);
+                if (pxcmnLeaf->c4ElemId() != CIDXML_ChildCM::c4EpsilonId)
+                    m_pxcmnLeaves[c4LocalIndex++] = pxcmnLeaf;
+                break;
+            }
+
+            default :
+                #if CID_DEBUG_ON
+                facCIDXML().ThrowErr
+                (
+                    CID_FILE
+                    , CID_LINE
+                    , kXMLErrs::errcCM_BadCMTypeHere
+                    , tCIDLib::ESeverities::ProcFatal
+                    , tCIDLib::EErrClasses::Internal
+                    , TInteger(tCIDLib::i4EnumOrd(eType))
+                );
+                #endif
+                break;
+        }
     }
     return c4LocalIndex;
 }

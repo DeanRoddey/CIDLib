@@ -162,6 +162,16 @@
 #include    "CIDOrb_Cmd.hpp"
 #include    "CIDOrb_ClientBase.hpp"
 #include    "CIDOrb_ServerBase.hpp"
+
+namespace tCIDOrb
+{
+    //
+    //  A by ref list of server side objects. We don't use it ourself, but it could
+    //  be useful to various bits of client code.
+    //
+    using TSrvObjList = TRefVector<TOrbServerBase>;
+}
+
 #include    "CIDOrb_ObjList.hpp"
 #include    "CIDOrb_ThisFacility.hpp"
 

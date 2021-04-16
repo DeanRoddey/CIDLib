@@ -46,7 +46,7 @@
 TNotHandlerBase::TNotHandlerBase(const TNotificationId& nidRequested) :
 
     m_nidRequested(nidRequested)
-    , m_pnothNext(0)
+    , m_pnothNext(nullptr)
 {
 }
 

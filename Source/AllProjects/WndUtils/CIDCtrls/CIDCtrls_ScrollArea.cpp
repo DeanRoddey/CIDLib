@@ -42,7 +42,10 @@ AdvRTTIDecls(TScrollArea, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_ScrollArea
 {
-    const tCIDLib::TInt4 i4LnSz = 16;
+    namespace
+    {
+        constexpr tCIDLib::TInt4 i4LnSz = 16;
+    }
 }
 
 
@@ -180,12 +183,12 @@ TScrollArea::Create(const   TWindow&                wndParent
 {
     // If we haven't registered our window class, then do that
     static const tCIDLib::TCh* pszClass = L"CIDScrollArea";
-    static tCIDLib::TBoolean bInitDone = kCIDLib::False;
-    if (!bInitDone)
+    static TAtomicFlag atomInitDone;
+    if (!atomInitDone)
     {
         // Lock while we do this
         TBaseLock lockInit;
-        if (!bInitDone)
+        if (!atomInitDone)
         {
             const TRGBClr rgbBgn = facCIDCtrls().rgbSysClr(tCIDCtrls::ESysColors::Window);
             RegWndClass
@@ -197,7 +200,7 @@ TScrollArea::Create(const   TWindow&                wndParent
                 , rgbBgn
                 , kCIDLib::False
             );
-            bInitDone = kCIDLib::True;
+            atomInitDone.Set();
         }
     }
 

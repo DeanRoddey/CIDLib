@@ -45,7 +45,7 @@ TMEngOpCode::TMEngOpCode() :
 
     m_eOpCode(tCIDMacroEng::EOpCodes::None)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
 }
 
 TMEngOpCode::TMEngOpCode(const TMEngOpCode& meopToCopy) :
@@ -90,13 +90,11 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
         case tCIDMacroEng::EOpCodes::PushImCard2 :
         case tCIDMacroEng::EOpCodes::PushImCard4 :
         {
-            tCIDLib::TCard4 c4Val;
+            tCIDLib::TCard4 c4Val = m_uStorage.c4Immediate;
             if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImCard1)
                 c4Val = m_uStorage.c1Immediate;
             else if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImCard2)
                 c4Val = m_uStorage.c2Immediate;
-            else
-                c4Val = m_uStorage.c4Immediate;
 
             if ((c2TargetId == tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Card1))
             &&  (c4Val <= kCIDLib::c1MaxCard))
@@ -231,8 +229,8 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
             //  If we are converting to any of the cardinal/integral types,
             //  we just throw away the decimal part.
             //
-            tCIDLib::TFloat4 f4Integral;
-            tCIDLib::TFloat4 f4Fract;
+            tCIDLib::TFloat4 f4Integral = 0;
+            tCIDLib::TFloat4 f4Fract = 0;
 
             const tCIDLib::TFloat4 f4Val = m_uStorage.f4Immediate;
             f4Fract = TMathLib::f4Split(f4Val, f4Integral);
@@ -303,8 +301,8 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
             //  If we are converting to any of the cardinal/integral types,
             //  we just throw away the decimal part.
             //
-            tCIDLib::TFloat8 f8Integral;
-            tCIDLib::TFloat8 f8Fract;
+            tCIDLib::TFloat8 f8Integral = 0;
+            tCIDLib::TFloat8 f8Fract = 0;
 
             const tCIDLib::TFloat8 f8Val = m_uStorage.f8Immediate;
             f8Fract = TMathLib::f8Split(f8Val, f8Integral);
@@ -382,13 +380,11 @@ TMEngOpCode::bConvertNumeric(const tCIDLib::TCard2 c2TargetId)
         case tCIDMacroEng::EOpCodes::PushImInt2 :
         case tCIDMacroEng::EOpCodes::PushImInt4 :
         {
-            tCIDLib::TInt4 i4Val;
+            tCIDLib::TInt4 i4Val = m_uStorage.i4Immediate;
             if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImInt1)
                 i4Val = m_uStorage.i1Immediate;
             else if (m_eOpCode == tCIDMacroEng::EOpCodes::PushImInt2)
                 i4Val = m_uStorage.i2Immediate;
-            else
-                i4Val = m_uStorage.i4Immediate;
 
             if ((c2TargetId == tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Card1))
             &&  (i4Val >= 0) && (i4Val <= kCIDLib::c1MaxCard))
@@ -628,7 +624,7 @@ TMEngOpCode::Format(TTextOutStream& strmTarget, const TCIDMacroEngine& meOwner) 
 tCIDLib::TVoid
 TMEngOpCode::SetOpCode(const tCIDMacroEng::EOpCodes eOpCode)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
 }
 
@@ -637,7 +633,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetSingleIndex(const   tCIDMacroEng::EOpCodes eOpCode
                                 , const tCIDLib::TCard2     c2Index)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.ac2Indices[0] = c2Index;
 }
@@ -648,7 +644,7 @@ TMEngOpCode::SetDoubleIndex(const   tCIDMacroEng::EOpCodes eOpCode
                                 , const tCIDLib::TCard2     c2Index1
                                 , const tCIDLib::TCard2     c2Index2)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.ac2Indices[0] = c2Index1;
     m_uStorage.ac2Indices[1] = c2Index2;
@@ -659,7 +655,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TBoolean   bImmediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.bImmediate = bImmediate;
 }
@@ -669,7 +665,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard1     c1Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c1Immediate = c1Immediate;
 }
@@ -678,7 +674,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard2     c2Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c2Immediate = c2Immediate;
 }
@@ -687,7 +683,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard4     c4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c4Immediate = c4Immediate;
 }
@@ -696,7 +692,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCard8     c8Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.c8Immediate = c8Immediate;
 }
@@ -706,7 +702,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TCh        chImmediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.chImmediate = chImmediate;
 }
@@ -716,7 +712,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TFloat4    f4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.f4Immediate = f4Immediate;
 }
@@ -725,7 +721,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TFloat8    f8Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.f8Immediate = f8Immediate;
 }
@@ -734,7 +730,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt1      i1Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i1Immediate = i1Immediate;
 }
@@ -743,7 +739,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt2      i2Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i2Immediate = i2Immediate;
 }
@@ -752,7 +748,7 @@ tCIDLib::TVoid
 TMEngOpCode::SetImmediate(  const   tCIDMacroEng::EOpCodes eOpCode
                             , const tCIDLib::TInt4      i4Immediate)
 {
-    TRawMem::SetMemBuf(&m_uStorage, tCIDLib::TCard1(0), sizeof(m_uStorage));
+    TRawMem::SetMemBuf(&m_uStorage, kCIDLib::c1MinCard, sizeof(m_uStorage));
     m_eOpCode = eOpCode;
     m_uStorage.i4Immediate = i4Immediate;
 }

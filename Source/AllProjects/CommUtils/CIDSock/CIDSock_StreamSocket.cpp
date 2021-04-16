@@ -332,7 +332,7 @@ TStreamSocket::c4ReceiveRawTO(          tCIDLib::TVoid* const   pToFill
     //  We need a pointer to the output buffer that we can index, so get
     //  a pointer to it as a TCard1 buffer.
     //
-    tCIDLib::TCard1* pc1ToFill = reinterpret_cast<tCIDLib::TCard1*>(pToFill);
+    tCIDLib::TCard1* pc1ToFill = static_cast<tCIDLib::TCard1*>(pToFill);
 
     // Loop until we run out of time or we get enough bytes
     tCIDLib::TEncodedTime enctCur = TTime::enctNow();
@@ -1037,8 +1037,12 @@ tCIDLib::TVoid TStreamSocket::DumpConnection()
 // ---------------------------------------------------------------------------
 //  TClientStreamSocket: Constructors and Destructor
 // ---------------------------------------------------------------------------
+TClientStreamSocket::TClientStreamSocket()
+{
+}
+
 TClientStreamSocket::
-TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
+TClientStreamSocket(const   tCIDSock::ESockProtos   eProtocol
                     , const tCIDSock::EAddrTypes    eAddrType) :
 
     TStreamSocket(eProtocol, eAddrType)
@@ -1046,7 +1050,7 @@ TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
 }
 
 TClientStreamSocket::
-TClientStreamSocket(const   tCIDSock::ESockProtos eProtocol
+TClientStreamSocket(const   tCIDSock::ESockProtos   eProtocol
                     , const TIPEndPoint&            ipepTarget) :
 
     TStreamSocket(eProtocol, ipepTarget.eAddrType())

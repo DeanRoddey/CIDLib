@@ -59,7 +59,7 @@ TXMLContextStack::TXMLContextStack() :
     TRawMem::SetMemBuf
     (
         m_pLevels
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TLevel) * m_c4LevelMax
     );
 }
@@ -183,7 +183,11 @@ tCIDLib::TBoolean TXMLContextStack::bPopLevel()
 
     // Update the text type field, if we are not empty
     if (m_c4LevelTop)
-        m_eTextType = m_pLevels[m_c4LevelTop - 1].pxdeclLevel->eTextType();
+    {
+        TXMLElemDecl* pxdeclTop = m_pLevels[m_c4LevelTop - 1].pxdeclLevel;
+        CIDAssert(pxdeclTop != nullptr, L"Popped back to null XMLDecl level");
+        m_eTextType = pxdeclTop->eTextType();
+    }
 
     // Return whether we are empty or not
     return (m_c4LevelTop == 0);
@@ -282,7 +286,7 @@ TXMLContextStack::PushNewLevel(         TXMLElemDecl* const pxdeclNew
         TRawMem::SetMemBuf
         (
             &pNewLevels[m_c4LevelMax]
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , sizeof(TLevel) * (c4NewSize - m_c4LevelMax)
         );
 
@@ -317,7 +321,7 @@ tCIDLib::TVoid TXMLContextStack::Reset()
     TRawMem::SetMemBuf
     (
         m_pLevels
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , sizeof(TLevel) * m_c4LevelMax
     );
 }

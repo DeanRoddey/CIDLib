@@ -63,8 +63,8 @@ TTextFile       stdOut(tCIDLib::EStdFiles::StdOut);
 //
 //  RETURN: 0 if successful, else 1.
 //
-#if defined(CIDBUILD_SHORTMAIN)
-tCIDLib::TSInt main(tCIDLib::SIn4 iArgs, tCIDLib::TSCh** apszArgs)
+#if defined(PLATFORM_LINUX)
+tCIDLib::TSInt main(tCIDLib::TSInt iArgs, tCIDLib::TSCh** apszArgs)
 {
     //
     //  We are all Unicode internally, so we have to create a transcoded
@@ -81,6 +81,13 @@ extern "C" tCIDLib::TSInt wmain(tCIDLib::TSInt iArgs, tCIDLib::TCh**apszArgs)
     return facCIDBuild.iMain(iArgs, apszArgs);
 }
 #endif
+
+
+// Some out of line helpers that the very first templatized headers need
+tCIDLib::TVoid tCIDBuild::LogMsg(const tCIDLib::TCh* const pszMsg)
+{
+    stdOut << pszMsg << kCIDBuild::EndLn;
+}
 
 
 
@@ -201,20 +208,3 @@ TTextFile& operator<<(TTextFile& strmOut, const tCIDBuild::EProjTypes eType)
         strmOut << L"[Unknown project type value]";
     return strmOut;
 }
-
-TTextFile& operator<<(TTextFile& strmOut, const tCIDBuild::ERTLModes eMode)
-{
-    if (eMode == tCIDBuild::ERTLModes::SingleStatic)
-        strmOut << L"Single/Static";
-    else if (eMode == tCIDBuild::ERTLModes::SingleDynamic)
-        strmOut << L"Single/Dynamic";
-    else if (eMode == tCIDBuild::ERTLModes::MultiStatic)
-        strmOut << L"Multi/Static";
-    else if (eMode == tCIDBuild::ERTLModes::MultiDynamic)
-        strmOut << L"Multi/Dynamic";
-    else
-        strmOut << L"[Unknown RTL mode value]";
-
-    return strmOut;
-}
-

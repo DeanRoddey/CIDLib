@@ -258,7 +258,7 @@ tCIDLib::TVoid TResCompiler::LoadCommonText()
     //
     TFindInfo   fndiSrc;
     TBldStr     strPath(facCIDBuild.strCIDLibSrcDir());
-    strPath.Append(L"Source\\AllProjects\\CIDCommonText");
+    strPath.AppendPathComps(L"Source", L"AllProjects", L"CIDCommonText");
     strPath.Append(L"_");
     strPath.Append(facCIDBuild.strLangSuffix());
     strPath.Append(L".MsgText");

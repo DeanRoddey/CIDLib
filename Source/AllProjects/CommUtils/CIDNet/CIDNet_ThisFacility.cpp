@@ -86,7 +86,7 @@ TFacCIDNet::TFacCIDNet() :
     TFacility
     (
         L"CIDNet"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -103,6 +103,21 @@ TFacCIDNet::~TFacCIDNet()
 // ---------------------------------------------------------------------------
 //  TFacCIDNet: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+// Compares the passed MIME type string against some common text formats
+tCIDLib::TBoolean TFacCIDNet::bIsKnownTextType(const TString& strType) const
+{
+    if (strType.bStartsWithI(L"text/"))
+        return kCIDLib::True;
+
+    return
+    (
+        strType.bCompareI(L"application/json")
+        || strType.bCompareI(L"application/javascript")
+        || strType.bCompareI(L"application/xml")
+    );
+}
+
 
 tCIDLib::TVoid
 TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
@@ -206,25 +221,25 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
     TString strPartTransEncoding;
 
     // A simple state machine
-    enum EStates
+    enum class EStates
     {
-        EState_FirstBoundary
-        , EState_Boundary
-        , EState_InHeaders
-        , EState_InPart
-        , EState_AtEnd
+        FirstBoundary
+        , Boundary
+        , InHeaders
+        , InPart
+        , AtEnd
     };
 
     // Now we start in a part, waiting for the first boundary
-    EStates eState = EState_FirstBoundary;
+    EStates eState = EStates::FirstBoundary;
     tCIDLib::TCard4 c4SrcInd = 0;
     THeapBuf mbufCurLn(2048, 64 * 1024);
     tCIDLib::TCard4 c4CurBytes;
     TString strCurLn;
     TString strTmp;
-    while ((c4SrcInd < c4SrcBytes) && (eState != EState_AtEnd))
+    while ((c4SrcInd < c4SrcBytes) && (eState != EStates::AtEnd))
     {
-        if (eState == EState_FirstBoundary)
+        if (eState == EStates::FirstBoundary)
         {
             //
             //  Ignore lines till the first boundary. If we hit the end here
@@ -233,24 +248,24 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
             //
             if (!bGetString(strCurLn, c4SrcInd, mbufSrc, c4SrcBytes))
             {
-                eState = EState_AtEnd;
+                eState = EStates::AtEnd;
                 break;
             }
 
             // If the start boundary, move to boundary state
             if (strCurLn.bCompareI(strBStart))
-                eState = EState_Boundary;
+                eState = EStates::Boundary;
         }
-         else if (eState == EState_Boundary)
+         else if (eState == EStates::Boundary)
         {
             // This is just a way station state to reset for the next part
             c4PartBytes = 0;
             strPartContType.Clear();
             strPartDisposition.Clear();
             strPartTransEncoding.Clear();
-            eState = EState_InHeaders;
+            eState = EStates::InHeaders;
         }
-         else if (eState == EState_InHeaders)
+         else if (eState == EStates::InHeaders)
         {
             // Shouldn't be empty, if so, break out with current state
             if (!bGetString(strCurLn, c4SrcInd, mbufSrc, c4SrcBytes))
@@ -263,7 +278,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
             //
             if (strCurLn.bIsEmpty())
             {
-                eState = EState_InPart;
+                eState = EStates::InPart;
             }
              else
             {
@@ -290,7 +305,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                     strPartTransEncoding = strTmp;
             }
         }
-         else if (eState == EState_InPart)
+         else if (eState == EStates::InPart)
         {
             c4CurBytes = 0;
             while (kCIDLib::True)
@@ -329,7 +344,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
 
                         // Force us to end if we matched
                         if (c4TestInd == c4CurBytes)
-                            eState = EState_AtEnd;
+                            eState = EStates::AtEnd;
                     }
                      else if (c4CurBytes == c4BStartLen)
                     {
@@ -343,18 +358,18 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
 
                         // Force us back to a boundary reset if we matched
                         if (c4TestInd == c4CurBytes)
-                            eState = EState_Boundary;
+                            eState = EStates::Boundary;
                     }
 
                     //
                     //  If still in part state, accumulate these bytes. If not, then
                     //  we are at the end of a part, so store the data.
                     //
-                    if (eState == EState_InPart)
+                    if (eState == EStates::InPart)
                     {
                         // We want to keep the new lines in this case
-                        mbufCurLn[c4CurBytes++] = 0xD;
-                        mbufCurLn[c4CurBytes++] = 0xA;
+                        mbufCurLn.PutCard1(0xD, c4CurBytes++);
+                        mbufCurLn.PutCard1(0xA, c4CurBytes++);
 
                         mbufPartBuf.CopyIn(mbufCurLn, c4CurBytes, c4PartBytes);
                         c4PartBytes += c4CurBytes;
@@ -370,8 +385,7 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                         colTransEncodings.objAdd(strPartTransEncoding);
 
                         // To only store the actual bytes for this round
-                        THeapBuf& mbufTar = colParts.objAdd(THeapBuf(c4PartBytes, c4PartBytes + 1));
-                        mbufTar.CopyIn(mbufPartBuf, c4PartBytes);
+                        colParts.objPlace(mbufPartBuf, c4PartBytes);
 
                         // And go back out to the outer loop
                         break;
@@ -380,14 +394,14 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
                  else
                 {
                     // Nothing special so just accumulate
-                    mbufCurLn[c4CurBytes++] = c1Cur;
+                    mbufCurLn.PutCard1(c1Cur, c4CurBytes++);
                 }
             }
         }
     }
 
     // If we didn't make it to the end state, can't be good
-    if (eState != EState_AtEnd)
+    if (eState != EStates::AtEnd)
     {
         facCIDNet().ThrowErr
         (
@@ -400,3 +414,56 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
     }
 }
 
+
+//
+//  Given a URL for an HTTP or HTTPS protocol, create a data source for it.
+//  Other protocols will be considered an error. The caller is responsible for
+//  the data source cleanup and typically puts it into a data source janitor.
+//
+//  If they want to set a specific host or ALPN list, they have to do it
+//  manually.
+//
+TCIDDataSrc*
+TFacCIDNet::pcdsMakeSocketSrc(const TString& strName, const TURL& urlSrc)
+{
+    TCIDDataSrc* pcdsRet = nullptr;
+    if (urlSrc.eProto() == tCIDSock::EProtos::HTTP)
+    {
+        pcdsRet = new TCIDSockStreamDataSrc(urlSrc.ipepHost());
+    }
+     else if (urlSrc.eProto() == tCIDSock::EProtos::HTTPS)
+    {
+        TJanitor<TClientStreamSocket> janSocket
+        (
+            new TClientStreamSocket(tCIDSock::ESockProtos::TCP, urlSrc.ipepHost())
+        );
+
+        // Let the data source adopt the socket
+        tCIDLib::TStrList colALPN;
+        pcdsRet = new TCIDSChanClDataSrc
+        (
+            strName
+            , janSocket.pobjThis()
+            , tCIDLib::EAdoptOpts::Adopt
+            , TString::strEmpty()
+            , colALPN
+            , tCIDSChan::EConnOpts::None
+            , urlSrc.strHost()
+        );
+
+        // Let the socket go now that it's stored away safely
+        janSocket.Orphan();
+    }
+     else
+    {
+        facCIDNet().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kNetErrs::errcHTTP_UnsupportedProto
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::NotSupported
+        );
+    }
+    return pcdsRet;
+}

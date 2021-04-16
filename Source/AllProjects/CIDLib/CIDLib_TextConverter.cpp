@@ -42,6 +42,66 @@ RTTIDecls(TTextConverter,TObject)
 // ---------------------------------------------------------------------------
 
 //
+//  In this case we get in and out streams, so we just read blocks from the
+//  input stream, convert them, and write them to the output stream.
+//
+tCIDLib::TCard4
+TTextConverter::c4ConvertFrom(  TBinInStream&       strmSrc
+                                , TTextOutStream&   strmTar
+                                , tCIDLib::TCard4&  c4OutChars)
+{
+    //
+    //  We use local byte and character buffers to convert chunks at a
+    //  time until the source stream runs out of data.
+    //
+    const tCIDLib::TCard4   c4InBufSz = 4096;
+    const tCIDLib::TCard4   c4OutBufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
+    tCIDLib::TCard1         ac1SrcBuf[c4InBufSz];
+    tCIDLib::TCh            achOutBuf[c4OutBufSz + 1] = L"";
+    tCIDLib::TBoolean       bStop = kCIDLib::False;
+    tCIDLib::TCard4         c4CurChars = 0;
+    tCIDLib::TCard4         c4BytesEaten = 0;
+    while (!strmSrc.bEndOfStream())
+    {
+        const tCIDLib::TCard4 c4SrcBytes = strmSrc.c4ReadRawBuffer
+        (
+            ac1SrcBuf, c4InBufSz, tCIDLib::EAllData::OkIfNotAll
+        );
+
+        const tCIDLib::TCard4 c4CurBytes = c4BlockFrom
+        (
+            ac1SrcBuf, c4SrcBytes, achOutBuf, c4OutBufSz, c4CurChars, bStop
+        );
+
+        // Update the number of bytes we've eaten
+        c4BytesEaten += c4CurBytes;
+
+        //
+        //  If we didn't eat all the bytes this time, push the rest back for the
+        //  next time around.
+        //
+        if (c4CurBytes < c4SrcBytes)
+            strmSrc.c4Pushback(&ac1SrcBuf[c4CurBytes], c4SrcBytes - c4CurBytes);
+
+        //  If we did any chars, then put those in the target.
+        if (c4CurChars)
+            strmTar.WriteChars(achOutBuf, c4CurChars);
+
+        // If we were asked to stop or got no chars, then break out
+        if (bStop || !c4CurChars)
+            break;
+    }
+
+    // Make sure it's flushed out to the target
+    strmTar.Flush();
+
+    // Return the bytes eaten
+    return c4BytesEaten;
+}
+
+
+//
 //  This one is just a straight callthrough to the protected, virtual block
 //  transcode method that each derivative implements.
 //
@@ -77,9 +137,9 @@ TTextConverter::c4ConvertFrom(  const   tCIDLib::TCard1* const  pc1Src
     //  we've filled the buffer or used up the source.
     //
     const tCIDLib::TCard4   c4BufSz = 2048;
-    tCIDLib::TCh            achBuf[c4BufSz + 1];
+    tCIDLib::TCh            achBuf[c4BufSz + 1] = L"";
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurChars;
+    tCIDLib::TCard4         c4CurChars = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
     while (c4SrcDone < c4SrcBytes)
     {
@@ -136,6 +196,61 @@ TTextConverter::c4ConvertFrom(  const   TMemBuf&                mbufSrc
 }
 
 
+tCIDLib::TCard4
+TTextConverter::c4ConvertTo(TTextInStream&      strmSrc
+                            , TBinOutStream&    strmTar
+                            , tCIDLib::TCard4&  c4OutBytes)
+{
+    const tCIDLib::TCard4   c4InBufSz = 2048;
+    tCIDLib::TCh            achInBuf[c4InBufSz] = L"";
+    const tCIDLib::TCard4   c4OutBufSz = c4InBufSz * kCIDLib::c4MaxUTF8Bytes;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
+    tCIDLib::TCard1         ac1OutBuf[c4OutBufSz];
+    tCIDLib::TBoolean       bStop = kCIDLib::False;
+    tCIDLib::TCard4         c4SrcDone = 0;
+
+    c4OutBytes = 0;
+    while (!strmSrc.bEndOfStream())
+    {
+        const tCIDLib::TCard4 c4SrcChars = strmSrc.c4ReadChars(achInBuf, c4InBufSz);
+        CIDAssert(c4SrcChars != 0, L"Got no chars but stream is not at end");
+
+        // Convert this block to bytes
+        tCIDLib::TCard4 c4CurBytes;
+        const tCIDLib::TCard4 c4CurChars = c4BlockTo
+        (
+            achInBuf
+            , c4SrcChars
+            , ac1OutBuf
+            , c4OutBufSz
+            , c4CurBytes
+            , bStop
+        );
+        CIDAssert(c4CurBytes != 0, L"No source chars were converter to target encoding");
+
+        // Update the number of chars we've eaten and write to the output
+        c4SrcDone += c4CurChars;
+
+        //  If we got any bytes, then write them to the output stream
+        if (c4CurBytes)
+        {
+            strmTar.c4WriteRawBuffer(ac1OutBuf, c4CurBytes);
+            c4OutBytes += c4CurBytes;
+        }
+
+        // If we were asked to stop or got no bytes, then break out
+        if (bStop || !c4CurBytes)
+            break;
+    }
+
+    // Make sure the stream is flushed
+    strmTar.Flush();
+
+    // Return the chars we ate
+    return c4SrcDone;
+}
+
+
 //
 //  This one is just a straight callthrough to the protected, virtual block
 //  transcode method that each derivative implements.
@@ -161,9 +276,10 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const pszSrc
     expbToFill.Reset();
 
     const tCIDLib::TCard4   c4BufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurBytes;
+    tCIDLib::TCard4         c4CurBytes = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
     while (c4SrcDone < c4SrcChars)
     {
@@ -202,9 +318,10 @@ TTextConverter::c4ConvertTo(const   tCIDLib::TCh* const     pszSrc
                             ,       tCIDLib::TCard4&        c4OutBytes)
 {
     const tCIDLib::TCard4   c4BufSz = 2048;
+    #pragma warning(suppress : 26494) // We don't want to have to init this buffer
     tCIDLib::TCard1         ac1Buf[c4BufSz];
     tCIDLib::TBoolean       bStop = kCIDLib::False;
-    tCIDLib::TCard4         c4CurBytes;
+    tCIDLib::TCard4         c4CurBytes = 0;
     tCIDLib::TCard4         c4SrcDone = 0;
 
     c4OutBytes = 0;
@@ -318,13 +435,12 @@ tCIDLib::TCh TTextConverter::chRepChar(const tCIDLib::TCh chToSet)
 //  Get or set the error action to take when bad data is seen during
 //  internalization.
 //
-tCIDLib::ETCvtActions TTextConverter::eErrorAction() const
+tCIDLib::ETCvtActs TTextConverter::eErrorAction() const
 {
     return m_eErrAction;
 }
 
-tCIDLib::ETCvtActions
-TTextConverter::eErrorAction(const tCIDLib::ETCvtActions eAction)
+tCIDLib::ETCvtActs TTextConverter::eErrorAction(const tCIDLib::ETCvtActs eAction)
 {
     m_eErrAction = eAction;
     return m_eErrAction;
@@ -344,27 +460,9 @@ const TString& TTextConverter::strEncodingName() const
 TTextConverter::TTextConverter(const TString& strEncodingName) :
 
     m_chRepChar(kCIDLib::chSpace)
-    , m_eErrAction(tCIDLib::ETCvtActions::Throw)
+    , m_eErrAction(tCIDLib::ETCvtActs::Throw)
     , m_strEncodingName(strEncodingName)
 {
-}
-
-TTextConverter::TTextConverter(const TTextConverter& tcvtToCopy) :
-
-    m_chRepChar(tcvtToCopy.m_chRepChar)
-    , m_eErrAction(tCIDLib::ETCvtActions::Throw)
-    , m_strEncodingName(tcvtToCopy.m_strEncodingName)
-{
-}
-
-tCIDLib::TVoid TTextConverter::operator=(const TTextConverter& tcvtToAssign)
-{
-    if (this != &tcvtToAssign)
-    {
-        m_chRepChar = tcvtToAssign.m_chRepChar;
-        m_eErrAction = tcvtToAssign.m_eErrAction;
-        m_strEncodingName = tcvtToAssign.m_strEncodingName;
-    }
 }
 
 

@@ -59,6 +59,21 @@ header {
     width : 100%;
 }
 
+/* A horizontal line divider */
+.HorzDivCont {
+    height : 7px;
+    width : 100%;
+    display : flex;
+    align-items: center;
+}
+
+.HorzDiv {
+    width : 85%;
+    border-bottom : 1px solid #8888AA;
+    margin : 0;
+}
+
+
 /*
  * All of the pages are two sided. On the left is a div that holds links to any
  * sub-topics/pages directly under that particular topic, and the right side
@@ -138,6 +153,42 @@ li {
 }
 
 
+/*
+ * An expandable div for things like enums, where we don't want to show
+ * the text for each item unless they ask to see it. So we expand the
+ * descriptive text when they hover over the name of the value.
+ */
+
+.ExpandItem .ExpandItemText {
+    height : 0px;
+    opacity : 0;
+}
+
+.ExpandItemText {
+    margin-left : 4em;
+    line-height: 1;
+    background-color: #eeeeee;
+}
+
+.ExpandItem:hover .ExpandItemText {
+    opacity : 1;
+    height : auto;
+    transition : opacity 0.5s;
+}
+
+.ExpandItems {
+    margin-left: 2em;
+    padding : 0;
+}
+
+.ExpandItem {
+    line-height: 0;
+}
+
+.ExpandItem:hover {
+    cursor: pointer;
+}
+
 
 /* A major help page section title */
 .SecHdr {
@@ -201,6 +252,15 @@ li {
 
 .DeemphCode {
     color : #555555;
+}
+
+
+/*
+ * A magic indenting node that our generic help text class outputs around the
+ * recursive contents it contains. This indents all such text over.
+ */
+.HelpTextCont {
+    margin-left : 24px;
 }
 
 

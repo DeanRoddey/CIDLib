@@ -33,9 +33,17 @@
 //   CLASS: TBag
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TBag : public TBasicDLinkedCol<TElem>
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Nested class type aliases
+        // -------------------------------------------------------------------
+        using TMyElemType = TElem;
+        using TMyType = TBag<TElem>;
+        using TParType = TBasicDLinkedCol<TElem>;
+
+
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -45,46 +53,40 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TBag(const TBag& colSrc) : TParent(colSrc)
-        {
-        }
+        TBag(const TMyType&) = default;
+        TBag(TMyType&&) = default;
 
-        TBag(TBag&& colSrc) :
-
-            TBag(colSrc.eMTState())
-        {
-            *this = operator=(tCIDLib::ForceMove(colSrc));
-        }
-
-        ~TBag()
-        {
-        }
+        ~TBag() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TBag& operator=(const TBag& colSrc)
-        {
-            if (&colSrc != this)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TBag& operator=(TBag&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TBag& operator=(const TBag&) = default;
+        TBag& operator=(TBag&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TElem& objAdd(const TElem& objNew)
+        TElem& objAdd(const TElem& objNew) override
         {
             // Delegate to our parent
             return TParent::objAddAtTop(objNew);
+        }
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        template <typename T = TElem> T& objAddMove(T&& objNew)
+        {
+            return this->objAddAtTop(tCIDLib::ForceMove(objNew));
+        }
+
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);
         }
 
 
@@ -97,5 +99,4 @@ template <class TElem> class TBag : public TBasicDLinkedCol<TElem>
 };
 
 #pragma CIDLIB_POPPACK
-
 

@@ -112,7 +112,7 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
         tCIDLib::TBoolean bParse
         (
             const   TString&                strMainClass
-            ,       TMemBuf&                mbufContent
+            , const TMemBuf&                mbufContent
             , const tCIDLib::TCard4         c4Bytes
             , const TString&                strEncoding
             ,       TMEngClassInfo*&        pmeciMainClass
@@ -225,12 +225,14 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
             , const tCIDMacroEng::ERecovers eRecover = tCIDMacroEng::ERecovers::No
         );
 
-        tCIDLib::TBoolean bGetClassPath
-        (
-                    TParserSrc&             psrcClass
-            ,       TString&                strToFill
-            , const tCIDMacroEng::ERecovers eRecover = tCIDMacroEng::ERecovers::No
-        );
+        tCIDLib::TBoolean
+        bGetClassPath(          TParserSrc&             psrcClass
+                        ,       TString&                strToFill
+                        , const tCIDMacroEng::ERecovers eRecover = tCIDMacroEng::ERecovers::No)
+        {
+            tCIDLib::TCard4 c4Dummy;
+            return bGetClassPath(psrcClass, strToFill, c4Dummy, kCIDLib::False, eRecover);
+        }
 
         tCIDLib::TBoolean bGetNameToken
         (
@@ -408,13 +410,13 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
 
         TMEngClassInfo& meciResolvePath
         (
-                    TParserSrc&             psrcClass
+            const   TParserSrc&             psrcClass
             , const TString&                strPath
         );
 
         TMEngClassInfo* pmeciCheckClassLoad
         (
-                    TParserSrc&             psrcClass
+            const   TParserSrc&             psrcClass
             , const TString&                strClassPath
         );
 
@@ -627,13 +629,4 @@ class CIDMACROENGEXP TMacroEngParser : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-inline tCIDLib::TBoolean
-TMacroEngParser::bGetClassPath(         TParserSrc&             psrcClass
-                                ,       TString&                strToFill
-                                , const tCIDMacroEng::ERecovers eRecover)
-{
-    tCIDLib::TCard4 c4Dummy;
-    return bGetClassPath(psrcClass, strToFill, c4Dummy, kCIDLib::False, eRecover);
-}
 

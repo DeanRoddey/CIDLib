@@ -55,10 +55,7 @@
 //  the constants namespace below. One of these is actually defined down in
 //  CIDKernel, so that the build tool can use those types.
 // ---------------------------------------------------------------------------
-#if         !defined(CIDKERNEL_TYPE_CTRLS)
 #include    "CIDKernel_Type_Ctrls.hpp"
-#endif
-
 #include    "CIDCtrls_Type.hpp"
 
 
@@ -73,10 +70,10 @@ namespace kCIDCtrls
     //  an arbitrary value to start assigning non-special child controls ids,
     //  so that we know they won't interfere with anything special.
     // -----------------------------------------------------------------------
-    const tCIDCtrls::TWndId     widOK           = 1;
-    const tCIDCtrls::TWndId     widCancel       = 2;
+    constexpr tCIDCtrls::TWndId     widOK           = 1;
+    constexpr tCIDCtrls::TWndId     widCancel       = 2;
 
-    const tCIDCtrls::TWndId     widFirstCtrl    = 1000;
+    constexpr tCIDCtrls::TWndId     widFirstCtrl    = 1000;
 
 
     // -----------------------------------------------------------------------
@@ -89,38 +86,38 @@ namespace kCIDCtrls
     //  Any messages received with these values will be sent to the UserMsg() virtual
     //  method.
     // -----------------------------------------------------------------------
-    const tCIDCtrls::TWndMsg    wmsgAsyncEvent1     = 0x8000;
-    const tCIDCtrls::TWndMsg    wmsgAsyncEvent2     = 0x8001;
-    const tCIDCtrls::TWndMsg    wmsgSyncEvent1      = 0x8002;
-    const tCIDCtrls::TWndMsg    wmsgChildFocusNot   = 0x8003;
-    const tCIDCtrls::TWndMsg    wmsgFirstUser       = 0x8100;
-    const tCIDCtrls::TWndMsg    wmsgLastUser        = 0x8200;
+    constexpr tCIDCtrls::TWndMsg    wmsgAsyncEvent1     = 0x8000;
+    constexpr tCIDCtrls::TWndMsg    wmsgAsyncEvent2     = 0x8001;
+    constexpr tCIDCtrls::TWndMsg    wmsgSyncEvent1      = 0x8002;
+    constexpr tCIDCtrls::TWndMsg    wmsgChildFocusNot   = 0x8003;
+    constexpr tCIDCtrls::TWndMsg    wmsgFirstUser       = 0x8100;
+    constexpr tCIDCtrls::TWndMsg    wmsgLastUser        = 0x8200;
 
 
     // ------------------------------------------------------------------------
     //  Some GUI oriented character constants
     // ------------------------------------------------------------------------
-    const tCIDLib::TCh          chMnemonic      = L'&';
+    constexpr tCIDLib::TCh          chMnemonic      = L'&';
 
 
     // ------------------------------------------------------------------------
     //  The maximum chars in a notification id
     // ------------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxNotIdLen   = 63;
+    constexpr tCIDLib::TCard4       c4MaxNotIdLen   = 63;
 
 
     // ------------------------------------------------------------------------
     //  The maximum number of frames that the pane window manager class will
     //  manage.
     // ------------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxPaneWnds   = 3;
+    constexpr tCIDLib::TCard4       c4MaxPaneWnds   = 3;
 
 
     // ------------------------------------------------------------------------
     //  Defaults for window sizes and positions.
     // ------------------------------------------------------------------------
-    const tCIDCtrls::TWndCoord  wcrDefault      = kCIDLib::i4MinInt;
-    const tCIDCtrls::TWndSize   wszDefault      = kCIDLib::c4MaxCard;
+    constexpr tCIDCtrls::TWndCoord  wcrDefault      = kCIDLib::i4MinInt;
+    constexpr tCIDCtrls::TWndSize   wszDefault      = kCIDLib::c4MaxCard;
 
 
     // ------------------------------------------------------------------------
@@ -136,13 +133,13 @@ namespace kCIDCtrls
     // -----------------------------------------------------------------------
     //  The max number of positions we'll capture for determinging gesture inertia.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4InertiaBufSz = 16;
+    constexpr tCIDLib::TCard4       c4InertiaBufSz = 16;
 
 
     // -----------------------------------------------------------------------
     //  The maximum number of timers per window
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxWndTimers = 32;
+    constexpr tCIDLib::TCard4       c4MaxWndTimers = 32;
 };
 
 

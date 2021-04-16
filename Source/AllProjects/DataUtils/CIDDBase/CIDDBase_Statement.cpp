@@ -45,6 +45,10 @@ RTTIDecls(TDBStatement,TObject)
 template <class T> T*
 pdbbindCheckType(TDBBinding* pdbbindTest, const TString& strStmtName)
 {
+    // It won't ever return false, that's just for the analyzer
+    if (!bCIDPreCond(pdbbindTest != nullptr))
+        return nullptr;
+
     // See if it's of the right type. If not, throw
     T* pdbbindRet = dynamic_cast<T*>(pdbbindTest);
     if (!pdbbindRet)

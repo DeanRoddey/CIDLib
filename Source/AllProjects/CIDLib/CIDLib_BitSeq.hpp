@@ -61,6 +61,11 @@ class CIDLIBEXP TBitSeq : public TObject
             const   TBitSeq&                bsqSrc
         );
 
+        TBitSeq
+        (
+                   TBitSeq&&               bsqSrc
+        );
+
         ~TBitSeq();
 
 
@@ -70,6 +75,11 @@ class CIDLIBEXP TBitSeq : public TObject
         TBitSeq& operator=
         (
             const   TBitSeq&                bsqSrc
+        );
+
+        TBitSeq& operator=
+        (
+                    TBitSeq&&               bsqSrc
         );
 
         tCIDLib::TBoolean operator[]

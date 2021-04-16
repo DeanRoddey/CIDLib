@@ -157,7 +157,7 @@ TTest_ChunkedBasic::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& b
     const tCIDLib::TCard4 c4InitDataSz = 1024;
     THeapBuf mbufData(c4InitDataSz, c4InitDataSz);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitDataSz; c4Index++)
-        mbufData[c4Index] = tCIDLib::TCard1(c4Index);
+        mbufData.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
 
 
     // Now try one with some data in it and manipulate the data
@@ -242,7 +242,7 @@ TTest_ChunkedBasic::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& b
         // Pause a little to make sure the time stamp is different if stored
         TThread::Sleep(10);
         THeapBuf mbufNew(mbufData);
-        mbufNew[0] = 0xFF;
+        mbufNew.PutCard1(0xFF, 0);
         if (!chflTest.bSetDataChunk(c4InitDataSz, mbufNew))
         {
             strmOut << TFWCurLn << L"Set of new data returned false" << kCIDLib::NewLn;
@@ -534,7 +534,7 @@ TTest_ChunkedExt::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
     const tCIDLib::TCard4 c4InitDataSz = 1024;
     THeapBuf mbufData(c4InitDataSz, c4InitDataSz);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitDataSz; c4Index++)
-        mbufData[c4Index] = tCIDLib::TCard1(c4Index);
+        mbufData.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
 
     // Set up the file with this initial data
     TChunkedFile chflTest(colMeta, c4InitDataSz, mbufData);
@@ -556,13 +556,13 @@ TTest_ChunkedExt::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
     const tCIDLib::TCard4 c4InitExtSz = 64;
     THeapBuf mbufDCExt(c4InitExtSz, c4InitExtSz);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitExtSz; c4Index++)
-        mbufDCExt[c4Index] = tCIDLib::TCard1(c4Index);
+        mbufDCExt.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
     chflTest.AddExtChunk(L"/TestFW/DCExt", c4InitExtSz, mbufDCExt, kCIDLib::True);
 
     // And set up another one that is not a data change chunk
     THeapBuf mbufExt(c4InitExtSz, c4InitExtSz);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitExtSz; c4Index++)
-        mbufExt[c4Index] = tCIDLib::TCard1(c4Index + 1);
+        mbufExt.PutCard1( tCIDLib::TCard1(c4Index + 1), c4Index);
     chflTest.AddExtChunk(L"/TestFW/Ext", c4InitExtSz, mbufExt, kCIDLib::False);
 
     // Try to add one of them again with the same id
@@ -633,7 +633,7 @@ TTest_ChunkedExt::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
     //
     tCIDLib::TCard4 c4OrgSerialNum = chflTest.c4SerialNum();
     tCIDLib::TEncodedTime enctOrgStamp = chflTest.enctLastChange();
-    mbufDCExt[0] = 0xFF;
+    mbufDCExt.PutCard1(0xFF, 0);
     if (!chflTest.bSetChunkById(L"/TestFW/DCExt", c4InitExtSz, mbufDCExt))
     {
         strmOut << TFWCurLn << L"Change to DC extension data returned false"
@@ -667,7 +667,7 @@ TTest_ChunkedExt::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bWa
     //
     c4OrgSerialNum = chflTest.c4SerialNum();
     enctOrgStamp = chflTest.enctLastChange();
-    mbufExt[0] = 0xF0;
+    mbufExt.PutCard1(0xF0, 0);
     if (!chflTest.bSetChunkById(L"/TestFW/Ext", c4InitExtSz, mbufExt))
     {
         strmOut << TFWCurLn << L"Change to extension data returned false"
@@ -742,7 +742,7 @@ TTest_ChunkedMeta::eRunTest(TTextStringOutStream& strmOut, tCIDLib::TBoolean& bW
     const tCIDLib::TCard4 c4InitDataSz = 1024;
     THeapBuf mbufData(c4InitDataSz, c4InitDataSz);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitDataSz; c4Index++)
-        mbufData[c4Index] = tCIDLib::TCard1(c4Index);
+        mbufData.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
 
     // Set up the file with this initial data
     TChunkedFile chflTest(colMeta, c4InitDataSz, mbufData);

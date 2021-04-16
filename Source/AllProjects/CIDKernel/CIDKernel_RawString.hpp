@@ -212,7 +212,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCard4 c4AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
@@ -224,7 +224,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCard8 c8AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
@@ -371,7 +371,7 @@ namespace TRawStr
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
-    KRNLEXPORT tCIDLib::TCh* pszConvert
+    KRNLEXPORT [[nodiscard]] tCIDLib::TCh* pszConvert
     (
         const   tCIDLib::TSCh* const    pszToConvert
     );
@@ -379,11 +379,11 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TCh* pszConvert
     (
         const   tCIDLib::TSCh* const    pszToConvert
-        ,       tCIDLib::TCh* const     pszTarget
+        ,       tCIDLib::TCh*           pszTarget
         , const tCIDLib::TCard4         c4MaxChars
     );
 
-    KRNLEXPORT tCIDLib::TSCh* pszConvert
+    KRNLEXPORT [[nodiscard]] tCIDLib::TSCh* pszConvert
     (
         const   tCIDLib::TCh* const  pszToConvert
     );
@@ -391,7 +391,7 @@ namespace TRawStr
     KRNLEXPORT tCIDLib::TSCh* pszConvert
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TSCh* const    pszTarget
+        ,       tCIDLib::TSCh*          pszTarget
         , const tCIDLib::TCard4         c4MaxChars
     );
 
@@ -701,6 +701,8 @@ namespace TRawStr
         tCIDLib::TCard4 c4Count = 0;
         if (pszSrc)
         {
+            // We just tested pszSrc above, so tmp cannot be null
+            CIDLib_Suppress(26429)
             const tCIDLib::TCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;
@@ -714,6 +716,8 @@ namespace TRawStr
         tCIDLib::TCard4 c4Count = 0;
         if (pszSrc)
         {
+            // We just tested pszSrc above, so tmp cannot be null
+            CIDLib_Suppress(26429)
             const tCIDLib::TSCh* pszTmp = pszSrc;
             while (*pszTmp)
                 pszTmp++;
@@ -731,13 +735,7 @@ namespace TRawStr
         //  Just call the previous sub string version with the last index as
         //  the start index.
         //
-        return pszFindPrevSubStr
-        (
-            pszToSearch
-            , pszSubStr
-            , c4StrLen(pszToSearch) - 1
-            , bCaseSensitive
-        );
+        return pszFindPrevSubStr(pszToSearch, pszSubStr, c4StrLen(pszToSearch) - 1, bCaseSensitive);
     }
 
     inline const tCIDLib::TCh*

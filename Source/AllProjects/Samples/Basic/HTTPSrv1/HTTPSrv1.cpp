@@ -164,7 +164,7 @@ static tCIDLib::TVoid ShowReq(  const   tCIDLib::TCard4     c4ThreadInd
                                 , const TString&            strURL
                                 , const tCIDLib::TKVPList&  colHdrLines)
 {
-    TMtxLocker mtxlSync(&mtxSyncOut);
+    TLocker lockrSync(&mtxSyncOut);
 
     strmOut << L'[' << c4ThreadInd << L"] - Request For : " << strURL << kCIDLib::EndLn;
 
@@ -200,14 +200,14 @@ static tCIDLib::TVoid ShowReq(  const   tCIDLib::TCard4     c4ThreadInd
 static tCIDLib::TVoid ShowMsg(  const   tCIDLib::TCard4 c4ThreadInd
                                 , const TString&        strToDisplay)
 {
-    TMtxLocker mtxlSync(&mtxSyncOut);
+    TLocker lockrSync(&mtxSyncOut);
     strmOut << L'[' << c4ThreadInd << L"] - " << strToDisplay << kCIDLib::EndLn;
 }
 
 static tCIDLib::TVoid ShowMsg(  const   tCIDLib::TCard4     c4ThreadInd
                                 , const tCIDLib::TCh* const pszToDisplay)
 {
-    TMtxLocker mtxlSync(&mtxSyncOut);
+    TLocker lockrSync(&mtxSyncOut);
     strmOut << L'[' << c4ThreadInd << L"] - " << pszToDisplay << kCIDLib::EndLn;
 }
 

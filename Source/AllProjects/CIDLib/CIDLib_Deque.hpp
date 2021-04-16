@@ -34,7 +34,7 @@
 //   CLASS: TDeque
 //  PREFIX: deq
 // ---------------------------------------------------------------------------
-template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
+template <typename TElem> class TDeque : public TBasicDLinkedCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -46,18 +46,8 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
         {
         }
 
-        TDeque(const TDeque& colSrc) :
-
-            TParent(colSrc)
-        {
-        }
-
-        TDeque(TDeque&& colSrc) :
-
-            TParent(colSrc.eMTState())
-        {
-            *this = operator=(tCIDLib::ForceMove(colSrc));
-        }
+        TDeque(const TDeque&) = default;
+        TDeque(TDeque&&) = default;
 
         ~TDeque()
         {
@@ -67,24 +57,14 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDeque& operator=(const TDeque& colSrc)
-        {
-            if (this != &colSrc)
-                TParent::operator=(colSrc);
-            return *this;
-        }
-
-        TDeque& operator=(TDeque&& colSrc)
-        {
-            TParent::operator=(tCIDLib::ForceMove(colSrc));
-            return *this;
-        }
+        TDeque& operator=(const TDeque&) = default;
+        TDeque& operator=(TDeque&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        TElem& objAdd(const TElem& objNew) override
+        TElem& objAdd(const TElem& objNew) final
         {
             // Delegate to our parent
             return this->objAddAtBottom(objNew);
@@ -106,6 +86,12 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return this->bGetFromTop(objToFill);
         }
 
+        template <typename T = TElem> T& objAddMove(T&& objNew)
+        {
+            // Delegate to our parent
+            return this->objAddAtBottom(tCIDLib::ForceMove(objNew));
+        }
+
         const TElem& objPeekBottom() const
         {
             // Delegate to our parent
@@ -118,28 +104,44 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
             return this->objPeekAtTop();
         }
 
+        template <typename... TArgs> TElem& objPlaceBottom(TArgs&&... Args)
+        {
+            return this->objPlaceAtBottom(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
+        template <typename... TArgs> TElem& objPlaceTop(TArgs&&... Args)
+        {
+            return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);
+        }
+
         TElem objPopBottom()
         {
-            // Delegate to our parent
             return this->objGetFromBottom();
         }
 
         TElem objPopTop()
         {
-            // Delegate to our parent
             return this->objGetFromTop();
         }
 
         TElem& objPushBottom(const TElem& objToAdd)
         {
-            // Delegate to our parent
             return this->objAddAtBottom(objToAdd);
+        }
+
+        TElem& objPushBottom(TElem&& objToAdd)
+        {
+            return this->objAddAtBottom(tCIDLib::ForceMove(objToAdd));
         }
 
         TElem& objPushTop(const TElem& objToAdd)
         {
-            // Delegate to our parent
             return this->objAddAtTop(objToAdd);
+        }
+
+        TElem& objPushTop(TElem&& objToAdd)
+        {
+            return this->objAddAtTop(tCIDLib::ForceMove(objToAdd));
         }
 
         tCIDLib::TVoid PopBottom()
@@ -160,6 +162,7 @@ template <class TElem> class TDeque : public TBasicDLinkedCol<TElem>
         DefPolyDup(TDeque<TElem>)
         TemplateRTTIDefs(TDeque<TElem>,TBasicDLinkedCol<TElem>)
 };
+
 
 #pragma CIDLIB_POPPACK
 

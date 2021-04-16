@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -101,7 +100,7 @@ bCommonTests(       TTextOutStream&     strmOut
                 << tCIDLib::TFloat8(8.8);
 
     // Write some objects, and a class info object to the stream
-    strmTestOut << TArea(6, 7, 8, 9) << TString(L"This is a test");
+    strmTestOut << TArea(6, 7, 8UL, 9UL) << TString(L"This is a test");
     strmTestOut.WriteClassInfo(TArea::clsThis());
     strmTestOut << kCIDLib::FlushIt;
 
@@ -137,7 +136,7 @@ bCommonTests(       TTextOutStream&     strmOut
                 << kCIDLib::EndLn;
     }
 
-    if (areaTest != TArea(6, 7, 8, 9))
+    if (areaTest != TArea(6, 7, 8UL, 9UL))
         strmOut << L"    " << CUR_LN << L"Area read back in was wrong" << kCIDLib::EndLn;
 
     if (strTest != TString(L"This is a test"))

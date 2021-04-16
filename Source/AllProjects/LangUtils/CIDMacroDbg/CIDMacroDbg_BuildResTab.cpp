@@ -129,6 +129,21 @@ TBuildResTab::TErrInfo::TErrInfo() :
 {
 }
 
+TBuildResTab::TErrInfo::
+TErrInfo(   const   tCIDLib::TCard4         c4ColNum
+            , const tCIDLib::TCard4         c4LineNum
+            , const tCIDMacroEng::EPrsEvs   eEvent
+            , const TString&                strClassPath
+            , const TString&                strText) :
+
+    m_c4ColNum(c4ColNum)
+    , m_c4LineNum(c4LineNum)
+    , m_eEvent(eEvent)
+    , m_strClassPath(strClassPath)
+    , m_strText(strText)
+{
+}
+
 TBuildResTab::TErrInfo::TErrInfo(const TErrInfo& erriSrc) :
 
     m_c4ColNum(erriSrc.m_c4ColNum)
@@ -187,13 +202,8 @@ TBuildResTab::ParseEvent(const  tCIDMacroEng::EPrsEvs   eEvent
                         , const tCIDLib::TCard4         c4Col
                         , const TString&                strClassPath)
 {
-    // Add a new item to the list, then fill it in
-    TErrInfo& erriNew = m_colErrs.objAdd(TErrInfo());
-    erriNew.m_c4LineNum = c4Line;
-    erriNew.m_c4ColNum = c4Col;
-    erriNew.m_eEvent = eEvent;
-    erriNew.m_strClassPath = strClassPath;
-    erriNew.m_strText = strText;
+    // Add anew error to our list
+    m_colErrs.objPlace(c4Col, c4Line, eEvent, strClassPath, strText);
 
     // Add an item. The text doesn't matter since we are custom draw
     m_pwndList->c4AddItem(TString::strEmpty());
@@ -206,13 +216,14 @@ TBuildResTab::ParseException(const  TError&         errCaught
                             , const tCIDLib::TCard4 c4Col
                             , const TString&        strClassPath)
 {
-    // Add a new item to the list, then fill it in
-    TErrInfo& erriNew = m_colErrs.objAdd(TErrInfo());
-    erriNew.m_c4LineNum = c4Line;
-    erriNew.m_c4ColNum = c4Col;
-    erriNew.m_eEvent = tCIDMacroEng::EPrsEvs::CIDLibExcept;
-    erriNew.m_strClassPath = strClassPath;
-    erriNew.m_strText = errCaught.strErrText();
+    m_colErrs.objPlace
+    (
+        c4Col
+        , c4Line
+        , tCIDMacroEng::EPrsEvs::CIDLibExcept
+        , strClassPath
+        , errCaught.strErrText()
+    );
 
     // Add an item. The text doesn't matter since we are custom draw
     m_pwndList->c4AddItem(TString::strEmpty());
@@ -223,12 +234,14 @@ TBuildResTab::ParseException(const  tCIDLib::TCard4 c4Line
                             , const tCIDLib::TCard4 c4Col
                             , const TString&        strClassPath)
 {
-    // Add a new item to the list, then fill it in
-    TErrInfo& erriNew = m_colErrs.objAdd(TErrInfo());
-    erriNew.m_c4LineNum = c4Line;
-    erriNew.m_c4ColNum = c4Col;
-    erriNew.m_eEvent = tCIDMacroEng::EPrsEvs::UnknownExcept;
-    erriNew.m_strClassPath = strClassPath;
+    m_colErrs.objPlace
+    (
+        c4Col
+        , c4Line
+        , tCIDMacroEng::EPrsEvs::UnknownExcept
+        , strClassPath
+        , TString::strEmpty()
+    );
 
     // Add an item. The text doesn't matter since we are custom draw
     m_pwndList->c4AddItem(TString::strEmpty());

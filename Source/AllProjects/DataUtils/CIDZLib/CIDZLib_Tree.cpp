@@ -538,6 +538,9 @@ TStaticZTreeDescr::c1ExtraBitsAt(const tCIDLib::TCard4 c4At) const
             , TString(L"TStaticZTreeDescr")
             , TCardinal(m_c4ExtraBits)
         );
+
+        // Won't happen, but makes the analyzer happy
+        return 0;
     }
     #endif
     return m_pc1ExtraBits[c4At];

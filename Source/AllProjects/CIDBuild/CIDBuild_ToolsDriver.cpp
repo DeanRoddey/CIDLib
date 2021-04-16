@@ -121,9 +121,7 @@ TToolsDriver& TToolsDriver::tdrvBuilder()
         //
         #if defined(_MSC_VER)
         ptdrvBuilder = new TVCppDriver;
-        #elif defined(m_KCC)
-        ptdrvBuilder = new TKCCDriver;
-        #elif defined(m_GNUCm_)
+        #elif defined(__GNUC__)
         ptdrvBuilder = new TGCCDriver;
         #else
         !Unknown Tool Driver Error!
@@ -436,11 +434,7 @@ TToolsDriver::bLibListCallBack( const  TBldStr&            strTarget
     const TProjectInfo& projiTar = facCIDBuild.projiByName(strTarget);
     if (projiTar.eType() <= tCIDBuild::EProjTypes::MaxCodeType)
     {
-        //
-        //  Get a copy of the project name and tack on a lib extension, which
-        //  will give us the name of the lib for this project. We have to add
-        //  in the version postfix though because lib files are versioned.
-        //
+        // Let the platform driver build the library name for us
         TBldStr strNew;
         BuildLibName(strTarget, strNew);
 

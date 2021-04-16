@@ -30,6 +30,10 @@
 //  The others will generally take a TCollection<T> or TRefCollection<T> and can
 //  work on any type of collection of that sort (by value or by reference.)
 //
+//
+//  We also define here some templates for accessing raw arrays, since there's
+//  not really a better place for them.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -40,27 +44,124 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+
 namespace tCIDColAlgo
 {
     //
-    //  Given an accumulator type T, and a collection of those, call += on each value
-    //  in the collection and return the result. We don't know what += means in this
-    //  case, we just call it. They have to provide us with an initial value to start
-    //  with.
+    //  If the passed object is not in the collection already, add it. Some
+    //  collections have such things built in, like has sets. But, for other
+    //  types, we have to just search it. This assumes it's not sorted already
+    //  so we have to search the whole thing. Returns true if it was added.
     //
-    template <typename T> T tAccumulate(const TCollection<T>& colSrc, const T& tInitVal)
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bAddIfNew(        TCol&   colTar
+                                , const TElem&  objToAdd
+                                ,       TComp   pfnComp = TComp())
     {
-        T retVal = tInitVal;
-        TColCursor<T>* pcursIter = colSrc.pcursNew();
-        TJanitor<TColCursor<T>> janCursor(pcursIter);
+        typename TCol::TCursor cursTar(&colTar);
+        for (; cursTar; ++cursTar)
+        {
+            // If we find a match, return false, didn't add it
+            if (pfnComp(*cursTar, objToAdd))
+                return kCIDLib::False;
+        }
 
+        // Never found it, so add it
+        colTar.objAdd(objToAdd);
+        return kCIDLib::True;
+    }
+
+
+    //
+    //  Remove elements that the passed test indicates should be removed.
+    //
+    //  This only works for a collection that has a RemoveAt(cursor) method, but
+    //  most do.
+    //
+    template<typename  TCol, typename TTest, typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bRemoveIf(TCol& colTar, TTest pfnTest)
+    {
+        tCIDLib::TBoolean bRet = kCIDLib::False;
+        typename TCol::TCursor cursTar(&colTar);
+        while (cursTar)
+        {
+            // Test this one, if a match remove it, else move forward
+            if (pfnTest(*cursTar))
+            {
+                colTar.RemoveAt(cursTar);
+                bRet = kCIDLib::True;
+            }
+             else
+            {
+                ++cursTar;
+            }
+        }
+        return bRet;
+    }
+
+
+    //
+    //  If the passed object is in the collection, remove it. It can remove just
+    //  the first match, or all. Some collections have built in mechanisms for
+    //  this kind of stuff, but this can be used for those that dont. Returns
+    //  true if it removed any.
+    //
+    //  This only works for a collection that has a RemoveAt(cursor) method, but
+    //  most do.
+    //
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    tCIDLib::TBoolean bRemoveMatches(       TCol&               colTar
+                                    , const TElem&              objToRem
+                                    , const tCIDLib::TBoolean   bRemoveAll
+                                    ,       TComp               pfnComp = TComp())
+    {
+        tCIDLib::TBoolean bRet = kCIDLib::False;
+        typename TCol::TCursor cursTar(&colTar);
+        while (cursTar)
+        {
+            // If we find a match, remove it
+            if (pfnComp(*cursTar, objToRem))
+            {
+                colTar.RemoveAt(cursTar);
+                bRet = kCIDLib::True;
+
+                // If not removing all, then we are done
+                if (!bRemoveAll)
+                    break;
+            }
+             else
+            {
+                // No match, so move forward
+                ++cursTar;
+            }
+        }
+        return bRet;
+    }
+
+
+    //
+    //  Given a collection and an initial value, call += for each value in the
+    //  collection, adding them to the incoming value, which we return as the
+    //  new value.
+    //
+    template <typename TCol, typename TElem = TCol::TMyElemType>
+    TElem tAccumulate(const TCol& colSrc, const TElem& tInitVal)
+    {
+        TElem retVal = tInitVal;
         try
         {
-            while (pcursIter->bIsValid())
-            {
-                retVal += pcursIter->objRCur();
-                pcursIter->bNext();
-            }
+            colSrc.bForEach
+            (
+                [&retVal](const TElem& tCur) -> tCIDLib::TBoolean
+                {
+                    retVal += tCur;
+                    return kCIDLib::True;
+                }
+            );
         }
 
         catch(TError& errToCatch)
@@ -73,10 +174,119 @@ namespace tCIDColAlgo
 
 
     //
+    //  Does a map operation. It will return a non-adopting by ref vector of the elements
+    //  that pfnTest say should be kept. We return it by value, but that's ok since it's
+    //  cheaply moveable. Of course the caller must not keep these references around beyond
+    //  the life of the source collection.
+    //
+    //  We have a const one and a non-const one. So the const one takes a const collection
+    //  and returns a vector of const references, and vice versa.
+    //
+    template<typename  TCol, typename TTest>
+    typename TRefVector<const typename TCol::TMyElemType>
+    colMap(const TCol& colSrc, TTest pfnTest, const tCIDLib::TCard4 c4InitAlloc = 0)
+    {
+        TRefVector<const typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objRCur());
+            }
+        }
+        return colKept;
+    }
+
+    template<typename  TCol, typename TTest>
+    typename TRefVector<typename TCol::TMyElemType>
+    colMapNC(TCol& colSrc, TTest pfnTest, const tCIDLib::TCard4 c4InitAlloc = 0)
+    {
+        TRefVector<typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objWCur());
+            }
+        }
+        return colKept;
+    }
+
+
+    //
+    //  Does a map and reduce operation. It does the map operation and then runs through the
+    //  resulting list, applying the reduce callback to each element in sequence. The final
+    //  resulting value is returned.
+    //
+    template<typename  TCol, typename TTest, typename Reduce>
+    typename TCol::TMyElemType
+    tMapReduce( const   TCol&                           colSrc
+                ,       TTest                           pfnTest
+                ,       Reduce                          pfnReduce
+                , const typename TCol::TMyElemType&     tInitVal
+                , const tCIDLib::TCard4                 c4InitAlloc = 0)
+    {
+        TRefVector<const typename TCol::TMyElemType> colKept
+        (
+            tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
+        );
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnTest(*cursSrc))
+            {
+                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
+                {
+                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
+                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
+                        colKept.CheckExpansion(colSrc.c4ElemCount());
+                    else
+                        colKept.CheckExpansion(c4Exp);
+                }
+                colKept.Add(&cursSrc.objRCur());
+            }
+        }
+
+        typename TCol::TMyElemType tRet = tInitVal;
+        using TKeptCursor = typename TRefVector<const typename TCol::TMyElemType>::TCursor;
+        TKeptCursor cursKept = TKeptCursor(&colKept);
+        for (; cursKept; ++cursKept)
+            pfnReduce(tRet, *cursKept);
+
+        return tRet;
+    }
+
+
+    //
     //  Find the first element that matches the passed object to find. If found the
     //  cursor will be pointed at that element, else invalid. The default equality
     //  comparison functor will be used if not explicitly provided, which requires
-    //  that the elements provide the equality operator.
+    //  that the elements provide the equality operator. We have const and non-const
+    //  versions.
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
@@ -85,7 +295,23 @@ namespace tCIDColAlgo
                                     , const TElem&      objToFind
                                     ,       TComp       pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFindNC(        TCol&       colSrc
+                                        , const TElem&      objToFind
+                                        ,       TComp       pfnComp = TComp())
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objToFind))
@@ -99,7 +325,8 @@ namespace tCIDColAlgo
     //  Find the first element that is not equal to the passed object to find. If
     //  found the cursor will be pointed at that element, else invalid. The default
     //  equality comparison functor will be used if not explicitly provided, which
-    //  requires that the elements provide the equality operator.
+    //  requires that the elements provide the equality operator. We have const
+    //  and non-const versions
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
@@ -108,7 +335,23 @@ namespace tCIDColAlgo
                                         , const TElem&  objToFind
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFindNotNC(         TCol&   colSrc
+                                            , const TElem&  objToFind
+                                            ,       TComp   pfnComp = TComp())
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (!pfnComp(*cursSrc, objToFind))
@@ -119,9 +362,80 @@ namespace tCIDColAlgo
 
 
     //
+    //  Find the first element that matches, by a key value, which the comparator parameter
+    //  knows how to access. And then find the first one that doesn't match. We have const
+    //  and non-const versions.
+    //
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TCursor cursFindByKey(const  TCol&   colSrc
+                                        , const TKey&   objKey
+                                        ,       TComp   pfnComp)
+    {
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TCursor cursFindNotByKey(const   TCol&   colSrc
+                                            , const TKey&   objKey
+                                            ,       TComp   pfnComp)
+    {
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TNCCursor cursFindByKeyNC(       TCol&   colSrc
+                                            , const TKey&   objKey
+                                            ,       TComp   pfnComp)
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TKey
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    typename TCol::TNCCursor cursFindNotByKeyNC(        TCol&   colSrc
+                                                , const TKey&   objKey
+                                                ,       TComp   pfnComp)
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (!pfnComp(*cursSrc, objKey))
+                break;
+        }
+        return cursSrc;
+    }
+
+
+    //
     //  Find the first element greater or less than the passed object to compare. The
     //  default magnitude comparison functor is used if not indicated explicitly (in
-    //  which case the element type must provide < and > operators.)
+    //  which case the element type must provide < and > operators.) We have consta nd
+    //  non-const versions.
     //
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
@@ -130,7 +444,7 @@ namespace tCIDColAlgo
                                             , const TElem&  objComp
                                             ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
@@ -146,7 +460,39 @@ namespace tCIDColAlgo
                                         , const TElem&  objComp
                                         ,       TComp   pfnComp = TComp())
     {
-        TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFirstGreaterNC(        TCol&   colSrc
+                                                , const TElem&  objComp
+                                                ,       TComp   pfnComp = TComp())
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstGreater)
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefMagComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFirstLessNC(       TCol&   colSrc
+                                            , const TElem&  objComp
+                                            ,       TComp   pfnComp = TComp())
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
         {
             if (pfnComp(*cursSrc, objComp) == tCIDLib::ESortComps::FirstLess)
@@ -183,8 +529,8 @@ namespace tCIDColAlgo
             return;
 
         // Lock both collections
-        TMtxLocker lockNew(colDest.pmtxLock());
-        TMtxLocker lockToDup(colSource.pmtxLock());
+        TLocker lockrNew(&colDest);
+        TLocker lockrToDup(&colSource);
 
         // Nothing to do if no elements!
         if (!colSource.c4ElemCount())
@@ -221,7 +567,7 @@ namespace tCIDColAlgo
             return 0;
 
         tCIDLib::TCard4 c4RemCount = 0;
-        TCol::TNCCursor cursCur(&colSrc);
+        typename TCol::TNCCursor cursCur(&colSrc);
         TElem& objLast = *cursCur;
         ++cursCur;
         while (cursCur.bIsValid())
@@ -279,6 +625,52 @@ namespace tCIDColAlgo
             }
         }
         return tLastBest;
+    }
+}
+
+namespace tCIDLib
+{
+    // Access a raw array safely
+    template <typename T, tCIDLib::TCard4 c4Size>
+    T& c4ArrayAt(T(& aSrc)[c4Size], const tCIDLib::TCard4 c4At)
+    {
+        if (c4At >= c4Size)
+        {
+            ThrowArrayIndexErr(c4At, c4Size);
+
+            // Won't happen but make the analyzer happy
+            return *static_cast<T*>(nullptr);
+        }
+        return aSrc[c4At];
+    }
+
+    template <typename T, tCIDLib::TCard4 c4Size>
+    const T& c4ArrayAt(const T(& aSrc)[c4Size], const tCIDLib::TCard4 c4At)
+    {
+        if (c4At >= c4Size)
+        {
+            ThrowArrayIndexErr(c4At, c4Size);
+
+            // Won't happen but make the analyzer happy
+            return *static_cast<T*>(nullptr);
+        }
+        return aSrc[c4At];
+    }
+
+
+    //
+    //  Get a pointer to the element past the end, for use with pointer
+    //  increment type loops.
+    //
+    template <typename T, tCIDLib::TCard4 c4Size> T* pArrayEndPtr(T(& aSrc)[c4Size])
+    {
+        return &aSrc[c4Size];
+    }
+
+    template <typename T, tCIDLib::TCard4 c4Size>
+    const T* pArrayEndPtr(const T(& aSrc)[c4Size])
+    {
+        return &aSrc[c4Size];
     }
 }
 

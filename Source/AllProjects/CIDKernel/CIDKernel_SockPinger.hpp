@@ -41,10 +41,12 @@
 //  request, so we can calculate how long we've waited. In wait init mode
 //  the stamp is 0 and has no meaning.
 //
-// CAVEATS/GOTCHAS:
+//  Most of this is implemented here at the platform independent level. The
+//  TKrnlSocket class provides a special method that only we can see, which
+//  will set it up for our purposes. The reset we can do via existing public
+//  functionality of the socket class.
 //
-//  1)  Because the stuff done here is so off the beaten path, we don't use
-//      any of our own socket functionality. It's all just done low level.
+// CAVEATS/GOTCHAS:
 //
 // LOG:
 //
@@ -67,7 +69,15 @@ class KRNLEXPORT TKrnlSockPinger
         // -------------------------------------------------------------------
         TKrnlSockPinger();
 
+        TKrnlSockPinger(const TKrnlSockPinger&) = delete;
+
         ~TKrnlSockPinger();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TKrnlSockPinger& operator=(const TKrnlSockPinger&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -80,19 +90,13 @@ class KRNLEXPORT TKrnlSockPinger
 
         tCIDLib::TBoolean bInitialize
         (
-            const   TKrnlIPAddr&            kipaTarget
+            const   TKrnlIPAddr&            kipaRemote
+            , const tCIDLib::TCard4         c4TTL = 128
         );
 
         tCIDLib::TBoolean bSendRequest();
 
         tCIDLib::TBoolean bTerminate();
-
-        tCIDLib::TCard4 c4TTL() const;
-
-        tCIDLib::TCard4 c4TTL
-        (
-            const   tCIDLib::TCard4         c4ToSet
-        );
 
         tCIDLib::TEncodedTime enctLastTime() const;
 
@@ -110,13 +114,6 @@ class KRNLEXPORT TKrnlSockPinger
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplimented constructors and operators
-        // -------------------------------------------------------------------
-        TKrnlSockPinger(const TKrnlSockPinger&);
-        tCIDLib::TVoid operator=(const TKrnlSockPinger&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
@@ -144,6 +141,10 @@ class KRNLEXPORT TKrnlSockPinger
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bV6Target
+        //      During init we remember if our target is V6 vs V4, which affects how
+        //      we set up the buffer we send and such.
+        //
         //  m_c2Id
         //      We get a unique id for this pinger object (from the static
         //      s_scntEqId member.) This plus our own sequence number tht we
@@ -156,9 +157,6 @@ class KRNLEXPORT TKrnlSockPinger
         //  m_c4PacketLen
         //      The packet length we calculate during init.
         //
-        //  m_c4TTL
-        //      The TTL that we set up the socket for.
-        //
         //  m_enctLastTime
         //      If our current state is waiting for a reply, then this is the
         //      time at which we made the original request. If our curent state
@@ -168,26 +166,38 @@ class KRNLEXPORT TKrnlSockPinger
         //  m_eState
         //      We remember our current state here.
         //
-        //  m_kipaTar
+        //  m_kipaRemote
         //      We resolve the caller's target IP address to here for later use.
         //
         //  m_pc1Buf
         //      A buffer we allocate to read the responses back into.
         //
-        //  m_pContext
-        //      Any context data that the platform implementation requies to
-        //      support this operation and maintain context. It's opaque here
-        //      at this public level.
+        //  m_ksockPing
+        //      The socket object we use to do the pinging.
+        //
+        //  m_ippnLocal
+        //      The local port we ended up bound to.
+        //
+        //  m_pc1LocalAddr
+        //  m_pc1RemAddr
+        //      We have to include the local and remote address info in the ping
+        //      buffer, so we get them out into raw form during init.
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bV6Target;
         tCIDLib::TCard2         m_c2Id;
         tCIDLib::TCard2         m_c2SeqNum;
+        tCIDLib::TCard4         m_c4LocalAddrSz;
         tCIDLib::TCard4         m_c4PacketLen;
-        tCIDLib::TCard4         m_c4TTL;
+        tCIDLib::TCard4         m_c4RemAddrSz;
         tCIDLib::TEncodedTime   m_enctLastTime;
         tCIDSock::EPingStates   m_eState;
-        TKrnlIPAddr             m_kipaTar;
+        TKrnlIPAddr             m_kipaLocal;
+        TKrnlIPAddr             m_kipaRemote;
+        TKrnlSocket             m_ksockPing;
+        tCIDLib::TIPPortNum     m_ippnLocal;
         tCIDLib::TCard1*        m_pc1Buf;
-        tCIDLib::TVoid*         m_pContext;
+        tCIDLib::TCard1*        m_pc1LocalAddr;
+        tCIDLib::TCard1*        m_pc1RemAddr;
 
 
         // -------------------------------------------------------------------

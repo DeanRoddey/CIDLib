@@ -81,7 +81,7 @@ AdvRTTIDecls(TFilledBoxWidget,TBoxWidget)
 //  TBagOWidgets
 //      This is a convenience typedef for our collection template.
 // ----------------------------------------------------------------------------
-typedef TRefBag<TBaseWidget> TBagOWidgets;
+using TBagOWidgets = TRefBag<TBaseWidget> ;
 
 
 // ----------------------------------------------------------------------------

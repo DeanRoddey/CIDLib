@@ -224,6 +224,7 @@ class CIDMACROENGEXP TMEngMethodImpl : public TMEngNamedItem
         TMEngMethodImpl() = delete;
 
         TMEngMethodImpl(const TMEngMethodImpl&) = delete;
+        TMEngMethodImpl(TMEngMethodImpl&&) = delete;
 
         ~TMEngMethodImpl();
 
@@ -232,6 +233,7 @@ class CIDMACROENGEXP TMEngMethodImpl : public TMEngNamedItem
         //  Public operators
         // -------------------------------------------------------------------
         TMEngMethodImpl& operator=(const TMEngMethodImpl&) = delete;
+        TMEngMethodImpl& operator=(TMEngMethodImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -358,6 +360,7 @@ class CIDMACROENGEXP TMEngOpMethodImpl : public TMEngMethodImpl
         );
 
         TMEngOpMethodImpl(const TMEngOpMethodImpl&) = delete;
+        TMEngOpMethodImpl(TMEngOpMethodImpl&&) = delete;
 
         ~TMEngOpMethodImpl();
 
@@ -366,6 +369,7 @@ class CIDMACROENGEXP TMEngOpMethodImpl : public TMEngMethodImpl
         //  Public operators
         // -------------------------------------------------------------------
         TMEngOpMethodImpl& operator=(const TMEngOpMethodImpl&) = delete;
+        TMEngOpMethodImpl& operator=(TMEngOpMethodImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -391,7 +395,7 @@ class CIDMACROENGEXP TMEngOpMethodImpl : public TMEngMethodImpl
             , const TMEngClassInfo&         meciTarget
             , const TMEngMethodInfo&        methiThis
             ,       TCIDMacroEngine&        meOwner
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------

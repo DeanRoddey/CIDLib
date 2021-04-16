@@ -37,7 +37,7 @@
 //   CLASS: TFundStack
 //  PREFIX: fcol
 // -----------------------------------------------------------------------------
-template <class T> class TFundStack : public TFundColBase, public MDuplicable
+template <typename T> class TFundStack : public TFundColBase, public MDuplicable
 {
     public :
         // --------------------------------------------------------------------
@@ -47,58 +47,71 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
 
             m_c4MaxElements(c4MaxElements)
             , m_c4Top(0)
-            , m_ptElements(0)
+            , m_ptElements(nullptr)
         {
             // Allocate the buffer
+            if (m_c4MaxElements == 0)
+                m_c4MaxElements = 1;
             m_ptElements = new T[m_c4MaxElements];
         }
 
-        TFundStack(const TFundStack<T>& fcolToCopy) :
+        TFundStack(const TFundStack<T>& fcolSrc) :
 
-            m_c4MaxElements(fcolToCopy.m_c4MaxElements)
-            , m_c4Top(fcolToCopy.m_c4Top)
-            , m_ptElements(0)
+            m_c4MaxElements(fcolSrc.m_c4MaxElements)
+            , m_c4Top(fcolSrc.m_c4Top)
+            , m_ptElements(nullptr)
         {
             // Allocate the buffer and copy over the source contents
             m_ptElements = new T[m_c4MaxElements];
-            TRawMem::CopyMemBuf
-            (
-                m_ptElements, fcolToCopy.m_ptElements, m_c4Top * sizeof(T)
-            );
+            TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
+        }
+
+        TFundStack(TFundStack<T>&& fcolSrc) :
+
+            TFundStack(1)
+        {
+            *this = tCIDLib::ForceMove(fcolSrc);
         }
 
         ~TFundStack()
         {
             delete [] m_ptElements;
-            m_ptElements = 0;
+            m_ptElements = nullptr;
         }
 
 
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TFundStack<T>& operator=(const TFundStack<T>& fcolToAssign)
+        TFundStack<T>& operator=(const TFundStack<T>& fcolSrc)
         {
-            if (this == &fcolToAssign)
+            if (this == &fcolSrc)
                 return *this;
 
             // If different max sizes, then reallocate
-            if (m_c4MaxElements != fcolToAssign.m_c4MaxElements)
+            if (m_c4MaxElements != fcolSrc.m_c4MaxElements)
             {
                 delete [] m_ptElements;
                 m_ptElements = new T[m_c4MaxElements];
-                m_c4MaxElements = fcolToAssign.m_c4MaxElements;
+                m_c4MaxElements = fcolSrc.m_c4MaxElements;
             }
 
             // Set the new top and copy over the source elements
-            m_c4Top = fcolToAssign.m_c4Top;
-            TRawMem::CopyMemBuf
-            (
-                m_ptElements
-                , fcolToAssign.m_ptElements
-                , m_c4Top * sizeof(T)
-            );
+            m_c4Top = fcolSrc.m_c4Top;
+            TRawMem::CopyMemBuf(m_ptElements, fcolSrc.m_ptElements, m_c4Top * sizeof(T));
 
+            return *this;
+        }
+
+        TFundStack<T>& operator=(TFundStack<T>&& fcolSrc)
+        {
+            if (&fcolSrc != this)
+            {
+                TParent::operator=(tCIDLib::ForceMove(fcolSrc));
+                tCIDLib::Swap(m_c4MaxElements, fcolSrc.m_c4MaxElements);
+                tCIDLib::Swap(m_c4Top, fcolSrc.m_c4Top);
+                tCIDLib::Swap(m_ptElements, fcolSrc.m_ptElements);
+            }
             return *this;
         }
 
@@ -245,7 +258,7 @@ template <class T> class TFundStack : public TFundColBase, public MDuplicable
 //   CLASS: TFundStackJan
 //  PREFIX: jan
 // -----------------------------------------------------------------------------
-template <class T> class TFundStackJan
+template <typename T> class TFundStackJan
 {
     public :
         TFundStackJan(const T tToPush, TFundStack<T>* const pfcolStack) :
@@ -255,31 +268,36 @@ template <class T> class TFundStackJan
             m_pfcolStack->Push(tToPush);
         }
 
+        TFundStackJan(const TFundStackJan&) = delete;
+        TFundStackJan(TFundStackJan&&) = delete;
+
         ~TFundStackJan()
         {
             if (m_pfcolStack)
                 m_pfcolStack->Pop();
         }
 
+        TFundStackJan& operator=(const TFundStackJan&) = delete;
+        TFundStackJan& operator=(TFundStackJan&&) = delete;
+
         tCIDLib::TVoid Orphan()
         {
-            m_pfcolStack = 0;
+            m_pfcolStack = nullptr;
         }
 
         T tValue() const
         {
-            return m_fcolStack->tPeek();
+            return m_pfcolStack->tPeek();
         }
 
     private :
-        TFundStackJan(const TFundStackJan&);
-        tCIDLib::TVoid operator=(const TFundStackJan&);
+        TFundStack<T>*  m_pfcolStack;
 };
 
 #pragma CIDLIB_POPPACK
 
 
-template <class T> TBinInStream&
+template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
 {
     // First we should get a stream marker
@@ -315,7 +333,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
     if (colToStream.m_c4MaxElements != c4NewMax)
     {
         delete [] colToStream.m_ptElements;
-        colToStream.m_ptElements = 0;
+        colToStream.m_ptElements = nullptr;
         colToStream.m_ptElements = new T[c4NewMax];
         colToStream.m_c4MaxElements = c4NewMax;
     }
@@ -328,7 +346,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundStack<T>& colToStream)
     return strmToReadFrom;
 }
 
-template <class T> TBinOutStream&
+template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundStack<T>& colToStream)
 {
     // Stream out our start marker, max elements and current element count

@@ -105,6 +105,11 @@ class KRNLEXPORT TKrnlThread
 
         TKrnlThread(const TKrnlThread&) = delete;
 
+        TKrnlThread
+        (
+                    TKrnlThread&&           kthrSrc
+        );
+
         ~TKrnlThread();
 
 
@@ -112,6 +117,11 @@ class KRNLEXPORT TKrnlThread
         //  Public operators
         // -------------------------------------------------------------------
         TKrnlThread& operator=(const TKrnlThread&) = delete;
+
+        TKrnlThread& operator=
+        (
+                    TKrnlThread&&           kthrSrc
+        );
 
 
         // -------------------------------------------------------------------
@@ -169,9 +179,15 @@ class KRNLEXPORT TKrnlThread
             const   tCIDLib::EPrioLevels    eLevel
         );
 
-        const TThreadHandle& hthrThis() const;
+        const TThreadHandle& hthrThis() const
+        {
+            return m_hthrThis;
+        }
 
-        TThreadHandle& hthrThis();
+        TThreadHandle& hthrThis()
+        {
+            return m_hthrThis;
+        }
 
         tCIDLib::TVoid MarkAsGUIThread();
 
@@ -201,15 +217,4 @@ class KRNLEXPORT TKrnlThread
 };
 
 #pragma CIDLIB_POPPACK
-
-
-inline const TThreadHandle& TKrnlThread::hthrThis() const
-{
-    return m_hthrThis;
-}
-
-inline TThreadHandle& TKrnlThread::hthrThis()
-{
-    return m_hthrThis;
-}
 

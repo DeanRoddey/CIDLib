@@ -33,43 +33,11 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 
-
-// ---------------------------------------------------------------------------
-//  Public functions
-// ---------------------------------------------------------------------------
-tCIDLib::TCard4 TRawBits::c4RotateLeft( const   tCIDLib::TCard4 c4Value
-                                        , const tCIDLib::TCard4 c4RotateCount)
-{
-    tCIDLib::TCard1 c1Rot = tCIDLib::TCard1(c4RotateCount % 32);
-    tCIDLib::TCard4 c4Ret = c4Value;
-
-    _asm
-    {
-        PUSH    ecx
-        mov     cl, c1Rot
-        ROL     c4Ret, cl
-        POP     ecx
-    }
-    return c4Ret;
-}
-
-tCIDLib::TCard4 TRawBits::c4RotateRight(const   tCIDLib::TCard4 c4Value
-                                        , const tCIDLib::TCard4 c4RotateCount)
-{
-    tCIDLib::TCard1 c1Rot = tCIDLib::TCard1(c4RotateCount % 32);
-    tCIDLib::TCard4 c4Ret = c4Value;
-
-    _asm
-    {
-        PUSH    ecx
-        mov     cl, c1Rot
-        ROR     c4Ret, cl
-        POP     ecx
-    }
-    return c4Ret;
-}
-
-
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812)
+#include    <intrin.h>
+#pragma     warning(pop)
 
 
 //
@@ -87,7 +55,7 @@ tCIDLib::TFloat4
 TRawBits::f4SwapBytes(  const   tCIDLib::TFloat4    f4ToSwap
                         , const tCIDLib::TBoolean   bIsLittle)
 {
-    if (bIsLittle)
+    if (!bIsLittle)
     {
         // <TBD>
     }
@@ -98,7 +66,7 @@ tCIDLib::TFloat8
 TRawBits::f8SwapBytes(  const   tCIDLib::TFloat8    f8ToSwap
                         , const tCIDLib::TBoolean   bIsLittle)
 {
-    if (bIsLittle)
+    if (!bIsLittle)
     {
         // <TBD>
     }
@@ -107,7 +75,25 @@ TRawBits::f8SwapBytes(  const   tCIDLib::TFloat8    f8ToSwap
 
 
 
-// These we can optimize a lot
+//
+//  Do bulk byte swapping. On some platforms this might be able to get
+//  various types of boosts. For the 32 bit one, where we have a built in
+//  CPU command for the swap, we just do inline. For the others we use
+//  intrinsics.
+//
+tCIDLib::TVoid
+TRawBits::SwapCard2Array(       tCIDLib::TCard2* const  pc2Data
+                        , const tCIDLib::TCard4         c4Count)
+{
+    tCIDLib::TCard2* pc2Cur = pc2Data;
+    const tCIDLib::TCard2* pc2End = pc2Data + c4Count;
+    while (pc2Cur < pc2End)
+    {
+        *pc2Cur = _byteswap_ushort(*pc2Cur);
+        pc2Cur++;
+    }
+}
+
 tCIDLib::TVoid
 TRawBits::SwapCard4Array(       tCIDLib::TCard4* const  pc4Data
                         , const tCIDLib::TCard4         c4Count)
@@ -138,11 +124,38 @@ TRawBits::SwapCard4Array(       tCIDLib::TCard4* const  pc4Data
     }
 }
 
+tCIDLib::TVoid
+TRawBits::SwapCard8Array(       tCIDLib::TCard8* const  pc8Data
+                        , const tCIDLib::TCard4         c4Count)
+{
+    tCIDLib::TCard8* pc8Cur = pc8Data;
+    const tCIDLib::TCard8* pc8End = pc8Data + c4Count;
+    while (pc8Cur < pc8End)
+    {
+        *pc8Cur = _byteswap_uint64(*pc8Cur);
+        pc8Cur++;
+    }
+}
+
+
+// These just call the unsigned versions above and cast the type
+tCIDLib::TVoid
+TRawBits::SwapInt2Array(        tCIDLib::TInt2* const   pi2Data
+                        , const tCIDLib::TCard4         c4Count)
+{
+    SwapCard2Array(reinterpret_cast<tCIDLib::TCard2*>(pi2Data), c4Count);
+}
 
 tCIDLib::TVoid
 TRawBits::SwapInt4Array(        tCIDLib::TInt4* const   pi4Data
                         , const tCIDLib::TCard4         c4Count)
 {
-    // Just call the other one and cast the type
     SwapCard4Array(reinterpret_cast<tCIDLib::TCard4*>(pi4Data), c4Count);
+}
+
+tCIDLib::TVoid
+TRawBits::SwapInt8Array(        tCIDLib::TInt8* const   pi8Data
+                        , const tCIDLib::TCard4         c4Count)
+{
+    SwapCard8Array(reinterpret_cast<tCIDLib::TCard8*>(pi8Data), c4Count);
 }

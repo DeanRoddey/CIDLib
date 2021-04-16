@@ -66,7 +66,7 @@ class CIDCTRLSEXP TGUIClipboard : public TObject
         //  We need a template member to put object onto the clipboard and
         //  to get objects off of it.
         // -------------------------------------------------------------------
-        template <class T> tCIDLib::TBoolean bReadObj(T*& pobjToFill)
+        template <typename T> tCIDLib::TBoolean bReadObj(T*& pobjToFill)
         {
             // See if a class value is stored. If so, get it, else we fail
             TString strClassName;
@@ -103,7 +103,7 @@ class CIDCTRLSEXP TGUIClipboard : public TObject
             return kCIDLib::True;
         }
 
-        template <class T> tCIDLib::TVoid WriteObj(const T& objToWrite)
+        template <typename T> tCIDLib::TVoid WriteObj(const T& objToWrite)
         {
             //
             //  We do the streaming at this level, then we can pass it off

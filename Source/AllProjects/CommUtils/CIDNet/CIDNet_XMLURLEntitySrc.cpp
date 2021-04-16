@@ -223,14 +223,11 @@ TBinInStream* TURLEntitySrc::pstrmMakeNew() const
         TString                 strRepLine;
 
         //
-        //  Allocate a buffer for the body content since we are going to
-        //  return a stream and we can just give it to him to adopt, and
-        //  avoid having to copy it. We allocate it small but give it a
-        //  large max, and just let the HTTP client size it up to fit
-        //  the content. This is the most efficient way.
+        //  Create  a buffer for the body content. We allocate it small
+        //  but give it a large max, and just let the HTTP client size
+        //  it up to fit the content. This is the most efficient way.
         //
-        THeapBuf* pmbufContent = new THeapBuf(8, 0x800000, 16 * 1024);
-        TJanitor<THeapBuf> janBuf(pmbufContent);
+        THeapBuf mbufContent(8, 0x800000, 16 * 1024);
 
         //
         //  Create an HTTP client and do the request. Let it create a one shot socket,
@@ -250,7 +247,7 @@ TBinInStream* TURLEntitySrc::pstrmMakeNew() const
             , strRepLine
             , colInHdrLines
             , strContType
-            , *pmbufContent
+            , mbufContent
             , c4ContLen
             , strUltimateURL
             , colOutHdrLines
@@ -270,11 +267,8 @@ TBinInStream* TURLEntitySrc::pstrmMakeNew() const
             );
         }
 
-        // Looks ok so create the memory buffer
-        pstrmRet = new TBinMBufInStream
-        (
-            janBuf.pobjOrphan(), c4ContLen, tCIDLib::EAdoptOpts::Adopt
-        );
+        // Looks ok so create the stream, giving him the buffer contents
+        pstrmRet = new TBinMBufInStream(tCIDLib::ForceMove(mbufContent), c4ContLen);
     }
      else
     {

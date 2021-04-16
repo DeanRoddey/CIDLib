@@ -42,19 +42,6 @@ namespace TRawStr
 
     tCIDLib::TBoolean bIsDigit(const tCIDLib::TCh chToCheck);
 
-    tCIDLib::TSInt iCompIStr
-    (
-        const   tCIDLib::TCh* const         pszOne
-        , const tCIDLib::TCh* const         pszTwo
-    );
-
-    tCIDLib::TSInt iCompIStrN
-    (
-        const   tCIDLib::TCh* const         pszOne
-        , const tCIDLib::TCh* const         pszTwo
-        , const tCIDLib::TCard4             c4Count
-    );
-
     tCIDLib::TBoolean bXlatCard4
     (
         const   tCIDLib::TCh* const         pszValue
@@ -68,25 +55,9 @@ namespace TRawStr
         ,       tCIDLib::TInt4&             i4ToFill
     );
 
-    tCIDLib::TVoid FormatVal
+    tCIDLib::TCh chToUpper
     (
-        const   tCIDLib::TCard4             c4ToFormat
-        ,       tCIDLib::TCh* const         pszToFill
-        , const tCIDLib::TCard4             c4MaxCars
-        , const tCIDLib::TCard4             c4Radix
-    );
-
-    tCIDLib::TVoid FormatVal
-    (
-        const   tCIDLib::TInt4              i4ToFormat
-        ,       tCIDLib::TCh* const         pszToFill
-        , const tCIDLib::TCard4             c4MaxCars
-    );
-
-    tCIDLib::TCh* pszStrTok
-    (
-                tCIDLib::TCh* const         pszToTok
-        , const tCIDLib::TCh* const         pszSeps
+        const   tCIDLib::TCh                chSrc
     );
 
     tCIDLib::TCh* pszTranscode
@@ -232,13 +203,50 @@ namespace TRawStr
         return 0;
     }
 
-    tCIDLib::TVoid FormatVal
+    tCIDLib::TSInt iCompIStr
     (
-        const   tCIDLib::TCard4     c4ToFormat
-        ,       TBldStr&            strToFill
-        , const tCIDLib::TCard4     c4Radix
+        const   tCIDLib::TCh* const         pszOne
+        , const tCIDLib::TCh* const         pszTwo
     );
 
+    tCIDLib::TSInt iCompIStrN
+    (
+        const   tCIDLib::TCh* const         pszOne
+        , const tCIDLib::TCh* const         pszTwo
+        , const tCIDLib::TCard4             c4Count
+    );
+
+
+    tCIDLib::TVoid FormatVal
+    (
+        const   tCIDLib::TCard4             c4ToFormat
+        ,       tCIDLib::TCh* const         pszToFill
+        , const tCIDLib::TCard4             c4MaxCars
+        , const tCIDLib::TCard4             c4Radix
+    );
+
+    tCIDLib::TVoid FormatVal
+    (
+        const   tCIDLib::TInt4              i4ToFormat
+        ,       tCIDLib::TCh* const         pszToFill
+        , const tCIDLib::TCard4             c4MaxCars
+    );
+
+    tCIDLib::TVoid FormatVal
+    (
+        const   tCIDLib::TCard4             c4ToFormat
+        ,       TBldStr&                    strToFill
+        , const tCIDLib::TCard4             c4Radix
+    );
+
+    tCIDLib::TCh* pszStrTok
+    (
+                tCIDLib::TCh* const         pszToTok
+        , const tCIDLib::TCh* const         pszSeps
+    );
+
+
+    // Simples we can inline or do in terms of other stuff
     inline tCIDLib::TVoid MoveChars(        tCIDLib::TCh* const pszTarget
                                     , const tCIDLib::TCh* const pszSource
                                     , const tCIDLib::TCard4     c4Count)

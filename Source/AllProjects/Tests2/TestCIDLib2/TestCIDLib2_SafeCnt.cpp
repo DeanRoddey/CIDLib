@@ -182,6 +182,7 @@ TTest_SafeCnt2::TTest_SafeCnt2() :
     )
     , m_colThreads(tCIDLib::EAdoptOpts::Adopt)
 {
+    MarkAsLong();
 }
 
 TTest_SafeCnt2::~TTest_SafeCnt2()

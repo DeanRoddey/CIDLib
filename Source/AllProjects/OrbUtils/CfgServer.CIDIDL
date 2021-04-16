@@ -50,7 +50,7 @@
                              CIDIDL:Value="/CIDLib/CfgSrv/%(h)/CoreAdmin"/>
 
             <CIDIDL:Constant CIDIDL:Name="strBinding"
-                             CIDIDL:Type="TString"
+                            CIDIDL:Type="TString"
                              CIDIDL:Value="/CIDLib/CfgSrv/%(h)/RepoObj"/>
         </CIDIDL:Constants>
 

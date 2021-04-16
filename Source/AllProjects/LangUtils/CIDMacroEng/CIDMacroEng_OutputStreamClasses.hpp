@@ -313,7 +313,7 @@ class CIDMACROENGEXP TMEngConOutStreamInfo : public TMEngClassInfo
         tCIDLib::TVoid Init
         (
                     TCIDMacroEngine&        meOwner
-        )   ;
+        )   override;
 
         TMEngClassVal* pmecvMakeStorage
         (

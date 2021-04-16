@@ -43,7 +43,17 @@ class CIDMETAEXTREXP TCIDBlurayID : public TObject
         // -------------------------------------------------------------------
         TCIDBlurayID();
 
+        TCIDBlurayID(const TCIDBlurayID&) = delete;
+        TCIDBlurayID(TCIDBlurayID&&) = delete;
+
         ~TCIDBlurayID();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDBlurayID& operator=(const TCIDBlurayID&) = delete;
+        TCIDBlurayID& operator=(TCIDBlurayID&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -58,19 +68,6 @@ class CIDMETAEXTREXP TCIDBlurayID : public TObject
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimpleemnted
-        // -------------------------------------------------------------------
-        TCIDBlurayID(const TCIDBlurayID&);
-        tCIDLib::TVoid operator=(const TCIDBlurayID&);
-
-
-        // -------------------------------------------------------------------
-        //  Private data members
-        //
-        // -------------------------------------------------------------------
-
-
         // -------------------------------------------------------------------
         //  Do any needed magic macros
         // -------------------------------------------------------------------

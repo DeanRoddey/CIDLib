@@ -31,6 +31,7 @@ IF "%1"=="cidmacrodbg" GOTO CD_CIDMACRODBG
 IF "%1"=="cidmacroeng" GOTO CD_CIDMACROENG
 IF "%1"=="cidnamesrv" GOTO CD_CIDNAMESRV
 IF "%1"=="cidnet" GOTO CD_CIDNET
+IF "%1"=="cidobjstore" GOTO CD_CIDOBJSTORE
 IF "%1"=="cidorb" GOTO CD_CIDORB
 IF "%1"=="cidorbwu" GOTO CD_CIDORBWU
 IF "%1"=="cidorbuc" GOTO CD_CIDORBUC
@@ -171,6 +172,10 @@ GOTO EXIT
 
 :CD_CIDNAMESRV
 CD %CID_SRCTREE%\Source\AllProjects\OrbUtils\CIDNameSrv
+GOTO EXIT
+
+:CD_CIDOBJSTORE
+CD %CID_SRCTREE%\Source\AllProjects\DataUtils\CIDObjStore
 GOTO EXIT
 
 :CD_CIDORB

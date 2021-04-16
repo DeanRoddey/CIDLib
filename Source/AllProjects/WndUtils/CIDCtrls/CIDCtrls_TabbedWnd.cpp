@@ -44,9 +44,12 @@ AdvRTTIDecls(TTabbedWnd, TCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_TabbedWnd
 {
-    // Pseudo menu command ids for use in our accelerator table
-    const tCIDLib::TResId ridMenu_Close     = 100;
-    const tCIDLib::TResId ridMenu_NextTab   = 101;
+    namespace
+    {
+        // Pseudo menu command ids for use in our accelerator table
+        constexpr tCIDLib::TResId ridMenu_Close     = 100;
+        constexpr tCIDLib::TResId ridMenu_NextTab   = 101;
+    }
 }
 
 
@@ -1879,7 +1882,7 @@ tCIDLib::TVoid TTabberWnd::CalcAreas(const TArea& areaNew)
     }
      else
     {
-        m_areaTabs.i4Top(m_areaTop.i4Bottom() + 1);
+        m_areaTabs.i4Top(m_areaTop.i4Bottom());
         m_areaTabs.i4Bottom(areaNew.i4Bottom());
     }
 }

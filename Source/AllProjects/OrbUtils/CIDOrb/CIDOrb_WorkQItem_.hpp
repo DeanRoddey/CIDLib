@@ -38,9 +38,15 @@
 //   CLASS: TWorkQItem
 //  PREFIX: wqi
 // ---------------------------------------------------------------------------
-class TWorkQItem : public TObject, public MRefCounted
+class TWorkQItem : public TObject
 {
     public :
+        // -------------------------------------------------------------------
+        //  Public static methods
+        // -------------------------------------------------------------------
+        static tCIDLib::TCard4 c4UsedQItems();
+
+
         // -------------------------------------------------------------------
         //  Constructor and Destructor
         // -------------------------------------------------------------------
@@ -52,29 +58,31 @@ class TWorkQItem : public TObject, public MRefCounted
         );
 
         TWorkQItem(const TWorkQItem&) = delete;
+        TWorkQItem(TWorkQItem&&) = delete;
 
-        ~TWorkQItem();
+        ~TWorkQItem() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TWorkQItem& operator=(const TWorkQItem&) = delete;
+        TWorkQItem& operator=(TWorkQItem&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 c4BufSize() const
+        [[nodiscard]] tCIDLib::TCard4 c4BufSize() const
         {
             return m_ocmdThis.c4BufSize();
         }
 
-        tCIDLib::TCard8 c8ConnId() const;
+        [[nodiscard]] tCIDLib::TCard8 c8ConnId() const;
 
-        tCIDLib::TEncodedTime enctElapsed() const;
+        [[nodiscard]] tCIDLib::TEncodedTime enctElapsed() const;
 
-        const TIPEndPoint& ipepClient() const;
+        [[nodiscard]] const TIPEndPoint& ipepClient() const;
 
         TOrbCmd& ocmdThis();
 
@@ -151,6 +159,7 @@ class TWorkQItemPtr : public TSimplePoolPtr<TWorkQItem>
         );
 
         TWorkQItemPtr(const TWorkQItemPtr&) = default;
+        TWorkQItemPtr(TWorkQItemPtr&&) = default;
 
         ~TWorkQItemPtr() = default;
 
@@ -159,6 +168,7 @@ class TWorkQItemPtr : public TSimplePoolPtr<TWorkQItem>
         //  Public operators
         // -------------------------------------------------------------------
         TWorkQItemPtr& operator=(const TWorkQItemPtr&) = default;
+        TWorkQItemPtr& operator=( TWorkQItemPtr&&) = default;
 };
 
 #pragma CIDLIB_POPPACK

@@ -555,26 +555,17 @@
                 </MethVar>
             </Method>
 
-            <Method Name="bIsAlpha" RetType="tCIDLib::TBoolean" Attrs="Const">
-                <Desc>
-                    Returns kCIDLib::True if all of the characters of this string are alphabetical.
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="bIsAlpha" RetType="tCIDLib::TBoolean">
+                Returns kCIDLib::True if all of the characters of this string are alphabetical.
+            </GetSet>
 
-            <Method Name="bIsAlphaNum" RetType="tCIDLib::TBoolean" Attrs="Const">
-                <Desc>
-                    Returns kCIDLib::True if all of the characters of this string are alpha-numeric.
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="bIsAlphaNum" RetType="tCIDLib::TBoolean">
+                Returns kCIDLib::True if all of the characters of this string are alpha-numeric.
+            </GetSet>
 
-            <Method Name="bIsEmpty" RetType="tCIDLib::TBoolean" Attrs="Const">
-                <Desc>
-                    Returns kCIDLib::True if this string's length is currently zero.
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="bIsEmpty" RetType="tCIDLib::TBoolean">
+                Returns kCIDLib::True if this string's length is currently zero.
+            </GetSet>
 
             <Method Name="bLastOccurrence" RetType="tCIDLib::TBoolean" Attrs="Const">
                 <Desc>
@@ -732,19 +723,13 @@
                 <MethVar><MethParam Name="chToFind" Type="tCIDLib::TCh"/></MethVar>
             </Method>
 
-            <Method Name="c4BufChars" RetType="tCIDLib::TCard4" Attrs="Const">
-                <Desc>
-                    Returns the current buffer allocation size of this string, in characters, not in bytes. In bytes it will be this value times kCIDLib::c4CharBytes.
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="c4BufChars" RetType="tCIDLib::TCard4">
+                Returns the current buffer allocation size of this string, in characters, not in bytes. In bytes it will be this value times kCIDLib::c4CharBytes.
+            </GetSet>
 
-            <Method Name="c4Length" RetType="tCIDLib::TCard4" Attrs="Const">
-                <Desc>
-                    Returns the current number of characters in this string's buffer. For UTF-16 based systems, this is really the number of code points, and the number of actual Unicode characters may be less than this if there are any characters that require more than a single 16 bit code point.
-                </Desc>
-                <MethVar/>
-            </Method>
+            <GetSet Name="c4Length" RetType="tCIDLib::TCard4">
+                Returns the current number of characters in this string's buffer. For UTF-16 based systems, this is really the number of code points, and the number of actual Unicode characters may be less than this if there are any characters that require more than a single 16 bit code point.
+            </GetSet>
 
             <Method Name="c4Val" RetType="tCIDLib::TCard4" Attrs="Const">
                 <Desc>

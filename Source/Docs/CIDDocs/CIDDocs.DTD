@@ -4,7 +4,7 @@
 <!ENTITY % BoolVal 'False | True'>
 <!ENTITY % YNVal 'Yes | No'>
 <!ENTITY % ParmDir 'In | Out | InOut'>
-<!ENTITY % PageTypes 'HelpPage | CppClass'>
+<!ENTITY % PageTypes 'HelpPage | CppClass | Namespace'>
 
 
 <!--
@@ -105,11 +105,10 @@
    - Any text dscription is in the body of the element, and it can point out any
    - important values if desired.
    -->
-<!ELEMENT   EnumVal     EMPTY>
+<!ELEMENT   EnumVal     (%HelpContent;)>
 <!ATTLIST   EnumVal     Name NMTOKEN #REQUIRED
                         Value CDATA #IMPLIED>
-<!ELEMENT   EnumVals    (EnumVal+)>
-<!ELEMENT   Enum        (Desc, EnumVals?)>
+<!ELEMENT   Enum        (Desc, EnumVal+)>
 <!ATTLIST   Enum        Name NMTOKEN #REQUIRED>
 <!ELEMENT   Enums       (Enum+)>
 
@@ -155,6 +154,7 @@
                         Type CDATA #REQUIRED
                         PBy (%RefType;) 'Val'
                         Dir (In | Out | InOut) 'In'
+                        Retained (%YNVal;) 'No'
                         DefVal CDATA #IMPLIED>
 
 <!-- If no attrs, the containing method's attrs are used -->
@@ -166,7 +166,14 @@
 <!ATTLIST   Method      Name CDATA #REQUIRED
                         RetType CDATA ''
                         RetBy (%RefType;) #IMPLIED
-                        Attrs NMTOKENS 'NoAttrs'>
+                        Attrs NMTOKENS 'NoAttrs'
+                        TmplParms CDATA #IMPLIED>
+
+<!ELEMENT   GetSet      (%HelpContent;)>
+<!ATTLIST   GetSet      Name CDATA #REQUIRED
+                        RetType CDATA #REQUIRED
+                        Dir (Set | Get | Both) 'Get'
+                        RetBy (%RefType;) #IMPLIED>
 
 <!ELEMENT   StaticMeths (Desc?, Method+)>
 <!ELEMENT   Ctors       (Desc?, Method*)>
@@ -177,7 +184,7 @@
                         DefMethods NMTOKENS 'None'>
 <!ELEMENT   VirtMeths   (Desc?, Method+)>
 <!ELEMENT   OverMeths   (Desc?, Method+)>
-<!ELEMENT   NVirtMeths  (Desc?, Method+)>
+<!ELEMENT   NVirtMeths  (Desc?, (Method | GetSet)*)>
 
 <!ELEMENT   PubIntf     (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
                         , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
@@ -186,10 +193,24 @@
 <!ELEMENT   PrivIntf    (Aliases?, Enums?, Constants?, StaticMeths?, Ctors?, Operators?
                         , VirtMeths?, OverMeths?, NVirtMeths?, Members?)>
 
-<!ELEMENT   CppClass    (Desc, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
+<!ELEMENT   TmplParam   EMPTY>
+<!ATTLIST   TmplParam   Name CDATA #REQUIRED
+                        DefVal CDATA ''>
+<!ELEMENT   TmplParams  (TmplParam+)>
+
+<!ELEMENT   CppClass    (Desc, TmplParams?, PubIntf?, ProtIntf?, PrivIntf?, Keywords?)>
 <!ATTLIST   CppClass    Class NMTOKEN #REQUIRED
                         Parent CDATA #REQUIRED
                         Prefix NMTOKEN #REQUIRED
                         VirtDtor (%YNVal;) 'No'
                         Flags NMTOKENS 'NoFlags'>
 
+
+<!--
+   - A C++ namespace. We just steal steal some stuff from the class definition
+   - above. We just don't have the visibility scopes to worry about, or
+   - constructors and operators. We just have one set of methods, plus constants
+   - and types.
+   -->
+<!ELEMENT   Namespace   (Desc, Aliases?, Enums?, Constants?, Method*)>
+<!ATTLIST   Namespace   Name NMTOKEN #REQUIRED>

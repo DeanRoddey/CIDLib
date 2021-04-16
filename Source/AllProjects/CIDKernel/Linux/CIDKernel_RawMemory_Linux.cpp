@@ -35,7 +35,7 @@
 // ---------------------------------------------------------------------------
 //  Local functions, structures, data and constants
 // ---------------------------------------------------------------------------
-namespace
+namespace CIDKernel_RawMemory_Linux
 {
     // ---------------------------------------------------------------------------
     //  Local constants
@@ -47,29 +47,29 @@ namespace
     // ---------------------------------------------------------------------------
     class TLinuxMemInfo
     {
-    public:
-        TLinuxMemInfo();
+        public:
+            TLinuxMemInfo();
 
-        const TLinuxMemInfo& operator= (const TLinuxMemInfo& Info);
+            const TLinuxMemInfo& operator= (const TLinuxMemInfo& Info);
 
-        tCIDLib::TBoolean       bInUse;
-        tCIDLib::TVoid*         pRegion;
-        tCIDLib::TCard4         c4Size;
-        tCIDLib::EMemAccFlags   eAccess;
+            tCIDLib::TBoolean       bInUse;
+            tCIDLib::TVoid*         pRegion;
+            tCIDLib::TCard4         c4Size;
+            tCIDLib::EMemAccFlags   eAccess;
     };
 
     // ---------------------------------------------------------------------------
     //  Local data
     // ---------------------------------------------------------------------------
-    pthread_mutex_t __mtxCmpXchg = PTHREAD_MUTEX_INITIALIZER;
-    TLinuxMemInfo* __aLinuxMemInfo = 0;
-    tCIDLib::TCard4 __c4Capacity = 0;
+    TLinuxMemInfo* aLinuxMemInfo = nullptr;
+    tCIDLib::TCard4 c4Capacity = 0;
 
     // ---------------------------------------------------------------------------
     //  Local functions
     // ---------------------------------------------------------------------------
-    TLinuxMemInfo::TLinuxMemInfo()
-        : bInUse(kCIDLib::False)
+    TLinuxMemInfo::TLinuxMemInfo() :
+    
+        bInUse(kCIDLib::False)
         , pRegion(0)
         , c4Size(0)
         , eAccess(tCIDLib::EMemAccFlags::None)
@@ -88,72 +88,72 @@ namespace
         return *this;
     }
 
-    tCIDLib::TVoid __AddInfo(const TLinuxMemInfo& Info)
+    tCIDLib::TVoid AddInfo(const TLinuxMemInfo& Info)
     {
-        if (!__c4Capacity)
+        if (!CIDKernel_RawMemory_Linux::c4Capacity)
         {
-            __aLinuxMemInfo = new TLinuxMemInfo[c4ChunkSize];
-            __c4Capacity = c4ChunkSize;
+            CIDKernel_RawMemory_Linux::aLinuxMemInfo = new TLinuxMemInfo[c4ChunkSize];
+            CIDKernel_RawMemory_Linux::c4Capacity = c4ChunkSize;
         }
         tCIDLib::TCard4 c4Idx;
-        for (c4Idx = 0; c4Idx < __c4Capacity; c4Idx++)
+        for (c4Idx = 0; c4Idx < CIDKernel_RawMemory_Linux::c4Capacity; c4Idx++)
         {
-            if (!__aLinuxMemInfo[c4Idx].bInUse)
+            if (!CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].bInUse)
             {
-                __aLinuxMemInfo[c4Idx] = Info;
-                __aLinuxMemInfo[c4Idx].bInUse = kCIDLib::True;
+                CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx] = Info;
+                CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].bInUse = kCIDLib::True;
                 return;
             }
         }
-        TLinuxMemInfo* aNewMemInfo = new TLinuxMemInfo[__c4Capacity + c4ChunkSize];
-        for (c4Idx = 0; c4Idx < __c4Capacity; c4Idx++)
-            aNewMemInfo[c4Idx] = __aLinuxMemInfo[c4Idx];
-        delete [] __aLinuxMemInfo;
-        __aLinuxMemInfo = aNewMemInfo;
-        __aLinuxMemInfo[__c4Capacity] = Info;
-        __aLinuxMemInfo[__c4Capacity].bInUse = kCIDLib::True;
-        __c4Capacity += c4ChunkSize;
+        TLinuxMemInfo* aNewMemInfo = new TLinuxMemInfo[CIDKernel_RawMemory_Linux::c4Capacity + c4ChunkSize];
+        for (c4Idx = 0; c4Idx < CIDKernel_RawMemory_Linux::c4Capacity; c4Idx++)
+            aNewMemInfo[c4Idx] = CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx];
+        delete [] CIDKernel_RawMemory_Linux::aLinuxMemInfo;
+        CIDKernel_RawMemory_Linux::aLinuxMemInfo = aNewMemInfo;
+        CIDKernel_RawMemory_Linux::aLinuxMemInfo[CIDKernel_RawMemory_Linux::c4Capacity] = Info;
+        CIDKernel_RawMemory_Linux::aLinuxMemInfo[CIDKernel_RawMemory_Linux::c4Capacity].bInUse = kCIDLib::True;
+        CIDKernel_RawMemory_Linux::c4Capacity += c4ChunkSize;
     }
 
-    TLinuxMemInfo* __FindInfo(const tCIDLib::TVoid* pAddrInRange)
+    TLinuxMemInfo* FindInfo(const tCIDLib::TVoid* pAddrInRange)
     {
-        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < __c4Capacity; c4Idx++)
+        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < CIDKernel_RawMemory_Linux::c4Capacity; c4Idx++)
         {
-            if (__aLinuxMemInfo[c4Idx].bInUse
-            &&  (__aLinuxMemInfo[c4Idx].pRegion <= pAddrInRange)
-            &&  (tCIDLib::TCard4(__aLinuxMemInfo[c4Idx].pRegion)
-                + __aLinuxMemInfo[c4Idx].c4Size > tCIDLib::TCard4(pAddrInRange)))
+            if (CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].bInUse
+            &&  (CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].pRegion <= pAddrInRange)
+            &&  (tCIDLib::TCard4(CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].pRegion)
+                + CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx].c4Size > tCIDLib::TCard4(pAddrInRange)))
             {
-                return &__aLinuxMemInfo[c4Idx];
+                return &CIDKernel_RawMemory_Linux::aLinuxMemInfo[c4Idx];
             }
         }
         return 0;
     }
 
-    tCIDLib::TCard4 __TranslateMemAccFlags(const tCIDLib::EMemAccFlags eAccess)
+    tCIDLib::TCard4 TranslateMemAccFlags(const tCIDLib::EMemAccFlags eAccess)
     {
         tCIDLib::TCard4 c4Return = 0;
         switch (eAccess)
         {
-        case tCIDLib::EMemAccFlags::None:
-        case tCIDLib::EMemAccFlags::Guard:        // No such thing as guard pages in Linux
-            c4Return |= PROT_NONE;
-            break;
-        case tCIDLib::EMemAccFlags::ReadOnly:
-            c4Return |= PROT_READ;
-            break;
-        case tCIDLib::EMemAccFlags::ReadWrite:
-            c4Return |= PROT_READ | PROT_WRITE;
-            break;
-        case tCIDLib::EMemAccFlags::Execute:
-            c4Return |= PROT_EXEC;
-            break;
-        case tCIDLib::EMemAccFlags::ExecuteRead:
-            c4Return |= PROT_EXEC | PROT_READ;
-            break;
-        case tCIDLib::EMemAccFlags::ExecuteReadWrite:
-            c4Return |= PROT_EXEC | PROT_READ | PROT_WRITE;
-            break;
+            case tCIDLib::EMemAccFlags::None:
+            case tCIDLib::EMemAccFlags::Guard:        // No such thing as guard pages in Linux
+                c4Return |= PROT_NONE;
+                break;
+            case tCIDLib::EMemAccFlags::ReadOnly:
+                c4Return |= PROT_READ;
+                break;
+            case tCIDLib::EMemAccFlags::ReadWrite:
+                c4Return |= PROT_READ | PROT_WRITE;
+                break;
+            case tCIDLib::EMemAccFlags::Execute:
+                c4Return |= PROT_EXEC;
+                break;
+            case tCIDLib::EMemAccFlags::ExecuteRead:
+                c4Return |= PROT_EXEC | PROT_READ;
+                break;
+            case tCIDLib::EMemAccFlags::ExecuteReadWrite:
+                c4Return |= PROT_EXEC | PROT_READ | PROT_WRITE;
+                break;
         }
         return c4Return;
     }
@@ -174,7 +174,7 @@ TRawMem::bCommitPages(          tCIDLib::TVoid*
 
 tCIDLib::TBoolean TRawMem::bFreeSysMem(const tCIDLib::TVoid* pToFree)
 {
-    TLinuxMemInfo* pMemInfo = __FindInfo(pToFree);
+    CIDKernel_RawMemory_Linux::TLinuxMemInfo* pMemInfo = CIDKernel_RawMemory_Linux::FindInfo(pToFree);
     if (!pMemInfo)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
@@ -198,12 +198,15 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
                         , const TRawMem::EMemAllFlags
                         ,       tCIDLib::TVoid*&        pToFill)
 {
-    tCIDLib::TVoid* pBuf = ::mmap(0,
-                                  c4Size,
-                                  __TranslateMemAccFlags(eAccess),
-                                  MAP_PRIVATE | MAP_ANON,
-                                  -1,
-                                  0);
+    tCIDLib::TVoid* pBuf = ::mmap
+    (
+        0
+        , c4Size
+        , CIDKernel_RawMemory_Linux::TranslateMemAccFlags(eAccess)
+        , MAP_PRIVATE | MAP_ANON
+        , -1
+        , 0
+    );
 
     if (!pBuf)
     {
@@ -213,54 +216,146 @@ TRawMem::bAllocSysMem(  const   tCIDLib::TCard4         c4Size
 
     pToFill = pBuf;
 
-    TLinuxMemInfo MemInfo;
+    CIDKernel_RawMemory_Linux::TLinuxMemInfo MemInfo;
     MemInfo.c4Size = c4Size;
     MemInfo.eAccess = eAccess;
     MemInfo.pRegion = pBuf;
-    __AddInfo(MemInfo);
+    CIDKernel_RawMemory_Linux::AddInfo(MemInfo);
 
     return kCIDLib::True;
 }
 
 
-tCIDLib::TVoid* TRawMem::pPageBaseAdr(const tCIDLib::TVoid* pBufContained)
-{
-    TLinuxMemInfo* pMemInfo = __FindInfo(pBufContained);
-    return pMemInfo ? pMemInfo->pRegion : 0;
-}
-
-
 tCIDLib::TCard4
-TRawMem::c4CompareAndExchange(           tCIDLib::TCard4&        c4ToFill
-                                , const tCIDLib::TCard4         c4New
-                                , const tCIDLib::TCard4         c4Compare)
+TRawMem::c4CompareAndExchange(          tCIDLib::TCard4&    c4ToFill
+                                , const tCIDLib::TCard4     c4New
+                                , const tCIDLib::TCard4     c4Compare) noexcept
 {
-    ::pthread_mutex_lock(&__mtxCmpXchg);
+    tCIDLib::TCard4 c4Tmp = c4Compare;
+    const tCIDLib::TBoolean bRes = __atomic_compare_exchange
+    (
+        &c4ToFill
+        , &c4Tmp
+        , &c4New
+        , kCIDLib::False
+        , __ATOMIC_SEQ_CST
+        , __ATOMIC_SEQ_CST
+    );
 
-    tCIDLib::TCard4 c4Return = c4ToFill;
+    // If true, then it was equal to compare and so that we the original value
+    if (bRes)
+        return c4Compare;
 
-    if (c4ToFill == c4Compare)
-    {
-        c4ToFill = c4New;
-    }
-
-    ::pthread_mutex_unlock(&__mtxCmpXchg);
-
-    return c4Return;
+    // The original value is in c4Tmp
+    return c4Tmp;
 }
+
 
 tCIDLib::TCard4
 TRawMem::c4Exchange(        tCIDLib::TCard4&        c4ToFill
-                    , const tCIDLib::TCard4         c4New)
+                    , const tCIDLib::TCard4         c4New) noexcept
 {
-    ::pthread_mutex_lock(&__mtxCmpXchg);
+    tCIDLib::TCard4 c4Ret;
+    __atomic_exchange(&c4ToFill, &c4New, &c4Ret, __ATOMIC_SEQ_CST);
+    return c4Ret;
+}
 
-    tCIDLib::TCard4 c4Return = c4ToFill;
-    c4ToFill = c4New;
 
-    ::pthread_mutex_unlock(&__mtxCmpXchg);
+//
+//  We do a safe inc/dec of the passed reference. Just to be safe we don't allow ref
+//  counts beyond i4MaxCard, since the interlocked stuff really works on signed
+//  values. It would be psychotic to expect such a thing anyway. And we check for an
+//  underflow in the release since that means something went really wrong.
+//
+tCIDLib::TCard4
+TRawMem::c4SafeRefAcquire(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(__sync_add_and_fetch(&c4Ref, 1));
+}
 
-    return c4Return;
+tCIDLib::TCard4
+TRawMem::c4SafeRefRelease(tCIDLib::TCard4& c4Ref, tCIDLib::TBoolean& bRes)
+{
+    if (c4Ref > tCIDLib::TCard4(kCIDLib::i4MaxInt))
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_BadRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    if (!c4Ref)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_ZeroRefCntRel);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+
+    tCIDLib::TInt4 iRes = __sync_sub_and_fetch(&c4Ref, 1);
+    if (iRes < 0)
+    {
+        // The ref count management must be wrong
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcMem_RefCntUnderflow);
+        bRes = kCIDLib::False;
+        return 0;
+    }
+    bRes = kCIDLib::True;
+    return tCIDLib::TCard4(iRes);
+}
+
+
+//
+//  Returns the original value in ppToFill. If that's the same as pCompare,
+//  then the exchange occurred.
+//
+tCIDLib::TVoid*
+TRawMem::pCompareAndExchangeRawPtr(         tCIDLib::TVoid**    ppToFill
+                                    , const tCIDLib::TVoid*     pNew
+                                    , const tCIDLib::TVoid*     pCompare) noexcept
+{
+    tCIDLib::TVoid* pTmp = const_cast<tCIDLib::TVoid*>(pCompare);
+    const tCIDLib::TBoolean bRes = __atomic_compare_exchange
+    (
+        ppToFill
+        , &pTmp
+        , &pNew
+        , kCIDLib::False
+        , __ATOMIC_SEQ_CST
+        , __ATOMIC_SEQ_CST
+    );
+
+    // If true, then it was equal to compare and so that we the original value
+    if (bRes)
+        return const_cast<tCIDLib::TVoid*>(pCompare);
+
+    // The original value is in pTmp
+    return pTmp;
+}
+
+
+//
+//  Atomically updates the to fill pointer with the new pointer. Returns the
+//  original value that was replaced.
+//
+tCIDLib::TVoid*
+TRawMem::pExchangeRawPtr(tCIDLib::TVoid** ppToFill, const tCIDLib::TVoid* pNew) noexcept
+{
+    tCIDLib::TVoid* pRet = nullptr;
+    __atomic_exchange(ppToFill, const_cast<tCIDLib::TVoid**>(&pNew), &pRet, __ATOMIC_SEQ_CST);
+    return pRet;
+}
+
+
+tCIDLib::TVoid* TRawMem::pPageBaseAdr(const tCIDLib::TVoid* pBufContained)
+{
+    CIDKernel_RawMemory_Linux::TLinuxMemInfo* pMemInfo = CIDKernel_RawMemory_Linux::FindInfo(pBufContained);
+    return pMemInfo ? pMemInfo->pRegion : nullptr;
 }
 
 
@@ -268,9 +363,12 @@ tCIDLib::TVoid*
 TRawMem::pQueryMemFlags(const   tCIDLib::TVoid*         pBufToQuery
                         ,       TRawMem::TSysMemInfo&   MemInfo)
 {
-    TLinuxMemInfo* pLinuxMemInfo = __FindInfo(pBufToQuery);
+    CIDKernel_RawMemory_Linux::TLinuxMemInfo* pLinuxMemInfo
+    (
+        CIDKernel_RawMemory_Linux::FindInfo(pBufToQuery)
+    );
     if (!pLinuxMemInfo)
-        return 0;
+        return nullptr;
 
     MemInfo.c4RegionSize = pLinuxMemInfo->c4Size;
     MemInfo.eAllocAccess = pLinuxMemInfo->eAccess;

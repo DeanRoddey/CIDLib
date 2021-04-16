@@ -123,7 +123,7 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
 
         static const TString& strId
         (
-            const   TAttrData&              attrSrc
+            const   TAttrData&              adatSrc
         );
 
 
@@ -134,8 +134,42 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
 
         TAttrData
         (
-            const   TAttrData&              attrSrc
+            const   TString&                strName
+            , const TString&                strId
+            , const tCIDMData::EAttrTypes   eType
+            , const tCIDMData::EAttrEdTypes eEdType = tCIDMData::EAttrEdTypes::Count
         );
+
+        TAttrData
+        (
+            const   TString&                strName
+            , const TString&                strId
+            , const TString&                strLimits
+            , const tCIDMData::EAttrTypes   eType
+            , const tCIDMData::EAttrEdTypes eEdType = tCIDMData::EAttrEdTypes::Count
+        );
+
+        TAttrData
+        (
+            const   TString&                strName
+            , const TString&                strId
+            , const TMemBuf&                mbufBinary
+            , const tCIDLib::TCard4         c4Bytes
+            , const TString&                strLimits
+            , const tCIDMData::EAttrEdTypes eEdType = tCIDMData::EAttrEdTypes::Count
+        );
+
+        TAttrData
+        (
+            const   TAttrData&              adatSrc
+        );
+
+        TAttrData(TAttrData&& adatSrc) :
+
+            TAttrData()
+        {
+            *this = tCIDLib::ForceMove(adatSrc);
+        }
 
         ~TAttrData();
 
@@ -146,6 +180,11 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         TAttrData& operator=
         (
             const   TAttrData&              adatSrc
+        );
+
+        TAttrData& operator=
+        (
+                    TAttrData&&             adatSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -364,6 +403,12 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             , const tCIDLib::TCard4         c4Bytes
         );
 
+        tCIDLib::TVoid SetMemBuf
+        (
+                    THeapBuf&&              mbufData
+            , const tCIDLib::TCard4         c4Bytes
+        );
+
         tCIDLib::TVoid SetPoint
         (
             const   TPoint&                 pntToSet
@@ -407,12 +452,12 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :
@@ -424,7 +469,10 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
             const   tCIDMData::EAttrTypes   eToCheck
         )   const;
 
-        tCIDLib::TVoid ResetValue();
+        tCIDLib::TVoid ResetValue
+        (
+            const   TAttrData&              adatSrc
+        );
 
         tCIDLib::TVoid SetEditTypes();
 
@@ -493,8 +541,8 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         //  m_i4Val2
         //      For integral and integral range storage.
         //
-        //  m_mbufVal
-        //      For storing binary data.
+        //  m_pmbufVal
+        //      For storing binary data. Only allocated if needed.
         //
         //  m_pntVal
         //      For point value storage.
@@ -550,7 +598,7 @@ class CIDMDATAEXP TAttrData : public TObject, public MStreamable
         tCIDMData::EAttrTypes   m_eType;
         tCIDLib::TInt4          m_i4Val;
         tCIDLib::TInt4          m_i4Val2;
-        THeapBuf                m_mbufVal;
+        THeapBuf*               m_pmbufVal;
         TPoint                  m_pntVal;
         TSize                   m_szVal;
         TString                 m_strGroup;

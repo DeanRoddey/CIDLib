@@ -107,8 +107,10 @@ class CIDLIBEXP TFindBuf :
 
         TFindBuf
         (
-            const   TFindBuf&               fndbToCopy
+            const   TFindBuf&               fndbSrc
         );
+
+        TFindBuf(TFindBuf&&) = delete;
 
         ~TFindBuf();
 
@@ -116,6 +118,13 @@ class CIDLIBEXP TFindBuf :
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TFindBuf& operator=
+        (
+            const   TFindBuf&               fndbSrc
+        );
+
+        TFindBuf& operator=(TFindBuf&&) = delete;
+
         tCIDLib::TBoolean operator<
         (
             const   TFindBuf&               fndbToTest
@@ -136,11 +145,6 @@ class CIDLIBEXP TFindBuf :
             const   TFindBuf&               fndbToTest
         )   const;
 
-        TFindBuf& operator=
-        (
-            const   TFindBuf&               fndbToAssign
-        );
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -156,8 +160,6 @@ class CIDLIBEXP TFindBuf :
         tCIDLib::TBoolean bIsFile() const;
 
         tCIDLib::TBoolean bIsNormal() const;
-
-        tCIDLib::TBoolean bIsNormalDir() const;
 
         tCIDLib::TBoolean bIsNormalFile() const;
 
@@ -238,17 +240,17 @@ class CIDLIBEXP TFindBuf :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
         // -------------------------------------------------------------------

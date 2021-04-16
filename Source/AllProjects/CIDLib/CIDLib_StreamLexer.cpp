@@ -41,17 +41,20 @@ RTTIDecls(TStreamLexer,TObject)
 
 namespace CIDLib_StreamLexer
 {
-    // -----------------------------------------------------------------------
-    //  Local constant data
-    //
-    //  c4MaxTokens
-    //      This is the maximum number of predefined tokens.
-    //
-    //  c4MaxUnget
-    //      This is the maximum size of the character unget stack.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxTokens  = 64;
-    const tCIDLib::TCard4   c4MaxUnget   = 4096;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local constant data
+        //
+        //  c4MaxTokens
+        //      This is the maximum number of predefined tokens.
+        //
+        //  c4MaxUnget
+        //      This is the maximum size of the character unget stack.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxTokens  = 64;
+        constexpr tCIDLib::TCard4   c4MaxUnget   = 4096;
+    }
 }
 
 
@@ -208,7 +211,7 @@ TStreamLexer::GetNextToken( const   TString&    strSeparators
     //  First we need to read until we get a non-separator character. Then
     //  we unget that character and fall into the next loop.
     //
-    tCIDLib::TCard4 c4Dummy;
+    tCIDLib::TCard4 c4Dummy     = 0;
     tCIDLib::TCard4 c4Ind       = 0;
     tCIDLib::TCh    chNext      = chGetNext();
 
@@ -391,12 +394,10 @@ TStreamLexer::UnGetToken(const tCIDLib::TCh* const pszTokenText)
 //
 tCIDLib::TCh TStreamLexer::chGetNext()
 {
-    tCIDLib::TCh     chRet;
-
     // If the unget stack is not empty, then return the stack top
     if (m_i4StackIndex != -1)
     {
-        chRet = m_pchCharStack[m_i4StackIndex];
+        const tCIDLib::TCh chRet = m_pchCharStack[m_i4StackIndex];
         m_i4StackIndex--;
         return chRet;
     }
@@ -406,7 +407,7 @@ tCIDLib::TCh TStreamLexer::chGetNext()
         return kCIDLib::chNull;
 
     // Else, get the next char from the stream
-    chRet = m_pstrmSrc->chRead();
+    const tCIDLib::TCh chRet = m_pstrmSrc->chRead();
 
     // If it is a new line, then bump up line count
     if (chRet == kCIDLib::chLF)

@@ -53,7 +53,7 @@ TFacCIDCrypto::TFacCIDCrypto() :
     TFacility
     (
         L"CIDCrypto"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -88,12 +88,12 @@ TFacCIDCrypto::~TFacCIDCrypto()
 //
 tCIDLib::TCard4 TFacCIDCrypto::c4GetRandom(const tCIDLib::TBoolean bNonZero) const
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     const tCIDLib::TCard4 c4MaxTries = 32;
     tCIDLib::TCard4 c4Count = 0;
 
-    tCIDLib::TCard4 c4RetVal;
+    tCIDLib::TCard4 c4RetVal = 0;
     while (c4Count < c4MaxTries)
     {
         c4RetVal = m_prandGen->c4GetNextNum();
@@ -190,14 +190,14 @@ TFacCIDCrypto::GenerateHMAC(const   TMemBuf&            mbufKey
 
         tCIDLib::TCard4 c4HashBytes = mhashToFill.c4ToBuffer(mbufRealKey);
         while (c4HashBytes < c4BlockSz)
-            mbufRealKey[c4HashBytes++] = 0;
+            mbufRealKey.PutCard1(0, c4HashBytes++);
     }
      else if (c4KeyBytes < c4BlockSz)
     {
         // The key is shorter so just zero pad it out
         mbufRealKey.CopyIn(mbufKey, c4KeyBytes);
         for (tCIDLib::TCard4 c4Index = c4KeyBytes; c4Index < c4BlockSz; c4Index++)
-            mbufRealKey[c4Index] = 0;
+            mbufRealKey.PutCard1(0, c4Index);
     }
      else if (c4KeyBytes == c4BlockSz)
     {
@@ -239,9 +239,9 @@ TFacCIDCrypto::GetRandomBytes(          TMemBuf&            mbufTarget
                                 , const tCIDLib::TCard4     c4At
                                 , const tCIDLib::TCard4     c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        mbufTarget[c4At + c4Index] = tCIDLib::TCard1(m_prandGen->c4GetNextNum());
+        mbufTarget.PutCard1(tCIDLib::TCard1(m_prandGen->c4GetNextNum()), c4At + c4Index);
 }
 
 
@@ -250,7 +250,7 @@ tCIDLib::TVoid
 TFacCIDCrypto::GetRandomBytes(          tCIDLib::TCard1* const  pc1Target
                                 , const tCIDLib::TCard4         c4Count)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         pc1Target[c4Index] = tCIDLib::TCard1(m_prandGen->c4GetNextNum());
 }

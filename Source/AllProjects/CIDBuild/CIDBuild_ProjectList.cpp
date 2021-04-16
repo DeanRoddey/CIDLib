@@ -142,8 +142,8 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
 {
     // Build up the path to the project file
     TBldStr strProjFile(facCIDBuild.strRootDir());
-    strProjFile.Append(L"Source", L"\\");
-    strProjFile.Append(L"AllProjects", L"\\");
+    strProjFile.Append(L"Source", kCIDBuild::pszPathSep);
+    strProjFile.Append(L"AllProjects", kCIDBuild::pszPathSep);
     strProjFile.Append(L"CIDBuild.Projects");
 
     // Make sure it exists
@@ -167,8 +167,11 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
     //  line reading loop. The file format is all line oriented so we
     //  don't need any fancy lexing here.
     //
-    TLineSpooler    lsplSource(strProjFile);
-    TBldStr         strReadBuf;
+    TLineSpooler        lsplSource(strProjFile);
+    TBldStr             strReadBuf;
+    TBldStr             strProjName;
+    tCIDBuild::TStrList listPlatfExcl;
+    tCIDBuild::TStrList listPlatfIncl;
     while (kCIDLib::True)
     {
         // Get the next line. If at the end of file, then we are done
@@ -177,43 +180,67 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
 
         if (strReadBuf.bStartsWith(L"PROJECT="))
         {
-            // Pull out the name, which should be the rest of the line
+            // Cut off the prefix to leave the name and possibly platform incl/excl lists
             strReadBuf.Cut(8);
             strReadBuf.StripWhitespace();
 
-            // Create a new project info object and let it parse itself
-            TProjectInfo* pprojiCur = new TProjectInfo(strReadBuf);
-
-            if (facCIDBuild.bVerbose())
-                stdOut << L"    Parsing project: " << strReadBuf << kCIDBuild::EndLn;
-
-            // Ask the object to parse out its info
-            pprojiCur->ParseContent(lsplSource);
+            // Parse this initial line info
+            ParseInitProjLine
+            (
+                strReadBuf, lsplSource.c4CurLine(), strProjName, listPlatfIncl, listPlatfExcl
+            );
 
             //
-            //  See if this project is targeted towards the current platform.
-            //  It will say it is if either the current platform was explicitly
-            //  given, or if no explicit platform support was given. We'll check
-            //  the base platform and the full one, it can match either for
-            //  more or less filtering.
+            //  Create a new project info object and let it parse it's name and
+            //  and include/exclude info if present.
             //
-            if (!pprojiCur->bSupportsPlatform(facCIDBuild.strBasePlatform())
-            &&  !pprojiCur->bSupportsPlatform(facCIDBuild.strFullPlatform()))
+            TProjectInfo* pprojiCur = new TProjectInfo(strProjName, listPlatfIncl, listPlatfExcl);
+
+            //
+            //  If it doesn't support the current platform, then we just eat lines until
+            //  the end of this project, then we can delete it and move on.
+            //
+            if (!pprojiCur->bSupportsThisPlatform())
             {
+                // Remember the project name and delete this project
+                const TBldStr strProjName = pprojiCur->strProjectName();
                 delete pprojiCur;
-                continue;
+
+                // Eat the rest of this project's content (tell it not to try to expand macros)
+                tCIDLib::TBoolean bGotEnd = kCIDLib::False;
+                while (lsplSource.bReadLine(strReadBuf, kCIDLib::True))
+                {
+                    if (strReadBuf.bIEquals(L"END PROJECT"))
+                    {
+                        bGotEnd = kCIDLib::True;
+                        break;
+                    }
+                }
+
+                if (!bGotEnd)
+                {
+                    stdOut  << L"(Line " << lsplSource.c4CurLine()
+                            << L") Never found end of unsupported project ("
+                            << strProjName << L")" << kCIDBuild::EndLn;
+                    throw tCIDBuild::EErrors::UnexpectedEOF;
+                }
             }
+             else
+            {
+                // This one is a keeper so ask it to parse out the rest of its content
+                pprojiCur->ParseContent(lsplSource);
 
-            //
-            //  Let this new project add him/herself to the dependency graph.
-            //  This will catch any duplicate names. He will cache the index
-            //  at which he was added to the graph, which will much speed up
-            //  later work.
-            //
-            pprojiCur->AddToDepGraph(m_depgList);
+                //
+                //  Let this new project add him/herself to the dependency graph.
+                //  This will catch any duplicate names. He will cache the index
+                //  at which he was added to the graph, which will much speed up
+                //  later work.
+                //
+                pprojiCur->AddToDepGraph(m_depgList);
 
-            // And then add this new project to our list of projects
-            m_listProjects.Add(pprojiCur);
+                // And then add this new project to our list of projects
+                m_listProjects.Add(pprojiCur);
+            }
         }
          else if (strReadBuf == L"ALLPROJECTS=")
         {
@@ -263,11 +290,7 @@ tCIDLib::TVoid TProjectList::ParseProjectFile()
                     //  use the cached index into the dependency graph instead
                     //  of doing an insert by project name.
                     //
-                    m_depgList.AddDependency
-                    (
-                        projiCur.c4DepIndex()
-                        , cursDeps.tCurElement()
-                    );
+                    m_depgList.AddDependency(projiCur.c4DepIndex(), cursDeps.tCurElement());
                 }   while (cursDeps.bNext());
             }
         }   while (cursProjs.bNext());
@@ -330,4 +353,69 @@ TProjectInfo* TProjectList::pprojiFindProject(const TBldStr& strName)
             return &cursProjs.tCurElement();
     }   while (cursProjs.bNext());
     return 0;
+}
+
+
+//
+//  We get a line like:
+//
+//      projname [incl1 incl2, excl1 excl2]
+//
+//  So the project name and an optional list of platforms to include, followed by an optional
+//  list of platforms to exclude. Each of the lists are space separated tokens.
+//
+tCIDLib::TVoid
+TProjectList::ParseInitProjLine(const   TBldStr&                strLine
+                                , const tCIDLib::TCard4         c4Line
+                                ,       TBldStr&                strName
+                                ,       tCIDBuild::TStrList&    listProjIncl
+                                ,       tCIDBuild::TStrList&    listProjExcl)
+{
+    listProjIncl.RemoveAll();
+    listProjExcl.RemoveAll();
+
+    // Tokenize the line on our known separators. If we get none, then obviously bad
+    tCIDBuild::TStrList listTokens;
+    if (!TUtils::bTokenize(strLine, L"[,]", TBldStr(), listTokens))
+    {
+        stdOut  << L"(Line " << c4Line
+                << L") At least a project name is required here" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::FileFormat;
+    }
+
+    tCIDBuild::TStrList::TCursor cursTokens(&listTokens);
+    if (!cursTokens.bResetIter())
+    {
+        stdOut  << L"(Line " << c4Line
+                << L") No tokens available even though some were reported" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::Internal;
+    }
+
+    // The first one has to be the project name
+    strName = cursTokens.tCurElement();
+    if (!TRawStr::bIsAlpha(strName.chFirst()))
+    {
+        stdOut  << L"(Line " << c4Line
+                << L") Project names must start with an alpha character" << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::FileFormat;
+    }
+
+    if (cursTokens.bNext())
+    {
+        // This has to be the open bracket
+        if (cursTokens.tCurElement() != L"[")
+        {
+            stdOut  << L"(Line " << c4Line
+                    << L") Expected open paren or end of line" << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::Internal;
+        }
+
+        // Call the utils helper that parses the lists from a cursor of tokens
+        TBldStr strError;
+        if (!TUtils::bParseInclExclLists(cursTokens, listProjIncl, listProjExcl, strError))
+        {
+            stdOut  << L"(Line " << c4Line << L") " << strError << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::FileFormat;
+        }
+    }
 }

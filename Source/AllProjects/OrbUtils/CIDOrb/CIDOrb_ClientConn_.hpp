@@ -107,6 +107,7 @@ class TOrbClientConnImpl : public TObject
         );
 
         TOrbClientConnImpl(const TOrbClientConnImpl&) = delete;
+        TOrbClientConnImpl(TOrbClientConnImpl&&) = delete;
 
         ~TOrbClientConnImpl();
 
@@ -115,14 +116,15 @@ class TOrbClientConnImpl : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbClientConnImpl& operator=(const TOrbClientConnImpl&) = delete;
+        TOrbClientConnImpl& operator=(TOrbClientConnImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bOffline() const;
+        [[nodiscard]] tCIDLib::TBoolean bOffline() const;
 
-        tCIDLib::TCard8 c8ConnId() const;
+        [[nodiscard]] tCIDLib::TCard8 c8ConnId() const;
 
         const TIPEndPoint& ipepClient() const;
 

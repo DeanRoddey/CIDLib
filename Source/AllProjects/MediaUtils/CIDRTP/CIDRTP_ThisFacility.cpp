@@ -46,7 +46,7 @@ TFacCIDRTP::TFacCIDRTP() :
     TFacility
     (
         L"CIDRTP"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -81,7 +81,7 @@ tCIDLib::TCard4 TFacCIDRTP::c4GenSyncSrcId()
 
     // Sync access while we do this
     {
-        TMtxLocker mtxlSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
         c4Ret = m_randGenId.c4GetNextNum();
     }
 

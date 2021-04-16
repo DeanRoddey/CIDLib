@@ -66,7 +66,8 @@ inline tCIDLib::TVoid TBinInStream_ReadArray(       TBinInStream&       strmSrc 
                                             ,       eEnumType* const    aeList \
                                             , const tCIDLib::TCard4     c4Count) \
 { \
-    tCIDLib::TCard4 c4Cur; \
+    CIDAssert(aeList != nullptr, L"Null array passed to TBInInStream::ReadArray"); \
+    tCIDLib::TCard4 c4Cur = 0; \
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
     { \
         strmSrc >> c4Cur; \
@@ -77,6 +78,7 @@ inline tCIDLib::TVoid TBinOutStream_WriteArray(         TBinOutStream&      strm
                                                 , const eEnumType* const    aeList \
                                                 , const tCIDLib::TCard4     c4Count) \
 { \
+    CIDAssert(aeList != nullptr, L"Null array passed to TBInInStream::ReadArray"); \
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++) \
         strmTar << tCIDLib::TCard4(aeList[c4Index]); \
 }
@@ -93,6 +95,28 @@ class TString;
 // ---------------------------------------------------------------------------
 namespace tCIDLib
 {
+    // -----------------------------------------------------------------------
+    //  Used by the standard command line parameter parsing stuff in TSysInfo
+    // -----------------------------------------------------------------------
+    enum class ECmdLnPTypes
+    {
+        Value
+        , Option
+        , OptionVal
+
+        , Count
+    };
+
+    enum class ECmdLnPRes
+    {
+        NotFound
+        , BadValue
+        , Found
+
+        , Count
+    };
+
+
     // -----------------------------------------------------------------------
     //  Our CIDLib logging flags. These are used to turn off and on logging in the
     //  stats cache item that our facility object creates. It provides a helper
@@ -266,7 +290,7 @@ namespace tCIDLib
 
 
     // To support TEArray below
-    CIDLIBEXP tCIDLib::TVoid ThrowEArrayIndexErr
+    CIDLIBEXP tCIDLib::TVoid ThrowArrayIndexErr
     (
         const   tCIDLib::TCard4         c4At
         , const tCIDLib::TCard4         c4Size
@@ -298,18 +322,19 @@ template
         // -----------------------------------------------------------------------
         TEArray() = delete;
 
+        CIDLib_Suppress(26495) // We are going to initialize the array below
         TEArray(const ElemType InitVal) :
 
-            m_bLoaded(kCIDLib::False)
-            , m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
+            m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
                 m_aetArray[c4Index] = InitVal;
         }
 
+        CIDLib_Suppress(26495) // We are going to initialize the array below
         TEArray(const ElemType aValues[tCIDLib::TCard4(ListSize) + c4Extra]) :
 
-            m_bLoaded(kCIDLib::True)
+            m_atomLoaded(kCIDLib::True)
             , m_c4Size(tCIDLib::TCard4(ListSize) + c4Extra)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
@@ -318,12 +343,14 @@ template
 
         TEArray(const TMyType& eaSrc) :
 
-            m_bLoaded(eaSrc.m_bLoaded)
+            m_atomLoaded(eaSrc.m_atomLoaded.bValue())
             , m_c4Size(eaSrc.m_c4Size)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Size; c4Index++)
                 m_aetArray[c4Index] = eaSrc.m_aetArray[c4Index];
         }
+
+        TEArray(TMyType&&) = delete;
 
         ~TEArray()
         {
@@ -339,14 +366,14 @@ template
         ElemType& operator[](const IndexType eAt)
         {
             if (tCIDLib::TCard4(eAt) >= m_c4Size)
-                tCIDLib::ThrowEArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
+                tCIDLib::ThrowArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
             return m_aetArray[tCIDLib::TCard4(eAt)];
         }
 
         const ElemType& operator[](const IndexType eAt) const
         {
             if (tCIDLib::TCard4(eAt) >= m_c4Size)
-                tCIDLib::ThrowEArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
+                tCIDLib::ThrowArrayIndexErr(tCIDLib::TCard4(eAt), m_c4Size);
             return m_aetArray[tCIDLib::TCard4(eAt)];
         }
 
@@ -356,12 +383,12 @@ template
         // -----------------------------------------------------------------------
         tCIDLib::TBoolean bIsLoaded() const
         {
-            return m_bLoaded;
+            return m_atomLoaded.bValue();
         }
 
         tCIDLib::TVoid SetLoaded()
         {
-            m_bLoaded = kCIDLib::True;
+            m_atomLoaded.Set();
         }
 
 
@@ -370,7 +397,7 @@ template
         //  Private data members
         // -----------------------------------------------------------------------
         ElemType            m_aetArray[tCIDLib::TCard4(ListSize) + c4Extra];
-        tCIDLib::TBoolean   m_bLoaded;
+        TAtomicFlag         m_atomLoaded;
         tCIDLib::TCard4     m_c4Size;
 };
 

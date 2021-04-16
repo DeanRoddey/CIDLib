@@ -62,14 +62,14 @@ namespace CIDSock_URL
     //      The list of characters (other than alphanumerics) that can be
     //      a part of a protocol name.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2DigitMask       = 0x0001;
-    const tCIDLib::TCard2   c2AlphaMask       = 0x0002;
-    const tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
-    const tCIDLib::TCard2   c2ProtoMask       = 0x0008;
-    const tCIDLib::TCard2   c2IllegalMask     = 0x0010;
-    const tCIDLib::TCard2   c2HostMask        = 0x0020;
-    const tCIDLib::TCh      chMaxChar = 0x7F;
-    const tCIDLib::TCh      achProtoChars[] =
+    constexpr tCIDLib::TCard2   c2DigitMask       = 0x0001;
+    constexpr tCIDLib::TCard2   c2AlphaMask       = 0x0002;
+    constexpr tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
+    constexpr tCIDLib::TCard2   c2ProtoMask       = 0x0008;
+    constexpr tCIDLib::TCard2   c2IllegalMask     = 0x0010;
+    constexpr tCIDLib::TCard2   c2HostMask        = 0x0020;
+    constexpr tCIDLib::TCh      chMaxChar = 0x7F;
+    constexpr tCIDLib::TCh      achProtoChars[] =
     {
         L'+', L'.', L'-', kCIDLib::chNull
     };
@@ -78,13 +78,13 @@ namespace CIDSock_URL
     // -----------------------------------------------------------------------
     //  Local static data
     //
-    //  bTableLoaded
+    //  atomTableLoaded
     //  ac2CharTable
     //      This is the character attributes table. Each ASCII char (all that
     //      are allowed directly in URIs) can be used to index this table and
     //      see what attributes it has.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bTableLoaded = kCIDLib::False;
+    TAtomicFlag         atomTableLoaded;
     tCIDLib::TCard2     ac2CharTable[chMaxChar + 1];
 
 
@@ -105,7 +105,7 @@ namespace CIDSock_URL
     //      A format version we write out when streamed, to allow for later
     //      upgrade of the format.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 ac4PortVals[] =
+    constexpr tCIDLib::TCard4 ac4PortVals[] =
     {
         0       // None
         , 0     // File
@@ -165,38 +165,39 @@ static tCIDLib::TVoid SetTableMasks(const   tCIDLib::TCh* const pchTable
 
 static tCIDLib::TVoid InitCharTable()
 {
+    // They already checked once before calling, so assume we need to lock
     TBaseLock lockInit;
 
     // If someone else beat us to it, return
-    if (CIDSock_URL::bTableLoaded)
-        return;
+    if (!CIDSock_URL::atomTableLoaded)
+    {
+        //
+        //  Ok, lets run through the lists of characters and set the appropriate
+        //  bits for each char we find. We first do some that are simple to do
+        //  without hard coded char lists, which are the alpha and digits and the
+        //  obviously illegal ones.
+        //
+        tCIDLib::TCh chCur;
+        for (chCur = L'A'; chCur <= L'Z'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
+        for (chCur = L'a'; chCur <= L'z'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
+        for (chCur = L'0'; chCur <= L'9'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2DigitMask | CIDSock_URL::c2HexDigitMask;
+        for (chCur = L'A'; chCur <= L'F'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
+        for (chCur = L'a'; chCur <= L'f'; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
+        for (chCur = 0; chCur < 0x20; chCur++)
+            CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2IllegalMask;
+        CIDSock_URL::ac2CharTable[0x7F] |= CIDSock_URL::c2IllegalMask;
 
-    //
-    //  Ok, lets run through the lists of characters and set the appropriate
-    //  bits for each char we find. We first do some that are simple to do
-    //  without hard coded char lists, which are the alpha and digits and the
-    //  obviously illegal ones.
-    //
-    tCIDLib::TCh chCur;
-    for (chCur = L'A'; chCur <= L'Z'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
-    for (chCur = L'a'; chCur <= L'z'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2AlphaMask;
-    for (chCur = L'0'; chCur <= L'9'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2DigitMask | CIDSock_URL::c2HexDigitMask;
-    for (chCur = L'A'; chCur <= L'F'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
-    for (chCur = L'a'; chCur <= L'f'; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2HexDigitMask;
-    for (chCur = 0; chCur < 0x20; chCur++)
-        CIDSock_URL::ac2CharTable[chCur] |= CIDSock_URL::c2IllegalMask;
-    CIDSock_URL::ac2CharTable[0x7F] |= CIDSock_URL::c2IllegalMask;
+        // And now do the ones that are stored in predone tables
+        SetTableMasks(CIDSock_URL::achProtoChars, CIDSock_URL::c2ProtoMask);
 
-    // And now do the ones that are stored in predone tables
-    SetTableMasks(CIDSock_URL::achProtoChars, CIDSock_URL::c2ProtoMask);
-
-    // Mark the table loaded last of all
-    CIDSock_URL::bTableLoaded = kCIDLib::True;
+        // Mark the table loaded last of all
+        CIDSock_URL::atomTableLoaded.Set();
+    }
 }
 
 
@@ -212,14 +213,8 @@ static tCIDLib::TVoid InitCharTable()
 // ---------------------------------------------------------------------------
 TURL& TURL::Nul_TURL()
 {
-    static TURL* purlNull = nullptr;
-    if (!purlNull)
-    {
-        TBaseLock lockInit;
-        if (!purlNull)
-            purlNull = new TURL;
-    }
-    return *purlNull;
+    static TURL urlNull;
+    return urlNull;
 }
 
 
@@ -229,7 +224,7 @@ tCIDLib::TBoolean TURL::bIsFirstProtocolChar(const tCIDLib::TCh chToTest)
         return kCIDLib::False;
 
     // Fault the table in if needed
-    if (!CIDSock_URL::bTableLoaded)
+    if (!CIDSock_URL::atomTableLoaded)
         InitCharTable();
     return (CIDSock_URL::ac2CharTable[chToTest] & CIDSock_URL::c2AlphaMask) != 0;
 }
@@ -244,7 +239,7 @@ tCIDLib::TBoolean TURL::bIsProtocolChar(const tCIDLib::TCh chToTest)
         return kCIDLib::False;
 
     // Fault the table in if needed
-    if (!CIDSock_URL::bTableLoaded)
+    if (!CIDSock_URL::atomTableLoaded)
         InitCharTable();
     return (CIDSock_URL::ac2CharTable[chToTest] & CIDSock_URL::c2ProtoMask) != 0;
 }
@@ -416,7 +411,7 @@ TURL::c4ParseQueryParms(        TTextInStream&          strmSrc
     //  it's the caller's fault and he just gets junk, so we can easily
     //  scan through and find the values.
     //
-    tCIDLib::TCh    chCur;
+    tCIDLib::TCh    chCur = kCIDLib::chNull;
     TString         strKey;
     TString         strValue;
     TString         strKExp;
@@ -643,7 +638,7 @@ tCIDLib::TVoid TURL::ExpandTo(  const   tCIDLib::TCh* const     pszSrc
                                 ,       TTextConverter* const   ptcvtToUse)
 {
     const tCIDLib::TCh* pszCur = pszSrc;
-    tCIDLib::TCard1 c1Ref;
+    tCIDLib::TCard1 c1Ref = 0;
     tCIDLib::TCard4 c4BufInd = 0;
     while (*pszCur)
     {
@@ -682,15 +677,15 @@ tCIDLib::TVoid TURL::ExpandTo(  const   tCIDLib::TCh* const     pszSrc
                     , tCIDLib::EErrClasses::Format
                 );
             }
-            mbufToUse[c4BufInd++] = c1Ref;
+            mbufToUse.PutCard1(c1Ref, c4BufInd++);
         }
          else if ((*pszCur == kCIDLib::chPlusSign) && (eType == EExpTypes::Query))
         {
-            mbufToUse[c4BufInd++] = 0x20;
+            mbufToUse.PutCard1(0x20, c4BufInd++);
         }
          else
         {
-            mbufToUse[c4BufInd++] = tCIDLib::TCard1(*pszCur);
+            mbufToUse.PutCard1(tCIDLib::TCard1(*pszCur), c4BufInd++);
         }
         pszCur++;
     }
@@ -990,6 +985,14 @@ TURL::TURL( const   TURL&               urlRelTo
         MakeRelativeTo(urlRelTo);
 }
 
+TURL::TURL(TURL&& urlSrc) :
+
+    m_colQParms()
+    , m_eProto(tCIDSock::EProtos::None)
+    , m_ippnHost(0)
+{
+    *this = tCIDLib::ForceMove(urlSrc);
+}
 
 TURL::~TURL()
 {
@@ -999,6 +1002,26 @@ TURL::~TURL()
 // ---------------------------------------------------------------------------
 //  TURL: Public operators
 // ---------------------------------------------------------------------------
+
+TURL& TURL::operator=(TURL&& urlSrc)
+{
+    if (this != &urlSrc)
+    {
+        tCIDLib::Swap(m_eProto, urlSrc.m_eProto);
+        tCIDLib::Swap(m_ippnHost, urlSrc.m_ippnHost);
+
+        m_colQParms = tCIDLib::ForceMove(urlSrc.m_colQParms);
+        m_strFragment = tCIDLib::ForceMove(urlSrc.m_strFragment);
+        m_strHost = tCIDLib::ForceMove(urlSrc.m_strHost);
+        m_strParams = tCIDLib::ForceMove(urlSrc.m_strParams);
+        m_strPassword = tCIDLib::ForceMove(urlSrc.m_strPassword);
+        m_strPath = tCIDLib::ForceMove(urlSrc.m_strPath);
+        m_strUser = tCIDLib::ForceMove(urlSrc.m_strUser);
+    }
+    return *this;
+}
+
+
 tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
 {
     if (this != &urlSrc)
@@ -1023,11 +1046,6 @@ tCIDLib::TBoolean TURL::operator==(const TURL& urlSrc) const
         }
     }
     return kCIDLib::True;
-}
-
-tCIDLib::TBoolean TURL::operator!=(const TURL& urlToCompare) const
-{
-    return !operator==(urlToCompare);
 }
 
 
@@ -1440,7 +1458,7 @@ TURL::QueryExpQParams(tCIDLib::TKVPList& colToFill, const tCIDLib::TBoolean bApp
         (
             kvalSrc.strValue(), strValue, TURL::EExpTypes::Query, tCIDLib::EAppendOver::Overwrite
         );
-        colToFill.objAdd(TKeyValuePair(strKey, strValue));
+        colToFill.objPlace(strKey, strValue);
     }
 }
 
@@ -1747,26 +1765,25 @@ TURL::Set(  const   tCIDSock::EProtos       eProto
         m_strPath = strPath;
         m_strFragment = strFrag;
 
-        TColCursor<TKeyValuePair>* pcursQPs = colQParms.pcursNew();
-        TJanitor<TColCursor<TKeyValuePair> > janCurs(pcursQPs);
-        for (; pcursQPs->bIsValid(); pcursQPs->bNext())
-            m_colQParms.objAdd(pcursQPs->objRCur());
+        TColCursor<TKeyValuePair>& cursQPs = *colQParms.pcursNew();
+        TJanitor<TColCursor<TKeyValuePair>> janCurs(&cursQPs);
+        for (; cursQPs; ++cursQPs)
+            m_colQParms.objAdd(*cursQPs);
     }
      else
     {
         EncodeTo(strPath, m_strPath, EExpTypes::Path, tCIDLib::EAppendOver::Overwrite);
         EncodeTo(strFrag, m_strFragment, EExpTypes::Fragment, tCIDLib::EAppendOver::Overwrite);
 
-
-        TColCursor<TKeyValuePair>* pcursQPs = colQParms.pcursNew();
-        TJanitor<TColCursor<TKeyValuePair> > janCurs(pcursQPs);
-        if (pcursQPs->bIsValid())
+        TColCursor<TKeyValuePair>& cursQPs = *colQParms.pcursNew();
+        TJanitor<TColCursor<TKeyValuePair>> janCurs(&cursQPs);
+        if (cursQPs)
         {
             TString strName;
             TString strVal;
-            for (; pcursQPs->bIsValid(); pcursQPs->bNext())
+            for (; cursQPs; ++cursQPs)
             {
-                const TKeyValuePair& kvalCur = pcursQPs->objRCur();
+                const TKeyValuePair& kvalCur = *cursQPs;
 
                 EncodeTo
                 (
@@ -1783,8 +1800,7 @@ TURL::Set(  const   tCIDSock::EProtos       eProto
                     , EExpTypes::Query
                     , tCIDLib::EAppendOver::Overwrite
                 );
-
-                m_colQParms.objAdd(TKeyValuePair(strName, strVal));
+                m_colQParms.objPlace(strName, strVal);
             }
         }
     }
@@ -1926,7 +1942,10 @@ tCIDLib::TVoid TURL::MakeRelativeTo(const TURL& urlRelTo)
                     m_strPath.Cut(0, 3);
                 else
                     m_strPath.Cut(0, 2);
-                *pszRelPart = 0;
+
+                // We know we found a slash since it as least started with one above
+                #pragma warning(suppress : 6011)
+                *pszRelPart = kCIDLib::chNull;
                 pszRelPart = TRawStr::pszFindLastChar(pszRelBase, L'/');
                 if (!pszRelPart)
                 {

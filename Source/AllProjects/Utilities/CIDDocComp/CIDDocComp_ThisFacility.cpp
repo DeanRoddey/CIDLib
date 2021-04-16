@@ -86,6 +86,20 @@ TCtxStackJan::TCtxStackJan(const TCppClassPage& pgToPush)
     );
 }
 
+TCtxStackJan::TCtxStackJan(const TNamespacePage& pgToPush)
+{
+    facCIDDocComp.m_colSrcStack.objPush
+    (
+        TFacCIDDocComp::TSrcStackItem
+        {
+            tCIDDocComp::ESrcTypes::Namespace
+            , pgToPush.strName()
+            , pgToPush.strPagePath()
+            , TString::strEmpty()
+        }
+    );
+}
+
 TCtxStackJan::~TCtxStackJan()
 {
     facCIDDocComp.m_colSrcStack.TrashTop();
@@ -470,7 +484,7 @@ tCIDLib::TVoid TFacCIDDocComp::LoadDTD(const TString& strSrcPath)
         , tCIDLib::EFilePerms::Default
         , tCIDLib::EFileFlags::SequentialScan
         , tCIDLib::EAccessModes::Excl_Read
-        , facCIDEncode().ptcvtMakeNew(L"Latin1")
+        , facCIDEncode().ptcvtMake(L"Latin1")
     );
 
     //

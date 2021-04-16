@@ -41,12 +41,12 @@
 // ----------------------------------------------------------------------------
 //  Includes
 // ----------------------------------------------------------------------------
+#include    "CIDEncode.hpp"
 #include    "CIDXML.hpp"
 
 
-
 // ----------------------------------------------------------------------------
-//  Include magic main module code to start the main thread
+//  For this simple example, just start the main thread on a global function.
 // ----------------------------------------------------------------------------
 tCIDLib::EExitCodes eXMLDemo2Thread(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"XMLDemo2Thread", eXMLDemo2Thread))
@@ -55,92 +55,85 @@ CIDLib_MainModule(TThread(L"XMLDemo2Thread", eXMLDemo2Thread))
 // ----------------------------------------------------------------------------
 //  Local data
 //
-//  uptrOut
-//      The output stream. If its redirected, we create a file stream with a
-//      UTF-8 converter. Otherwise, its just a console.
+//  conOut
+//      The parsed XML output can go to this, or to an output file. Otherwise this
+//      is used for program output, usage msg, error msg.
 // ----------------------------------------------------------------------------
-using   TStreamPtr = TUniquePtr<TTextOutStream>;
-static  TStreamPtr  uptrOut;
-
-
-
-// ----------------------------------------------------------------------------
-//  Local helper methods
-// ----------------------------------------------------------------------------
-
-// Just shows a usage banner if we get bad parms
-static tCIDLib::TVoid ShowUsage()
-{
-    *uptrOut << L"Usage: XMLDemo2 [options]\n"
-                L"       Options:\n"
-                L"          /File=xxx\n"
-                L"          /IgnoreBadChars\n"
-                L"          /MemTest\n"
-                L"          /Validate\n"
-            << kCIDLib::EndLn;
-}
+TOutConsole conOut;
 
 
 // ----------------------------------------------------------------------------
 //  Local helper functions
 // ----------------------------------------------------------------------------
 
+// Just shows a usage banner if we get bad parms
+static tCIDLib::TVoid ShowUsage()
+{
+    conOut  << L"Usage: XMLDemo2 [options]\n"
+               L"       Options:\n"
+               L"          /InFile=xxx\n"
+               L"          /OutFile=xxx\n"
+               L"          /IgnoreBadChars\n"
+               L"          /Encoding=xxx\n"
+               L"          /Validate\n"
+               L"          /IgnoreDTD\n\n"
+               L"   If no output file, output is to the console\n"
+               L"   Encoding is only used if outputing to a file"
+            << kCIDLib::NewEndLn;
+}
+
+
 //
 //  This is called to do the actual parse. If it works, then the passed
-//  tree parser is filled in.
+//  tree parser is filled in. We get the input file name for error msg
+//  display purposes. We get an output stream to dump the resulting
+//  XML content back out to.
 //
 static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
                                 , const TString&            strFile
                                 , const tCIDXML::EParseOpts eOpts
-                                , const tCIDLib::TBoolean   bDump)
+                                ,       TTextOutStream&     strmOut)
 {
     try
     {
-        // And now parse the file
+        //
+        //  Do the XML parse using the tree parser. Tell the tree to store all
+        //  XML content. Often you will just want to store elements and character
+        //  data if the purpose is to process the contents for your own purposes.
+        //  here we are writing it back out so we want it all.
+        //
         if (xtprsToUse.bParseRootEntity(strFile
                                         , eOpts
                                         , tCIDXML::EParseFlags::All))
         {
-            // Print the document out if asked to
-            if (bDump)
-                *uptrOut << xtprsToUse.xtdocThis() << kCIDLib::DNewLn;
+            //
+            //  It worked, so format it back out to the output passed output stream, We
+            //  just dump the top level document and it all recursively formats out.
+            //
+            strmOut << xtprsToUse.xtdocThis() << kCIDLib::NewEndLn;
         }
          else
         {
-            const TXMLTreeParser::TErrInfo& errCur = xtprsToUse.colErrors()[0];
-            *uptrOut   << L"The parse failed\n"
-                       << errCur.strText()
-                       << kCIDLib::NewLn << L"(" << errCur.c4Line()
-                       << kCIDLib::chPeriod << errCur.c4Column()
-                       << L") " << errCur.strSystemId() << kCIDLib::NewEndLn;
+            // XML errors occurred, display the first one
+            const TXMLTreeParser::TErrInfo& errFirst = xtprsToUse.erriFirst();
+            conOut.FormatF
+            (
+                L"\nThe parse failed\n    %(1)\n    (%(2).%(3)) %(4)\n"
+                , errFirst.strText()
+                , errFirst.c4Line()
+                , errFirst.c4Column()
+                , errFirst.strSystemId()
+            );
         }
-
-        // Flush the output stream to force all output out
-        uptrOut->Flush();
     }
 
     catch(TError& errToCatch)
     {
-        *uptrOut    << L"A CIDLib runtime error occured during parsing.\n"
-                    << L"Error: " << errToCatch.strErrText() << kCIDLib::NewEndLn;
-    }
-
-    //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my demo programs so I can catch them if they do
-    //  and fix them.
-    //
-    catch(const TKrnlError& kerrToCatch)
-    {
-        *uptrOut << L"A kernel error occured during parsing.\nError="
-                 << kerrToCatch.errcId() << kCIDLib::NewEndLn;
-    }
-
-    // Catch a general exception
-    catch(...)
-    {
-        *uptrOut << L"A general exception occured during parsing"
-                 << kCIDLib::NewEndLn;
+        conOut.FormatF
+        (
+            L"A CIDLib runtime error occured during parsing.\n    Error: %(1)\n\n"
+            , errToCatch.strErrText()
+        );
     }
 }
 
@@ -153,137 +146,83 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    // Create our standard output stream
-    if (TFileSys::bIsRedirected(tCIDLib::EStdFiles::StdOut))
-    {
-        uptrOut = TStreamPtr
-        (
-            new TTextFileOutStream
-            (
-                tCIDLib::EStdFiles::StdOut, new TUTFConverter(TUTFConverter::EEncodings::UTF8)
-            )
-        );
-    }
-     else
-    {
-        uptrOut = TStreamPtr(new TOutConsole);
-    }
-
-    tCIDLib::TBoolean   bMemTest = kCIDLib::False;
+    // Parse our parameters, some are defaulted
+    tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
     tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
-    TString             strFileParm;
-    try
+    TString             strInFileParm;
+    TString             strOutFileParm;
+    TString             strEncoding;
     {
-        // Get the command line parms
-        TSysInfo::TCmdLineCursor cursParms = TSysInfo::cursCmdLineParms();
-        TString strParm;
-        for (; cursParms; ++cursParms)
-        {
-            strParm = *cursParms;
+        TCmdLine cmdlLoad;
 
-            if (strParm.bStartsWithI(L"/File="))
-            {
-                strParm.Cut(0, 6);
-                strFileParm = strParm;
-            }
-             else if (strParm.bCompareI(L"/IgnoreBadChars"))
-            {
-                eOptsToUse = tCIDLib::eOREnumBits
-                (
-                    eOptsToUse, tCIDXML::EParseOpts::IgnoreBadChars
-                );
-            }
-             else if (strParm.bCompareI(L"/IgnoreDTD"))
-            {
-                eOptsToUse = tCIDLib::eOREnumBits
-                (
-                    eOptsToUse, tCIDXML::EParseOpts::IgnoreDTD
-                );
-            }
-             else if (strParm.bCompareI(L"/Validate"))
-            {
-                eOptsToUse = tCIDLib::eOREnumBits
-                (
-                    eOptsToUse, tCIDXML::EParseOpts::Validate
-                );
-            }
-             else if (strParm.bCompareI(L"/MemTest"))
-            {
-                bMemTest = kCIDLib::True;
-            }
-             else
-            {
-                ShowUsage();
-                return tCIDLib::EExitCodes::BadParameters;
-            }
+        // Remove consumed parms so we can check for unknown ones at the end
+        cmdlLoad.bRemoveConsumed(kCIDLib::True);
+
+        // The input file is required
+        if (!cmdlLoad.bFindOptionVal(L"InFile", strInFileParm))
+        {
+            ShowUsage();
+            return tCIDLib::EExitCodes::BadParameters;
         }
 
-        if (strFileParm.bIsEmpty())
+        // Values that are optional or defaulted if not set
+        cmdlLoad.bFindOptionVal(L"OutFile", strOutFileParm);
+        if (!cmdlLoad.bFindOptionVal(L"Encoding", strEncoding))
+            strEncoding = L"UTF-8";
+
+        //
+        //  These are just option flags. Note we are OR'ing class type enums
+        //  since our enums are IDL generated and support that.
+        //
+        if (cmdlLoad.bFindOption(L"IgnoreBadChars"))
+            eOptsToUse |= tCIDXML::EParseOpts::IgnoreBadChars;
+        if (cmdlLoad.bFindOption(L"IgnoreDTD"))
+            eOptsToUse |= tCIDXML::EParseOpts::IgnoreDTD;
+        if (cmdlLoad.bFindOption(L"Validate"))
+            eOptsToUse |= tCIDXML::EParseOpts::Validate;
+
+        // If any left, they are unknown ones
+        if (!cmdlLoad.bIsEmpty())
         {
             ShowUsage();
             return tCIDLib::EExitCodes::BadParameters;
         }
     }
 
-    // Catch any CIDLib runtime errors
-    catch(const TError& errToCatch)
+    // See if we can create the requested encoding
+    TTextConverter* ptcvtOut = facCIDEncode().ptcvtMake(strEncoding);
+    if (!ptcvtOut)
     {
-        *uptrOut << L"A CIDLib runtime error occured during init.\n"
-                 << L"Error: " << errToCatch.strErrText()
-                 << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::RuntimeError;
+        conOut.FormatF
+        (
+            L"Could not create a converter for encoding: %(1)\n\n", strEncoding
+        );
+        return tCIDLib::EExitCodes::BadParameters;
     }
 
     //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my demo programs so I can catch them if they do
-    //  and fix them.
+    //  Decide where to send the output. If they provided an output file, then
+    //  let's create a file stream for that. Else we use the console. The file
+    //  output stream adopts our text converter even if we don't end up using it.
     //
-    catch(const TKrnlError& kerrToCatch)
+    TTextOutStream*     pstrmOut = &conOut;
+    TTextFileOutStream  strmOutFile(ptcvtOut);
+    if (!strOutFileParm.bIsEmpty())
     {
-        *uptrOut   << L"A kernel error occured during init.\nError="
-                   << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::FatalError;
+        strmOutFile.Open
+        (
+            strOutFileParm
+            , tCIDLib::ECreateActs::CreateAlways
+            , tCIDLib::EFilePerms::Default
+            , tCIDLib::EFileFlags::SafeStream
+            , tCIDLib::EAccessModes::Excl_Write
+        );
+        pstrmOut = &strmOutFile;
     }
 
-    // Catch a general exception
-    catch(...)
-    {
-        *uptrOut   << L"A general exception occured during init"
-                   << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::SystemException;
-    }
-
-    // Run the test. Ask it to dump out the results
+    // And do the parse and output, passing along options and target stream
     TXMLTreeParser xtprsToUse;
-    DoParse(xtprsToUse, strFileParm, eOptsToUse, kCIDLib::True);
-
-    //
-    //  Debug memory leaks by running it again with a memory check around it.
-    //  The first one will fault in any statics, and this one should only involve
-    //  stuff allocated and freed during the parse. It'll create a memory dump
-    //  in the current directory.
-    //
-    #if CID_DEBUG_ON
-    #define DUMP_MEM 0
-    #if DUMP_MEM
-    if (bMemTest)
-    {
-        xtprsToUse.Reset();
-        TKrnlMemCheck kmchkTest;
-        kmchkTest.ReportToFile(L"MemDump_XMLDemo2.Txt");
-        kmchkTest.TakeSnapshot();
-        {
-            DoParse(xtprsToUse, strFileParm, eOptsToUse, kCIDLib::False);
-            DoParse(xtprsToUse, strFileParm, eOptsToUse, kCIDLib::False);
-        }
-        xtprsToUse.Reset();
-        kmchkTest.DumpSnapDiffs();
-    }
-    #endif
-    #endif
+    DoParse(xtprsToUse, strInFileParm, eOptsToUse, *pstrmOut);
 
     return tCIDLib::EExitCodes::Normal;
 }
-
-

@@ -50,8 +50,8 @@ RTTIDecls(TMEngStringOutStreamInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_OuptutStreamClasses
 {
-    const TString strTextOutPath(L"MEng.System.Runtime.TextOutStream");
-    const TString strStringOutPath(L"MEng.System.Runtime.StringOutStream");
+    static const TString strTextOutPath(L"MEng.System.Runtime.TextOutStream");
+    static const TString strStringOutPath(L"MEng.System.Runtime.StringOutStream");
 }
 
 
@@ -198,35 +198,37 @@ TMEngTextOutStreamInfo::TMEngTextOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Abstract
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2EnumId_Justify(kMacroEng::c2BadId)
-    , m_c2EnumId_Radix(kMacroEng::c2BadId)
-    , m_c2MethId_DNewLine(kMacroEng::c2BadId)
-    , m_c2MethId_Flush(kMacroEng::c2BadId)
-    , m_c2MethId_FmtBool(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard1(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard1R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard2(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard2R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard4(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCard4R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtChar(kMacroEng::c2BadId)
-    , m_c2MethId_FmtCurLine(kMacroEng::c2BadId)
-    , m_c2MethId_FmtFloat4(kMacroEng::c2BadId)
-    , m_c2MethId_FmtFloat8(kMacroEng::c2BadId)
-    , m_c2MethId_FmtFmtable(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt1(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt1R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt2(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt2R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt4(kMacroEng::c2BadId)
-    , m_c2MethId_FmtInt4R(kMacroEng::c2BadId)
-    , m_c2MethId_FmtString(kMacroEng::c2BadId)
-    , m_c2MethId_NewLine(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
-    , m_c2MethId_SeekToEnd(kMacroEng::c2BadId)
-    , m_c2MethId_SetJust(kMacroEng::c2BadId)
-    , m_c2MethId_SetWidth(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_Justify(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_Radix(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DNewLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Flush(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtBool(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard1(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard1R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard2R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard4(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard4R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard8(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCard8R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtChar(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtCurLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtFloat4(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtFloat8(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtFmtable(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt1(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt1R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt2R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt4(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtInt4R(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FmtString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_NewLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SeekToEnd(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetJust(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetWidth(kCIDMacroEng::c2BadId)
     , m_c4ErrId_FmtErr(kCIDLib::c4MaxCard)
     , m_pmeciErrs(0)
     , m_pmeciJustify(0)
@@ -730,7 +732,7 @@ TMEngTextOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
           ||  (c2MethId == m_c2MethId_FmtCard4R))
     {
         // Get the value out into a Card4
-        tCIDLib::TCard4 c4Val;
+        tCIDLib::TCard4 c4Val = 0;
         if (c2MethId == m_c2MethId_FmtCard1R)
             c4Val = meOwner.c1StackValAt(c4FirstInd);
         else if (c2MethId == m_c2MethId_FmtCard2R)
@@ -840,7 +842,7 @@ TMEngTextOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
           ||  (c2MethId == m_c2MethId_FmtInt4R))
     {
         // Get the value out into a Int4
-        tCIDLib::TInt4 i4Val;
+        tCIDLib::TInt4 i4Val = 0;
         if (c2MethId == m_c2MethId_FmtInt1R)
             i4Val = meOwner.i1StackValAt(c4FirstInd);
         else if (c2MethId == m_c2MethId_FmtInt2R)
@@ -973,7 +975,7 @@ TMEngConOutStreamInfo::TMEngConOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextOutStream"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
 {
 }
 
@@ -1065,10 +1067,11 @@ TMEngFileOutStreamInfo::TMEngFileOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextOutStream"
     )
-    , m_c2EnumId_CreateAct(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_EncodingCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Open(kMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2EnumId_CreateAct(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EncodingCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Open(kCIDMacroEng::c2BadId)
     , m_strDotDot(L"..")
 {
     // Add imports for any non-intrinsic classes we use in our signatures
@@ -1253,7 +1256,7 @@ TMEngFileOutStreamInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
                     , tCIDLib::EFilePerms::Default
                     , tCIDLib::EFileFlags::SequentialScan
                     , tCIDLib::EAccessModes::Write
-                    , facCIDEncode().ptcvtMakeNew(mecvActual.strEncoding())
+                    , facCIDEncode().ptcvtMake(mecvActual.strEncoding())
                 )
                 , tCIDLib::EAdoptOpts::Adopt
             );
@@ -1307,10 +1310,11 @@ TMEngStringOutStreamInfo::TMEngStringOutStreamInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.System.Runtime.TextOutStream"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetText(kMacroEng::c2BadId)
-    , m_c2MethId_SizeCtor(kMacroEng::c2BadId)
-    , m_c2MethId_XcodeTo(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SizeCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_XcodeTo(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Xcode(kCIDLib::c4MaxCard)
 {
 }
@@ -1467,7 +1471,7 @@ TMEngStringOutStreamInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
             TMEngMemBufVal& mecvToFill = meOwner.mecvStackAtAs<TMEngMemBufVal>(c4FirstInd);
 
             // Get the encoding and create a text converter
-            TTextConverter* ptcvtToUse = facCIDEncode().ptcvtMakeNew
+            TTextConverter* ptcvtToUse = facCIDEncode().ptcvtMake
             (
                 meOwner.strStackValAt(c4FirstInd + 1)
             );

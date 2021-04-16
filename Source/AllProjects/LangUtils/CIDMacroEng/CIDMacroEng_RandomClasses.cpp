@@ -45,11 +45,14 @@ RTTIDecls(TMEngRandomNumInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_RandomClass
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes and their paths.
-    // -----------------------------------------------------------------------
-    const TString   strName(L"RandomNum");
-    const TString   strPath(L"MEng.System.Runtime.RandomNum");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes and their paths.
+        // -----------------------------------------------------------------------
+        const TString   strName(L"RandomNum");
+        const TString   strPath(L"MEng.System.Runtime.RandomNum");
+    }
 }
 
 
@@ -62,9 +65,9 @@ namespace CIDMacroEng_RandomClass
 // ---------------------------------------------------------------------------
 //  TMEngRandomNumVal: Constuctors and Destructor
 // ---------------------------------------------------------------------------
-TMEngRandomNumVal::TMEngRandomNumVal(const  TString&                strName
-                                    , const tCIDLib::TCard2         c2Id
-                                    , const tCIDMacroEng::EConstTypes  eConst) :
+TMEngRandomNumVal::TMEngRandomNumVal(const  TString&                    strName
+                                    , const tCIDLib::TCard2             c2Id
+                                    , const tCIDMacroEng::EConstTypes   eConst) :
 
     TMEngClassVal(strName, c2Id, eConst)
     , m_prandValue(new TRandomNum)
@@ -122,9 +125,9 @@ TMEngRandomNumInfo::TMEngRandomNumInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetNextVal(kMacroEng::c2BadId)
-    , m_c2MethId_Seed(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNextVal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Seed(kCIDMacroEng::c2BadId)
 {
 }
 

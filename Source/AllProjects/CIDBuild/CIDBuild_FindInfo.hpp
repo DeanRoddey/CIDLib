@@ -96,23 +96,24 @@ class TFindInfo
 
 
         // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        friend tCIDLib::TBoolean operator>
-        (
-            const   TFindInfo&              fndiLHS
-            , const TFindInfo&              fndiRHS
-        );
-
-
-        // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsDirectory() const;
+        tCIDLib::TBoolean bIsDirectory() const
+        {
+            return m_bIsDir;
+        }
 
         tCIDLib::TBoolean bIsSpecialDirectory() const;
 
-        const TBldStr& strFileName() const;
+        tCIDLib::TCard4 c4Size() const
+        {
+            return m_c4Size;
+        }
+
+        const TBldStr& strFileName() const
+        {
+            return m_strFileName;
+        }
 
         tCIDLib::TVoid Set
         (
@@ -122,12 +123,22 @@ class TFindInfo
             , const tCIDLib::TCard4         c4Size
         );
 
-        tCIDLib::TFloat8 tmLastWrite() const;
-
-        tCIDLib::TCard4 c4Size() const;
+        tCIDLib::TFloat8 tmLastWrite() const
+        {
+            return m_tmLastWrite;
+        }
 
 
     protected :
+        // -------------------------------------------------------------------
+        //   Declare our friends
+        // -------------------------------------------------------------------
+        friend tCIDLib::TBoolean operator>(const TFindInfo& fndiLHS, const TFindInfo& fndiRHS)
+        {
+            return fndiLHS.m_tmLastWrite > fndiRHS.m_tmLastWrite;
+        }
+
+
         // -------------------------------------------------------------------
         //  Hidden Constructors
         // -------------------------------------------------------------------
@@ -173,38 +184,4 @@ class TFindInfo
         TBldStr             m_strFileName;
         tCIDLib::TFloat8    m_tmLastWrite;
 };
-
-
-// ---------------------------------------------------------------------------
-//  TFindInfo: Public operators
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean
-operator>(const TFindInfo& fndiLHS, const TFindInfo& fndiRHS)
-{
-    return fndiLHS.m_tmLastWrite > fndiRHS.m_tmLastWrite;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TFindInfo: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean TFindInfo::bIsDirectory() const
-{
-    return m_bIsDir;
-}
-
-inline const TBldStr& TFindInfo::strFileName() const
-{
-    return m_strFileName;
-}
-
-inline tCIDLib::TFloat8 TFindInfo::tmLastWrite() const
-{
-    return m_tmLastWrite;
-}
-
-inline tCIDLib::TCard4 TFindInfo::c4Size() const
-{
-    return m_c4Size;
-}
 

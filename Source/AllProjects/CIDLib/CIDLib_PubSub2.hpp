@@ -35,7 +35,7 @@
 //  CLASS: TPubSubAsyncSub
 // PREFIX: psasub
 // ---------------------------------------------------------------------------
-class CIDLIBEXP TPubSubAsyncSub : public TObject, public MPubSubscription
+class CIDLIBEXP TPubSubAsyncSub : public TObject, private MPubSubscription
 {
     public  :
         // -------------------------------------------------------------------
@@ -47,6 +47,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, public MPubSubscription
         );
 
         TPubSubAsyncSub(const TPubSubAsyncSub&) = delete;
+        TPubSubAsyncSub(TPubSubAsyncSub&&) = delete;
 
         ~TPubSubAsyncSub();
 
@@ -55,6 +56,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, public MPubSubscription
         //  Public operators
         // -------------------------------------------------------------------
         TPubSubAsyncSub& operator=(const TPubSubAsyncSub&) = delete;
+        TPubSubAsyncSub& operator=(TPubSubAsyncSub&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -91,7 +93,7 @@ class CIDLIBEXP TPubSubAsyncSub : public TObject, public MPubSubscription
         tCIDLib::TVoid ProcessPubMsg
         (
             const   TPubSubMsg&             psmsgIn
-        )   override;
+        )   final;
 
 
     private :

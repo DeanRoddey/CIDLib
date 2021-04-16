@@ -197,6 +197,9 @@ TSectionalList::eCustomDraw(        TGraphDrawDev&      gdevTar
             {
                 TArea areaCur;
                 QueryColArea(c4Row, c4Column, areaCur);
+
+                // Adjust for exclusive lower right points
+                areaCur.AdjustSize(-1, -1);
                 gdevTar.DrawLine(areaCur.pntUR(), areaCur.pntLR(), facCIDGraphDev().rgbPaleGrey);
             }
         }

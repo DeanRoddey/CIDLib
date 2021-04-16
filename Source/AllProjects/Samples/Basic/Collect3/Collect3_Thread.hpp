@@ -83,8 +83,8 @@ class TColThread : public TThread
         //
         //  m_pcolToUse
         //      This is a pointer to the collection that the thread works
-        //      on. Its not adopted, just referenced. The type is just a
-        //      typedef of a template collection.
+        //      on. Its not adopted, just referenced. The type is just an
+        //      alias of a template collection.
         //
         //  m_pstrmOut
         //      The stream to use for text output. Note that text output

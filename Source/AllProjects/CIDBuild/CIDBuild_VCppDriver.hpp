@@ -78,6 +78,13 @@ class TVCppDriver : public TToolsDriver
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean bCompileOne
+        (
+            const   tCIDLib::TCh**          apszParms
+            , const tCIDLib::TCard4         c4ParmCnt
+            ,       tCIDLib::TCard4&        c4ErrCode
+        );
+
         tCIDLib::TBoolean bCompileCpps();
 
         tCIDLib::TBoolean bLibsNewer

@@ -45,12 +45,14 @@ RTTIDecls(TMEngCryptoKeyInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_CryptoKey
 {
-    // -----------------------------------------------------------------------
-    //  The names of our classes
-    // -----------------------------------------------------------------------
-    const TString   strKeyName(L"CryptoKey");
-    const TString   strKeyClassPath(L"MEng.System.Runtime.CryptoKey");
-
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names of our classes
+        // -----------------------------------------------------------------------
+        const TString   strKeyName(L"CryptoKey");
+        const TString   strKeyClassPath(L"MEng.System.Runtime.CryptoKey");
+    }
 }
 
 
@@ -180,13 +182,13 @@ TMEngCryptoKeyInfo::TMEngCryptoKeyInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_FromHash(kMacroEng::c2BadId)
-    , m_c2MethId_FromString(kMacroEng::c2BadId)
-    , m_c2MethId_HashCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
-    , m_c2MethId_StrCtor(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromHash(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromString(kCIDMacroEng::c2BadId)
+    , m_c2MethId_HashCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_StrCtor(kCIDMacroEng::c2BadId)
 {
     // Import the MD5 hash class
     bAddClassImport(TMEngMD5HashInfo::strPath());

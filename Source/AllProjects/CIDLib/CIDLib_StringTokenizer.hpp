@@ -103,6 +103,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
         );
 
         TStringTokenizer(const TStringTokenizer&) = delete;
+        TStringTokenizer(TStringTokenizer&&) = delete;
 
         ~TStringTokenizer() = default;
 
@@ -111,6 +112,7 @@ class CIDLIBEXP TStringTokenizer : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TStringTokenizer& operator=(const TStringTokenizer&) = delete;
+        TStringTokenizer& operator=(TStringTokenizer&&) = delete;
 
 
         // -------------------------------------------------------------------

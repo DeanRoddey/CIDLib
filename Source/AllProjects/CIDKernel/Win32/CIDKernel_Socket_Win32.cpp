@@ -31,23 +31,28 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
+
+#pragma     warning(push)
+#include    <CodeAnalysis\Warnings.h>
+#pragma     warning(disable : ALL_CODE_ANALYSIS_WARNINGS 26812 26814)
 #include    <winhttp.h>
-#include    <Ws2tcpip.h>
+#pragma     warning(pop)
+
 
 
 namespace CIDKernel_Socket_Win32
 {
     // -----------------------------------------------------------------------
-    //  Lock constants
+    //  Socket constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    hInvalid = tCIDLib::TCard4(-1);
+    constexpr tCIDLib::TCard4   hInvalid = tCIDLib::TCard4(-1);
 
 
     // -----------------------------------------------------------------------
     //  A mapping array to map from our socket protocol enum to the actual
     //  system value for that protocol.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   ac4ProtoMaps[] =
+    const tCIDLib::TCard4       ac4ProtoMaps[] =
     {
         0       // IP
         , 1     // ICMP
@@ -57,8 +62,9 @@ namespace CIDKernel_Socket_Win32
         , 17    // UDP
         , 22    // IDP
         , 255   // RawIP
+        , 58    // ICMP6
     };
-    const tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
+    constexpr tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
 }
 
 
@@ -77,7 +83,7 @@ static tCIDLib::TCard4 c4XlatProto(const tCIDSock::ESockProtos eToXlat)
             , CID_LINE
         );
     }
-    return CIDKernel_Socket_Win32::ac4ProtoMaps[tCIDLib::TCard4(eToXlat)];
+    return CIDKernel_Socket_Win32::ac4ProtoMaps[tCIDLib::c4EnumOrd(eToXlat)];
 }
 
 
@@ -97,7 +103,7 @@ static unsigned short usConvertFamily(TKrnlIPAddr& kipaSrc)
 // ---------------------------------------------------------------------------
 TSocketHandle::TSocketHandle() :
 
-    m_phsockiThis(0)
+    m_phsockiThis(nullptr)
 {
     m_phsockiThis = new TSocketHandleImpl;
     m_phsockiThis->hSock = CIDKernel_Socket_Win32::hInvalid;
@@ -105,7 +111,7 @@ TSocketHandle::TSocketHandle() :
 
 TSocketHandle::TSocketHandle(const TSocketHandle& hsockToCopy) :
 
-    m_phsockiThis(0)
+    m_phsockiThis(nullptr)
 {
     m_phsockiThis = new TSocketHandleImpl;
     m_phsockiThis->hSock = hsockToCopy.m_phsockiThis->hSock;
@@ -114,7 +120,7 @@ TSocketHandle::TSocketHandle(const TSocketHandle& hsockToCopy) :
 TSocketHandle::~TSocketHandle()
 {
     delete m_phsockiThis;
-    m_phsockiThis = 0;
+    m_phsockiThis = nullptr;
 }
 
 
@@ -213,7 +219,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
     HINTERNET           hOpen;
     HINTERNET           hConnect;
     HINTERNET           hRequest;
-    IStream*            pStream;
+    IStream*            pStream = nullptr;
     HRESULT             hRes;
 
     // Try to open the WinHTTP API
@@ -317,7 +323,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
         hRequest
         , pszInHdrs ? pszInHdrs : WINHTTP_NO_ADDITIONAL_HEADERS
         , -1
-        , c4ContLen ? pc1OutBuf : 0
+        , c4ContLen ? pc1OutBuf : nullptr
         , c4ContLen
         , c4ContLen
         , 0
@@ -426,7 +432,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
                 tCIDLib::TCh* pszKey = (tCIDLib::TCh*)pc1OutHrs;
                 const tCIDLib::TCh* pszEnd = (tCIDLib::TCh*)(pc1OutHrs + cch);
                 tCIDLib::TCard4 c4Len;
-                tCIDLib::TCh* pszVal;
+                tCIDLib::TCh* pszVal = nullptr;
                 while (pszKey < pszEnd)
                 {
                     // Remember the full length before we mangle it
@@ -552,7 +558,7 @@ TKrnlSocket::bDoSSLPageOp(  const   tCIDNet::ESSLOps                eOp
     ::WinHttpCloseHandle(hOpen);
 
     // Null terminate the stream
-    tCIDLib::TCard1* pc1Null = 0;
+    tCIDLib::TCard1* pc1Null = nullptr;
     pStream->Write(&pc1Null, 1, NULL);
 
     HGLOBAL hgl;
@@ -611,7 +617,7 @@ bMultiReadSel(          TKrnlSocket*            apsockList[kCIDSock::c4MaxSelect
     }
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -706,7 +712,7 @@ TKrnlSocket::bMultiSel(         TKrnlSocket*            apsockList[kCIDSock::c4M
     }
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1088,8 +1094,18 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
     }
 
     // Convert the passed socket type to the internal value
-    const tCIDLib::TCard4 c4Type = (eType == tCIDSock::ESocketTypes::Stream) ?
-                                    SOCK_STREAM : SOCK_DGRAM;
+    tCIDLib::TCard4 c4Type;
+    if (eType == tCIDSock::ESocketTypes::Stream)
+        c4Type = SOCK_STREAM;
+    else if (eType == tCIDSock::ESocketTypes::Datagram)
+        c4Type = SOCK_DGRAM;
+    else if (eType == tCIDSock::ESocketTypes::Raw)
+        c4Type = SOCK_RAW;
+    else
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_WrongSOType);
+        return kCIDLib::False;
+    }
 
     // Translate the protocol
     const tCIDLib::TCard4 c4Proto = c4XlatProto(eProtocol);
@@ -1099,6 +1115,11 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
         iFamily = AF_INET;
     else if (eAddrType == tCIDSock::EAddrTypes::IPV6)
         iFamily = AF_INET6;
+    else
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_BadAddrType);
+        return kCIDLib::False;
+    }
 
     // And try to create the socket
     const tCIDLib::TInt4 i4Tmp = ::socket(iFamily, c4Type, c4Proto);
@@ -1133,11 +1154,7 @@ TKrnlSocket::bCreate(   const   tCIDSock::ESocketTypes  eType
 tCIDLib::TBoolean TKrnlSocket::bDataReady(tCIDLib::TCard4& c4ToFill) const
 {
     // Query the amount of data readable via the next read operation
-    if (::ioctlsocket
-    (
-        m_hsockThis.m_phsockiThis->hSock
-        , FIONREAD
-        , &c4ToFill) == SOCKET_ERROR)
+    if (::ioctlsocket(m_hsockThis.m_phsockiThis->hSock, FIONREAD, &c4ToFill) == SOCKET_ERROR)
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
         TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(c4LastErr), c4LastErr);
@@ -1209,12 +1226,6 @@ TKrnlSocket::bGetSockOpt(const  TKrnlSocket::EBSockOpts eOpt
         case EBSockOpts::KeepAlive :
             iLevel = SOL_SOCKET;
             iOpt = SO_KEEPALIVE;
-            break;
-
-        case EBSockOpts::Linger :
-            iLevel = SOL_SOCKET;
-            iOpt = SO_DONTLINGER;
-            bNegate = kCIDLib::True;
             break;
 
         case EBSockOpts::Nagle :
@@ -1384,7 +1395,29 @@ TKrnlSocket::bJoinMulticastGroup(const  TKrnlIPAddr& kipaGroup
 }
 
 
-// Setting linger has it's own special method
+// Setting linger has it's own special methods
+tCIDLib::TBoolean TKrnlSocket::bLinger(tCIDLib::TBoolean& bNewState) const
+{
+    linger LingerInfo;
+    socklen_t LingerLen = sizeof(linger);
+
+    if (::getsockopt
+    (
+        m_hsockThis.m_phsockiThis->hSock
+        , SOL_SOCKET
+        , SO_LINGER
+        , reinterpret_cast<char*>(&LingerInfo)
+        , &LingerLen) == SOCKET_ERROR)
+    {
+        tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
+        TKrnlError::SetLastKrnlError(TKrnlIP::c4XlatError(c4LastErr), c4LastErr);
+        return kCIDLib::False;
+    }
+
+    bNewState = LingerInfo.l_onoff ? kCIDLib::True : kCIDLib::False;
+    return kCIDLib::True;
+}
+
 tCIDLib::TBoolean
 TKrnlSocket::bLinger(   const   tCIDLib::TBoolean   bNewState
                         , const tCIDLib::TCard4     c4Time)
@@ -1747,6 +1780,7 @@ TKrnlSocket::bSetSockOpt(       TKrnlSocket::EBSockOpts eOpt
     return kCIDLib::True;
 }
 
+
 tCIDLib::TBoolean
 TKrnlSocket::bSetSockOpt(       TKrnlSocket::EISockOpts eOpt
                         , const tCIDLib::TInt4          i4NewValue)
@@ -1766,6 +1800,16 @@ TKrnlSocket::bSetSockOpt(       TKrnlSocket::EISockOpts eOpt
         case EISockOpts::SendBuf :
             c4Level = SOL_SOCKET;
             c4Opt = SO_SNDBUF;
+            break;
+
+        case EISockOpts::TTL :
+            c4Level = IPPROTO_IP;
+            c4Opt = IP_TTL;
+            break;
+
+        case EISockOpts::TTLV6 :
+            c4Level = IPPROTO_IPV6;
+            c4Opt = IPV6_UNICAST_HOPS;
             break;
 
         default :
@@ -1823,7 +1867,7 @@ TKrnlSocket::bWaitForConnectReady(          tCIDLib::TBoolean&      bGotConnect
     FDConn.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1867,7 +1911,7 @@ TKrnlSocket::bWaitForDataReady(         tCIDLib::TBoolean&      bGotData
     FDRead.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);
@@ -1918,7 +1962,7 @@ TKrnlSocket::bWaitForSendReady(         tCIDLib::TBoolean&      bReady
     FDRead.fd_array[0] = m_hsockThis.m_phsockiThis->hSock;
 
     timeval WTime;
-    timeval* pWTime = 0;
+    timeval* pWTime = nullptr;
     if (enctWait != kCIDLib::enctMaxWait)
     {
         WTime.tv_sec = tCIDLib::TCard4(enctWait / kCIDLib::enctOneSecond);

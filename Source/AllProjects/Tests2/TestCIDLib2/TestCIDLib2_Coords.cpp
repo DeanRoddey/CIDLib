@@ -256,16 +256,7 @@ TTest_CoordCtor::eRunTest(  TTextStringOutStream&   strmOut
         tCIDLib::THostPoint HostPnt2 = { 500, 200 };
 
         TArea areaTest1(HostPnt1, HostPnt2);
-        if (!bCheckArea(areaTest1, 100, 100, 401, 101))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Area ctor failed\n\n";
-        }
-    }
-
-    {
-        TArea areaTest(TPoint(10, 20), TPoint(30, 40));
-        if (!bCheckArea(areaTest, 10, 20, 20, 20))
+        if (!bCheckArea(areaTest1, 100, 100, 400, 100))
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"Area ctor failed\n\n";
@@ -471,13 +462,13 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         }
 
         // Check the calculation of the bottom and right sides
-        if (areaTest.i4Right() != 191)
+        if (areaTest.i4Right() != 192)
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"i4Right() returned incorrect value\n\n";
         }
 
-        if (areaTest.i4Bottom() != 287)
+        if (areaTest.i4Bottom() != 288)
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"i4Bottom() returned incorrect value\n\n";
@@ -861,36 +852,7 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
         TArea areaTest(10, 10, 20, 30);
         tCIDLib::THostRectl HostRectl;
 
-        areaTest.ToRectl(HostRectl, tCIDLib::ERectlTypes::Inclusive);
-        if ((HostRectl.i4Left != 10)
-        ||  (HostRectl.i4Top != 10)
-        ||  (HostRectl.i4Right != 29)
-        ||  (HostRectl.i4Bottom != 39))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Convert to host rectl failed\n\n";
-        }
-
-        //
-        //  These return inclusive points, which should be the same as the rectl
-        //  since we did it inclusively.
-        //
-        if ((HostRectl.i4Right != areaTest.i4Right())
-        ||  (HostRectl.i4Bottom != areaTest.i4Bottom()))
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Rectl right/bottom is wrong\n\n";
-        }
-
-        // Construct another area from it (other mode) and compare to original
-        TArea areaTest2(HostRectl, tCIDLib::ERectlTypes::Inclusive);
-        if (areaTest2 != areaTest)
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Conversion back from rectl failed\n\n";
-        }
-
-        areaTest.ToRectl(HostRectl, tCIDLib::ERectlTypes::NonInclusive);
+        areaTest.ToRectl(HostRectl);
         if ((HostRectl.i4Left != 10)
         ||  (HostRectl.i4Top != 10)
         ||  (HostRectl.i4Right != 30)
@@ -900,8 +862,20 @@ TTest_CoordAcc::eRunTest(TTextStringOutStream&  strmOut
             strmOut << TFWCurLn << L"Convert to host rectl failed\n\n";
         }
 
+        //
+        //  This time they shoudl be the same as the non-inclusive values of the
+        //  area.
+        //
+        if ((HostRectl.i4Right != areaTest.i4Right())
+        ||  (HostRectl.i4Bottom != areaTest.i4Bottom()))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Host Rectl right/bottom is wrong\n\n";
+        }
+
         // Convert back from the rectangle
-        areaTest2.FromRectl(HostRectl, tCIDLib::ERectlTypes::NonInclusive);
+        TArea areaTest2;
+        areaTest2.FromRectl(HostRectl);
         if (areaTest2 != areaTest)
         {
             eRes = tTestFWLib::ETestRes::Failed;
@@ -926,7 +900,7 @@ TTest_CoordOps::TTest_CoordOps() :
 
     TTestFWTest
     (
-        L"Operators", L"Tests TArea/TPoint operators", 2
+        L"Coordinate Operators", L"Tests TArea/TPoint operators", 2
     )
 {
 }
@@ -1178,11 +1152,8 @@ TTest_Area1::eRunTest(  TTextStringOutStream&   strmOut
           , TTestData(TArea(TPoint(51, 61), 71, 81), 51, 61, 71, 81)
           , TTestData(TArea(TPoint(1, 1), TPoint(100, 100)), 1, 1, 99, 99)
 
-          // Inclusive vs. exclusive tests
-          , TTestData(TArea(rectlSrc1, tCIDLib::ERectlTypes::Inclusive), 1, 1, 2, 2)
-          , TTestData(TArea(rectlSrc1, tCIDLib::ERectlTypes::NonInclusive), 1, 1, 1, 1)
-          , TTestData(TArea(rectlSrc2, tCIDLib::ERectlTypes::Inclusive), 1, 1, 1, 1)
-          , TTestData(TArea(rectlSrc2, tCIDLib::ERectlTypes::NonInclusive), 1, 1, 0, 0)
+          , TTestData(TArea(rectlSrc1), 1, 1, 1, 1)
+          , TTestData(TArea(rectlSrc2), 1, 1, 0, 0)
         };
         const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aTestData);
 
@@ -1205,15 +1176,15 @@ TTest_Area1::eRunTest(  TTextStringOutStream&   strmOut
     // Do some basic sanity check tests
     TArea areaTest1(0, 0, 10, 10);
 
-    // Make sure that the right/bottom methods are correct. They return inclusive points!
-    if (areaTest1.i4Right() != 9)
+    // Make sure that the right/bottom methods are correct. They return non-inclusive points!
+    if (areaTest1.i4Right() != 10)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Right side (" << areaTest1.i4Right()
                 << L" not at expected coordinate\n\n";
     }
 
-    if (areaTest1.i4Bottom() != 9)
+    if (areaTest1.i4Bottom() != 10)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Bottom (" << areaTest1.i4Bottom()
@@ -1300,14 +1271,12 @@ TTest_Area1::eRunTest(  TTextStringOutStream&   strmOut
     }
 
 
-    //
-    //  Test setting from points. They are assumed to be non-inclusive.
-    //
+    // Test setting from points
     areaTest1.FromPoints(TPoint(0, 0), TPoint(1, 1));
     if (areaTest1 != TArea(0, 0, 1, 1))
     {
         eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"SetFromPoints method failed \n\n";
+        strmOut << TFWCurLn << L"SetFromPoints non-inclusive method failed \n\n";
     }
 
     return eRes;

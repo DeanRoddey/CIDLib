@@ -44,32 +44,35 @@ class TCIDCoreAdminImpl : public TCIDCoreAdminBaseImpl
         // --------------------------------------------------------------------
         TCIDCoreAdminImpl();
 
+        TCIDCoreAdminImpl(const TCIDCoreAdminImpl&) = delete;
+        TCIDCoreAdminImpl(TCIDCoreAdminImpl&&) = delete;
+
         ~TCIDCoreAdminImpl();
+
+
+        // --------------------------------------------------------------------
+        //  Public operators
+        // --------------------------------------------------------------------
+        TCIDCoreAdminImpl& operator=(const TCIDCoreAdminImpl&) = delete;
+        TCIDCoreAdminImpl& operator=(TCIDCoreAdminImpl&&) = delete;
 
 
         // --------------------------------------------------------------------
         // Public, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid AdminStop();
+        tCIDLib::TVoid AdminStop() final;
 
 
     protected :
         // --------------------------------------------------------------------
         //  Protected, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :
-        // --------------------------------------------------------------------
-        //  Unimplemented ctors and operators
-        // --------------------------------------------------------------------
-        TCIDCoreAdminImpl(const TCIDCoreAdminImpl&);
-        tCIDLib::TVoid operator=(const TCIDCoreAdminImpl&);
-
-
         // --------------------------------------------------------------------
         //  Magic macros
         // --------------------------------------------------------------------

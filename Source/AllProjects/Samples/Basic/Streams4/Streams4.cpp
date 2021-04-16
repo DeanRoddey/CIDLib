@@ -19,11 +19,11 @@
 //  programs. This one is basically just like the previous version, except
 //  that this one uses smart polymorphic streaming.
 //
-//  When using polymorphic streaming, each object streamed out must also be
+//  When using polymorphic streaming, each object streamed out must be
 //  streamed along with its class information. This allows the code that
 //  streams that objects back in to know what class each stored object is.
 //  It uses this information to create a new object of that type and stream
-//  the stored information inot the new object.
+//  the stored information into the new object.
 //
 //  This extra class information can be a large burden if there are a lot of
 //  objects being streamed (particularly if the object's themselves are
@@ -31,7 +31,7 @@
 //  streaming that can drastically reduce the overhead of streaming out
 //  class information.
 //
-//  The smart polymorphic streamer will maintain a dictionary of types that
+//  The polymorphic streamer will maintain a dictionary of types that
 //  have been streamed. So it knows whether you've streamed an object out
 //  of a particular type. So, instead of writing out full type info, it just
 //  writes out an id value. When reading back in, it reads in the dictionary
@@ -41,8 +41,7 @@
 // CAVEATS/GOTCHAS:
 //
 //  1)  This program is very simple so it does not attempt to be language
-//      independent and it does not provide its own facility object since
-//      it does not need one.
+//      independent and it does not provide its own facility class or object.
 //
 // LOG:
 //
@@ -66,9 +65,7 @@
 RTTIDecls(TBaseWidget,TObject)
 AdvRTTIDecls(TLineWidget,TBaseWidget)
 AdvRTTIDecls(TCircleWidget,TBaseWidget)
-AdvRTTIDecls(TBoxWidget,TBaseWidget)
-AdvRTTIDecls(TFilledBoxWidget,TBoxWidget)
-AdvRTTIDecls(TTextWidget,TBaseWidget)
+AdvRTTIDecls(TFilledCircleWidget,TCircleWidget)
 
 
 // ----------------------------------------------------------------------------
@@ -77,48 +74,13 @@ AdvRTTIDecls(TTextWidget,TBaseWidget)
 //  TBagOWidgets
 //      This is a convenience typedef for our collection template.
 // ----------------------------------------------------------------------------
-typedef TRefBag<TBaseWidget>   TBagOWidgets;
 
-
-// ----------------------------------------------------------------------------
-//  Local static data
-//
-//  rgbBlack
-//  rgbWhite
-//      Some convenience colors to use in our test.
-//
-//  strTestFile
-//      This is the name of the file that we use as the backing for the file
-//      stream that we test.
-// ----------------------------------------------------------------------------
-static const TRGBClr    rgbBlack(0,0,0);
-static const TRGBClr    rgbWhite(0xFF,0xFF,0xFF);
-static const TString    strTestFile(L"TestStreamFile.Dat");
 
 
 // ----------------------------------------------------------------------------
-//  Forward references
+//  For this simple demo, just start the program on a global function
 // ----------------------------------------------------------------------------
-tCIDLib::EExitCodes eMainThreadFunc
-(
-        TThread&            thrThis
-        , tCIDLib::TVoid*   pData
-);
-
-
-// ----------------------------------------------------------------------------
-//  Local data
-//
-//  conOut
-//      This is a console object which we use in this program for our standard
-//      output. Its a specialized text stream class.
-// ----------------------------------------------------------------------------
-static TOutConsole  conOut;
-
-
-// ----------------------------------------------------------------------------
-//  Do the magic main module code
-// ----------------------------------------------------------------------------
+tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"Streams4MainThread", eMainThreadFunc))
 
 
@@ -126,214 +88,86 @@ CIDLib_MainModule(TThread(L"Streams4MainThread", eMainThreadFunc))
 //  Local functions
 // ----------------------------------------------------------------------------
 
-//
-//  Since this program has no user interaction, we need to have some widgets
-//  to use, as though they were entered by a user in a real drawing program.
-//  So this guy just puts some widgets into the passed collection.
-//  RETURN: None
-//
-static tCIDLib::TVoid FillBag(TBagOWidgets& colWidgets)
-{
-    // A line from 10,10 to 100,100
-    colWidgets.Add(new TLineWidget(TPoint(10, 10), TPoint(100, 100)));
-
-    // An unfilled box from 50,50 to 64,92
-    colWidgets.Add(new TBoxWidget(TPoint(50,50), TPoint(64,92)));
-
-    // A line from 200,150 to 210,155
-    colWidgets.Add(new TLineWidget(TPoint(200, 150), TPoint(210, 155)));
-
-    // A text widet at 20, 40
-    colWidgets.Add(new TTextWidget(TPoint(20, 40), TString(L"The text")));
-
-    // A filled box from 500,50 to 525,100, white filled
-    colWidgets.Add(new TFilledBoxWidget(TPoint(500,500), TPoint(525,100), rgbWhite));
-
-    // A filled box from 50,100 to 55,110, black filled
-    colWidgets.Add(new TFilledBoxWidget(TPoint(50,100), TPoint(55,110), rgbBlack));
-
-    // A line from 320,480 to 20, 15
-    colWidgets.Add(new TLineWidget(TPoint(320, 480), TPoint(20, 15)));
-}
-
-
-// ----------------------------------------------------------------------------
-//  Local functions
-// ----------------------------------------------------------------------------
-
-//
-//  This is the the thread function for the main thread. It creates the file
-//  stream, streams out the objects 'drawing' them as it goes, then streams
-//  them back in and 'draws' them again. This should cause the exact same
-//  output as the originals.
-//
+// The entry point for this program
 tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 {
     // We have to let our calling thread go first
     thrThis.Sync();
 
-    //
-    //  Since this is a demo and partly a testing program, we'd like to
-    //  catch all exceptions cleanly and report them. So put the whole thing
-    //  in a try.
-    //
-    try
-    {
-        // Create our bag that we will use to hold the widgets
-        TBagOWidgets colWidgets(tCIDLib::EAdoptOpts::Adopt);
-
-        //
-        //  Open or create a file based binary stream to use as the test
-        //  stream. Check its size afterwards. If its zero sized, then
-        //  we just created it and need to fill it in.
-        //
-        TBinFileOutStream strmTestOut
-        (
-            strTestFile
-            , tCIDLib::ECreateActs::OpenOrCreate
-            , tCIDLib::EFilePerms::AllAccess
-            , tCIDLib::EFileFlags::SequentialScan
-        );
-
-        TBinFileInStream strmTestIn
-        (
-            strTestFile
-            , tCIDLib::ECreateActs::OpenIfExists
-            , tCIDLib::EFilePerms::AllAccess
-            , tCIDLib::EFileFlags::SequentialScan
-        );
-
-        // Create a poly streamer to stream out with
-        TPolyStreamer<TBaseWidget> pstmrTest(&strmTestIn, &strmTestOut);
-
-        // Create a cursor for our widget list
-        TBagOWidgets::TCursor cursWidgets(&colWidgets);
-        if (strmTestIn.c8CurSize() == 0)
-        {
-            //
-            //  Since we have no user interface, just call a function that will
-            //  fill in our bag of widgets with some test objects.
-            //
-            FillBag(colWidgets);
-
-            // Reset the cursor to get it back into sync
-            cursWidgets.bReset();
-
-            //
-            //  Now we can iterate the bag. We polymorphically stream each
-            //  widget element out. This uses a template method that understands
-            //  now to write out the correct type information with the object.
-            //
-            conOut  << kCIDLib::DNewLn << L"Writing and 'drawing' objects"
-                    << kCIDLib::EndLn;
-            for (; cursWidgets; ++cursWidgets)
-            {
-                pstmrTest.StreamOut(*cursWidgets);
-
-                // Tell the one we just wrote to 'draw' itself
-                cursWidgets->Draw(conOut);
-                conOut << kCIDLib::NewLn;
-            }
-
-            // Flush the console output
-            conOut << kCIDLib::FlushIt;
-
-            // Flush the collection now so the original objects are destroyed
-            colWidgets.RemoveAll();
-        }
-
-        //
-        //  Now we can stream in the elements that we written to the file.
-        //  Note that we don't need to know what order they were streamed
-        //  out because our polymorphic streaming system figures this out
-        //  for us.
-        //
-        while (!pstmrTest.bEndOfStream())
-        {
-            // A base widget pointer to read objects back into
-            TBaseWidget* pwidRead;
-
-            //
-            //  Now we use the polymorphic reading template function that
-            //  understands now to find out what the next object is, create
-            //  an object of that type using dynamic type creation, then
-            //  to stream into that object.
-            //
-            //  We get back a dynamically allocated object that can be put
-            //  into a counted pointer object and into the collection.
-            //
-            pwidRead = pstmrTest.pobjStreamIn();
-
-            // Put it into the collection
-            colWidgets.Add(pwidRead);
-        }
-
-        //
-        //  Now reset the cursor so we can iterate the collection again
-        //  and 'draw' the objects once more. The output should be exactly
-        //  the same as before.
-        //
-        //  Here again, sanity check and make sure that the reset call returns
-        //  true, which indicates that there are elements to be cursored.
-        //
-        if (!cursWidgets.bReset())
-        {
-            conOut  << L"Widget collection cursor reset returned false!\n"
-                    << kCIDLib::EndLn;
-            return tCIDLib::EExitCodes::FatalError;
-        }
-
-        //
-        //  We have the same number of elements so iterate them and 'draw'
-        //  each one. Note that, here again, the element is the counted
-        //  pointer, so we go the next level and get the object out of it
-        //  because that's what we want to call the Draw() method on.
-        //
-        conOut << kCIDLib::DNewLn << L"'Drawing' read in objects" << kCIDLib::NewLn;
-        for (; cursWidgets; ++cursWidgets)
-        {
-            cursWidgets->Draw(conOut);
-            conOut << kCIDLib::EndLn;
-        }
-    }
-
-    // Catch any CIDLib runtime errors
-    catch(TError& errToCatch)
-    {
-        // If this hasn't been logged already, then log it
-        if (!errToCatch.bLogged())
-        {
-            errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
-        }
-
-        conOut  << L"A CIDLib runtime error occured during processing.\n"
-                << L"Error: " << errToCatch.strErrText();
-        if (!errToCatch.strAuxText().bIsEmpty())
-            conOut << L", " << errToCatch.strAuxText();
-        conOut << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::RuntimeError;
-    }
+    // We need a console to 'draw' our widgets to
+     TOutConsole  conOut;
 
     //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my demo programs so I can catch them if they do
-    //  and fix them.
+    //  Create our bag that we will use to hold the widgets and load up some test
+    //  widgets into it. Tell it to adopt the widgets we put into it.
     //
-    catch(const TKrnlError& kerrToCatch)
+    using TBagOWidgets = TRefBag<TBaseWidget>;
+    TBagOWidgets colWidgets(tCIDLib::EAdoptOpts::Adopt);
+    colWidgets.Add(new TLineWidget(TPoint(10, 10), TPoint(100, 100)));
+    colWidgets.Add(new TLineWidget(TPoint(200, 150), TPoint(210, 155)));
+    colWidgets.Add(new TCircleWidget(TPoint(50,150), 25));
+    colWidgets.Add(new TFilledCircleWidget(TPoint(75,100), 80, TRGBClr(0,0,0)));
+    colWidgets.Add(new TLineWidget(TPoint(320, 480), TPoint(20, 15)));
+
+    //
+    //  Create a new binary output file stream, overwriting any previous
+    //  contents. Then create a linked binary input file stream over that.
+    //
+    const TString strTestFile(L"TestStreamFile.Dat");
+    TBinFileOutStream strmTestOut
+    (
+        strTestFile
+        , tCIDLib::ECreateActs::CreateAlways
+        , tCIDLib::EFilePerms::AllAccess
+        , tCIDLib::EFileFlags::SequentialScan
+    );
+
+    TBinFileInStream strmTestIn
+    (
+        strTestFile
+        , tCIDLib::ECreateActs::OpenIfExists
+        , tCIDLib::EFilePerms::AllAccess
+        , tCIDLib::EFileFlags::SequentialScan
+    );
+
+    // Create a poly streamer to stream out with
+    TPolyStreamer<TBaseWidget> pstmrTest(&strmTestIn, &strmTestOut);
+
+    // Loop through them streaming and 'drawing' each one
+    conOut  << kCIDLib::DNewLn
+            << L"Writing and 'drawing' objects" << kCIDLib::EndLn;
+
+    TBagOWidgets::TCursor cursWidgets(&colWidgets);
+    for (; cursWidgets; ++cursWidgets)
     {
-        conOut  << L"A kernel error occured during processing.\nError="
-                << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::FatalError;
+        pstmrTest.StreamOut(*cursWidgets);
+        cursWidgets->Draw(conOut);
+        conOut << kCIDLib::NewLn;
+    }
+    conOut << kCIDLib::EndLn;
+
+    // Flush the collection now so the original objects are destroyed
+    colWidgets.RemoveAll();
+
+    //
+    //  Now we can stream in the elements that we wrote to the file.
+    //  The poly streamer figures out what the objects are and creates
+    //  an object of that type for us to stream into. We then just add
+    //  them into the bag.
+    //
+    while (!pstmrTest.bEndOfStream())
+    {
+        colWidgets.Add(pstmrTest.pobjStreamIn());
     }
 
-    // Catch a general exception
-    catch(...)
+    // Now we can 'draw' them again and should get the same output
+    conOut << kCIDLib::DNewLn << L"'Drawing' read in objects" << kCIDLib::NewLn;
+    for (cursWidgets.bReset(); cursWidgets; ++cursWidgets)
     {
-        conOut  << L"A general exception occured during processing\n"
-                << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::SystemException;
+        cursWidgets->Draw(conOut);
+        conOut << kCIDLib::EndLn;
     }
+    conOut << kCIDLib::EndLn;
 
     return tCIDLib::EExitCodes::Normal;
 }

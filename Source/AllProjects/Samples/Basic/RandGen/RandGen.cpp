@@ -44,12 +44,10 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread&, tCIDLib::TVoid*);
 CIDLib_MainModule(TThread(L"RandGenMainThread", eMainThreadFunc))
 
 
-
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
 TOutConsole conOut;
-
 
 
 // ---------------------------------------------------------------------------
@@ -108,80 +106,42 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
              << L"CIDLib Random Number Generator"
              << kCIDLib::NewLn << kCIDLib::EndLn;
 
-    //
-    //  Since this is a demo and testing program, we'd like to catch
-    //  all exceptions cleanly and report them. So put the whole thing
-    //  in a try.
-    //
-    try
+    const tCIDLib::TCard4 c4ArgCount = TSysInfo::c4CmdLineParmCount();
+    if (c4ArgCount != 2)
     {
-        const tCIDLib::TCard4 c4ArgCount = TSysInfo::c4CmdLineParmCount();
-        if (c4ArgCount != 2)
-        {
-            ShowUsage();
-            return tCIDLib::EExitCodes::BadParameters;
-        }
-
-        //
-        //  Set up a random number generator. Generate a simple seed from the
-        //  current millis.
-        //
-        TRandomNum randOut;
-        randOut.Seed(TTime::c4Millis());
-
-        // Get the two parms out
-        const tCIDLib::TCard4 c4MinVal
-                        = TSysInfo::strCmdLineParmAt(0).c4Val(tCIDLib::ERadices::Dec);
-        const tCIDLib::TCard4 c4MaxVal
-                        = TSysInfo::strCmdLineParmAt(1).c4Val(tCIDLib::ERadices::Dec);
-
-        // Generate the random numbers
-        conOut << L"Generating random numbers:\n-----------------------" << kCIDLib::EndLn;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < 64; c4Index++)
-        {
-            tCIDLib::TCard4 c4Cur = c4GenNum(randOut, c4MinVal, c4MaxVal);
-            conOut << c4Cur << kCIDLib::chSpace;
-        }
-        conOut << kCIDLib::DNewLn;
-
-        // Generate the unique ids
-        TString strUID;
-        conOut << L"Generating unique ids:\n-----------------------" << kCIDLib::EndLn;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < 24; c4Index++)
-        {
-            TUniqueId::MakeId(strUID);
-            conOut << strUID << kCIDLib::NewLn;
-        }
-        conOut << kCIDLib::NewEndLn;
-    }
-
-    // Catch any CIDLib runtime errors
-    catch(const TError& errToCatch)
-    {
-        conOut <<  L"A CIDLib runtime error occured during processing. "
-                 <<  L"Error: " << errToCatch.strErrText() << kCIDLib::NewLn << kCIDLib::NewLn;
-        return tCIDLib::EExitCodes::FatalError;
+        ShowUsage();
+        return tCIDLib::EExitCodes::BadParameters;
     }
 
     //
-    //  Kernel errors should never propogate out of CIDLib, but I test
-    //  for them in my test programs so I can catch them if they do
-    //  and fix them.
+    //  Set up a random number generator. Generate a simple seed from the
+    //  current millis.
     //
-    catch(const TKrnlError& kerrToCatch)
-    {
-        conOut << L"A kernel error occured during processing.\n  Error="
-                 << kerrToCatch.errcId() << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::FatalError;
-    }
+    TRandomNum randOut;
+    randOut.Seed(TTime::c4Millis());
 
-    // Catch a general exception
-    catch(...)
+    // Get the two parms out
+    const tCIDLib::TCard4 c4MinVal
+                    = TSysInfo::strCmdLineParmAt(0).c4Val(tCIDLib::ERadices::Dec);
+    const tCIDLib::TCard4 c4MaxVal
+                    = TSysInfo::strCmdLineParmAt(1).c4Val(tCIDLib::ERadices::Dec);
+
+    // Generate the random numbers
+    conOut << L"Generating random numbers:\n-----------------------" << kCIDLib::EndLn;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 64; c4Index++)
     {
-        conOut << L"A general exception occured during processing"
-                 << kCIDLib::NewLn << kCIDLib::EndLn;
-        return tCIDLib::EExitCodes::SystemException;
+        tCIDLib::TCard4 c4Cur = c4GenNum(randOut, c4MinVal, c4MaxVal);
+        conOut << c4Cur << kCIDLib::chSpace;
     }
+    conOut << kCIDLib::DNewLn;
+
+    // Generate the unique ids
+    TString strUID;
+    conOut << L"Generating unique ids:\n-----------------------" << kCIDLib::EndLn;
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < 24; c4Index++)
+        conOut << TUniqueId::strMakeId() << kCIDLib::NewLn;
+    conOut << kCIDLib::NewEndLn;
+
     return tCIDLib::EExitCodes::Normal;
 }
 

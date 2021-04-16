@@ -42,34 +42,37 @@ AdvRTTIDecls(TLatin1Converter,TTextConverter)
 
 namespace CIDEncode_ISO8859_1
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  ac1Map
-    //      This is an array of flags that represent the valid ISO-8859-1 code
-    //      points. Since the Unicode code points for the valid 8859 points
-    //      are the same values. We can just look up a flag here and, if its
-    //      non-zero, the code point value is valid for both Unicode and 8859.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1 ac1Map[] =
+    namespace
     {
-          1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0 , 0 , 1 , 0 , 0
-        , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0
-        , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
-        , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-        , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
-    };
+        // -------------------------------------------------------------------
+        //  Local const data
+        //
+        //  ac1Map
+        //      This is an array of flags that represent the valid ISO-8859-1 code
+        //      points. Since the Unicode code points for the valid 8859 points
+        //      are the same values. We can just look up a flag here and, if its
+        //      non-zero, the code point value is valid for both Unicode and 8859.
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1 ac1Map[] =
+        {
+            1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0 , 0 , 1 , 0 , 0
+            , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0
+            , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
+            , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+            , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1
+        };
+    }
 }
 
 
@@ -81,30 +84,6 @@ TLatin1Converter::TLatin1Converter() :
 
     TTextConverter(L"ISO-8859-1")
 {
-}
-
-TLatin1Converter::TLatin1Converter(const TLatin1Converter& tcvtToCopy) :
-
-    TTextConverter(tcvtToCopy)
-{
-}
-
-TLatin1Converter::~TLatin1Converter()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TLatin1Converter: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TLatin1Converter&
-TLatin1Converter::operator=(const TLatin1Converter& tcvtToAssign)
-{
-    if (this == &tcvtToAssign)
-        return *this;
-
-    TParent::operator=(tcvtToAssign);
-    return *this;
 }
 
 
@@ -129,7 +108,7 @@ TLatin1Converter::c4BlockFrom(  const   tCIDLib::TCard1* const  pc1Src
                                 ,       tCIDLib::TBoolean&      bStop)
 {
     const tCIDLib::TCh          chRep = chRepChar();
-    const tCIDLib::ETCvtActions eAct = eErrorAction();
+    const tCIDLib::ETCvtActs    eAct = eErrorAction();
     bStop = kCIDLib::False;
 
     //
@@ -160,13 +139,13 @@ TLatin1Converter::c4BlockFrom(  const   tCIDLib::TCard1* const  pc1Src
             continue;
         }
 
-        if ((eAct == tCIDLib::ETCvtActions::StopThenThrow) && c4Index)
+        if ((eAct == tCIDLib::ETCvtActs::StopThenThrow) && c4Index)
         {
             bStop = kCIDLib::True;
             break;
         }
 
-        if (eAct == tCIDLib::ETCvtActions::Replace)
+        if (eAct == tCIDLib::ETCvtActs::Replace)
         {
             pszToFill[c4Index] = chRep;
         }
@@ -231,7 +210,7 @@ TLatin1Converter::c4BlockTo(const   tCIDLib::TCh* const     pszSrc
             }
         }
 
-        if ((eErrorAction() == tCIDLib::ETCvtActions::StopThenThrow) && c4Index)
+        if ((eErrorAction() == tCIDLib::ETCvtActs::StopThenThrow) && c4Index)
         {
             bStop = kCIDLib::True;
             break;

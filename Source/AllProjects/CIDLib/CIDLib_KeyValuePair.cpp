@@ -51,8 +51,11 @@ RTTIDecls(TKeyValues,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_KeyValuePair
 {
-    // The persistent format version for the key/value/flag class
-    const tCIDLib::TCard1       c1KVPFFmtVersion = 1;
+    namespace
+    {
+        // The persistent format version for the key/value/flag class
+        constexpr tCIDLib::TCard1       c1KVPFFmtVersion = 1;
+    }
 }
 
 
@@ -281,7 +284,7 @@ tCIDLib::TVoid TKeyValuePair::Set(  const   TString&    strNewKey
 // ---------------------------------------------------------------------------
 //  TKeyValuePair: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKeyValuePair::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TKeyValuePair::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     strmDest << L"{" << m_strKey << L"," << m_strValue << L"}";
 }
@@ -569,7 +572,7 @@ TKeyNumPair::Set(const  TString&            strNewKey
 // ---------------------------------------------------------------------------
 //  TKeyNumPair: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKeyNumPair::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TKeyNumPair::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     strmDest << L"{"
              << m_strKey << L"," << m_f4Value;
@@ -810,7 +813,7 @@ tCIDLib::TVoid TKeyValues::Set( const   tCIDLib::TCh* const pszNewKey
 // ---------------------------------------------------------------------------
 //  TKeyValues: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TKeyValues::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TKeyValues::FormatTo(CIOP TTextOutStream& strmDest) const
 {
     strmDest    << L"{"
                 << m_strKey << L" - "

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TColCursor" Prefix="curs" Parent="TCursorBase" Flags="Template">
+
+    <Desc>
+        <P>TColCursor is the next step up from <ClassRef Ref="TCursorBase"/>, our parent class. TCursorBase is not a template, so it can't define any of the cursor interface that depend son knowing the collection element type. This class is still abstract, but it is a template and can provide the rest of the cursor interface, least for uni-directional cursors. There is another class, <ClassRef Ref="TBiCursor"/> derived from this one that is the base class for bi-directional cursors.</P>
+
+        <P>Note also that only const access is provided to the element here. Each collection will create a derivative of this either this or the bi-directional derivative which provides non-const access as well.</P>
+    </Desc>
+
+    <TmplParams><TmplParam Name="TElem"/></TmplParams>
+
+    <PubIntf>
+        <Ctors DefMethods="Dtor"/>
+
+        <Operators>
+
+            <Method Name="operator tCIDLib::TBoolean" Attrs="Const Explicit" RetBy="None">
+                <Desc>A simple wrapper around the base class' bIsValid() method. This makes it easy and convenient to test the cursor in places where a boolean is expected.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="operator!" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Sort of the opposite of the boolean conversion operator above. This will call the underlying class' bIsValid() method and negate the return value.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="operator->" Attrs="Const" RetType="TElem" RetBy="CPtr">
+                <Desc>If this cursors is valid, this dereferences it and returns a const pointer to the current element. Use this to invoke operations on the current element.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="operator*" Attrs="Const" RetType="TElem" RetBy="CRef">
+                <Desc>If this cursors is valid, this dereferences it and returns a const reference to the current element. You can use this to pass the cursor to something that expects a const reference to the element type.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="operator==" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>If the base class reports equality, then this guy will compare the collections associated with this cursor and the source. If they are the same object, it returns kCIDLib::True. We can't compare the actual current element at this level.</Desc>
+                <MethVar><MethParam Name="cursSrc" Type="TColCursor" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator!=" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Calls the equality operator above and negates his return.</Desc>
+                <MethVar><MethParam Name="cursSrc" Type="TColCursor" PBy="CRef"/></MethVar>
+            </Method>
+
+            <Method Name="operator++" Attrs="Const" RetType="TColCursor" RetBy="Ref">
+                <Desc>
+                    <P>A convenient wrapper around bNext(), which in this case does a pre-increment. It calls bNext(), and then returns a ref to ourself that is now on the next element (or invalid if we have hit the end.) Post-increment must be provided at the derived levels since it has to return a copy of itself.</P>
+
+                    <Note>It is not an error to call this when already at the end. It just does nothing. You should be checking the validity as you iterator, to know when you hit the end.</Note>
+                </Desc>
+                <MethVar/>
+            </Method>
+
+        </Operators>
+
+        <VirtMeths>
+
+            <Method Name="objRCur" Attrs="Const Pure" RetType="TElem" RetBy="CRef">
+                <Desc>This is a method that must be overridden by one of the concrete derivatives, to provide const access to the current element. All of our other operators and methods at this level that access the current element do so by calling this. You can call it yourself as well, though using the operators above is generally more convenient.</Desc>
+                <MethVar/>
+            </Method>
+
+        </VirtMeths>
+
+        <OverMeths>
+
+            <Desc>Since we now have the actual collection, at least through the base collection interface, we can override these methods, ask the collection, and return its reply.</Desc>
+
+            <Method Name="bIsEmpty" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns whether the associated collection is empty or not. If the collection is not set, this is not an error, this just returns kCIDLib::True to indicate it is empty.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="bIsValid" Attrs="Const" RetType="tCIDLib::TBoolean">
+                <Desc>Returns whether this collection is valid or not. If not collection is set on us, then the return is kCIDLib::False. Otherwise, we return whether our serial number still matches the one of the collectoin we are associated with.</Desc>
+                <MethVar/>
+            </Method>
+
+            <Method Name="c4ElemCount" Attrs="Const" RetType="tCIDLib::TCard4">
+                <Desc>If this cursor is not associated with a collection yet, then this will throw an exception. Else it asks the collection for its element count and passes that back.</Desc>
+                <MethVar/>
+            </Method>
+
+        </OverMeths>
+
+
+        <NVirtMeths>
+
+            <Method Name="bIsCursoring" Attrs="Const" RetType="tCIDLib::TBoolean" >
+                <Desc>Returns kCIDLib::True if the passed collection is the one that this cursor is associated with.</Desc>
+                <MethVar><MethParam Name="colToCheck" Type="TCollectBase" PBy="CRef"/></MethVar>
+            </Method>
+
+        </NVirtMeths>
+
+    </PubIntf>
+
+    <ProtIntf>
+
+    </ProtIntf>
+
+</CppClass>

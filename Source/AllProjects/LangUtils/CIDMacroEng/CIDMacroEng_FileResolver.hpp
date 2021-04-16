@@ -100,6 +100,12 @@ class CIDMACROENGEXP TMEngFixedBaseFileResolver
             const   TString&                strBasePath
         );
 
+        TMEngFixedBaseFileResolver
+        (
+            const   TString&                strBasePath
+            , const TString&                strSubDir
+        );
+
         TMEngFixedBaseFileResolver(const TMEngFixedBaseFileResolver&) = delete;
 
         ~TMEngFixedBaseFileResolver();

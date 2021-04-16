@@ -16,7 +16,7 @@
 // DESCRIPTION:
 //
 //  This is the main (only) module of the SockPing demo program. This program
-//  demonstrates the SockPinger class, which implements the standard ICMP
+//  demonstrates the SockPinger class, which implements the standard ICMP/ICMP6
 //  ping protocol. You just provide a target host.
 //
 //

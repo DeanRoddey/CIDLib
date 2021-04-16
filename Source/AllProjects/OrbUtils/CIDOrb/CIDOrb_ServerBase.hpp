@@ -36,6 +36,8 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TOrbSrvEnteredJan;
+
 // ---------------------------------------------------------------------------
 //   CLASS: TOrbServerBase
 //  PREFIX: orbs
@@ -44,33 +46,41 @@ class CIDORBEXP TOrbServerBase : public TObject
 {
     public :
         // -------------------------------------------------------------------
+        //  Public static methods
+        // -------------------------------------------------------------------
+        static tCIDLib::TBoolean bIsInitialized();
+
+
+        // -------------------------------------------------------------------
         //  Public destructor
         // -------------------------------------------------------------------
         TOrbServerBase() = delete;
 
         TOrbServerBase(const TOrbServerBase&) = delete;
+        TOrbServerBase(TOrbServerBase&&) = delete;
 
-        ~TOrbServerBase();
+        ~TOrbServerBase() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TOrbServerBase& operator=(const TOrbServerBase&) = delete;
+        TOrbServerBase& operator=(TOrbServerBase&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCleanup() const;
+        tCIDLib::TBoolean bCleanup() const
+        {
+            return m_bCleanup;
+        }
 
-        tCIDLib::TCard4 c4DecEnteredCount();
-
-        tCIDLib::TCard4 c4EnteredCount() const;
-
-        tCIDLib::TCard4 c4IncEnteredCount();
-
-        const TOrbObjId& ooidThis() const;
+        const TOrbObjId& ooidThis() const
+        {
+            return m_ooidThis;
+        }
 
 
     protected :
@@ -78,6 +88,7 @@ class CIDORBEXP TOrbServerBase : public TObject
         //  Declare our friends
         // -------------------------------------------------------------------
         friend class TFacCIDOrb;
+        friend class TOrbSrvEnteredJan;
 
 
         // -------------------------------------------------------------------
@@ -112,7 +123,27 @@ class CIDORBEXP TOrbServerBase : public TObject
         // --------------------------------------------------------------------
         //  Protected, non-virtual methods
         // --------------------------------------------------------------------
-        tCIDLib::TVoid SetCleanupFlag();
+        tCIDLib::TCard4 c4DecEnteredCount()
+        {
+            // We want to return the post-dec count so use prefix
+            return --m_scntEntered;
+        }
+
+        tCIDLib::TCard4 c4EnteredCount() const
+        {
+            return m_scntEntered.c4Value();
+        }
+
+        tCIDLib::TCard4 c4IncEnteredCount()
+        {
+            // We want to return the post-inc count so use prefix
+            return ++m_scntEntered;
+        }
+
+        tCIDLib::TVoid SetCleanupFlag()
+        {
+            m_bCleanup = kCIDLib::True;
+        }
 
 
     private :
@@ -128,23 +159,21 @@ class CIDORBEXP TOrbServerBase : public TObject
         //  Private data members
         //
         //  m_bCleanup
-        //      This is settable by the ORB as a hint to threads that might
-        //      be in the object that it's time to give up and get out so that
-        //      the object can be cleaned up.
+        //      This is settable by the ORB as a hint to threads that might be in the
+        //      object that it's time to give up and get out so that the object can be
+        //      cleaned up.
         //
         //  m_ooidThis
-        //      This is our object id. It uniquely identifies this object
-        //      instance, what interface it implements, and where it lives.
+        //      This is our object id. It uniquely identifies this object instance, and
+        //      indicates what interface it implements, and where it lives.
         //
-        //      It also contains the key that is used to store this object
-        //      in a hash table on the server side, and which is used to
-        //      vector incoming calls to it.
+        //      It also contains the key that is used to store this object in a hash
+        //      table on the server side, and which is used to vector incoming calls to it.
         //
         //  m_scntEntered
-        //      We have to know if threads are in a particular object so that
-        //      when removing objects we can wait for them to exit the object
-        //      before we kill it. The TOrbSrvEnteredJan class will inc/dec
-        //      this for us.
+        //      We have to know if threads are in a particular object so that when removing
+        //      objects we can wait for them to exit the object before we kill it. The
+        //      TOrbSrvEnteredJan class will inc/dec this for us.
         // -------------------------------------------------------------------
         tCIDLib::TBoolean   m_bCleanup;
         TOrbObjId           m_ooidThis;
@@ -168,6 +197,8 @@ class TOrbSrvEnteredJan
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TOrbSrvEnteredJan() = delete;
+
         TOrbSrvEnteredJan(TOrbServerBase* const porbsEntered) :
 
             m_porbsEntered(porbsEntered)
@@ -176,6 +207,7 @@ class TOrbSrvEnteredJan
         }
 
         TOrbSrvEnteredJan(const TOrbSrvEnteredJan&) = delete;
+        TOrbSrvEnteredJan(TOrbSrvEnteredJan&&) = delete;
 
         ~TOrbSrvEnteredJan()
         {
@@ -187,6 +219,7 @@ class TOrbSrvEnteredJan
         //  Public operators
         // -------------------------------------------------------------------
         TOrbSrvEnteredJan& operator=(const TOrbSrvEnteredJan&) = delete;
+        TOrbSrvEnteredJan& operator=(TOrbSrvEnteredJan&&) = delete;
 
 
     private :

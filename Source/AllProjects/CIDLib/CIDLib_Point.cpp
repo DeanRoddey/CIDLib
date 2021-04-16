@@ -55,28 +55,22 @@ const TPoint TPoint::pntOrigin(0, 0);
 // ---------------------------------------------------------------------------
 TPoint& TPoint::Nul_TPoint()
 {
-    static TPoint* ppntNull = nullptr;
-    if (!ppntNull)
-    {
-        TBaseLock lockInit;
-        if (!ppntNull)
-            TRawMem::pExchangePtr(&ppntNull, new TPoint);
-    }
-    return *ppntNull;
+    static TPoint pntNull;
+    return pntNull;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TPoint: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TPoint::TPoint(const tCIDLib::THostPoint& ptSrc) :
+TPoint::TPoint(const tCIDLib::THostPoint& ptSrc) noexcept :
 
     m_i4X(ptSrc.i4X)
     , m_i4Y(ptSrc.i4Y)
 {
 }
 
-TPoint::TPoint(const tCIDLib::TRawPoint& ptSrc) :
+TPoint::TPoint(const tCIDLib::TRawPoint& ptSrc) noexcept :
 
     m_i4X(ptSrc.i4X)
     , m_i4Y(ptSrc.i4Y)
@@ -211,19 +205,16 @@ TPoint::bParseFromText( const   TString&            strText
     strTmp.Append(kCIDLib::chSpace);
     TStringTokenizer stokParse(&strText, strTmp);
 
-    tCIDLib::TBoolean bOk;
-    tCIDLib::TInt4 i4X;
-    tCIDLib::TInt4 i4Y;
-
+    tCIDLib::TBoolean bOk = kCIDLib::False;
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
@@ -241,8 +232,8 @@ TPoint::bParseFromText( const   TString&            strText
 //
 tCIDLib::TCard4 TPoint::c4AbsDiff(const TPoint& pntOther) const
 {
-    tCIDLib::TInt4 i4XDiff;
-    tCIDLib::TInt4 i4YDiff;
+    tCIDLib::TInt4 i4XDiff = 0;
+    tCIDLib::TInt4 i4YDiff = 0;
 
     if (m_i4X > pntOther.m_i4X)
         i4XDiff = m_i4X - pntOther.m_i4X;

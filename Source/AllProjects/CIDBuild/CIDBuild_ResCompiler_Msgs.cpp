@@ -100,7 +100,8 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
         //  If this is a backslash character, then we need to see if its
         //  one of the standard escape sequences and translate it into a
         //  single, binary control character. If not, just put out the
-        //  slash itself.
+        //  slash itself (which may be an end of line continuation that will
+        //  be dealt with upon return.)
         //
         if (chNext == L'\\')
         {
@@ -116,13 +117,16 @@ TResCompiler::bMassageMsgText(  const   TBldStr&        strOriginal
             else
                 chActual = L'\\';
 
-            strToFill.AppendCh(chActual);
-            c4SrcIndex++;
+            strToFill.Append(chActual);
+
+            // If it was an escape sequence we ate another one
+            if (chActual != L'\\')
+                c4SrcIndex++;
         }
          else
         {
             // Nothing special, just put it in the string
-            strToFill.AppendCh(chNext);
+            strToFill.Append(chNext);
         }
     }
     return kCIDLib::True;
@@ -541,7 +545,7 @@ TIdInfo* TResCompiler::pidiProcessMsg(          TBldStr&        strFirstLine
 
     // Make sure the id is legal
     tCIDLib::TCard4 c4Id;
-    if (!TRawStr::bXlatCard4(strId.pszBuffer(), c4Id, 0))
+    if (!TRawStr::bXlatCard4(strId.pszBuffer(), c4Id))
     {
         stdOut  << L"(Line " << m_plsplInput->c4CurLine()
                 << L") Id field was not a valid number"
@@ -636,7 +640,7 @@ tCIDLib::TVoid TResCompiler::WriteMsgHeaders()
 
                 if (idiCur.eType() == TIdInfo::ETypes::Msg)
                 {
-                    tflMsgHpp   << "    const tCIDLib::TMsgId "
+                    tflMsgHpp   << "    constexpr tCIDLib::TMsgId "
                                 << idiCur.strName().pszBuffer()
                                 << " = "
                                 << strIdFmt
@@ -644,7 +648,7 @@ tCIDLib::TVoid TResCompiler::WriteMsgHeaders()
                 }
                  else
                 {
-                    tflErrHpp   << "    const tCIDLib::TErrCode "
+                    tflErrHpp   << "    constexpr tCIDLib::TErrCode "
                                 << idiCur.strName().pszBuffer()
                                 << " = "
                                 << strIdFmt

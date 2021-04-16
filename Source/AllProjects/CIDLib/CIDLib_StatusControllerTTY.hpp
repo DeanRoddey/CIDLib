@@ -74,23 +74,23 @@ class CIDLIBEXP TStatusControllerTTY : public TStatusController
         tCIDLib::TVoid Starting
         (
             const   TString&                strStartText
-        );
+        )   final;
 
         tCIDLib::TVoid WaitForComplete
         (
             const   tCIDLib::TCard4         c4MilliSecs
-        );
+        )   final;
 
         tCIDLib::TVoid Working
         (
             const    TString&               strStatusText
             , const     tCIDLib::TCard4     c4PercentComplete
-        );
+        )   final;
 
         tCIDLib::TVoid WorkComplete
         (
             const   TString&                strClosingComment
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------

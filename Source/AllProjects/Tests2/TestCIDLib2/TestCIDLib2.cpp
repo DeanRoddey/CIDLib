@@ -72,19 +72,30 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     //  we'd want to test them, so that within a given test level they will
     //  be seen in this order.
     //
+    AddTest(new TTest_StringTokens);
 
     // The most fundamental stuff
     AddTest(new TTest_Types);
+    AddTest(new TTest_RawBits);
+    AddTest(new TTest_Atomics);
     AddTest(new TTest_SafeCnt1);
+    AddTest(new TTest_FlagJanitor);
+    AddTest(new TTest_LambdaJan);
+    AddTest(new TTest_Enum1);
+    AddTest(new TTest_MetaProg1);
+    AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_MemberPtr1);
     AddTest(new TTest_CntPtr1);
     AddTest(new TTest_UniquePtr);
-    AddTest(new TTest_FlagJanitor);
-    AddTest(new TTest_Enum1);
-    AddTest(new TTest_EnumForEach);
+    AddTest(new TTest_WeakPtr1);
+    AddTest(new TTest_WeakPtr2);
+    AddTest(new TTest_ObjLocker1);
 
     AddTest(new TTest_String1);
     AddTest(new TTest_String2);
     AddTest(new TTest_String3);
+    AddTest(new TTest_StringTokens);
+    AddTest(new TTest_StringTokenRep);
     AddTest(new TTest_StringMove);
     AddTest(new TTest_StringCat);
 
@@ -105,6 +116,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_Time2);
     AddTest(new TTest_Time3);
     AddTest(new TTest_Time4);
+    AddTest(new TTest_Time5);
     AddTest(new TTest_Base641);
     AddTest(new TTest_BitSeq1);
     AddTest(new TTest_BitSeq2);
@@ -112,17 +124,26 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_Bitset1);
 
     // Fundamental collection tests
+    AddTest(new TTest_FundArrayMove);
     AddTest(new TTest_FundVectorLambda);
 
     // Collection tests
     AddTest(new TTest_ObjArrayLambda);
     AddTest(new TTest_ObjArrayMoveSem);
+    AddTest(new TTest_RefVectorBasic);
     AddTest(new TTest_RefVectorLambda);
     AddTest(new TTest_RefVectorMoveItem);
     // AddTest(new TTest_RefVectorMoveSem);
+    AddTest(new TTest_VectorBasic);
     AddTest(new TTest_VectorLambda);
     AddTest(new TTest_VectorMoveSem);
+    AddTest(new TTest_VectorPlace);
     AddTest(new TTest_DequeMoveSem);
+    AddTest(new TTest_DequePlace);
+    AddTest(new TTest_HashSetMove);
+    AddTest(new TTest_HashSetPlace);
+    AddTest(new TTest_BagMove);
+    AddTest(new TTest_BagPlace);
     AddTest(new TTest_ColAlgo1);
 
     AddTest(new TTest_ColCursors);
@@ -134,31 +155,36 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_SimplePool);
     AddTest(new TTest_SimplePoolPtr);
     AddTest(new TTest_FixedSizePool);
+    AddTest(new TTest_FixedSizePoolPtr);
 
     // Higher level stuff
     AddTest(new TTest_GenCache1);
     AddTest(new TTest_GenCache2);
     AddTest(new TTest_GenCache3);
 
-    // Test out streams first then input, which are linked to outputs
-    AddTest(new TTest_ChunkedBinOutStream);
-    AddTest(new TTest_ChunkedTextOutStream);
-    AddTest(new TTest_ChunkedBinInStream);
-    AddTest(new TTest_ChunkedTextInStream);
+    // Stream related tests
+    AddTest(new TTest_MBufBinStream);
+    AddTest(new TTest_ChunkedBinStream);
+    AddTest(new TTest_ChunkedTextStream);
 
     // Cicular buffer
     AddTest(new TTest_CircularBuf);
 
-    // High level tests that can gen up some threads
+    // Directory change monitoring
+    AddTest(new TTest_DirChange1);
+
+    //
+    //  High level tests that can gen up some threads and take a while
+    //
+
+    // Some threaded tests of variosu synchronized bits
     AddTest(new TTest_CntPtr2);
+    AddTest(new TTest_WeakPtr3);
     AddTest(new TTest_SafeCnt2);
 
     // Publish/subscribe
     AddTest(new TTest_PubSub1);
     AddTest(new TTest_PubSubVector);
-
-    // Directory change monitoring
-    AddTest(new TTest_DirChange1);
 }
 
 tCIDLib::TVoid TCIDLibTestApp::PostTest(const TTestFWTest&)

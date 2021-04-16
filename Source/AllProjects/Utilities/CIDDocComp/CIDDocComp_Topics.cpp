@@ -99,7 +99,7 @@ tCIDLib::TVoid TTopic::Parse()
 
     // It parsed OK, so get the root node and let's start pulling our info out
     const TXMLTreeElement& xtnodeRoot = facCIDDocComp.xtnodeRoot();
-    m_strTopicPage = xtnodeRoot.xtattrNamed(L"TopicPage").strValue();
+    m_strTopicPage = xtnodeRoot.strAttr(L"TopicPage");
 
     // Parse the pages and add those to the list of pages for this topic
     tCIDLib::TCard4 c4At;
@@ -188,6 +188,14 @@ tCIDLib::TVoid TTopic::Parse()
 
                 // Also add it to the main 'by name' list of the facility
                 facCIDDocComp.AddClass(ppgNew);
+            }
+             else if (eType == tCIDDocComp::EPageTypes::Namespace)
+            {
+                TNamespacePage* ppgNew = new TNamespacePage
+                (
+                    strExtTitle, m_pathSource, m_strTopicPath, strFileName
+                );
+                m_colPages.objAdd(TPagePtr(ppgNew));
             }
              else
             {

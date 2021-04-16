@@ -48,87 +48,97 @@ class CIDXMLEXP TDTDValidator : public TXMLValidator
         TDTDValidator
         (
                     TXMLParserCore* const   pxprsOwner
-            ,       MXMLDTDEvents* const    pmxevToUse = 0
+            ,       MXMLDTDEvents* const    pmxevToUse = nullptr
         );
+
+        TDTDValidator(const TDTDValidator&) = delete;
+        TDTDValidator(TDTDValidator&&) = delete;
 
         ~TDTDValidator();
 
 
         // -------------------------------------------------------------------
+        //  Unimplemented constructors and operators
+        // -------------------------------------------------------------------
+        TDTDValidator& operator=(const TDTDValidator&) = delete;
+        TDTDValidator& operator=(TDTDValidator&&) = delete;
+
+
+        // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bCanParseDTD() const;
+        tCIDLib::TBoolean bCanParseDTD() const final;
 
         tCIDLib::TBoolean bIsValidRoot
         (
             const   TXMLElemDecl&           xdeclToTest
-        );
+        )   final;
 
         tCIDLib::TBoolean bValidateAttr
         (
             const   TXMLAttrDef&            xadToTest
             , const TString&                strValue
-        );
+        )   final;
 
         tCIDLib::TBoolean bValidateContent
         (
             const   TXMLElemDecl&           xdeclParent
             , const tCIDLib::TCard4* const  pc4Children
             , const tCIDLib::TCard4         c4ChildCount
-        );
+        )   final;
 
         TXMLElemDecl* pxdeclFindElemById
         (
             const   tCIDLib::TCard4         c4Id
-        );
+        )   final;
 
         const TXMLElemDecl* pxdeclFindElemById
         (
             const   tCIDLib::TCard4         c4Id
-        )   const;
+        )   const final;
 
         TXMLElemDecl* pxdeclFindElemByName
         (
             const   TString&                strQName
             , const tCIDXML::EPoolOpts      eOpt
             ,       tCIDLib::TBoolean&      bAdded
-        );
+        )   final;
 
         const TXMLElemDecl* pxdeclFindElemByName
         (
             const   TString&                strQName
             , const tCIDXML::EPoolOpts      eOpt
             ,       tCIDLib::TBoolean&      bAdded
-        )   const;
+        )   const final;
 
         TXMLEntityDecl* pxdeclFindEntityByName
         (
             const   TString&                strName
-        );
-
-        TXMLNotationDecl* pxdeclFindNotationByName
-        (
-            const   TString&                strName
-        );
+        )   final;
 
         tCIDLib::TVoid ParseDefExtSS
         (
             const   TString&                strRootElem
-        );
+        )   final;
 
         tCIDLib::TVoid ParseDTD
         (
             const   tCIDLib::TBoolean       bIgnoreDTD
-        );
+        )   final;
 
-        tCIDLib::TVoid ParseDTDDecl();
+        tCIDLib::TVoid ParseDTDDecl() final;
 
-        tCIDLib::TVoid Reset();
+        tCIDLib::TVoid Reset() final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
+        TXMLNotationDecl* pxdeclFindNotationByName
+        (
+            const   TString&                strName
+        );
+
         MXMLDTDEvents* pmxevDTDEventHandler() const;
 
         MXMLDTDEvents* pmxevDTDEventHandler
@@ -138,13 +148,6 @@ class CIDXMLEXP TDTDValidator : public TXMLValidator
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TDTDValidator(const TDTDValidator&);
-        tCIDLib::TVoid operator=(const TDTDValidator&);
-
-
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         //

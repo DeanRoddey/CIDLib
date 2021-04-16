@@ -36,10 +36,6 @@
 //
 #pragma once
 
-
-#if !defined(CIDKERNEL_REMMEDIA_HPP)
-#define CIDKERNEL_REMMEDIA_HPP 1
-
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 //
@@ -72,16 +68,16 @@ namespace TKrnlRemMedia
     #pragma CIDLIB_POPPACK
 
     // Number of LBA blocks per second
-    const tCIDLib::TCard4 c4CDBlksPerSec = 75;
+    constexpr tCIDLib::TCard4 c4CDBlksPerSec = 75;
 
     // Number of bytes in a raw sector
-    const tCIDLib::TCard4 c4CDRawSectorSz = 2352;
+    constexpr tCIDLib::TCard4 c4CDRawSectorSz = 2352;
 
     // Number of bytes in a cookied sector
-    const tCIDLib::TCard4 c4CDCookedSectorSz = 2048;
+    constexpr tCIDLib::TCard4 c4CDCookedSectorSz = 2048;
 
     // Max chars we'll store for a drive id
-    const tCIDLib::TCard4 c4MaxDriveIdLen = 64;
+    constexpr tCIDLib::TCard4 c4MaxDriveIdLen = 64;
 
 
     // -----------------------------------------------------------------------
@@ -127,6 +123,12 @@ namespace TKrnlRemMedia
 class KRNLEXPORT TKrnlRemMediaDrv
 {
     public :
+        // -------------------------------------------------------------------
+        //  Forward ref our per-platform data structure, which is opaque publically
+        // -------------------------------------------------------------------
+        struct TPlatData;
+
+
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -197,7 +199,6 @@ class KRNLEXPORT TKrnlRemMediaDrv
         const tCIDLib::TCh* pszDrivePath() const;
 
 
-
     private :
         // -------------------------------------------------------------------
         //  Private data members
@@ -215,7 +216,7 @@ class KRNLEXPORT TKrnlRemMediaDrv
         //      to the user to identify the drive.
         // -------------------------------------------------------------------
         tCIDLib::TCard4 m_c4DriveNum;
-        tCIDLib::TVoid* m_pPlatData;
+        TPlatData*      m_pPlatData;
         tCIDLib::TCh    m_szDriveId[TKrnlRemMedia::c4MaxDriveIdLen + 1];
 };
 
@@ -235,10 +236,10 @@ namespace TKrnlRemMedia
     (
         const   TKrnlRemMedia::TCDTOCInfo& SrcTOC
         , const tCIDLib::TCard4         c4TrackNum
-        ,       tCIDLib::TCard4&        c4StartBlock
-        ,       tCIDLib::TCard4&        c4BlockCnt
-        ,       tCIDLib::TCard4&        c4Minutes
-        ,       tCIDLib::TCard4&        c4Seconds
+        , COP   tCIDLib::TCard4&        c4StartBlock
+        , COP   tCIDLib::TCard4&        c4BlockCnt
+        , COP   tCIDLib::TCard4&        c4Minutes
+        , COP   tCIDLib::TCard4&        c4Seconds
     );
 
     KRNLEXPORT tCIDLib::TBoolean bIsBDType
@@ -278,7 +279,5 @@ namespace TKrnlRemMedia
 }
 
 #pragma CIDLIB_POPPACK
-
-#endif
 
 

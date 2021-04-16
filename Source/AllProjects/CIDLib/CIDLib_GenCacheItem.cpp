@@ -25,7 +25,7 @@
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
-#include    "CIDLib.hpp"
+#include    "CIDLib_.hpp"
 
 
 
@@ -128,6 +128,8 @@ TCIDGenCacheItem::TCIDGenCacheItem(const TCIDGenCacheItem& cciSrc) :
     , m_enctStamp(cciSrc.m_enctStamp)
     , m_strName(cciSrc.m_strName)
 {
+    // Copy over the useful bytes
+    m_mbufData.CopyIn(cciSrc.m_mbufData, m_c4Bytes);
 }
 
 TCIDGenCacheItem::~TCIDGenCacheItem()
@@ -138,7 +140,7 @@ TCIDGenCacheItem::~TCIDGenCacheItem()
 // ---------------------------------------------------------------------------
 //  TCIDGenCacheItem: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
+TCIDGenCacheItem& TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
 {
     if (this != &cciSrc)
     {
@@ -149,6 +151,7 @@ tCIDLib::TVoid TCIDGenCacheItem::operator=(const TCIDGenCacheItem& cciSrc)
         // Copy over the useful bytes
         m_mbufData.CopyIn(cciSrc.m_mbufData, m_c4Bytes);
     }
+    return *this;
 }
 
 
@@ -240,12 +243,19 @@ const TString& TCIDGenCacheItem::strName() const
 
 // Set new data on the cache item
 tCIDLib::TVoid
-TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, const TMemBuf& mbufToSet)
+TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, const TMemBuf& mbufSrc)
 {
     if (m_mbufData.c4Size() < c4Bytes)
         m_mbufData.Reallocate(c4Bytes, kCIDLib::False);
-    m_mbufData.CopyIn(mbufToSet, c4Bytes);
+    m_mbufData.CopyIn(mbufSrc, c4Bytes);
 
+    m_c4Bytes = c4Bytes;
+}
+
+tCIDLib::TVoid
+TCIDGenCacheItem::SetData(const tCIDLib::TCard4 c4Bytes, THeapBuf&& mbufSrc)
+{
+    m_mbufData = tCIDLib::ForceMove(mbufSrc);
     m_c4Bytes = c4Bytes;
 }
 
@@ -267,10 +277,9 @@ tCIDLib::TVoid TCIDGenCacheItem::UpdateTimeStamp(const tCIDLib::TCard4 c4SecsFro
 // Generate a semi-random starting serial number
 tCIDLib::TCard4 TCIDGenCacheItem::c4GenInitSerialNum()
 {
-    tCIDLib::TCard4 c4Ret = tCIDLib::TCard4(TTime::enctNow() & 0xFFFFFFFF);
+    tCIDLib::TCard4 c4Ret = TRawBits::c4Low32From64(TTime::enctNow());
     if (!c4Ret)
         c4Ret++;
 
     return c4Ret;
 }
-

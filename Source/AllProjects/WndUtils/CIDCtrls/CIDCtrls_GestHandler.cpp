@@ -43,10 +43,10 @@ namespace CIDCtrls_CIDGestureEng
     //  really a gesture.
     // -----------------------------------------------------------------------
     #if CID_DEBUG_ON
-//    const tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOneSecond * 60);
-    const tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOnePtFiveSec);
+    // const tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOneSecond * 60);
+    constexpr tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOnePtFiveSec);
     #else
-    const tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOnePtFiveSec);
+    constexpr tCIDLib::TEncodedTime enctMaxTime(kCIDLib::enctOnePtFiveSec);
     #endif
 
 
@@ -54,7 +54,7 @@ namespace CIDCtrls_CIDGestureEng
     //  Some global init stuff that we will check for once upon the first init
     //  of a gesture engine.
     // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bGlobalInitDone = kCIDLib::False;
+    TAtomicFlag         atomGlobInitDone;
     tCIDLib::TFloat4    f4InertiaScaler = 1.0F;
 }
 
@@ -132,8 +132,7 @@ TCIDGestHandler::i4AdjustForSpeed(  const   tCIDLib::TInt4      i4MaxPels
         //  based on how much of a full page we have.
         //
         f8AdjSpeed = f8Speed
-                    + ((tCIDLib::TFloat8(i4SpanPels)
-                       / tCIDLib::TFloat8(i4MaxPels)) * 0.25);
+                     + ((tCIDLib::TFloat8(i4SpanPels) / tCIDLib::TFloat8(i4MaxPels)) * 0.25);
         if (f8AdjSpeed > 1.0)
             f8AdjSpeed = 1.0;
 
@@ -159,7 +158,7 @@ TCIDGestHandler::i4AdjustForSpeed(  const   tCIDLib::TInt4      i4MaxPels
     TMathLib::Round(f8Ret);
 
     // And return cast to an int
-    return tCIDLib::TInt4(f8Ret);
+    return static_cast<tCIDLib::TInt4>(f8Ret);
 }
 
 
@@ -239,10 +238,10 @@ tCIDLib::TVoid TCIDGestHandler::CancelGesture()
 //
 tCIDLib::TVoid TCIDGestHandler::Initialize()
 {
-    if (!CIDCtrls_CIDGestureEng::bGlobalInitDone)
+    if (!CIDCtrls_CIDGestureEng::atomGlobInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDCtrls_CIDGestureEng::bGlobalInitDone)
+        if (!CIDCtrls_CIDGestureEng::atomGlobInitDone)
         {
             TString strVal;
             if (TProcEnvironment::bFind(L"CID_GESTSCALER", strVal))
@@ -262,7 +261,7 @@ tCIDLib::TVoid TCIDGestHandler::Initialize()
             }
 
             // Set the flag last;
-            CIDCtrls_CIDGestureEng::bGlobalInitDone = kCIDLib::False;
+            CIDCtrls_CIDGestureEng::atomGlobInitDone.Set();
         }
     }
 }

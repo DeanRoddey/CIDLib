@@ -249,6 +249,11 @@ namespace TFileSys
         const   TString&                strPath
     );
 
+    CIDLIBEXP tCIDLib::TBoolean bIsNormalDir
+    (
+        const   TString&                strPath
+    );
+
     CIDLIBEXP tCIDLib::TBoolean bIsRedirected
     (
         const   tCIDLib::EStdFiles      eStdFile
@@ -406,6 +411,8 @@ namespace TFileSys
     CIDLIBEXP tCIDLib::TVoid RemovePath
     (
         const   TString&                strStartDir
+        , const tCIDLib::ETreeDelModes  eMode = tCIDLib::ETreeDelModes::Remove
+        , const tCIDLib::TBoolean       bRemoveStart = kCIDLib::True
     );
 
     CIDLIBEXP tCIDLib::TVoid Rename

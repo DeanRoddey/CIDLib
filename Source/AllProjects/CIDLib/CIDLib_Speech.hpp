@@ -72,6 +72,7 @@ class CIDLIBEXP TSpeech : public TObject
         TSpeech();
 
         TSpeech(const TSpeech&) = delete;
+        TSpeech(TSpeech&&) = delete;
 
         ~TSpeech();
 
@@ -80,6 +81,7 @@ class CIDLIBEXP TSpeech : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSpeech& operator=(const TSpeech&) = delete;
+        TSpeech& operator=(TSpeech&&) = delete;
 
 
         // -------------------------------------------------------------------

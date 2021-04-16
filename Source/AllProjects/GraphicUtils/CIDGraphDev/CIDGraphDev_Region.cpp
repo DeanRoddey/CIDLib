@@ -133,16 +133,9 @@ TArea TGUIRegion::areaBounds() const
         );
     }
 
-    //
-    //  Convert to an area for return. Indicate that it is non-inclusive,
-    //  which will make it come out correctly.
-    //
+    //  Convert to an area for return
     TArea areaRet;
-    areaRet.FromRectl
-    (
-        *reinterpret_cast<tCIDLib::THostRectl*>(&rectLog)
-        , tCIDLib::ERectlTypes::NonInclusive
-    );
+    areaRet.FromRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&rectLog));
     return areaRet;
 }
 
@@ -163,7 +156,7 @@ tCIDLib::TBoolean TGUIRegion::bIntersects(const TArea& areaToTest) const
     //  it check the whole area.
     //
     tCIDLib::THostRectl rectToTest;
-    areaToTest.ToRectl(rectToTest, tCIDLib::ERectlTypes::Inclusive);
+    areaToTest.ToRectl(rectToTest);
 
     if (::RectInRegion(m_hrgnThis, reinterpret_cast<RECT*>(&rectToTest)))
         return kCIDLib::True;
@@ -194,6 +187,9 @@ tCIDLib::TBoolean TGUIRegion::bSetFromDev(TGraphDrawDev& gdevSrc)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // Try to get the current clip
@@ -214,6 +210,9 @@ tCIDLib::TBoolean TGUIRegion::bSetFromDev(TGraphDrawDev& gdevSrc)
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // If we have one already, then get rid of it
@@ -347,16 +346,10 @@ TGUIRegion::Offset(const tCIDLib::TInt4 i4XOfs, const tCIDLib::TInt4 i4YOfs)
 // Set us to a new area
 tCIDLib::TVoid TGUIRegion::Set(const TArea& areaToSet)
 {
-    //
-    //  Create the region. The area is assumed to be exclusive, so the bottom/right
-    //  edges aren't included. So we have to bump ours by 1.
-    //
+    // Create the region. The area should be non-inclusive
     tCIDGraphDev::TRegionHandle hrgnTmp = ::CreateRectRgn
     (
-        areaToSet.i4X()
-        , areaToSet.i4Y()
-        , areaToSet.i4Right() + 1
-        , areaToSet.i4Bottom() + 1
+        areaToSet.i4X(), areaToSet.i4Y(), areaToSet.i4Right(), areaToSet.i4Bottom()
     );
 
     if (!hrgnTmp)
@@ -397,16 +390,15 @@ tCIDLib::TVoid TGUIRegion::Set( const   TArea&          areaToSet
 {
     //
     //  Create the region. There is a known stupidity in Windows in which the area
-    //  of a rounded rect region is not the same as a non-rounded. It ends up being
-    //  doubly exclusive, so we have to add 2 to get the same results, where we only
-    //  add 1 for the non-rounded.
+    //  of a rounded rect region is not the same as a non-rounded, so we have to add
+	//	1 to get the right results. It's sort of doubly non-inclusive.
     //
     tCIDGraphDev::TRegionHandle hrgnTmp = ::CreateRoundRectRgn
     (
         areaToSet.i4X()
         , areaToSet.i4Y()
-        , areaToSet.i4Right() + 2
-        , areaToSet.i4Bottom() + 2
+        , areaToSet.i4Right() + 1
+        , areaToSet.i4Bottom() + 1
         , c4Rounding
         , c4Rounding
     );

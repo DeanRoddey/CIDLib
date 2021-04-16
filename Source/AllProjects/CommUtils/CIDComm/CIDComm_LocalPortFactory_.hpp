@@ -64,23 +64,23 @@ class TLocalComPortFactory : public TComPortFactory
         (
                     tCIDLib::TStrCollect&   colToFill
             , const tCIDLib::TBoolean       bAvailOnly
-        )   const override;
+        )   const final;
 
         tCIDLib::TBoolean bTestCfg
         (
             const   TCommPortCfg&           cpcfgTest
             ,       TString&                strReason
-        )   const override;
+        )   const final;
 
         tCIDLib::TBoolean bValidatePath
         (
             const   TString&                strPath
-        )   const override;
+        )   const final;
 
         [[nodiscard]] TCommPortBase* pcommMakeNew
         (
             const   TString&                strPath
-        )   override;
+        )   final;
 
 
     private :

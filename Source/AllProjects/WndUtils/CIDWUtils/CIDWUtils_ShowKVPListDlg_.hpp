@@ -44,6 +44,7 @@ class TShowKVPListDlg : public TDlgBox
         TShowKVPListDlg();
 
         TShowKVPListDlg(const TShowKVPListDlg&) = delete;
+        TShowKVPListDlg(TShowKVPListDlg&&) = delete;
 
         ~TShowKVPListDlg();
 
@@ -52,6 +53,7 @@ class TShowKVPListDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TShowKVPListDlg& operator=(const TShowKVPListDlg&) = delete;
+        TShowKVPListDlg& operator=(TShowKVPListDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

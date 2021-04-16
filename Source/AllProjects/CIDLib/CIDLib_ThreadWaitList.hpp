@@ -73,6 +73,7 @@ class CIDLIBEXP TThreadWaitList : public TObject
         );
 
         TThreadWaitList(const TThreadWaitList&) = delete;
+        TThreadWaitList(TThreadWaitList&&) = delete;
 
         ~TThreadWaitList();
 
@@ -81,6 +82,7 @@ class CIDLIBEXP TThreadWaitList : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TThreadWaitList& operator=(const TThreadWaitList&) = delete;
+        TThreadWaitList& operator=(TThreadWaitList&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -104,7 +106,7 @@ class CIDLIBEXP TThreadWaitList : public TObject
 
         tCIDLib::TBoolean bWaitOnList
         (
-                    TMtxLocker&             lockSync
+                    TLocker&                lockSync
             , const tCIDLib::TCard4         c4Reason
             , const tCIDLib::TCard4         c4Millis
         );

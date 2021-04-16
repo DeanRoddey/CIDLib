@@ -38,7 +38,6 @@
 //  $_CIDLib_Log_$
 //
 
-
 // ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
@@ -97,9 +96,9 @@ static void LocalTmplCheckFunc()
     tCIDLib::eOREnumBits(eVal1, eVal2);
 
     tCIDLib::TBoolean b1 = kCIDLib::True;
-    const tCIDLib::TBoolean b2 = kCIDLib::False;
+    constexpr tCIDLib::TBoolean b2 = kCIDLib::False;
     tCIDLib::TBoolean b3 = kCIDLib::True;
-    const tCIDLib::TBoolean b4 = kCIDLib::False;
+    constexpr tCIDLib::TBoolean b4 = kCIDLib::False;
 
     tCIDLib::TBoolean* pB1 = &b1;
     const tCIDLib::TBoolean* pB2 = &b2;
@@ -111,6 +110,10 @@ static void LocalTmplCheckFunc()
     {
         TPtrJanitor<const tCIDLib::TBoolean> janTest(pB2, pB4);
     }
+
+    TAtomicFlag atomFlag(kCIDLib::True);
+    if (atomFlag.bValue())
+        atomFlag.SetValue(kCIDLib::False);
 }
 #endif
 
@@ -212,9 +215,9 @@ TCIDKrnlModule::TCIDKrnlModule() :
     if (!bQueryFromName
     (
         L"CIDKernel"
-        , tCIDLib::EModTypes::Dll
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
+        , tCIDLib::EModTypes::SharedLib
         , tCIDLib::EModFlags::HasMsgFile))
     {
         const TKrnlError& kerrToShow = TKrnlError::kerrLast();
@@ -297,7 +300,6 @@ TCIDKrnlModule::TCIDKrnlModule() :
         ,   { &TCIDKrnlModule::bInitTermAudio       , kKrnlMsgs::midInit_Audio }
         ,   { &TCIDKrnlModule::bInitTermIP          , kKrnlMsgs::midInit_IP }
         ,   { &TCIDKrnlModule::bInitTermTime        , kKrnlMsgs::midInit_Time }
-        ,   { &TCIDKrnlModule::bInitTermPerThread   , kKrnlMsgs::midInit_PerThread }
         ,   { &TCIDKrnlModule::bInitTermSysInfo     , kKrnlMsgs::midInit_SysInfo }
         ,   { &TCIDKrnlModule::bInitTermEnvironment , kKrnlMsgs::midInit_Environment }
         ,   { &TCIDKrnlModule::bInitTermFileSys     , kKrnlMsgs::midInit_FileSys }
@@ -322,7 +324,7 @@ TCIDKrnlModule::TCIDKrnlModule() :
                 //  A kernel error occured during init, so show the information
                 //  to the user and give up.
                 //
-                const tCIDLib::TCard4 c4MaxChars = 4095;
+                constexpr tCIDLib::TCard4 c4MaxChars = 4095;
                 tCIDLib::TCh szMsg[c4MaxChars+1];
                 TRawStr::CopyCatStr
                 (
@@ -354,8 +356,8 @@ TCIDKrnlModule::TCIDKrnlModule() :
             //  A system exception occured during init, so show the
             //  information to the user and give up.
             //
-            const tCIDLib::TCard4 c4MaxChars = 4095;
-            tCIDLib::TCh szMsg[c4MaxChars+1];
+            constexpr tCIDLib::TCard4 c4MaxChars = 4095;
+            tCIDLib::TCh szMsg[c4MaxChars + 1];
             TRawStr::CopyCatStr
             (
                 szMsg
@@ -405,8 +407,8 @@ TCIDKrnlModule::~TCIDKrnlModule()
             //  A kernel error occured during init, so show the information
             //  to the user, but don't exit since we are exiting anyway.
             //
-            const tCIDLib::TCard4 c4MaxChars = 4095;
-            tCIDLib::TCh szMsg[c4MaxChars+1];
+            constexpr tCIDLib::TCard4 c4MaxChars = 4095;
+            tCIDLib::TCh szMsg[c4MaxChars + 1];
             TRawStr::CopyCatStr
             (
                 szMsg
@@ -436,8 +438,8 @@ TCIDKrnlModule::~TCIDKrnlModule()
             //  information to the user, but don't exit since we are exiting
             //  anyway.
             //
-            const tCIDLib::TCard4 c4MaxChars = 4095;
-            tCIDLib::TCh szMsg[c4MaxChars+1];
+            constexpr tCIDLib::TCard4 c4MaxChars = 4095;
+            tCIDLib::TCh szMsg[c4MaxChars + 1];
             TRawStr::CopyCatStr
             (
                 szMsg

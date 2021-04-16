@@ -60,7 +60,17 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
         // -------------------------------------------------------------------
         TXMLEntityMgr();
 
+        TXMLEntityMgr(const TXMLEntityMgr&) = delete;
+        TXMLEntityMgr(TXMLEntityMgr&&) = delete;
+
         ~TXMLEntityMgr();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEntityMgr& operator=(const TXMLEntityMgr&) = delete;
+        TXMLEntityMgr& operator=(TXMLEntityMgr&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -115,7 +125,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
         tCIDLib::TBoolean bSkippedQuote
         (
-                    tCIDLib::TCh&           chSkipped
+            COP     tCIDLib::TCh&           chSkipped
         );
 
         tCIDLib::TBoolean bSkippedSpace();
@@ -152,7 +162,7 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
         tCIDLib::TVoid GetSpaces
         (
-                    TString&                strToFill
+            COP     TString&                strToFill
         );
 
         [[nodiscard]] TXMLEntSpooler* pxesMakeNew
@@ -198,13 +208,6 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
 
     private :
         // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLEntityMgr(const TXMLEntityMgr&);
-        tCIDLib::TVoid operator=(const TXMLEntityMgr&);
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bPopEntity();
@@ -220,7 +223,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
         //  entity that is needed.
         //
         //  This element owns the spoolers but the entity decls are just
-        //  referenced from the pools that they come from.
+        //  referenced from the pools that they come from. So we can use default
+        //  copy/move here even though we have pointer members.
         // -------------------------------------------------------------------
         class TEMStackElem
         {
@@ -230,8 +234,8 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 // -----------------------------------------------------------
                 TEMStackElem() :
 
-                    pxesThis(0)
-                    , pxdeclThis(0)
+                    pxesThis(nullptr)
+                    , pxdeclThis(nullptr)
                 {
                 }
 
@@ -243,36 +247,22 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 {
                 }
 
-                TEMStackElem(const TEMStackElem& elemToCopy) :
+                TEMStackElem(const TEMStackElem&) = default;
+                TEMStackElem(TEMStackElem&& elemSrc) = default;
 
-                    pxesThis(elemToCopy.pxesThis)
-                    , pxdeclThis(elemToCopy.pxdeclThis)
-                {
-                }
-
-                ~TEMStackElem()
-                {
-                    //
-                    //  We don't delete anything here. The spooler does belong
-                    //  to the manager, but they are deleted in the entity
-                    //  mgr stack, not automatically here.
-                    //
-                }
+                //
+                //  We don't delete anything here. The spooler does belong
+                //  to the manager, but they are deleted in the entity
+                //  mgr stack, not automatically here.
+                //
+                ~TEMStackElem() = default;
 
 
                 // -----------------------------------------------------------
                 //  Public operators
                 // -----------------------------------------------------------
-                TEMStackElem& operator=(const TEMStackElem& elemToAssign)
-                {
-                    if (this == &elemToAssign)
-                        return *this;
-
-                    pxesThis = elemToAssign.pxesThis;
-                    pxdeclThis = elemToAssign.pxdeclThis;
-
-                    return *this;
-                }
+                TEMStackElem& operator=(const TEMStackElem&) = default;
+                TEMStackElem& operator=(TEMStackElem&& elemSrc)  = default;
 
 
                 // -----------------------------------------------------------
@@ -280,11 +270,11 @@ class CIDXMLEXP TXMLEntityMgr : public TObject
                 //
                 //  pxesSrc
                 //      The source entity spooler for the current entity. We
-                //      own this one.
+                //      own this.
                 //
                 //  pxdeclEntity
                 //      A pointer to the entity decl that our spooler is
-                //      spooling from. We don't own this!!
+                //      spooling from. We don't own this.
                 // -----------------------------------------------------------
                 TXMLEntSpooler*         pxesThis;
                 const TXMLEntityDecl*   pxdeclThis;
@@ -361,16 +351,28 @@ class TXMLEMStackJan
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLEMStackJan() = delete;
+
         TXMLEMStackJan(TXMLEntityMgr* const pxemToRemove) :
 
             m_pxemToRemove(pxemToRemove)
         {
         }
 
+        TXMLEMStackJan(const TXMLEMStackJan&) = delete;
+        TXMLEMStackJan(TXMLEMStackJan&&) = delete;
+
         ~TXMLEMStackJan()
         {
             m_pxemToRemove->Reset();
         }
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEMStackJan& operator=(const TXMLEMStackJan&) = delete;
+        TXMLEMStackJan& operator=(TXMLEMStackJan&&) = delete;
+
 
     private :
         // -------------------------------------------------------------------
@@ -394,6 +396,8 @@ class TXMLEMThrowJan
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TXMLEMThrowJan() = delete;
+
         TXMLEMThrowJan(         TXMLEntityMgr* const    pxemTarget
                         , const tCIDLib::TBoolean       bNewState) :
 
@@ -403,10 +407,21 @@ class TXMLEMThrowJan
             m_pxemTarget->m_bThrowAtEnd = bNewState;
         }
 
+        TXMLEMThrowJan(const TXMLEMThrowJan&) = delete;
+        TXMLEMThrowJan(TXMLEMThrowJan&&) = delete;
+
         ~TXMLEMThrowJan()
         {
             m_pxemTarget->m_bThrowAtEnd = m_bOldState;
         }
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TXMLEMThrowJan& operator=(const TXMLEMThrowJan&) = delete;
+        TXMLEMThrowJan& operator=(TXMLEMThrowJan&&) = delete;
+
 
     private :
         // -------------------------------------------------------------------

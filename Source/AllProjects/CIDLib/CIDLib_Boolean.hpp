@@ -51,6 +51,7 @@ class CIDLIBEXP TBoolean :
         );
 
         TBoolean(const TBoolean&) = default;
+        TBoolean(TBoolean&&) = default;
 
         ~TBoolean();
 
@@ -59,6 +60,7 @@ class CIDLIBEXP TBoolean :
         //  Public operators
         // -------------------------------------------------------------------
         TBoolean& operator=(const TBoolean&) = default;
+        TBoolean& operator=(TBoolean&&) = default;
 
         TBoolean& operator=
         (
@@ -107,17 +109,17 @@ class CIDLIBEXP TBoolean :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private             :

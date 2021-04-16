@@ -55,14 +55,16 @@ class CIDLIBEXP MDirChangeMon
         MDirChangeMon();
 
         MDirChangeMon(const MDirChangeMon&) = delete;
+        MDirChangeMon(MDirChangeMon&&) = delete;
 
-        ~MDirChangeMon();
+        virtual ~MDirChangeMon();
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         MDirChangeMon& operator=(const MDirChangeMon&) = delete;
+        MDirChangeMon& operator=(MDirChangeMon&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -120,6 +122,10 @@ class CIDLIBEXP MDirChangeMon
         //
         //  m_strDirChangePath
         //      If we are set up, this is the target directory we are monitoring.
+        //
+        //  m_thrMonitor
+        //      The thread that we spin up to do the monitoring. We point it at
+        //      eMonThread().
         // -------------------------------------------------------------------
         TKrnlDirChangeMon   m_kdchmImpl;
         TString             m_strDirChangePath;
@@ -141,6 +147,7 @@ class CIDLIBEXP TDirChangeMon : public MDirChangeMon
         TDirChangeMon();
 
         TDirChangeMon(const TDirChangeMon&) = delete;
+        TDirChangeMon(TDirChangeMon&&) = delete;
 
         ~TDirChangeMon();
 
@@ -149,6 +156,7 @@ class CIDLIBEXP TDirChangeMon : public MDirChangeMon
         //  Public operators
         // -------------------------------------------------------------------
         TDirChangeMon& operator=(const TDirChangeMon&) = delete;
+        TDirChangeMon& operator=(TDirChangeMon&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -184,7 +192,7 @@ class CIDLIBEXP TDirChangeMon : public MDirChangeMon
 
     private :
         // -------------------------------------------------------------------
-        //  Private data membres
+        //  Private data members
         //
         //  m_bOverflow
         //      If our changes list is overflowed becasue the caller isn't reading
@@ -219,8 +227,16 @@ class CIDLIBEXP TDirChangePub  : public MDirChangeMon
         TDirChangePub();
 
         TDirChangePub(const TDirChangePub&) = delete;
+        TDirChangePub(TDirChangePub&&) = delete;
 
         ~TDirChangePub();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TDirChangePub& operator=(const TDirChangePub&) = delete;
+        TDirChangePub& operator=(TDirChangePub&&) = delete;
 
 
         // -------------------------------------------------------------------

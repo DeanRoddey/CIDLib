@@ -34,9 +34,16 @@
 //   CLASS: TRefBag
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
 {
     public  :
+        // -------------------------------------------------------------------
+        //  Public types
+        // -------------------------------------------------------------------
+        using TMyType = TRefBag<TElem>;
+        using TParType = TBasicDLinkedRefCol<TElem>;
+
+
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
@@ -45,23 +52,24 @@ template <class TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
         TRefBag(const   tCIDLib::EAdoptOpts eAdopt
                 , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TParent(eAdopt, eMTSafe)
+            TParType(eAdopt, eMTSafe)
         {
         }
 
+        // Not copyable, only moveable
         TRefBag(const TRefBag&) = delete;
-        TRefBag(TRefBag&&) = delete;
+        TRefBag(TRefBag&& colSrc) = default;
 
-        ~TRefBag()
-        {
-        }
+        ~TRefBag() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only moveable
         TRefBag& operator=(const TRefBag&) = delete;
-        TRefBag& operator=(TRefBag&&) = delete;
+        TRefBag& operator=(TRefBag&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -82,5 +90,3 @@ template <class TElem> class TRefBag : public TBasicDLinkedRefCol<TElem>
 };
 
 #pragma CIDLIB_POPPACK
-
-

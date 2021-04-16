@@ -59,7 +59,7 @@ class CIDLIBEXP TPopUpLogger : public TObject, public MLogger
         tCIDLib::TVoid LogEvent
         (
             const   TLogEvent&              logevToLog
-        );
+        )   final;
 
 
     private :

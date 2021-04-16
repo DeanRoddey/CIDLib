@@ -31,9 +31,10 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
+#include    "CIDKernel_PlatformStrOps.hpp"
 
 
-namespace
+namespace CIDKernel_ExtProc_Linux
 {
     // ---------------------------------------------------------------------------
     //  Local functions
@@ -44,99 +45,98 @@ namespace
     // a SIGCHLD, then to store termination information in the handle.
     class TChildProcs
     {
-    public:
-        TChildProcs();
-        ~TChildProcs();
+        public:
+            TChildProcs();
+            ~TChildProcs();
 
-        TProcessHandle** ahprocChildProcs();
-        tCIDLib::TVoid AddChildProc(TProcessHandle* phprocChild);
-        tCIDLib::TCard4 c4Size();
-        tCIDLib::TVoid RemoveChildProc(TProcessHandle* phprocChild);
+            TProcessHandle** ahprocChildProcs();
+            tCIDLib::TVoid AddChildProc(TProcessHandle* phprocChild);
+            tCIDLib::TCard4 c4Size();
+            tCIDLib::TVoid RemoveChildProc(TProcessHandle* phprocChild);
 
-    private:
-        static const tCIDLib::TCard4 c4DefaultChunkSize = 10;
+        private:
+            static const tCIDLib::TCard4 c4DefaultChunkSize = 10;
 
-        TProcessHandle** __aphprocChildProcs;
-        tCIDLib::TCard4  __c4Size;
-        TKrnlLinux::TRecursiveMutex __rmtxLock;
+            TProcessHandle** m_aphprocChildProcs;
+            tCIDLib::TCard4  m_c4Size;
+            TKrnlLinux::TRecursiveMutex m_rmtxLock;
     };
 
     TChildProcs::TChildProcs()
     {
-        __c4Size = 0;
-        __aphprocChildProcs = 0;
-        __rmtxLock.iInitialize();
+        m_c4Size = 0;
+        m_aphprocChildProcs = nullptr;
+        m_rmtxLock.iInitialize();
     }
 
     TChildProcs::~TChildProcs()
     {
-        __rmtxLock.iLock();
-        delete [] __aphprocChildProcs;
-        __rmtxLock.iUnlock();
-        __rmtxLock.iDestroy();
+        m_rmtxLock.iLock();
+        delete [] m_aphprocChildProcs;
+        m_rmtxLock.iUnlock();
+        m_rmtxLock.iDestroy();
     }
 
     tCIDLib::TVoid TChildProcs::AddChildProc(TProcessHandle* phprocChild)
     {
-        __rmtxLock.iLock();
+        m_rmtxLock.iLock();
         tCIDLib::TCard4 c4Idx;
-        for (c4Idx = 0; c4Idx < __c4Size; c4Idx++)
+        for (c4Idx = 0; c4Idx < m_c4Size; c4Idx++)
         {
-            if (__aphprocChildProcs[c4Idx] == 0)
+            if (m_aphprocChildProcs[c4Idx] == 0)
             {
-                __aphprocChildProcs[c4Idx] = phprocChild;
-                __rmtxLock.iUnlock();
+                m_aphprocChildProcs[c4Idx] = phprocChild;
+                m_rmtxLock.iUnlock();
                 return;
             }
         }
-        tCIDLib::TCard4 c4OldSize = __c4Size;
-        __c4Size += c4DefaultChunkSize;
-        TProcessHandle** aphprocTmp = new TProcessHandle*[__c4Size];
+        tCIDLib::TCard4 c4OldSize = m_c4Size;
+        m_c4Size += c4DefaultChunkSize;
+        TProcessHandle** aphprocTmp = new TProcessHandle*[m_c4Size];
         for (c4Idx = 0; c4Idx < c4OldSize; c4Idx++)
-            aphprocTmp[c4Idx] = __aphprocChildProcs[c4Idx];
+            aphprocTmp[c4Idx] = m_aphprocChildProcs[c4Idx];
         aphprocTmp[c4OldSize] = phprocChild;
-        for (c4Idx = c4OldSize + 1; c4Idx < __c4Size; c4Idx++)
-            aphprocTmp[c4Idx] = 0;
-        delete [] __aphprocChildProcs;
-        __aphprocChildProcs = aphprocTmp;
-        __rmtxLock.iUnlock();
+        for (c4Idx = c4OldSize + 1; c4Idx < m_c4Size; c4Idx++)
+            aphprocTmp[c4Idx] = nullptr;
+        delete [] m_aphprocChildProcs;
+        m_aphprocChildProcs = aphprocTmp;
+        m_rmtxLock.iUnlock();
     }
 
     inline TProcessHandle** TChildProcs::ahprocChildProcs()
     {
-        return __aphprocChildProcs;
+        return m_aphprocChildProcs;
     }
 
     inline tCIDLib::TCard4 TChildProcs::c4Size()
     {
-        return __c4Size;
+        return m_c4Size;
     }
 
     tCIDLib::TVoid TChildProcs::RemoveChildProc(TProcessHandle* phprocChild)
     {
-        __rmtxLock.iLock();
-        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < __c4Size; c4Idx++)
+        m_rmtxLock.iLock();
+        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < m_c4Size; c4Idx++)
         {
-            if (__aphprocChildProcs[c4Idx] == phprocChild)
+            if (m_aphprocChildProcs[c4Idx] == phprocChild)
             {
-                __aphprocChildProcs[c4Idx] = 0;
-                __rmtxLock.iUnlock();
+                m_aphprocChildProcs[c4Idx] = nullptr;
+                m_rmtxLock.iUnlock();
                 return;
             }
         }
-        __rmtxLock.iUnlock();
+        m_rmtxLock.iUnlock();
     }
 
-    static TChildProcs __ChildProcs;
+    TChildProcs ChildProcs;
 
-    // ---------------------------------------------------------------------------
-    //  Local functions
-    // ---------------------------------------------------------------------------
+
 
     // This function does the work of collecting termination information about child
     // processes. It processes SIGCHLD signals and stores appropriate information in
     // the process handle.
-    tCIDLib::TVoid __ChildSignalHandler(tCIDLib::TSInt iSignal)
+    //
+    tCIDLib::TVoid ChildSignalHandler(tCIDLib::TSInt iSignal)
     {
         // The time gathered here will be used as the end time of the child process,
         // since the kernel does not track that information.
@@ -152,9 +152,9 @@ namespace
             return;
 
         // Now look up the child process
-        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < __ChildProcs.c4Size(); c4Idx++)
+        for (tCIDLib::TCard4 c4Idx = 0; c4Idx < CIDKernel_ExtProc_Linux::ChildProcs.c4Size(); c4Idx++)
         {
-            TProcessHandle* phprocCur = __ChildProcs.ahprocChildProcs()[c4Idx];
+            TProcessHandle* phprocCur = CIDKernel_ExtProc_Linux::ChildProcs.ahprocChildProcs()[c4Idx];
             if (phprocCur && phprocCur->hprociThis().pidThis == pid)
             {
                 TProcessHandleImpl& hprociThis = const_cast<TProcessHandleImpl&>(phprocCur->hprociThis());
@@ -179,11 +179,11 @@ namespace
     }
 
     // This function looks up the boot time in the /proc file system.
-    tCIDLib::TBoolean __bQueryBootTime(tCIDLib::TCard4& c4ToFill)
+    tCIDLib::TBoolean bQueryBootTime(tCIDLib::TCard4& c4ToFill)
     {
-        static tCIDLib::TCard4 __c4BootTime = 0;
+        static tCIDLib::TCard4 c4BootTime = 0;
 
-        if (__c4BootTime == 0)
+        if (c4BootTime == 0)
         {
             FILE* KrnlStat = ::fopen("/proc/stat", "r");
             if (!KrnlStat)
@@ -200,7 +200,7 @@ namespace
 
                 if (!::strncmp(szLine, "btime", 5))
                 {
-                    if (::sscanf(szLine, "%*s %d", &__c4BootTime) != 1)
+                    if (::sscanf(szLine, "%*s %lu", &c4BootTime) != 1)
                         continue;
                     break;
                 }
@@ -208,20 +208,20 @@ namespace
 
             ::fclose(KrnlStat);
 
-            if (!__c4BootTime)
+            if (!c4BootTime)
             {
                 TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidFormat);
                 return kCIDLib::False;
             }
         }
 
-        c4ToFill = __c4BootTime;
+        c4ToFill = c4BootTime;
 
         return kCIDLib::True;
     }
 
     // This function queries the start time of a running process.
-    tCIDLib::TBoolean __bQueryRawStartTime(pid_t pidToQuery, tCIDLib::TCard4& c4RawStartTime)
+    tCIDLib::TBoolean bQueryRawStartTime(pid_t pidToQuery, tCIDLib::TCard4& c4RawStartTime)
     {
         tCIDLib::TSCh szFileName[kCIDLib::c4MaxPathLen + 1];
         ::sprintf(szFileName, "/proc/%d/stat", pidToQuery);
@@ -232,9 +232,12 @@ namespace
             return kCIDLib::False;
         }
 
-        tCIDLib::TSInt iRet = ::fscanf(StatFile,
-                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %d",
-                                       &c4RawStartTime);
+        tCIDLib::TSInt iRet = ::fscanf
+        (
+            StatFile
+            , "%*u %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %lu"
+            , &c4RawStartTime
+        );
 
         ::fclose(StatFile);
 
@@ -249,7 +252,7 @@ namespace
 
     // This function queries interesting timing information of a currently
     // running process.
-    tCIDLib::TBoolean __bQueryRawTimes(pid_t pidToQuery
+    tCIDLib::TBoolean bQueryRawTimes(   pid_t pidToQuery
                                        , tCIDLib::TCard4& c4RawUserTime
                                        , tCIDLib::TCard4& c4RawKernelTime)
     {
@@ -264,7 +267,7 @@ namespace
         }
 
         tCIDLib::TSInt iRet = ::fscanf(StatFile,
-                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %d %d",
+                                       "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %lu %lu",
                                        &c4RawUserTime,
                                        &c4RawKernelTime);
 
@@ -280,20 +283,26 @@ namespace
     }
 }
 
+
+//
 // Here is where the SIGCHLD handler is registered. We need to handle this signal
 // so that child process can be appropriately cleaned up.
+//
 tCIDLib::TBoolean TKrnlLinux::bInitTermExtProcess(const tCIDLib::EInitTerm eState)
 {
     if (eState == tCIDLib::EInitTerm::Initialize)
     {
         struct sigaction SigAction;
-        SigAction.sa_handler = __ChildSignalHandler;
+        SigAction.sa_handler = CIDKernel_ExtProc_Linux::ChildSignalHandler;
         ::sigemptyset(&SigAction.sa_mask);
         SigAction.sa_flags = 0;
         ::sigaction(SIGCHLD, &SigAction, 0);
     }
     return kCIDLib::True;
 }
+
+
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TKrnlExtProcess
@@ -309,13 +318,50 @@ TKrnlExtProcess::TKrnlExtProcess()
 
 TKrnlExtProcess::~TKrnlExtProcess()
 {
-    __ChildProcs.RemoveChildProc(&__hprocThis);
+    CIDKernel_ExtProc_Linux::ChildProcs.RemoveChildProc(&m_hprocThis);
 }
 
 
 // ---------------------------------------------------------------------------
 //  TKrnlExtProcess: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+//
+//  If this object has not been previously set, we can adopt a process and
+//  gain access to it, given that the handle to it has been obtained.
+//
+tCIDLib::TBoolean TKrnlExtProcess::bAdoptProcess(TProcessHandle& hprocToAdopt)
+{
+    if (m_hprocThis.m_phprociThis->pidThis != 0)
+    {
+        // This object has already been associated with a process
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyStarted);
+
+        //
+        //  There's nothing we can do with the passed handle. It's just a process
+        //  id so we don't close it or anything. It just gets dropped.
+        //
+        return kCIDLib::False;
+    }
+
+    // Copy over the process handle info
+    m_hprocThis.m_phprociThis->pidThis = hprocToAdopt.m_phprociThis->pidThis;
+
+    return kCIDLib::True;
+}
+
+
+
+tCIDLib::TBoolean
+TKrnlExtProcess::bEverStarted(tCIDLib::TBoolean& bToFill) const
+{
+    bToFill = (m_hprocThis.m_phprociThis->pidThis != 0)
+              && !m_hprocThis.m_phprociThis->bAlreadyClean;
+
+    return kCIDLib::True;
+}
+
+
 tCIDLib::TBoolean
 TKrnlExtProcess::bGetPriorityClass(tCIDLib::EPrioClasses& eToFill) const
 {
@@ -329,7 +375,7 @@ TKrnlExtProcess::bGetPriorityClass(tCIDLib::EPrioClasses& eToFill) const
         return kCIDLib::False;
     }
 
-    tCIDLib::TSInt iPolicy = ::sched_getscheduler(__hprocThis.__phprociThis->pidThis);
+    tCIDLib::TSInt iPolicy = ::sched_getscheduler(m_hprocThis.m_phprociThis->pidThis);
     if (iPolicy == -1)
     {
         TKrnlError::SetLastHostError(errno);
@@ -350,8 +396,8 @@ TKrnlExtProcess::bGetPriorityClass(tCIDLib::EPrioClasses& eToFill) const
 tCIDLib::TBoolean
 TKrnlExtProcess::bIsRunning(tCIDLib::TBoolean& bToFill) const
 {
-    if (!__hprocThis.__phprociThis->pidThis
-        || __hprocThis.__phprociThis->bAlreadyClean)
+    if (!m_hprocThis.m_phprociThis->pidThis
+    ||  m_hprocThis.m_phprociThis->bAlreadyClean)
     {
         bToFill = kCIDLib::False;
     }
@@ -377,10 +423,99 @@ tCIDLib::TBoolean TKrnlExtProcess::bKill()
     }
 
     // Do a SIGTERM instead of SIGKILL so that the process can clean up.
-    if (::kill(__hprocThis.__phprociThis->pidThis, SIGTERM))
+    if (::kill(m_hprocThis.m_phprociThis->pidThis, SIGTERM))
     {
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
+    }
+
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlExtProcess::bQueryFullPath(        tCIDLib::TCh* const pszToFill
+                                , const tCIDLib::TCard4     c4MaxChars)
+{
+    // We have to be running for this to work
+    tCIDLib::TBoolean bState;
+    if (!bIsRunning(bState) || !bState)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NeverStarted);
+        return kCIDLib::False;
+    }
+
+    char pszSym[32];
+    char pszPath[PATH_MAX + 1] = {0};
+
+    sprintf(pszSym, "/proc/%d/exe", m_hprocThis.m_phprociThis->pidThis);
+    if (::readlink(pszSym, pszPath, PATH_MAX) == -1)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;    
+    }
+
+    tCIDLib::TCard4 c4OutChars;
+    return CIDStrOp_MBToWC(pszToFill, c4MaxChars, pszPath, c4OutChars);
+}
+
+
+tCIDLib::TBoolean
+TKrnlExtProcess::bQueryProcessTimes(tCIDLib::TEncodedTime&     enctStart
+                                    , tCIDLib::TEncodedTime&   enctEnd
+                                    , tCIDLib::TEncodedTime&   enctInKernel
+                                    , tCIDLib::TEncodedTime&   enctInUserMode)
+{
+    tCIDLib::TCard4 c4BootTime;
+    if (!CIDKernel_ExtProc_Linux::bQueryBootTime(c4BootTime))
+        return kCIDLib::False;
+
+    tCIDLib::TBoolean bRun;
+    if (!bIsRunning(bRun))
+        return kCIDLib::False;
+
+    // First set the start time
+    TKrnlLinux::LinuxFileTimeToCIDFileTime(c4BootTime, enctStart);
+    enctStart += tCIDLib::TEncodedTime(m_hprocThis.m_phprociThis->c4JiffyStartTime) * 100000;
+
+    // We need to use a different method of getting the time if the process is still
+    // running.
+    if (bRun)
+    {
+        tCIDLib::TCard4 c4JiffyUserTime;
+        tCIDLib::TCard4 c4JiffyKernelTime;
+
+        if (!CIDKernel_ExtProc_Linux::bQueryRawTimes(m_hprocThis.m_phprociThis->pidThis
+                                                    , c4JiffyUserTime
+                                                    , c4JiffyKernelTime))
+        {
+            return kCIDLib::False;
+        }
+
+        // Now user time
+        enctInUserMode = tCIDLib::TEncodedTime(c4JiffyUserTime) * 100000;
+
+        // And kernel time
+        enctInKernel = tCIDLib::TEncodedTime(c4JiffyKernelTime) * 100000;
+
+        // End time is not relevant
+        enctEnd = 0;
+    }
+    else
+    {
+        // Now user time
+        tCIDLib::TEncodedTime enctSec = m_hprocThis.m_phprociThis->UserTime.tv_sec;
+        tCIDLib::TEncodedTime enctUSec = m_hprocThis.m_phprociThis->UserTime.tv_usec;
+        enctInUserMode = (enctSec * 1000000 + enctUSec) * 10;
+
+        // And kernel time
+        enctSec = m_hprocThis.m_phprociThis->KernelTime.tv_sec;
+        enctUSec = m_hprocThis.m_phprociThis->KernelTime.tv_usec;
+        enctInKernel = (enctSec * 1000000 + enctUSec) * 10;
+
+        // Now end time
+        TKrnlLinux::LinuxFileTimeToCIDFileTime(m_hprocThis.m_phprociThis->EndTime.tv_sec, enctEnd);
+        enctEnd += tCIDLib::TEncodedTime(m_hprocThis.m_phprociThis->EndTime.tv_usec) * 10;
     }
 
     return kCIDLib::True;
@@ -422,7 +557,7 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
         SchedParam.sched_priority = ::sched_get_priority_min(SCHED_RR);
     }
 
-    if (::sched_setscheduler(__hprocThis.__phprociThis->pidThis
+    if (::sched_setscheduler(m_hprocThis.m_phprociThis->pidThis
                              , iPolicy
                              , &SchedParam))
     {
@@ -434,75 +569,15 @@ TKrnlExtProcess::bSetPriorityClass(const tCIDLib::EPrioClasses eNewClass)
 }
 
 
-tCIDLib::TBoolean
-TKrnlExtProcess::bQueryProcessTimes(tCIDLib::TEncodedTime&     enctStart
-                                    , tCIDLib::TEncodedTime&   enctEnd
-                                    , tCIDLib::TEncodedTime&   enctInKernel
-                                    , tCIDLib::TEncodedTime&   enctInUserMode)
-{
-    tCIDLib::TCard4 c4BootTime;
-    if (!__bQueryBootTime(c4BootTime))
-        return kCIDLib::False;
-
-    tCIDLib::TBoolean bRun;
-    if (!bIsRunning(bRun))
-        return kCIDLib::False;
-
-    // First set the start time
-    TKrnlLinux::LinuxFileTimeToCIDFileTime(c4BootTime, enctStart);
-    enctStart += tCIDLib::TEncodedTime(__hprocThis.__phprociThis->c4JiffyStartTime) * 100000;
-
-    // We need to use a different method of getting the time if the process is still
-    // running.
-    if (bRun)
-    {
-        tCIDLib::TCard4 c4JiffyUserTime;
-        tCIDLib::TCard4 c4JiffyKernelTime;
-
-        if (!__bQueryRawTimes(__hprocThis.__phprociThis->pidThis
-                              , c4JiffyUserTime
-                              , c4JiffyKernelTime))
-        {
-            return kCIDLib::False;
-        }
-
-        // Now user time
-        enctInUserMode = tCIDLib::TEncodedTime(c4JiffyUserTime) * 100000;
-
-        // And kernel time
-        enctInKernel = tCIDLib::TEncodedTime(c4JiffyKernelTime) * 100000;
-
-        // End time is not relevant
-        enctEnd = 0;
-    }
-    else
-    {
-        // Now user time
-        tCIDLib::TEncodedTime enctSec = __hprocThis.__phprociThis->UserTime.tv_sec;
-        tCIDLib::TEncodedTime enctUSec = __hprocThis.__phprociThis->UserTime.tv_usec;
-        enctInUserMode = (enctSec * 1000000 + enctUSec) * 10;
-
-        // And kernel time
-        enctSec = __hprocThis.__phprociThis->KernelTime.tv_sec;
-        enctUSec = __hprocThis.__phprociThis->KernelTime.tv_usec;
-        enctInKernel = (enctSec * 1000000 + enctUSec) * 10;
-
-        // Now end time
-        TKrnlLinux::LinuxFileTimeToCIDFileTime(__hprocThis.__phprociThis->EndTime.tv_sec, enctEnd);
-        enctEnd += tCIDLib::TEncodedTime(__hprocThis.__phprociThis->EndTime.tv_usec) * 10;
-    }
-
-    return kCIDLib::True;
-}
 
 
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
-                        ,       tCIDLib::TCh**          apszParms
-                        , const tCIDLib::TCard4         c4ParmCount
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
-                        , const tCIDLib::EExtProcFlags  eFlag)
+                        , const tCIDLib::TCh* const     pszInitPath
+                        ,       tCIDKernel::TStrList&   klistParms
+                        ,       tCIDKernel::TStrList&   klistEnviron
+                        , const tCIDLib::EExtProcFlags  eFlag
+                        , const tCIDLib::EExtProcShows  eShow)
 {
     tCIDLib::TBoolean bRun;
     if (!bIsRunning(bRun))
@@ -514,35 +589,54 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
         return kCIDLib::False;
     }
 
+    //
     // Make the array for arguments. Add two to the size because the first argument
     // should be the name of the file to execute and the last should be zero.
-    tCIDLib::TCard4 c4Counter;
-    tCIDLib::TSCh** apszParamCopy = new tCIDLib::TSCh*[c4ParmCount + 2];
+    //
+    tCIDLib::TSCh** apszParamCopy = new tCIDLib::TSCh*[klistParms.c4ElemCount() + 2];
 
     tCIDLib::TCh szNameExt[kCIDLib::c4MaxPathLen + 1];
     TKrnlPathStr::bQueryNameExt(pszPath, szNameExt, c4MaxBufChars(szNameExt));
-    apszParamCopy[0] = TRawStr::pszConvert(szNameExt);
+    tCIDLib::TCard4 c4ArrayIndex = 0;
+    
+    apszParamCopy[c4ArrayIndex++] = TRawStr::pszConvert(szNameExt);
 
-    for (c4Counter = 1; c4Counter <= c4ParmCount; c4Counter++)
-        apszParamCopy[c4Counter] = TRawStr::pszConvert(apszParms[c4Counter - 1]);
-    apszParamCopy[c4Counter] = 0;
+    if (klistParms.bResetCursor())
+    {
+        TKrnlString* pkstrCur = klistParms.pobjHead();
+        do
+        {
+            apszParamCopy[c4ArrayIndex++] = TRawStr::pszConvert(pkstrCur->pszValue());            
+        }   while (klistParms.bNext(pkstrCur));
+    }
+    apszParamCopy[c4ArrayIndex++] = 0;
 
-    // Now convert the file name.
-    // Search for it manually in the path for simplicity. The other option
-    // would be to call "execvp", but that would only work if there is no
-    // environment passed in. It doesn't make sense to introduce the extra
-    // complexity.
+    //
+    //  Now convert the file name.
+    //
+    //  Search for it manually in the path for simplicity. The other option
+    //  would be to call "execvp", but that would only work if there is no
+    //  environment passed in. It doesn't make sense to introduce the extra
+    //  complexity.
+    //
     tCIDLib::TSCh* pszFileName = TKrnlLinux::pszFindInPath(pszPath);
     TArrayJanitor<tCIDLib::TSCh> janPath(pszFileName);
 
     // Only worry about the environment if there is one.
-    tCIDLib::TSCh** apszEnvironCopy = 0;
-    if (c4EnvironCount)
+    tCIDLib::TSCh** apszEnvironCopy = nullptr;
+    if (!klistEnviron.bIsEmpty())
     {
-        apszEnvironCopy = new tCIDLib::TSCh*[c4EnvironCount + 1];
-        for (c4Counter = 0; c4Counter < c4ParmCount; c4Counter++)
-            apszEnvironCopy[c4Counter] = TRawStr::pszConvert(apszEnviron[c4Counter]);
-        apszEnvironCopy[c4Counter] = 0;
+        apszEnvironCopy = new tCIDLib::TSCh*[klistEnviron.c4ElemCount() + 1];
+        c4ArrayIndex = 0;
+        if (klistEnviron.bResetCursor())
+        {
+            TKrnlString* pkstrCur = klistEnviron.pobjHead();
+            do
+            {
+                apszEnvironCopy[c4ArrayIndex++] = TRawStr::pszConvert(pkstrCur->pszValue());            
+            }   while (klistEnviron.bNext(pkstrCur));
+        }
+        apszEnvironCopy[c4ArrayIndex] = 0;
     }
 
     // Before we make the new process, we need to block child signals.
@@ -567,26 +661,29 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
         ::sigprocmask(SIG_SETMASK, &OldSigSet, 0);
 
         // Clean up the strings we converted
-        c4Counter = 0;
-        while (apszParamCopy[c4Counter])
-            delete [] apszParamCopy[c4Counter++];
+        c4ArrayIndex = 0;
+        while (apszParamCopy[c4ArrayIndex])
+            delete [] apszParamCopy[c4ArrayIndex++];
         delete [] apszParamCopy;
-        if (c4EnvironCount)
+
+        if (apszEnvironCopy)
         {
-            c4Counter = 0;
-            while (apszEnvironCopy[c4Counter])
-                delete [] apszEnvironCopy[c4Counter++];
+            c4ArrayIndex = 0;
+            while (apszEnvironCopy[c4ArrayIndex])
+                delete [] apszEnvironCopy[c4ArrayIndex++];
             delete [] apszEnvironCopy;
         }
         TKrnlError::SetLastHostError(errno);
         return kCIDLib::False;
     }
 
+    //
     // pidTmp equals zero if we're in the child process. In that case
     // we need to execute the file.
+    //
     if (pidTmp == 0)
     {
-        if (c4EnvironCount)
+        if (apszEnvironCopy)
             ::execve(pszFileName, apszParamCopy, apszEnvironCopy);
         else
             ::execv(pszFileName, apszParamCopy);
@@ -604,21 +701,21 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
 
         // Call _exit() instead of exit() to avoid flushing buffered streams
         // that actually belong to the parent.
-        ::_exit(eExit);
+        ::_exit(tCIDLib::c4EnumOrd(eExit));
     }
 
     // We're in the parent process
     // Get its start time. Since SIGCHLD is blocked, we can be sure
     // that this data is available.
-    if (!__bQueryRawStartTime(pidTmp, __hprocThis.__phprociThis->c4JiffyStartTime))
-        __hprocThis.__phprociThis->c4JiffyStartTime = 0;
+    if (!CIDKernel_ExtProc_Linux::bQueryRawStartTime(pidTmp, m_hprocThis.m_phprociThis->c4JiffyStartTime))
+        m_hprocThis.m_phprociThis->c4JiffyStartTime = 0;
 
     // Set up the handle
-    __hprocThis.__phprociThis->pidThis = pidTmp;
+    m_hprocThis.m_phprociThis->pidThis = pidTmp;
 
     // Add it to the list of processes for which we're waiting. This handle will be
     // removed from the list when this object is destroyed.
-    __ChildProcs.AddChildProc(&__hprocThis);
+    CIDKernel_ExtProc_Linux::ChildProcs.AddChildProc(&m_hprocThis);
 
     // Now it's safe to restore the old signal mask, which should unblock
     // the SIGCHLD signal.
@@ -626,15 +723,16 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
     ::sigprocmask(SIG_SETMASK, &OldSigSet, 0);
 
     // Delete the strings we converted
-    c4Counter = 0;
-    while (apszParamCopy[c4Counter])
-        delete [] apszParamCopy[c4Counter++];
+    c4ArrayIndex = 0;
+    while (apszParamCopy[c4ArrayIndex])
+        delete [] apszParamCopy[c4ArrayIndex++];
     delete [] apszParamCopy;
-    if (c4EnvironCount)
+
+    if (apszEnvironCopy)
     {
-        c4Counter = 0;
-        while (apszEnvironCopy[c4Counter])
-            delete [] apszEnvironCopy[c4Counter++];
+        c4ArrayIndex = 0;
+        while (apszEnvironCopy[c4ArrayIndex])
+            delete [] apszEnvironCopy[c4ArrayIndex++];
         delete [] apszEnvironCopy;
     }
 
@@ -644,59 +742,32 @@ TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszPath
 
 tCIDLib::TBoolean
 TKrnlExtProcess::bStart(const   tCIDLib::TCh* const     pszStartString
-                        ,       tCIDLib::TCh**          apszEnviron
-                        , const tCIDLib::TCard4         c4EnvironCount
-                        , const tCIDLib::EExtProcFlags  eFlag)
+                        , const tCIDLib::TCh* const     pszInitPath
+                        ,       tCIDKernel::TStrList&   klistEnviron
+                        , const tCIDLib::EExtProcFlags  eFlag
+                        , const tCIDLib::EExtProcShows  eShow)
 {
-    //  Ok, first check to make sure that we are not already running. If
-    //  we are, then that's this is not legal.
-    tCIDLib::TBoolean bRun;
-    if (!bIsRunning(bRun))
-        return kCIDLib::False;
+    // Break out the start string into a program to run plus parameters
+    
 
-    if (bRun)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyStarted);
-        return kCIDLib::False;
-    }
-
-    //  Parse the command line into its components. This both makes sure that
-    //  its legal, and allows us to separate out the program part of the
-    //  command line (so that we can see that type of program it is.)
-    const tCIDLib::TCard4 c4MaxParmCnt = 512;
-    tCIDLib::TCh** apszParms = new tCIDLib::TCh*[c4MaxParmCnt];
-
-    tCIDLib::TCard4 c4ActualParmCnt =
-        c4BreakOutParms(pszStartString, apszParms, c4MaxParmCnt);
-
-    tCIDLib::TBoolean bRet;
-    if (c4ActualParmCnt != 0)
-    {
-        bRet = bStart(apszParms[0]
-                      , &apszParms[1]
-                      , c4ActualParmCnt - 1
-                      , apszEnviron
-                      , c4EnvironCount
-                      , eFlag);
-    }
-    else
-    {
-        bRet = kCIDLib::False;
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcExtP_EmptyCmdLine);
-    }
-
-    // Clean up the params
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ActualParmCnt; c4Index++)
-        delete [] apszParms[c4Index];
-    delete [] apszParms;
-
-    return bRet;
-}
+    return kCIDLib::False;
+}                        
 
 
 tCIDLib::TBoolean
-TKrnlExtProcess::bSystemEscape(const tCIDLib::TCh* const pszCommandLine
-                               , const tCIDLib::ESysEscFlags   eFlags)
+TKrnlExtProcess::bStartAsOpen(  const   tCIDLib::TCh* const     pszDocPath
+                                , const tCIDLib::EExtProcShows  eShow
+                                , const tCIDLib::TBoolean       bAdminPrivs)
+{
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}                                
+
+
+
+tCIDLib::TBoolean
+TKrnlExtProcess::bSystemEscape(const    tCIDLib::TCh* const     pszCommandLine
+                               , const  tCIDLib::ESysEscFlags   eFlags)
 {
     //
     //  This guy just needs to create a new string which runs the system
@@ -707,8 +778,8 @@ TKrnlExtProcess::bSystemEscape(const tCIDLib::TCh* const pszCommandLine
     const tCIDLib::TCard4       c4BufSize = 4095;
     tCIDLib::TCh                szCmdLine[c4BufSize + 1];
 
-    tCIDLib::TCh* pszShellSwitches;
-    if (eFlags & tCIDLib::ESysEscFlags::StayOpen)
+    const tCIDLib::TCh* pszShellSwitches;
+    if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::ESysEscFlags::StayOpen))
         pszShellSwitches = L"-i -c ";
     else
         pszShellSwitches = L"-c ";
@@ -720,13 +791,14 @@ TKrnlExtProcess::bSystemEscape(const tCIDLib::TCh* const pszCommandLine
                         , pszCommandLine);
 
     // And now just call the appropriate start command, run it non-detached
-    if (!bStart(szCmdLine, tCIDLib::EExtProcFlags::NonDetached))
+    if (!bStart(szCmdLine, L"", tCIDLib::EExtProcFlags::None, tCIDLib::EExtProcShows::Normal))
         return kCIDLib::False;
 
-    if (eFlags & tCIDLib::ESysEscFlags::Wait)
+    if (tCIDLib::bAllBitsOn(eFlags, tCIDLib::ESysEscFlags::Wait))
     {
+        tCIDLib::TBoolean bState;
         tCIDLib::EExitCodes eExit;
-        return bWaitForDeath(eExit);
+        return bWaitForDeath(bState, eExit, kCIDLib::c4MaxWait);
     }
 
     return kCIDLib::True;
@@ -734,19 +806,29 @@ TKrnlExtProcess::bSystemEscape(const tCIDLib::TCh* const pszCommandLine
 
 
 tCIDLib::TBoolean
-TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
-                                , const tCIDLib::TCard4      c4MilliSecs) const
+TKrnlExtProcess::bTryAttachTo(  const   tCIDLib::TCh* const pszAttachInfo
+                                ,       tCIDLib::TBoolean&  bAttached)
 {
-    if (!__hprocThis.__phprociThis->pidThis)
+    TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotSupported);
+    return kCIDLib::False;
+}
+
+
+tCIDLib::TBoolean
+TKrnlExtProcess::bWaitForDeath(         tCIDLib::TBoolean&      bState
+                                ,       tCIDLib::EExitCodes&    eToFill
+                                , const tCIDLib::TCard4         c4MilliSecs) const
+{
+    if (!m_hprocThis.m_phprociThis->pidThis)
     {
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NeverStarted);
         return kCIDLib::False;
     }
 
     // If it's already clean, then we're off the hook.
-    if (__hprocThis.__phprociThis->bAlreadyClean)
+    if (m_hprocThis.m_phprociThis->bAlreadyClean)
     {
-        eToFill = __hprocThis.__phprociThis->eExit;
+        eToFill = m_hprocThis.m_phprociThis->eExit;
         return kCIDLib::True;
     }
 
@@ -766,9 +848,9 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
             return kCIDLib::False;
         }
 
-        if (__hprocThis.__phprociThis->bAlreadyClean)
+        if (m_hprocThis.m_phprociThis->bAlreadyClean)
         {
-            eToFill = __hprocThis.__phprociThis->eExit;
+            eToFill = m_hprocThis.m_phprociThis->eExit;
             return kCIDLib::True;
         }
 
@@ -776,12 +858,14 @@ TKrnlExtProcess::bWaitForDeath(         tCIDLib::EExitCodes& eToFill
         TimeRequested.tv_nsec = TimeRemaining.tv_nsec;
     }
 
-    if (__hprocThis.__phprociThis->bAlreadyClean)
+    if (m_hprocThis.m_phprociThis->bAlreadyClean)
     {
-        eToFill = __hprocThis.__phprociThis->eExit;
+        eToFill = m_hprocThis.m_phprociThis->eExit;
         return kCIDLib::True;
     }
 
     TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_Timeout);
     return kCIDLib::False;
 }
+
+

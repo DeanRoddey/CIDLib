@@ -473,27 +473,28 @@ namespace tCIDCtrls
     CIDCTRLSEXP const TString& strLoadEEdgeAnchors(const tCIDCtrls::EEdgeAnchors);
     CIDCTRLSEXP tCIDCtrls::EWndThemes eXlatEWndThemes(const TString&);
     CIDCTRLSEXP const TString& strLoadEWndThemes(const tCIDCtrls::EWndThemes);
+
+
+    // ---------------------------------------------------------------------------
+    //  Provide streaming and standard enum class support for some of our enums that
+    //  have to be defined down below the ability to use the IDL compiler.
+    // ---------------------------------------------------------------------------
+    #if !defined(CIDCTRLS_NOCLASSES)
+    EnumBinStreamMacros(tCIDCtrls::EEdgeAnchors)
+    EnumBinStreamMacros(tCIDCtrls::EPosStates)
+    EnumBinStreamMacros(tCIDCtrls::EWndStyles)
+    EnumBinStreamMacros(tCIDCtrls::EWndThemes)
+
+    StdEnumTricks(tCIDCtrls::EEdgeAnchors)
+    StdEnumTricks(tCIDCtrls::EWndThemes)
+
+    BmpEnumTricks(tCIDCtrls::EDlgFlags)
+    BmpEnumTricks(tCIDCtrls::EDlgItemFlags)
+    BmpEnumTricks(tCIDCtrls::ERedrawFlags)
+    BmpEnumTricks(tCIDCtrls::EWndStyles)
+    BmpEnumTricks(tCIDCtrls::EExWndStyles)
+
 }
-
-
-// ---------------------------------------------------------------------------
-//  Provide streaming and standard enum class support for some of our enums that
-//  have to be defined down below the ability to use the IDL compiler.
-// ---------------------------------------------------------------------------
-#if !defined(CIDCTRLS_NOCLASSES)
-EnumBinStreamMacros(tCIDCtrls::EEdgeAnchors)
-EnumBinStreamMacros(tCIDCtrls::EPosStates)
-EnumBinStreamMacros(tCIDCtrls::EWndStyles)
-EnumBinStreamMacros(tCIDCtrls::EWndThemes)
-
-StdEnumTricks(tCIDCtrls::EEdgeAnchors)
-StdEnumTricks(tCIDCtrls::EWndThemes)
-
-BmpEnumTricks(tCIDCtrls::EDlgFlags)
-BmpEnumTricks(tCIDCtrls::EDlgItemFlags)
-BmpEnumTricks(tCIDCtrls::ERedrawFlags)
-BmpEnumTricks(tCIDCtrls::EWndStyles)
-BmpEnumTricks(tCIDCtrls::EExWndStyles)
 
 #endif
 

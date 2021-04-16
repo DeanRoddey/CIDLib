@@ -44,12 +44,15 @@ RTTIDecls(TMEngArrayInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_ArrayClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strArray(L"Array");
-    const TString   strClassPath(L"MEng.System.Runtime.Array");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strArray(L"Array");
+        const TString   strClassPath(L"MEng.System.Runtime.Array");
+    }
 }
 
 
@@ -178,7 +181,7 @@ TMEngArrayVal::CopyFrom(const   TMEngClassVal&      mecvToCopy
         TRawMem::SetMemBuf
         (
             pNew
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , mecvSrc.m_c4ElemCount * sizeof(TMEngClassVal*)
         );
 
@@ -337,7 +340,7 @@ tCIDLib::TVoid TMEngArrayVal::Initialize(const tCIDLib::TCard4 c4ElemCount)
     TRawMem::SetMemBuf
     (
         m_pElems
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , c4ElemCount * sizeof(TMEngClassVal*)
     );
 }
@@ -369,7 +372,7 @@ TMEngArrayVal::Reallocate(const tCIDLib::TCard4 c4ElemCount)
     TRawMem::SetMemBuf
     (
         pNew
-        , tCIDLib::TCard1(0)
+        , kCIDLib::c1MinCard
         , c4ElemCount * sizeof(TMEngClassVal*)
     );
 
@@ -499,9 +502,9 @@ TMEngArrayInfo::TMEngArrayInfo(         TCIDMacroEngine&    meOwner
         , strParentClassPath
         , c2ElemId
     )
-    , m_c2MethId_Ctor(kMacroEng::c2BadId)
-    , m_c2MethId_GetElemCount(kMacroEng::c2BadId)
-    , m_c2MethId_Reallocate(kMacroEng::c2BadId)
+    , m_c2MethId_Ctor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetElemCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reallocate(kCIDMacroEng::c2BadId)
     , m_pmeciBase(0)
 {
     //

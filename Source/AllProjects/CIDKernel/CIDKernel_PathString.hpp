@@ -53,12 +53,33 @@
 // ---------------------------------------------------------------------------
 namespace TKrnlPathStr
 {
+    KRNLEXPORT tCIDLib::TBoolean bAddLevel
+    (
+                tCIDLib::TCh* const     pszTar
+        , const tCIDLib::TCh* const     pszToAdd
+        , const tCIDLib::TCard4         c4MaxChars
+    );
+
+    KRNLEXPORT tCIDLib::TBoolean bAddTrailingSep
+    (
+                tCIDLib::TCh* const     pszTar
+        , const tCIDLib::TCard4         c4MaxChars
+    );
+
+    KRNLEXPORT tCIDLib::TBoolean bCombinePath
+    (
+                tCIDLib::TCh* const     pszTar
+        , const tCIDLib::TCh* const     pszFirst
+        , const tCIDLib::TCh* const     pszSecond
+        , const tCIDLib::TCard4         c4MaxChars
+    );
+
     KRNLEXPORT tCIDLib::TBoolean bFindPart
     (
-        const   tCIDLib::TCh* const pszSrc
-        ,       tCIDLib::TCard4&    c4Start
-        ,       tCIDLib::TCard4&    c4End
-        , const tCIDLib::EPathParts ePart
+        const   tCIDLib::TCh* const     pszSrc
+        ,       tCIDLib::TCard4&        c4Start
+        ,       tCIDLib::TCard4&        c4End
+        , const tCIDLib::EPathParts     ePart
     );
 
     KRNLEXPORT tCIDLib::TBoolean bHasExt

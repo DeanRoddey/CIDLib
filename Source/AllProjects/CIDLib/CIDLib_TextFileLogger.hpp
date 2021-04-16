@@ -65,6 +65,7 @@ class CIDLIBEXP TTextFileLogger : public TObject, public MLogger
         );
 
         TTextFileLogger(const TTextFileLogger&) = delete;
+        TTextFileLogger(TTextFileLogger&&) = delete;
 
         ~TTextFileLogger();
 
@@ -73,6 +74,7 @@ class CIDLIBEXP TTextFileLogger : public TObject, public MLogger
         //  Public operators
         // -------------------------------------------------------------------
         TTextFileLogger& operator=(const TTextFileLogger&) = delete;
+        TTextFileLogger& operator=(TTextFileLogger&&) = delete;
 
 
         // -------------------------------------------------------------------

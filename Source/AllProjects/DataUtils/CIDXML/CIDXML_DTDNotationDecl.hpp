@@ -71,10 +71,8 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
             , const tCIDLib::TCh* const     pszSystemId
         );
 
-        TDTDNotationDecl
-        (
-            const   TDTDNotationDecl&       xdeclToCopy
-        );
+        TDTDNotationDecl(const TDTDNotationDecl&) = default;
+        TDTDNotationDecl(TDTDNotationDecl&&) = default;
 
         ~TDTDNotationDecl();
 
@@ -82,10 +80,8 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TDTDNotationDecl& operator=
-        (
-            const   TDTDNotationDecl&       xdeclToAssign
-        );
+        TDTDNotationDecl& operator=(const TDTDNotationDecl&) = default;
+        TDTDNotationDecl& operator=(TDTDNotationDecl&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -95,7 +91,7 @@ class CIDXMLEXP TDTDNotationDecl : public TXMLNotationDecl
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPools
-        )   const;
+        )   const final;
 
 
     private :

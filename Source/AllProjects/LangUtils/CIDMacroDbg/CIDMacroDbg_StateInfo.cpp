@@ -43,8 +43,11 @@ RTTIDecls(TMacroDbgStateInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDMacroDbg_StateInfo
 {
-    // Our current persistent format version
-    const   tCIDLib::TCard2     c2FmtVersion = 1;
+    namespace
+    {
+        // Our current persistent format version
+        constexpr   tCIDLib::TCard2     c2FmtVersion = 1;
+    }
 }
 
 

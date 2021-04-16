@@ -49,14 +49,8 @@ AdvRTTIDecls(TMoney,TObject)
 // ---------------------------------------------------------------------------
 TMoney& TMoney::Nul_TMoney()
 {
-    static TMoney* pmonNull = nullptr;
-    if (!pmonNull)
-    {
-        TBaseLock lockInit;
-        if (!pmonNull)
-            TRawMem::pExchangePtr(&pmonNull, new TMoney);
-    }
-    return *pmonNull;
+    static TMoney monNull;
+    return monNull;
 }
 
 
@@ -162,7 +156,7 @@ tCIDLib::TFloat8 TMoney::f8Val(const tCIDLib::TFloat8 f8NewVal)
 // ---------------------------------------------------------------------------
 //  TMoney: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TMoney::FormatTo(TTextOutStream& strmToWriteTo) const
+tCIDLib::TVoid TMoney::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
     // Get a quick ref to the value
     const tCIDLib::TFloat8 f8Fmt = f8Val();

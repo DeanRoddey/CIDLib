@@ -60,14 +60,16 @@ class CIDENCODEEXP TMode1EncodingBase : public TTextConverter
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
+        tCIDLib::EBaseTextFmts eBaseFmt() const override;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
         tCIDLib::TBoolean bDoTests
         (
                     TString&                strErr
         );
-
-        tCIDLib::EBaseTextFmts eBaseFmt() const;
-
-        tCIDLib::TVoid Reset();
 
 
     protected :
@@ -82,15 +84,11 @@ class CIDENCODEEXP TMode1EncodingBase : public TTextConverter
             , const tCIDLib::TCard4         c4FromSize
         );
 
-        TMode1EncodingBase
-        (
-            const   TMode1EncodingBase&     tcvtToCopy
-        );
+        TMode1EncodingBase(const TMode1EncodingBase&) = default;
+        TMode1EncodingBase(TMode1EncodingBase&&) = default;
 
-        TMode1EncodingBase& operator=
-        (
-            const   TMode1EncodingBase&     tcvtToAssign
-        );
+        TMode1EncodingBase& operator=(const TMode1EncodingBase&) = default;
+        TMode1EncodingBase& operator=(TMode1EncodingBase&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -104,7 +102,7 @@ class CIDENCODEEXP TMode1EncodingBase : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   override;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -114,7 +112,7 @@ class CIDENCODEEXP TMode1EncodingBase : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   override;
 
 
     private :

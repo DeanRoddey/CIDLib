@@ -46,12 +46,12 @@ class CIDLIBEXP TSize :
 
         TSize
         (
-            const   tCIDLib::THostSize&     szToCopy
+            const   tCIDLib::THostSize&     szSrc
         );
 
         TSize
         (
-            const   tCIDLib::TRawSize&      szToCopy
+            const   tCIDLib::TRawSize&      szSrc
         );
 
         TSize(const tCIDLib::TCard4 c4X, const tCIDLib::TCard4 c4Y) :
@@ -69,14 +69,18 @@ class CIDLIBEXP TSize :
         }
 
         TSize(const TSize& szSrc) = default;
+        TSize(TSize&& szSrc) = default;
+
+        ~TSize() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        operator const tCIDLib::THostSize&() const;
-
         TSize& operator=(const TSize&) = default;
+        TSize& operator=(TSize&&) = default;
+
+        operator const tCIDLib::THostSize&() const;
 
         tCIDLib::TVoid operator=
         (
@@ -181,7 +185,7 @@ class CIDLIBEXP TSize :
         (
             const   TString&                strText
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
         );
 
         tCIDLib::TCard4 c4Packed() const;
@@ -237,7 +241,7 @@ class CIDLIBEXP TSize :
 
         tCIDLib::TVoid Exchange()
         {
-            tCIDLib::TCard4 i4Tmp = m_c4CX;
+            const tCIDLib::TCard4 i4Tmp = m_c4CX;
             m_c4CX = m_c4CY;
             m_c4CY = i4Tmp;
         }
@@ -246,7 +250,7 @@ class CIDLIBEXP TSize :
         (
                     TString&                strToFill
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
         )   const;
 
@@ -254,7 +258,7 @@ class CIDLIBEXP TSize :
         (
             const   TString&                strText
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
-            , const tCIDLib::TCh            chSepChar = L','
+            , const tCIDLib::TCh            chSepChar = kCIDLib::chComma
         );
 
         tCIDLib::TVoid Scale
@@ -333,17 +337,17 @@ class CIDLIBEXP TSize :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

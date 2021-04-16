@@ -41,21 +41,17 @@ class CIDENCODEEXP TLatin2Converter : public TMode1EncodingBase
         // -------------------------------------------------------------------
         TLatin2Converter();
 
-        TLatin2Converter
-        (
-            const   TLatin2Converter&       tcvtToCopy
-        );
+        TLatin2Converter(const TLatin2Converter&) = default;
+        TLatin2Converter(TLatin2Converter&&) = default;
 
-        ~TLatin2Converter();
+        ~TLatin2Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TLatin2Converter& operator=
-        (
-            const   TLatin2Converter&       tcvtToAssign
-        );
+        TLatin2Converter& operator=(const TLatin2Converter&) = default;
+        TLatin2Converter& operator=(TLatin2Converter&&) = default;
 
 
     private :

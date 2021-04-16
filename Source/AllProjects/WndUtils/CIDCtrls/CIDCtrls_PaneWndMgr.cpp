@@ -43,15 +43,18 @@ RTTIDecls(TPaneWndCont, TWindow)
 // ---------------------------------------------------------------------------
 namespace CIDCtrls_PaneWndMgr
 {
-    // The pixels between panes (where the resizing is done)
-    const tCIDLib::TCard4 c4DivMargin(4);
+    namespace
+    {
+        // The pixels between panes (where the resizing is done)
+        constexpr tCIDLib::TCard4 c4DivMargin = 4;
 
-    //
-    //  The space around the div that we use to decide whether the mouse is on the div
-    //  or not.
-    //
-    const tCIDLib::TInt4  i4DivMinus = 7;
-    const tCIDLib::TInt4  i4DivPlus = 8;
+        //
+        //  The space around the div that we use to decide whether the mouse is on the div
+        //  or not.
+        //
+        constexpr tCIDLib::TInt4  i4DivMinus = 7;
+        constexpr tCIDLib::TInt4  i4DivPlus = 8;
+    }
 }
 
 
@@ -81,6 +84,7 @@ TPaneWnd::TPaneWnd(         TWindow* const  pwndMng
     m_szMin.TakeLarger(TSize(32, 32));
 }
 
+// We don't copy runtime only stuff
 TPaneWnd::TPaneWnd(const TPaneWnd& panewSrc) :
 
     m_pwndPane(panewSrc.m_pwndPane)
@@ -97,6 +101,8 @@ TPaneWnd::~TPaneWnd()
 // ---------------------------------------------------------------------------
 //  TPaneWndCont::TPaneWnd: Public operators
 // ---------------------------------------------------------------------------
+
+// We don't copy runtime only stuff
 TPaneWnd& TPaneWnd::operator=(const TPaneWnd& panewSrc)
 {
     if (&panewSrc != this)
@@ -379,7 +385,7 @@ TPaneLayout2Horz::AdjustPanes(          tCIDCtrls::TPaneList&   colPanes
                 //  we just have to overhang.
                 //
                 panew1.SetHeight(c41MinSz);
-                panew2.SetTop(panew1.i4Bottom() + 1);
+                panew2.SetTop(panew1.i4Bottom());
                 panew2.SetHeight(c42MinSz);
             }
              else if (c41MinSz + c42MinSz < areaNew.c4Height())
@@ -418,7 +424,7 @@ TPaneLayout2Horz::AdjustPanes(          tCIDCtrls::TPaneList&   colPanes
                             panew1.SetHeight(c41MinSz);
                     }
 
-                    panew2.SetTop(panew1.i4Bottom() + 1);
+                    panew2.SetTop(panew1.i4Bottom());
                     panew2.SetBottom(areaNew.i4Bottom());
                 }
             }
@@ -502,7 +508,7 @@ TPaneLayout2Horz::bDragAdjust(          tCIDCtrls::TPaneList&   colPanes
     TPaneWnd& panew2 = colPanes[c4Sec];
 
     panew1.SetBottom(pntAt.i4Y());
-    panew2.SetTop(panew1.i4Bottom() + 1);
+    panew2.SetTop(panew1.i4Bottom());
 
     // The 2nd is ended at the availale area
     panew2.SetBottom(areaAvail.i4Bottom());
@@ -553,7 +559,7 @@ TPaneLayout2Horz::InitPanes(        tCIDCtrls::TPaneList&   colPanes
     }
 
     colPanes[0].SetHeight(c4Height1);
-    colPanes[1].SetTop(colPanes[0].i4Bottom() + 1);
+    colPanes[1].SetTop(colPanes[0].i4Bottom());
     colPanes[1].SetHeight(c4Height2);
 }
 
@@ -620,7 +626,7 @@ TPaneLayout2Vert::AdjustPanes(          tCIDCtrls::TPaneList&   colPanes
             {
                 // They both have to go to min, even if one hangs off
                 panew1.SetWidth(c41MinSz);
-                panew2.SetLeft(panew1.i4Right() + 1);
+                panew2.SetLeft(panew1.i4Right());
                 panew2.SetWidth(c42MinSz);
             }
              else if (c41MinSz + c42MinSz < areaNew.c4Width())
@@ -656,7 +662,7 @@ TPaneLayout2Vert::AdjustPanes(          tCIDCtrls::TPaneList&   colPanes
                             panew1.SetWidth(c41MinSz);
                     }
 
-                    panew2.SetLeft(panew1.i4Right() + 1);
+                    panew2.SetLeft(panew1.i4Right());
                     panew2.SetRight(areaNew.i4Right());
                 }
             }
@@ -740,7 +746,7 @@ TPaneLayout2Vert::bDragAdjust(          tCIDCtrls::TPaneList&   colPanes
     TPaneWnd& panew2 = colPanes[c4Sec];
 
     panew1.SetRight(pntAt.i4X());
-    panew2.SetLeft(panew1.i4Right() + 1);
+    panew2.SetLeft(panew1.i4Right());
 
     // The 2nd is ended at the availale area
     panew2.SetRight(areaAvail.i4Right());
@@ -791,7 +797,7 @@ TPaneLayout2Vert::InitPanes(        tCIDCtrls::TPaneList&   colPanes
     }
 
     colPanes[0].SetWidth(c4Width1);
-    colPanes[1].SetLeft(colPanes[0].i4Right() + 1);
+    colPanes[1].SetLeft(colPanes[0].i4Right());
     colPanes[1].SetWidth(c4Width2);
 }
 
@@ -861,18 +867,18 @@ TPaneLayout3Vert::AdjustPanes(          tCIDCtrls::TPaneList&   colPanes
              else if (c41Sz + c42MinSz + c43MinSz <= areaNew.c4Width())
             {
                 // #3 We can take it from 2 and 3 panes
-                panew2.SetLeft(panew1.i4Right() + 1);
+                panew2.SetLeft(panew1.i4Right());
                 panew2.SetWidth(c42MinSz);
-                panew3.SetLeft(panew2.i4Right() + 1);
+                panew3.SetLeft(panew2.i4Right());
                 panew3.SetRight(areaNew.i4Right());
             }
              else
             {
                 // #4 They all have to go min, even if they overhang
                 panew1.SetWidth(c41MinSz);
-                panew2.SetLeft(panew1.i4Right() + 1);
+                panew2.SetLeft(panew1.i4Right());
                 panew2.SetWidth(c42MinSz);
-                panew3.SetLeft(panew2.i4Right() + 1);
+                panew3.SetLeft(panew2.i4Right());
                 panew3.SetWidth(c43MinSz);
             }
         }
@@ -963,7 +969,7 @@ TPaneLayout3Vert::bDragAdjust(          tCIDCtrls::TPaneList&   colPanes
     TPaneWnd& panew2 = colPanes[c4Sec];
 
     panew1.SetRight(pntAt.i4X());
-    panew2.SetLeft(panew1.i4Right() + 1);
+    panew2.SetLeft(panew1.i4Right());
 
     // The 2nd is ended either on the left of the last pane, or the available area
     if (c4First == 0)
@@ -1016,10 +1022,10 @@ TPaneLayout3Vert::InitPanes(        tCIDCtrls::TPaneList&   colPanes
 
     colPanes[0].SetWidth(c4Width1);
 
-    colPanes[1].SetLeft(colPanes[0].i4Right() + 1);
+    colPanes[1].SetLeft(colPanes[0].i4Right());
     colPanes[1].SetWidth(c4Width2);
 
-    colPanes[2].SetLeft(colPanes[1].i4Right() + 1);
+    colPanes[2].SetLeft(colPanes[1].i4Right());
     colPanes[2].SetWidth(c4Width3);
 }
 

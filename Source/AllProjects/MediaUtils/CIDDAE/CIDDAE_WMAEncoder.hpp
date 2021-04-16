@@ -50,6 +50,7 @@ class CIDDAEEXP TCIDDAEWMADec : public TCIDDAEDecoder
         TCIDDAEWMADec();
 
         TCIDDAEWMADec(const TCIDDAEWMADec&) = delete;
+        TCIDDAEWMADec(TCIDDAEWMADec&&) = delete;
 
         ~TCIDDAEWMADec();
 
@@ -58,6 +59,7 @@ class CIDDAEEXP TCIDDAEWMADec : public TCIDDAEDecoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWMADec& operator=(const TCIDDAEWMADec&) = delete;
+        TCIDDAEWMADec& operator=(TCIDDAEWMADec&&) = delete;
 
 
     protected :
@@ -68,16 +70,16 @@ class CIDDAEEXP TCIDDAEWMADec : public TCIDDAEDecoder
         (
                     TMemBuf&                mbufToFill
             , const tCIDLib::TCard4         c4StartInd = 0
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid CleanupImpl() override;
+        tCIDLib::TVoid CleanupImpl() final;
 
-        tCIDLib::TVoid EndDecodeImpl() override;
+        tCIDLib::TVoid EndDecodeImpl() final;
 
         tCIDLib::TVoid StartDecodeImpl
         (
             const   TString&                strSrcFile
-        )   override;
+        )   final;
 
 
     private :
@@ -150,7 +152,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
                 {
                 }
 
-                ~TCodecInfo() {}
+                ~TCodecInfo() = default;
 
                 tCIDLib::TBoolean   m_bIsVBR;
                 tCIDLib::TCard4     m_c4Index;
@@ -190,6 +192,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
         TCIDDAEWMAEnc();
 
         TCIDDAEWMAEnc(const TCIDDAEWMAEnc&) = delete;
+        TCIDDAEWMAEnc(TCIDDAEWMAEnc&&) = delete;
 
         ~TCIDDAEWMAEnc();
 
@@ -198,6 +201,7 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWMAEnc& operator=(const TCIDDAEWMAEnc&) = delete;
+        TCIDDAEWMAEnc& operator=(TCIDDAEWMAEnc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -207,27 +211,27 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
         (
             const   TString&                strCodec
             , const TString&                strFormat
-        )   const;
+        )   const final;
 
         tCIDLib::TCard4 c4QueryCodecNames
         (
                     tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
         tCIDLib::TCard4 c4QueryCodecFmtNames
         (
             const   TString&                strCodec
             ,       tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid CleanupImpl() override;
+        tCIDLib::TVoid CleanupImpl() final;
 
-        tCIDLib::TVoid EndEncodeImpl() override;
+        tCIDLib::TVoid EndEncodeImpl() final;
 
         tCIDLib::TVoid StartEncodeImpl
         (
@@ -241,13 +245,13 @@ class CIDDAEEXP TCIDDAEWMAEnc : public TCIDDAEEncoder
             , const TString&                strLabel
             , const TString&                strGenre
             , const tCIDLib::TCard4         c4Year
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StoreChunkImpl
         (
             const   tCIDLib::TCard1* const  pc1Data
             , const tCIDLib::TCard4         c4Bytes
-        )   override;
+        )   final;
 
 
     private :

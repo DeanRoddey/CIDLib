@@ -38,19 +38,6 @@ RTTIDecls(TExternalProcess,TObject)
 
 
 // ---------------------------------------------------------------------------
-//  Local static functions
-// ---------------------------------------------------------------------------
-static tCIDLib::TVoid
-CleanUpStrArray(tCIDLib::TCh** apszToClean, const tCIDLib::TCard4 c4Count)
-{
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        delete [] apszToClean[c4Index];
-
-    delete [] apszToClean;
-}
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TExternalProcess
 //  PREFIX: extp
 // ---------------------------------------------------------------------------
@@ -437,44 +424,34 @@ TExternalProcess::Start(const   TString&                strCmdLine
     //  Ok, so lets build up the environment strings that the kernel needs to
     //  do its thing.
     //
-    tCIDLib::TCh**  apszEnv = 0;
-    tCIDLib::TCard4 c4EnvCount = 0;
-    TString         strTmp;
+    tCIDKernel::TStrList klistEnv;
     try
     {
-        if (TEnvironment::bIsNullObject(envToUse))
-            c4EnvCount = 0;
-        else
-            c4EnvCount = envToUse.c4Entries();
-
-        if (c4EnvCount)
+        if (!TEnvironment::bIsNullObject(envToUse))
         {
-            apszEnv = new tCIDLib::TCh*[c4EnvCount];
+            TString strTmp;
             TEnvironment::TCursor cursEnv = envToUse.cursThis();
 
             tCIDLib::TCard4 c4Index = 0;
             for (; cursEnv; ++cursEnv)
             {
-                strTmp = cursEnv->strKey();
+                strTmp = cursEnv->strKey().pszBuffer();
                 strTmp.Append(kCIDLib::chEquals);
-                strTmp.Append(cursEnv->strValue());
-                apszEnv[c4Index++] = strTmp.pszDupBuffer();
-            };
+                strTmp.Append(cursEnv->strValue().pszBuffer());
+
+                klistEnv.pobjAddNew(new TKrnlString(strTmp.pszBuffer()));
+            }
         }
 
         //
         //  Start it by calling the kernel impl object. We pass along the
         //  command line and any environment info we have.
         //
-        const tCIDLib::TCh* pszInitPath = 0;
+        const tCIDLib::TCh* pszInitPath = nullptr;
         if (!strInitPath.bIsEmpty())
             pszInitPath = strInitPath.pszBuffer();
-        if (!m_kextpThis.bStart(strCmdLine.pszBuffer()
-                                , pszInitPath
-                                , apszEnv
-                                , c4EnvCount
-                                , eFlag
-                                , eShow))
+
+        if (!m_kextpThis.bStart(strCmdLine.pszBuffer(), pszInitPath, klistEnv, eFlag, eShow))
         {
             facCIDLib().ThrowKrnlErr
             (
@@ -487,19 +464,11 @@ TExternalProcess::Start(const   TString&                strCmdLine
                 , strCmdLine
             );
         }
-
-        // Clean up the buffers
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = 0;
     }
 
     catch(TError& errToCatch)
     {
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = 0;
-
         throw;
     }
 }
@@ -554,49 +523,36 @@ TExternalProcess::Start(const   TString&                strPath
     //  Ok, so lets build up the raw parameter and environment strings that
     //  the kernel needs to do its thing.
     //
-    tCIDLib::TCh**          apszEnv = nullptr;
-    tCIDLib::TCh**          apszCmdLine = nullptr;
-    tCIDLib::TCard4         c4EnvCount = 0;
-    tCIDLib::TCard4         c4ParmCount = 0;
+    tCIDKernel::TStrList    klistEnv;
+    tCIDKernel::TStrList    klistParms;
     TString                 strTmp;
     try
     {
-        if (TEnvironment::bIsNullObject(envToUse))
-            c4EnvCount = 0;
-        else
-            c4EnvCount = envToUse.c4Entries();
-
-        if (c4EnvCount)
+        if (!TEnvironment::bIsNullObject(envToUse))
         {
-            apszEnv = new tCIDLib::TCh*[c4EnvCount];
             TEnvironment::TCursor cursEnv = envToUse.cursThis();
 
             tCIDLib::TCard4 c4Index = 0;
             for (; cursEnv; ++cursEnv)
             {
-                strTmp = cursEnv->strKey();
+                strTmp = cursEnv->strKey().pszBuffer();
                 strTmp.Append(kCIDLib::chEquals);
-                strTmp.Append(cursEnv->strValue());
-                apszEnv[c4Index++] = strTmp.pszDupBuffer();
+                strTmp.Append(cursEnv->strValue().pszBuffer());
+
+                klistEnv.pobjAddNew(new TKrnlString(strTmp.pszBuffer()));
             }
         }
 
         if (colParms.c4ElemCount())
         {
-            c4ParmCount = colParms.c4ElemCount();
-            apszCmdLine = new tCIDLib::TCh*[c4ParmCount];
-
             // Get a new cursor from the collection
-            TColCursor<TString>* pcursParms = colParms.pcursNew();
-            TJanitor<TColCursor<TString>> janCurs(pcursParms);
+            TColCursor<TString>& cursParms = *colParms.pcursNew();
+            TJanitor<TColCursor<TString>> janCurs(&cursParms);
 
-            tCIDLib::TCard4 c4Index = 0;
-            for (; pcursParms->bIsValid(); pcursParms->bNext())
+            // And create a list of kernel strings from those
+            for (; cursParms; ++cursParms)
             {
-                apszCmdLine[c4Index++] = TRawStr::pszReplicate
-                (
-                    pcursParms->objRCur().pszBuffer()
-                );
+                klistParms.pobjAddNew(new TKrnlString(cursParms->pszBuffer()));
             }
         }
 
@@ -609,10 +565,8 @@ TExternalProcess::Start(const   TString&                strPath
             pszInitPath = strInitPath.pszBuffer();
         if (!m_kextpThis.bStart(strPath.pszBuffer()
                                 , pszInitPath
-                                , apszCmdLine
-                                , c4ParmCount
-                                , apszEnv
-                                , c4EnvCount
+                                , klistParms
+                                , klistEnv
                                 , eFlag
                                 , eShow))
         {
@@ -627,23 +581,11 @@ TExternalProcess::Start(const   TString&                strPath
                 , strPath
             );
         }
-
-        // Clean up the buffers
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = nullptr;
-        CleanUpStrArray(apszCmdLine, c4ParmCount);
-        apszCmdLine = nullptr;
     }
 
     catch(TError& errToCatch)
     {
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-        CleanUpStrArray(apszEnv, c4EnvCount);
-        apszEnv = nullptr;
-        CleanUpStrArray(apszCmdLine, c4ParmCount);
-        apszCmdLine = nullptr;
-
         throw;
     }
 }

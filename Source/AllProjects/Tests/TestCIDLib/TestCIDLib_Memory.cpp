@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -80,7 +79,7 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
     //  This will fail for a shared buffer because they will refer to the
     //  same actual buffer. So test it differently.
     //
-    mbufToTest[0] = 16;
+    mbufToTest.PutCard1(16, 0);
     if (bShared)
     {
         if (mbufToTest != mbufCopy)
@@ -100,8 +99,8 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
     }
 
     // Probe the boundaries and check for bad range checks
-    mbufToTest[0]               = 1;
-    mbufToTest[c4InitSize - 1]  = 255;
+    mbufToTest.PutCard1(1, 0);
+    mbufToTest.PutCard1(255, c4InitSize - 1);
 
     // See if the elements got set
     if (mbufToTest[0] != 1)
@@ -118,7 +117,7 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
     tCIDLib::TBoolean bCaughtIt = kCIDLib::False;
     try
     {
-        mbufToTest[c4MaxSize] = 0;
+        mbufToTest.PutCard1(0, c4MaxSize);
     }
 
     catch(...)
@@ -136,8 +135,7 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
     //
     if (c4InitSize != c4MaxSize)
     {
-        mbufToTest[c4InitSize] = 0xAC;
-
+        mbufToTest.PutCard1(0xAC, c4InitSize);
         if (mbufToTest.c4Size() == c4InitSize)
         {
             strmOut << CUR_LN << L"Buffer failed to expand" << kCIDLib::EndLn;
@@ -145,7 +143,7 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
         }
 
         // Now try to set the last byte
-        mbufToTest[c4MaxSize - 1] = 0xCA;
+        mbufToTest.PutCard1(0xCA, c4MaxSize - 1);
 
         if (mbufToTest.c4Size() != c4MaxSize)
         {
@@ -158,7 +156,7 @@ tCIDLib::TVoid CommonTests(         TTextOutStream&     strmOut
     //  Now that the buffer is fully allocated, lets just do some basic
     //  access operations.
     //
-    mbufToTest[2] = 0xFF;
+    mbufToTest.PutCard1(0xFF, 2);
     if (mbufToTest.c1At(2) != 0xFF)
     {
         strmOut << CUR_LN << L"c1At returned wrong results" << kCIDLib::EndLn;
@@ -641,7 +639,7 @@ static tCIDLib::TVoid TestBufferExpansion(TTextOutStream& strmOut)
     bGotIt = kCIDLib::False;
     try
     {
-        mbufSysTest[8195] = 1;
+        mbufSysTest.PutCard1(1, 8195);
     }
 
     catch(...)
@@ -695,8 +693,8 @@ static tCIDLib::TVoid TestLazyShared(TTextOutStream& strmOut)
     // Probe both first pages to make sure that they got committed
     try
     {
-        mbufLazy[0] = 1;
-        mbufLazy[kCIDLib::c4MemPageSize] = 2;
+        mbufLazy.PutCard1(1, 0);
+        mbufLazy.PutCard1(2, kCIDLib::c4MemPageSize);
     }
 
     catch(...)
@@ -711,7 +709,7 @@ static tCIDLib::TVoid TestLazyShared(TTextOutStream& strmOut)
     // And it should auto-extend for us
     try
     {
-        mbufLazy[(kCIDLib::c4MemPageSize * 2)] = 1;
+        mbufLazy.PutCard1(1, kCIDLib::c4MemPageSize * 2);
     }
 
     catch(...)
@@ -734,7 +732,7 @@ static tCIDLib::TVoid TestLazyShared(TTextOutStream& strmOut)
     // And again
     try
     {
-        mbufLazy[(kCIDLib::c4MemPageSize * 3)] = 1;
+        mbufLazy.PutCard1(1, (kCIDLib::c4MemPageSize * 3));
     }
 
     catch(...)
@@ -757,7 +755,7 @@ static tCIDLib::TVoid TestLazyShared(TTextOutStream& strmOut)
     //  And the last time on the last byte
     try
     {
-        mbufLazy[(kCIDLib::c4MemPageSize * 4)] = 1;
+        mbufLazy.PutCard1(1, kCIDLib::c4MemPageSize * 4);
     }
 
     catch(...)

@@ -70,6 +70,12 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
 
         TBinMBufInStream
         (
+                    THeapBuf&&              mbufToTake
+            , const tCIDLib::TCard4         c4InitLogicalEnd = 0
+        );
+
+        TBinMBufInStream
+        (
             const   tCIDLib::TCard1* const  pc1InitData
             , const tCIDLib::TCard4         c4Count
         );
@@ -80,6 +86,7 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
         );
 
         TBinMBufInStream(const TBinMBufInStream&) = delete;
+        TBinMBufInStream(TBinMBufInStream&&) = delete;
 
         ~TBinMBufInStream();
 
@@ -88,6 +95,7 @@ class CIDLIBEXP TBinMBufInStream : public TBinInStream
         //  Public operators
         // -------------------------------------------------------------------
         TBinMBufInStream& operator=(const TBinMBufInStream&) = delete;
+        TBinMBufInStream& operator=(TBinMBufInStream&&) = delete;
 
 
         // -------------------------------------------------------------------

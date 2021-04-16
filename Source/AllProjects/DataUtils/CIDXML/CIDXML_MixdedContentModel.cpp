@@ -32,13 +32,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Magic RTTI macros
-// ---------------------------------------------------------------------------
-RTTIDecls(TXMLMixedCM,TXMLContentModel)
-
-
-
-// ---------------------------------------------------------------------------
 //  CLASS: TXMLMixedCM
 // PREFIX: xcm
 // ---------------------------------------------------------------------------
@@ -49,7 +42,7 @@ RTTIDecls(TXMLMixedCM,TXMLContentModel)
 TXMLMixedCM::TXMLMixedCM(const  tCIDLib::TCard4* const  pc4ChildIds
                         , const tCIDLib::TCard4         c4Count) :
     m_c4Count(c4Count)
-    , m_pc4ChildIds(0)
+    , m_pc4ChildIds(nullptr)
 {
     m_pc4ChildIds = new tCIDLib::TCard4[c4Count];
     TRawMem::CopyMemBuf(m_pc4ChildIds, pc4ChildIds, c4Count * sizeof(tCIDLib::TCard4));
@@ -137,6 +130,9 @@ TXMLMixedCM::FormatTo(          TTextOutStream& strmDest
                 , tCIDLib::EErrClasses::Internal
                 , TCardinal(m_pc4ChildIds[c4Index])
             );
+
+            // Won't happen, but makes the analyzer happy
+            return;
         }
 
         strmDest << L"|" << pxdeclCur->strFullName();

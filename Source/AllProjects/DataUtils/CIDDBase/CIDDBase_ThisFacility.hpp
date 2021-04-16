@@ -93,12 +93,17 @@ class  CIDDBASEEXP TFacCIDDBase : public TFacility
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_atomInit
+        //      Though they have to call init/term methods, we want to be thread
+        //      safe for these calls.
+        //
         //  m_pEnvHandle
         //      This is an opaque structure that is defined on a per-platform basis.
         //      We make it available so that the other classes can get to this info
         //      which provides overall environmental info that might be required on
         //      a given platform.
         // -------------------------------------------------------------------
+        TAtomicFlag                 m_atomInit;
         tCIDDBase::TDBEnvHandle*    m_pEnvHandle;
 
 

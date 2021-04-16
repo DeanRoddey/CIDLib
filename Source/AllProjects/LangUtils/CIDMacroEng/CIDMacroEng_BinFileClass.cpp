@@ -45,8 +45,11 @@ RTTIDecls(TMEngBinFileVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_BinFileClass
 {
-    const TString   strName(L"BinFile");
-    const TString   strClassPath(L"MEng.System.Runtime.BinFile");
+    namespace
+    {
+        const TString   strName(L"BinFile");
+        const TString   strClassPath(L"MEng.System.Runtime.BinFile");
+    }
 }
 
 
@@ -157,24 +160,25 @@ TMEngBinFileInfo::TMEngBinFileInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_Close(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Flush(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurPos(kMacroEng::c2BadId)
-    , m_c2MethId_GetCurSize(kMacroEng::c2BadId)
-    , m_c2MethId_GetIsOpen(kMacroEng::c2BadId)
-    , m_c2MethId_GetLastAcc(kMacroEng::c2BadId)
-    , m_c2MethId_GetLastMod(kMacroEng::c2BadId)
-    , m_c2MethId_OffsetCurPos(kMacroEng::c2BadId)
-    , m_c2MethId_Open(kMacroEng::c2BadId)
-    , m_c2MethId_ReadBuffer(kMacroEng::c2BadId)
-    , m_c2MethId_SetCurPos(kMacroEng::c2BadId)
-    , m_c2MethId_TruncateAt(kMacroEng::c2BadId)
-    , m_c2MethId_WriteBuffer(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Flush(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurPos(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCurSize(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetIsOpen(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLastAcc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLastMod(kCIDMacroEng::c2BadId)
+    , m_c2MethId_OffsetCurPos(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Open(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ReadBuffer(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetCurPos(kCIDMacroEng::c2BadId)
+    , m_c2MethId_TruncateAt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_WriteBuffer(kCIDMacroEng::c2BadId)
     , m_c4ErrCloseFailed(kCIDLib::c4MaxCard)
     , m_c4ErrGenErr(kCIDLib::c4MaxCard)
     , m_c4ErrOpenFailed(kCIDLib::c4MaxCard)
+    , m_c4ErrNotOpen(kCIDLib::c4MaxCard)
     , m_c4ErrReadFailed(kCIDLib::c4MaxCard)
     , m_c4ErrWriteFailed(kCIDLib::c4MaxCard)
     , m_pmeciErrors(0)

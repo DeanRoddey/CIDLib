@@ -43,16 +43,19 @@ RTTIDecls(TSysBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 namespace CIDLib_SysMemBuf
 {
-    // -----------------------------------------------------------------------
-    //  Our persistent format versions
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our persistent format versions
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
 
 
-    // -----------------------------------------------------------------------
-    //  If they don't provide a size, we use this default size
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4DefMinSize = 1024;
+        // -----------------------------------------------------------------------
+        //  If they don't provide a size, we use this default size
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4DefMinSize = 1024;
+    }
 }
 
 
@@ -440,6 +443,14 @@ TSysBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
 
 
 tCIDLib::TVoid
+TSysBuf::QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
+                        , tCIDLib::TCard4&  c4MaxSize) const
+{
+    c4CurSize = m_c4Size;
+    c4MaxSize = m_c4MaxSize;
+}
+
+tCIDLib::TVoid
 TSysBuf::Realloc(   const   tCIDLib::TCard4     c4NewSize
                     , const tCIDLib::TBoolean   ) const
 {
@@ -602,7 +613,7 @@ tCIDLib::TVoid TSysBuf::Create()
     }
 
     // Store the buffer pointer
-    m_pc1Data = reinterpret_cast<tCIDLib::TCard1*>(pBuf);
+    m_pc1Data = static_cast<tCIDLib::TCard1*>(pBuf);
 
     //
     //  Now if there is any current size and its not the same as the max

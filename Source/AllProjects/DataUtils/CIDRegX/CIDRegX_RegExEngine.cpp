@@ -40,15 +40,18 @@ RTTIDecls(TRegEx,TObject)
 
 namespace CIDRegX_Engine
 {
-    // -----------------------------------------------------------------------
-    //  Local, const data
-    //
-    //  c4Scan
-    //      This is a special value that is put into the deque while running
-    //      the DFA. It separates the states for the current character and
-    //      those for the next character.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local, const data
+        //
+        //  c4Scan
+        //      This is a special value that is put into the deque while running
+        //      the DFA. It separates the states for the current character and
+        //      those for the next character.
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
+    }
 }
 
 
@@ -66,9 +69,10 @@ TRegEx::TRegEx() :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
 }
 
@@ -77,9 +81,10 @@ TRegEx::TRegEx(const TString& strExpression) :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
     SetExpression(strExpression.pszBuffer());
 }
@@ -89,11 +94,25 @@ TRegEx::TRegEx(const tCIDLib::TCh* const pszExpression) :
     m_bEscaped(kCIDLib::False)
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
+    , m_c4CurState(0)
     , m_c4PatLen(0)
-    , m_prxnfaPattern(0)
-    , m_pszPattern(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
 {
     SetExpression(pszExpression);
+}
+
+TRegEx::TRegEx(TRegEx&& regxSrc) :
+
+    m_bEscaped(kCIDLib::False)
+    , m_bLetter(kCIDLib::False)
+    , m_c4CurInd(0)
+    , m_c4CurState(0)
+    , m_c4PatLen(0)
+    , m_prxnfaPattern(nullptr)
+    , m_pszPattern(nullptr)
+{
+    *this = tCIDLib::ForceMove(regxSrc);
 }
 
 TRegEx::~TRegEx()
@@ -101,6 +120,26 @@ TRegEx::~TRegEx()
     delete [] m_pszPattern;
     delete m_prxnfaPattern;
 }
+
+
+// ---------------------------------------------------------------------------
+//  TRegEx: Public operators
+// ---------------------------------------------------------------------------
+TRegEx& TRegEx::operator=(TRegEx&& regxSrc)
+{
+    if (&regxSrc != this)
+    {
+        tCIDLib::Swap(m_bEscaped, regxSrc.m_bEscaped);
+        tCIDLib::Swap(m_bLetter, regxSrc.m_bLetter);
+        tCIDLib::Swap(m_c4CurInd, regxSrc.m_c4CurInd);
+        tCIDLib::Swap(m_c4CurState, regxSrc.m_c4CurState);
+        tCIDLib::Swap(m_c4PatLen, regxSrc.m_c4PatLen);
+        tCIDLib::Swap(m_prxnfaPattern, regxSrc.m_prxnfaPattern);
+        tCIDLib::Swap(m_pszPattern, regxSrc.m_pszPattern);
+    }
+    return *this;
+}
+
 
 
 // ---------------------------------------------------------------------------
@@ -115,14 +154,7 @@ TRegEx::bFindMatch( const   TString&            strFindIn
 {
     // Just call the other version with the raw string and start of 0
     c4Ofs  = 0;
-    return bFindMatchAt
-    (
-        strFindIn.pszBuffer()
-        , c4Ofs
-        , c4Len
-        , bOnlyAtStart
-        , bCaseSensitive
-    );
+    return bFindMatchAt(strFindIn.pszBuffer(), c4Ofs, c4Len, bOnlyAtStart, bCaseSensitive);
 }
 
 tCIDLib::TBoolean
@@ -162,6 +194,8 @@ TRegEx::bFindMatchAt(const  tCIDLib::TCh* const pszFindIn
                     , const tCIDLib::TBoolean   bOnlyAtStart
                     , const tCIDLib::TBoolean   bCaseSensitive) const
 {
+    c4Len = 0;
+
     // Check for not having set up the expression yet
     if (!m_prxnfaPattern)
     {
@@ -378,6 +412,9 @@ TRegEx::bFullyMatches(  const   tCIDLib::TCh* const pszToTest
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotReady
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDLib::False;
     }
 
     // Get the length of the string to search
@@ -489,7 +526,7 @@ TRegEx::bReplaceAll(        TString&            strFindIn
     tCIDLib::TBoolean bChanges = kCIDLib::False;
 
     tCIDLib::TCard4 c4At = 0;
-    tCIDLib::TCard4 c4Len;
+    tCIDLib::TCard4 c4Len = 0;
     while (c4At < strFindIn.c4Length())
     {
         const tCIDLib::TBoolean bMatch = bFindMatchAt
@@ -689,11 +726,11 @@ tCIDLib::TCard4 TRegEx::c4ParseExpr()
 
 tCIDLib::TCard4 TRegEx::c4ParseFactor()
 {
-    tCIDLib::TCard4 c4State1, c4State2;
-    tCIDLib::TCard4 c4Ret(0);
+    tCIDLib::TCard4 c4State2 = kCIDLib::c4MaxCard;
+    tCIDLib::TCard4 c4Ret = 0;
 
     // Remember the next available state as our first state
-    c4State1 = m_prxnfaPattern->c4StateCount();
+    tCIDLib::TCard4 c4State1 = m_prxnfaPattern->c4StateCount();
 
     //
     //  First, check for whether we have a letter. This will handle any
@@ -1018,7 +1055,7 @@ tCIDLib::TCh TRegEx::chNext()
     //  get the second character and bump the index by 2. Otherwise get the
     //  first character and bump the index by one.
     //
-    tCIDLib::TCh chRet;
+    tCIDLib::TCh chRet = kCIDLib::chNull;
     if (m_bEscaped)
     {
         chRet =  m_pszPattern[m_c4CurInd+1];
@@ -1054,12 +1091,12 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
     //  multiple characters and multiple ranges and it can be "not'ed" as
     //  well.
     //
-    enum EStates
+    enum class EStates
     {
-        EState_FirstChar
-        , EState_Dash
-        , EState_SecondChar
-        , EState_End
+        FirstChar
+        , Dash
+        , SecondChar
+        , End
     };
 
     //
@@ -1103,9 +1140,9 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
 
     // We start in the base state. We have to end in base or char state
     tCIDLib::TCh    chFirst = kCIDLib::chNull;
-    EStates         eCurState = EState_FirstChar;
+    EStates         eCurState = EStates::FirstChar;
     tCIDLib::TCard4 c4RangeCount = 0;
-    while (eCurState != EState_End)
+    while (eCurState != EStates::End)
     {
         //
         //  Get the status flags and then the character. This will throw
@@ -1132,7 +1169,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
             );
         }
 
-        if (eCurState == EState_FirstChar)
+        if (eCurState == EStates::FirstChar)
         {
             if (bLetter)
             {
@@ -1141,22 +1178,22 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 //  of a range, and move to the dash range since we
                 //  anticipate a dash (though it might be another char.)
                 //
-                eCurState = EState_Dash;
+                eCurState = EStates::Dash;
                 chFirst = chCur;
             }
              else if (chCur == kCIDLib::chCloseBracket)
             {
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
-         else if (eCurState == EState_Dash)
+         else if (eCurState == EStates::Dash)
         {
             if (bLetter)
             {
                 if (chCur == kCIDLib::chHyphenMinus)
                 {
                     // Just move on to get the potential second character
-                    eCurState = EState_SecondChar;
+                    eCurState = EStates::SecondChar;
                 }
                  else
                 {
@@ -1193,10 +1230,10 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 c4RangeCount++;
 
                 // And move to the end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
-         else if (eCurState == EState_SecondChar)
+         else if (eCurState == EStates::SecondChar)
         {
             if (bLetter)
             {
@@ -1229,7 +1266,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 }
 
                 // And go back to the first char state
-                eCurState = EState_FirstChar;
+                eCurState = EStates::FirstChar;
             }
              else if (chCur == kCIDLib::chCloseBracket)
             {
@@ -1242,7 +1279,7 @@ TRXMatcher* TRegEx::pmatchParseCharRange()
                 c4RangeCount += 2;
 
                 // Move to the end state
-                eCurState = EState_End;
+                eCurState = EStates::End;
             }
         }
         #if CID_DEBUG_ON

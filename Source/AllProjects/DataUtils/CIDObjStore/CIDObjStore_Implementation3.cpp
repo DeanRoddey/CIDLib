@@ -116,7 +116,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::BackupStore()
         {
             THeapBuf mbufKey(1024);
             THeapBuf mbufData(32 * 1024);
-            TStoreItemHdr hdrCur;
+            TStoreItemHdr hdrCur{};
 
             for (; cursItems; ++cursItems)
             {
@@ -529,7 +529,7 @@ TCIDObjStoreImpl::ValidateStore(TTextOutStream* const pstrmOut)
     const tCIDLib::TCard4   c4FreeHdrSize = sizeof(TStoreItemFreeHdr);
     const tCIDLib::TCard4   c4Count = colSeqData.c4ElemCount();
     tCIDLib::TCard4         c4CurOfs   = sizeof(TStoreHdr);
-    tCIDLib::TCard4         c4MagicVal;
+    tCIDLib::TCard4         c4MagicVal = 0;
     THeapBuf                mbufData(8192);
     TBinMBufInStream        strmTmp(&mbufData, 0, tCIDLib::EAdoptOpts::NoAdopt);
     TString                 strKey;
@@ -748,9 +748,7 @@ TCIDObjStoreImpl::ValidateStore(TTextOutStream* const pstrmOut)
             //
             const tCIDLib::THashVal hshTest = mbufData.hshCalcHash
             (
-                kCIDObjStore_::c4Modulus
-                , 0
-                , hdrItem.m_c4CurUsed
+                kCIDObjStore_::c4Modulus, 0, hdrItem.m_c4CurUsed
             );
 
             if (hshTest != hdrItem.m_hshData)
@@ -891,7 +889,7 @@ TCIDObjStoreImpl::InitRepoFile(         TBinaryFile&    flToInit
     {
         const tCIDLib::TCard4 c4BufSz = 1024;
         tCIDLib::TCard1 ac1Buf[c4BufSz];
-        TRawMem::SetMemBuf(ac1Buf, tCIDLib::TCard1(0), c4BufSz);
+        TRawMem::SetMemBuf(ac1Buf, kCIDLib::c1MinCard, c4BufSz);
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4InitFreeK; c4Index++)
         {
             if (flToInit.c4WriteBuffer(ac1Buf, c4BufSz) != c4BufSz)
@@ -930,8 +928,6 @@ TCIDObjStoreImpl::CommitStoreItem(          TBinaryFile&    flTarget
                                     , const TMemBuf&        mbufKey
                                     , const TString&        strRepoName)
 {
-    tCIDLib::TCard4 c4Written;
-
     //
     //  First fill in a store header and commit that to the store. All
     //  the info we need is in the index item we were passed.
@@ -951,7 +947,7 @@ TCIDObjStoreImpl::CommitStoreItem(          TBinaryFile&    flTarget
 
     // Write the header
     flTarget.SetFilePos(osiToCommit.c4Offset());
-    c4Written = flTarget.c4WriteBuffer(&hdrItem, sizeof(hdrItem));
+    tCIDLib::TCard4 c4Written = flTarget.c4WriteBuffer(&hdrItem, sizeof(hdrItem));
     if (c4Written != sizeof(hdrItem))
     {
         facCIDObjStore().ThrowErr
@@ -1422,8 +1418,8 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
     //  the appropriate list.
     //
     tCIDLib::TCard4         c4MagicVal;
-    TStoreItemHdr           hdrItem;
-    TStoreItemFreeHdr       hdrFree;
+    TStoreItemHdr           hdrItem{};
+    TStoreItemFreeHdr       hdrFree{};
     THeapBuf                mbufData(8192);
     TBinMBufInStream        strmTmp(&mbufData, 0, tCIDLib::EAdoptOpts::NoAdopt);
     TString                 strKey;
@@ -1545,19 +1541,15 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
                 }
             }
 
-            TOSStoreItem& osiNew = m_colStoreList.objAdd
+            TOSStoreItem& osiNew = m_colStoreList.objPlace
             (
-                TOSStoreItem
-                (
-                    c4CurOfs
-                    , hdrItem.m_c4CurUsed
-                    , hdrItem.m_c4Allocated
-                    , hdrItem.m_c4VersionNum
-                    , strKey
-                    , hdrItem.m_c4KeyBytes
-                )
+                c4CurOfs
+                , hdrItem.m_c4CurUsed
+                , hdrItem.m_c4Allocated
+                , hdrItem.m_c4VersionNum
+                , strKey
+                , hdrItem.m_c4KeyBytes
             );
-
 
             //
             //  If the allocation is larger than the used, then we have to
@@ -2028,7 +2020,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::ExpandStore(const tCIDLib::TCard4 c4Needed)
     // Write out up to 8K chunks at a time
     const tCIDLib::TCard8 c8ChunkSize = 8192;
     tCIDLib::TCard1 ac1Buf[c8ChunkSize];
-    TRawMem::SetMemBuf(ac1Buf, tCIDLib::TCard1(0), c8ChunkSize);
+    TRawMem::SetMemBuf(ac1Buf, kCIDLib::c1MinCard, c8ChunkSize);
 
     try
     {
@@ -2037,7 +2029,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::ExpandStore(const tCIDLib::TCard4 c4Needed)
         while (c8Inc < c8NewEnd)
         {
             // Either write a whole chunk or a partial
-            tCIDLib::TCard8 c8CurSz;
+            tCIDLib::TCard8 c8CurSz = 0;
             if (c8NewEnd - c8Inc < c8ChunkSize)
                 c8CurSz = c8NewEnd - c8Inc;
             else

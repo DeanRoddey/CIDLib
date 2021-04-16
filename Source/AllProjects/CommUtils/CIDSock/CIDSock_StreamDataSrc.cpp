@@ -103,13 +103,15 @@ TCIDSockStreamDataSrc::~TCIDSockStreamDataSrc()
 // Associate the passed event with our socket for reads
 tCIDLib::TVoid TCIDSockStreamDataSrc::AssociateReadEvent(TEvent& evToSet)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
     m_psockSrc->AssociateReadEvent(evToSet);
 }
 
 
 // Return whether our socket is connected
-tCIDLib::TBoolean TCIDSockStreamDataSrc::bConnected() const
+tCIDLib::TBoolean TCIDSockStreamDataSrc::bIsConnected() const
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
     return m_psockSrc->bIsConnected();
 }
 
@@ -120,6 +122,7 @@ tCIDLib::TBoolean TCIDSockStreamDataSrc::bConnected() const
 //
 tCIDSock::ESockEvs TCIDSockStreamDataSrc::eEnumEvents(TEvent& evReset)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
     return m_psockSrc->eEnumEvents(evReset);
 }
 
@@ -130,6 +133,7 @@ tCIDSock::ESockEvs TCIDSockStreamDataSrc::eEnumEvents(TEvent& evReset)
 //
 tCIDLib::TVoid TCIDSockStreamDataSrc::FormatSrcInfo(TString& strToFill)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
     m_psockSrc->ipepRemoteEndPoint().FormatPlain(strToFill);
 }
 
@@ -148,6 +152,7 @@ tCIDLib::TVoid TCIDSockStreamDataSrc::FormatSrcInfo(TString& strToFill)
 //
 tCIDLib::TVoid TCIDSockStreamDataSrc::Connect(const TIPEndPoint& ipepTar)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
     m_psockSrc->Connect(ipepTar);
 }
 
@@ -162,6 +167,8 @@ TCIDSockStreamDataSrc::c4GetData(       TMemBuf&                mbufTar
                                 , const tCIDLib::TCard4         c4MaxBytes
                                 , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
+
     //
     //  If the end time is zero, then just do a check for anything already present.
     //  Else, wait for up to the end time for something to show up.
@@ -192,6 +199,8 @@ TCIDSockStreamDataSrc::PutData( const   TMemBuf&                mbufSrc
                                 , const tCIDLib::TCard4         c4ToSend
                                 , const tCIDLib::TEncodedTime   enctEnd)
 {
+    CIDAssert(m_psockSrc != nullptr, L"Src socket not set");
+
     tCIDLib::TEncodedTime enctNow = TTime::enctNow();
     if (enctNow >= enctEnd)
         return;
@@ -221,7 +230,7 @@ tCIDLib::TVoid
 TCIDSockStreamDataSrc::TerminateSrc(const   tCIDLib::TEncodedTime
                                     , const tCIDLib::TBoolean       bClose)
 {
-    if (bClose)
+    if (bClose && m_psockSrc)
         m_psockSrc->Close();
 }
 

@@ -47,7 +47,15 @@ class CIDGRDEVEXP TGUIBrush : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
+        TGUIBrush(TGUIBrush&&) = delete;
+
         ~TGUIBrush();
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        TGUIBrush& operator=(TGUIBrush&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -69,25 +77,25 @@ class CIDGRDEVEXP TGUIBrush : public TObject
 
     protected :
         // -------------------------------------------------------------------
-        //  Hidden constructors
+        //  Hidden constructors and operators
         // -------------------------------------------------------------------
         TGUIBrush();
 
         TGUIBrush
         (
-            const   TGUIBrush&                  gbrToCopy
+            const   TGUIBrush&                  gbrSrc
         );
 
         tCIDLib::TVoid operator=
         (
-            const   TGUIBrush&                  gbrToAssign
+            const   TGUIBrush&                  gbrSrc
         );
 
 
         // -------------------------------------------------------------------
         //  Protected, virtual methods
         // -------------------------------------------------------------------
-        virtual tCIDGraphDev::TBrushHandle hbrCreateBrush() const = 0;
+        virtual [[nodiscard]] tCIDGraphDev::TBrushHandle hbrCreateBrush() const = 0;
 
 
         // -------------------------------------------------------------------
@@ -135,13 +143,15 @@ class CIDGRDEVEXP TSolidBrush : public TGUIBrush
 
         TSolidBrush
         (
-            const   TRGBClr&                rgbClr
+            const   TRGBClr&                rgbSrc
         );
 
         TSolidBrush
         (
-            const   TSolidBrush&            gbrToCopy
+            const   TSolidBrush&            gbrSrc
         );
+
+        TSolidBrush(TSolidBrush&&) = delete;
 
         ~TSolidBrush();
 
@@ -153,6 +163,8 @@ class CIDGRDEVEXP TSolidBrush : public TGUIBrush
         (
             const   TSolidBrush&            gbrToAssign
         );
+
+        TSolidBrush& operator=(TSolidBrush&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -170,7 +182,7 @@ class CIDGRDEVEXP TSolidBrush : public TGUIBrush
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
+        [[nodiscard]] tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
 
 
     private :
@@ -210,8 +222,10 @@ class CIDGRDEVEXP THatchedBrush : public TGUIBrush
 
         THatchedBrush
         (
-            const   THatchedBrush&          gbrToCopy
+            const   THatchedBrush&          gbrSrc
         );
+
+        THatchedBrush(THatchedBrush&&) = delete;
 
         ~THatchedBrush();
 
@@ -221,8 +235,10 @@ class CIDGRDEVEXP THatchedBrush : public TGUIBrush
         // -------------------------------------------------------------------
         THatchedBrush& operator=
         (
-            const   THatchedBrush&          gbrToAssign
+            const   THatchedBrush&          gbrSrc
         );
+
+        THatchedBrush& operator=(THatchedBrush&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -239,7 +255,7 @@ class CIDGRDEVEXP THatchedBrush : public TGUIBrush
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
+        [[nodiscard]] tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
 
 
     private :
@@ -281,8 +297,10 @@ class CIDGRDEVEXP TBitmapBrush : public TGUIBrush
 
         TBitmapBrush
         (
-            const   TBitmapBrush&           gbrToCopy
+            const   TBitmapBrush&           gbrSrc
         );
+
+        TBitmapBrush(TBitmapBrush&&) = delete;
 
         ~TBitmapBrush();
 
@@ -292,15 +310,17 @@ class CIDGRDEVEXP TBitmapBrush : public TGUIBrush
         // -------------------------------------------------------------------
         TBitmapBrush& operator=
         (
-            const   TBitmapBrush&           gbrToAssign
+            const   TBitmapBrush&           gbrSrc
         );
+
+        TBitmapBrush& operator=(TBitmapBrush&&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
+        [[nodiscard]] tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
 
 
     private :
@@ -337,8 +357,10 @@ class CIDGRDEVEXP TNullBrush : public TGUIBrush
 
         TNullBrush
         (
-            const   TNullBrush&          gbrToCopy
+            const   TNullBrush&          gbrSrc
         );
+
+        TNullBrush(TNullBrush&&) = delete;
 
         ~TNullBrush();
 
@@ -348,15 +370,17 @@ class CIDGRDEVEXP TNullBrush : public TGUIBrush
         // -------------------------------------------------------------------
         TNullBrush& operator=
         (
-            const   TNullBrush&          gbrToAssign
+            const   TNullBrush&          gbrSrc
         );
+
+        TNullBrush& operator=(TNullBrush&&) = delete;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
+        [[nodiscard]] tCIDGraphDev::TBrushHandle hbrCreateBrush() const override;
 
 
     private :
@@ -385,7 +409,17 @@ class CIDGRDEVEXP TBrushJanitor
             , const tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::NoAdopt
         );
 
+        TBrushJanitor(const TBrushJanitor&) = delete;
+        TBrushJanitor(TBrushJanitor&&) = delete;
+
         ~TBrushJanitor();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TBrushJanitor& operator=(const TBrushJanitor&) = delete;
+        TBrushJanitor& operator=(TBrushJanitor&&) = delete;
 
 
     private :

@@ -47,7 +47,9 @@ RTTIDecls(TMEngEnumInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  TMEngClassInfo::Item: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TMEngEnumInfo::TItem::TItem()
+TMEngEnumInfo::TItem::TItem() :
+
+    m_c4MapVal(0)
 {
 }
 
@@ -60,11 +62,11 @@ TMEngEnumInfo::TItem::TItem(const   TString&        strName
 {
 }
 
-TMEngEnumInfo::TItem::TItem(const TItem& itemToCopy) :
+TMEngEnumInfo::TItem::TItem(const TItem& itemSrc) :
 
-    m_c4MapVal(itemToCopy.m_c4MapVal)
-    , m_strName(itemToCopy.m_strName)
-    , m_strText(itemToCopy.m_strText)
+    m_c4MapVal(itemSrc.m_c4MapVal)
+    , m_strName(itemSrc.m_strName)
+    , m_strText(itemSrc.m_strText)
 {
 }
 
@@ -176,14 +178,14 @@ TMEngEnumVal::bParseFromText(const  TString&        strValue
 
 
 tCIDLib::TVoid
-TMEngEnumVal::CopyFrom( const   TMEngClassVal&      mecvToCopy
+TMEngEnumVal::CopyFrom( const   TMEngClassVal&      mecvSrc
                         ,       TCIDMacroEngine&    meOwner)
 {
     if (meOwner.bValidation())
-        meOwner.CheckSameClasses(*this, mecvToCopy);
+        meOwner.CheckSameClasses(*this, mecvSrc);
 
     // We don't have to copy the max value, which is fixed for this class
-    m_c4OrdValue = static_cast<const TMEngEnumVal&>(mecvToCopy).m_c4OrdValue;
+    m_c4OrdValue = static_cast<const TMEngEnumVal&>(mecvSrc).m_c4OrdValue;
 }
 
 
@@ -285,32 +287,34 @@ TMEngEnumInfo::TMEngEnumInfo(       TCIDMacroEngine&    meOwner
         , tCIDMacroEng::EClassExt::Abstract
         , strParentClassPath
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_AtMax(kMacroEng::c2BadId)
-    , m_c2MethId_AtMin(kMacroEng::c2BadId)
-    , m_c2MethId_Dec(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_FromName(kMacroEng::c2BadId)
-    , m_c2MethId_FromText(kMacroEng::c2BadId)
-    , m_c2MethId_FormatList(kMacroEng::c2BadId)
-    , m_c2MethId_GetOrd(kMacroEng::c2BadId)
-    , m_c2MethId_GetOrdCount(kMacroEng::c2BadId)
-    , m_c2MethId_GetName(kMacroEng::c2BadId)
-    , m_c2MethId_GetText(kMacroEng::c2BadId)
-    , m_c2MethId_GreaterThan(kMacroEng::c2BadId)
-    , m_c2MethId_GreaterThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_Inc(kMacroEng::c2BadId)
-    , m_c2MethId_LessThan(kMacroEng::c2BadId)
-    , m_c2MethId_MapFromText(kMacroEng::c2BadId)
-    , m_c2MethId_LessThanEq(kMacroEng::c2BadId)
-    , m_c2MethId_SetMin(kMacroEng::c2BadId)
-    , m_c2MethId_SetMax(kMacroEng::c2BadId)
-    , m_c2MethId_SetOrd(kMacroEng::c2BadId)
-    , m_c2MethId_ValCtor(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AtMax(kCIDMacroEng::c2BadId)
+    , m_c2MethId_AtMin(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Dec(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FromText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatList(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetOrd(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetOrdCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GreaterThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GreaterThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Inc(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LessThan(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MapFromText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_LessThanEq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetMin(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetMax(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetOrd(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ValCtor(kCIDMacroEng::c2BadId)
     , m_colItems(c4ExpectedItems ? c4ExpectedItems : 8)
-    , m_c4ErrBadOrdinal(0)
-    , m_pmeciErrors(0)
+    , m_c4ErrBadOrdinal(kCIDLib::c4MaxCard)
+    , m_c4ErrNameNotFound(kCIDLib::c4MaxCard)
+    , m_c4ErrTextNotFound(kCIDLib::c4MaxCard)
+    , m_pmeciErrors(nullptr)
 {
     if (strClassPath() != L"MEng.Enum")
         eExtend(tCIDMacroEng::EClassExt::Final);
@@ -351,7 +355,7 @@ TMEngEnumInfo::eCastFrom(           TCIDMacroEngine&
     // Get the source value
     const tCIDLib::TCard2 c2SrcId = mecvSrc.c2ClassId();
 
-    tCIDLib::TCard4 c4New;
+    tCIDLib::TCard4 c4New = kCIDLib::c4MaxCard;
     switch(tCIDMacroEng::EIntrinsics(c2SrcId))
     {
         case tCIDMacroEng::EIntrinsics::Card1 :
@@ -876,18 +880,18 @@ tCIDLib::TCard4 TMEngEnumInfo::c4ValueCount() const
 
 TString TMEngEnumInfo::strFullName(const TMEngEnumVal& mecvValue) const
 {
-    TString strRet(strClassPath());
-    strRet.Append(kCIDLib::chPeriod);
-    strRet.Append(m_colItems[mecvValue.c4Ordinal()].m_strName);
-    return strRet;
+    return TString
+    (
+        TStrCat(strClassPath(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName)
+    );
 }
 
 TString TMEngEnumInfo::strFullName(const tCIDLib::TCard4 c4Ordinal) const
 {
-    TString strRet(strClassPath());
-    strRet.Append(kCIDLib::chPeriod);
-    strRet.Append(m_colItems[c4Ordinal].m_strName);
-    return strRet;
+    return TString
+    (
+        TStrCat(strClassPath(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName)
+    );
 }
 
 
@@ -904,18 +908,15 @@ const TString& TMEngEnumInfo::strItemName(const tCIDLib::TCard4 c4Ordinal) const
 
 TString TMEngEnumInfo::strPartialName(const TMEngEnumVal& mecvValue) const
 {
-    TString strRet(strName());
-    strRet.Append(kCIDLib::chPeriod);
-    strRet.Append(m_colItems[mecvValue.c4Ordinal()].m_strName);
-    return strRet;
+    return TString
+    (
+        TStrCat(strName(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName)
+    );
 }
 
 TString TMEngEnumInfo::strPartialName(const tCIDLib::TCard4 c4Ordinal) const
 {
-    TString strRet(strName());
-    strRet.Append(kCIDLib::chPeriod);
-    strRet.Append(m_colItems[c4Ordinal].m_strName);
-    return strRet;
+    return TString(TStrCat(strName(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName));
 }
 
 
@@ -1100,7 +1101,7 @@ TMEngEnumInfo::bInvokeMethod(       TCIDMacroEngine&    meOwner
         //  depending on the second parm.
         //
         const TString& strToFind = meOwner.strStackValAt(c4FirstInd);
-        tCIDLib::TCard4 c4New;
+        tCIDLib::TCard4 c4New = kCIDLib::c4MaxCard;
         if (meOwner.bStackValAt(c4FirstInd + 1))
             c4New = c4FindOrdinal(strToFind);
         else

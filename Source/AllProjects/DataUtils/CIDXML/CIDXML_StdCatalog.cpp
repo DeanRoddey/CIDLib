@@ -65,16 +65,19 @@ if (xtn.strQName() != nam) \
 // ---------------------------------------------------------------------------
 namespace CIDXML_StdCatalog
 {
-    // -----------------------------------------------------------------------
-    //  Our fixed DTD that we fault into all standard catalogs being parsed
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* const   pszFixedDTD =
-                        L"<?xml encoding='$NativeWideChar$'?>\n"
-                        L"<!ELEMENT CIDStdCat:Catalog (CIDStdCat:MapItem*)>\n"
-                        L"<!ELEMENT CIDStdCat:MapItem EMPTY>\n"
-                        L"<!ATTLIST CIDStdCat:MapItem\n"
-                        L"          CIDStdCat:PublicId CDATA #REQUIRED\n"
-                        L"          CIDStdCat:MapTo CDATA #REQUIRED>\n";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Our fixed DTD that we fault into all standard catalogs being parsed
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCh* const   pszFixedDTD =
+                            L"<?xml encoding='$NativeWideChar$'?>\n"
+                            L"<!ELEMENT CIDStdCat:Catalog (CIDStdCat:MapItem*)>\n"
+                            L"<!ELEMENT CIDStdCat:MapItem EMPTY>\n"
+                            L"<!ATTLIST CIDStdCat:MapItem\n"
+                            L"          CIDStdCat:PublicId CDATA #REQUIRED\n"
+                            L"          CIDStdCat:MapTo CDATA #REQUIRED>\n";
+    }
 }
 
 
@@ -279,10 +282,7 @@ tCIDLib::TVoid TXMLStdCatalog::Initialize(tCIDXML::TEntitySrcRef& esrToParse)
         //  And add an element to our collection for this guy. Make the value
         //  the system id and the key the public id.
         //
-        m_colIdMap.objAdd
-        (
-            tCIDXML::TEntitySrcRef(new TFileEntitySrc(strValue, strKey))
-        );
+        m_colIdMap.objPlace(new TFileEntitySrc(strValue, strKey));
     }
 }
 

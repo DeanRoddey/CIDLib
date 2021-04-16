@@ -701,7 +701,7 @@ TInPlaceEdit::bProcess(         TWindow&        wndParent
         // Subclass it so we can spy on user input
         SetSubclass();
 
-        // Set us to use the passed font
+        // Set us to use the default font
         ::SendMessage
         (
             hwndThis()

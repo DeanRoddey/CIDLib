@@ -39,7 +39,9 @@
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermCore(const tCIDLib::EInitTerm eState)
+TCIDKrnlModule::bInitTermCore(const tCIDLib::EInitTerm eState)
 {
     return TKrnlLinux::bInitTermExtProcess(eState);
 }
+
+

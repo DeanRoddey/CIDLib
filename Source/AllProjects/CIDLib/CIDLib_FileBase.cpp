@@ -92,8 +92,8 @@ TFileBase::~TFileBase()
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TFileBase::bEndOfFile()
 {
-    tCIDLib::TCard8   c8CurPos;
-    tCIDLib::TCard8   c8CurSize;
+    tCIDLib::TCard8   c8CurPos = 0;
+    tCIDLib::TCard8   c8CurSize = 0;
 
     if (!m_kflThis.bQueryCurSize(c8CurSize))
     {

@@ -48,6 +48,7 @@ class TRXCharMatcher : public TRXMatcher
         );
 
         TRXCharMatcher(const TRXCharMatcher&) = delete;
+        TRXCharMatcher(TRXCharMatcher&&) = delete;
 
         ~TRXCharMatcher();
 
@@ -56,6 +57,7 @@ class TRXCharMatcher : public TRXMatcher
         //  Public operators
         // --------------------------------------------------------------------
         TRXCharMatcher& operator=(const TRXCharMatcher&) = delete;
+        TRXCharMatcher& operator=(TRXCharMatcher&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -80,7 +82,7 @@ class TRXCharMatcher : public TRXMatcher
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const final;
 
 
     private :
@@ -118,6 +120,7 @@ class TRXAnyCharMatcher : public TRXMatcher
         TRXAnyCharMatcher();
 
         TRXAnyCharMatcher(const TRXAnyCharMatcher&) = delete;
+        TRXAnyCharMatcher(TRXAnyCharMatcher&&) = delete;
 
         ~TRXAnyCharMatcher();
 
@@ -126,6 +129,7 @@ class TRXAnyCharMatcher : public TRXMatcher
         //  Public operators
         // --------------------------------------------------------------------
         TRXAnyCharMatcher& operator=(const TRXAnyCharMatcher&) = delete;
+        TRXAnyCharMatcher& operator=(TRXAnyCharMatcher&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -137,14 +141,14 @@ class TRXAnyCharMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const override;
+        )   const final;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const final;
 
 
     private :
@@ -168,6 +172,7 @@ class TRXRangeMatcher : public TRXMatcher
         TRXRangeMatcher(const tCIDLib::TBoolean bNot = kCIDLib::False);
 
         TRXRangeMatcher(const TRXRangeMatcher&) = delete;
+        TRXRangeMatcher(TRXRangeMatcher&&) = delete;
 
         ~TRXRangeMatcher();
 
@@ -176,6 +181,7 @@ class TRXRangeMatcher : public TRXMatcher
         //  Public operators
         // --------------------------------------------------------------------
         TRXRangeMatcher& operator=(const TRXRangeMatcher&) = delete;
+        TRXRangeMatcher& operator=(TRXRangeMatcher&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -187,7 +193,7 @@ class TRXRangeMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const override;
+        )   const final;
 
 
         // --------------------------------------------------------------------
@@ -206,7 +212,7 @@ class TRXRangeMatcher : public TRXMatcher
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const final;
 
 
     private :
@@ -256,6 +262,7 @@ class TRXPosMatcher : public TRXMatcher
         TRXPosMatcher(const tCIDLib::TBoolean bAtStart);
 
         TRXPosMatcher(const TRXPosMatcher&) = delete;
+        TRXPosMatcher(TRXPosMatcher&&) = delete;
 
         ~TRXPosMatcher();
 
@@ -264,6 +271,7 @@ class TRXPosMatcher : public TRXMatcher
         //  Public operators
         // --------------------------------------------------------------------
         TRXPosMatcher& operator=(const TRXPosMatcher&) = delete;
+        TRXPosMatcher& operator=(TRXPosMatcher&&) = delete;
 
 
         // --------------------------------------------------------------------
@@ -275,14 +283,14 @@ class TRXPosMatcher : public TRXMatcher
             , const tCIDLib::TCard4         c4CurOfs
             , const tCIDLib::TCard4         c4SearchLen
             , const tCIDLib::TBoolean       bCaseSensitive
-        )   const override;
+        )   const final;
 
 
     protected :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const override;
+        tCIDLib::TVoid FormatTo(TTextOutStream& strmDest) const final;
 
 
     private :

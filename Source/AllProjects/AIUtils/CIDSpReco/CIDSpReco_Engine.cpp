@@ -130,7 +130,7 @@ TCIDSpReco::~TCIDSpReco()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }
@@ -271,7 +271,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
 
         // Set up our internal data structure
         m_pInfo = new TSpRecoInfo;
-        TRawMem::SetMemBuf(m_pInfo, tCIDLib::TCard1(0), sizeof(TSpRecoInfo));
+        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TSpRecoInfo));
         m_pInfo->hSpeechEvent = INVALID_HANDLE_VALUE;
 
         // Let's try to create the speech recognizer now
@@ -282,7 +282,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(ISpRecognizer)
-            , (void**)&m_pInfo->pSpeechRecognizer
+            , tCIDLib::pToVoidPP(&m_pInfo->pSpeechRecognizer)
         );
 
         if (FAILED(hRes))
@@ -322,7 +322,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(ISpStream)
-            , (void**)&m_pInfo->pstrmSpeech
+            , tCIDLib::pToVoidPP(&m_pInfo->pstrmSpeech)
         );
 
         if (FAILED(hRes))
@@ -482,10 +482,10 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
         }
 
         // It all worked, so release any of the janitors for things we want to keep
-        janGrammar.pobjOrphan();
-        janContext.pobjOrphan();
-        janRecog.pobjOrphan();
-        janStream.pobjOrphan();
+        janGrammar.Orphan();
+        janContext.Orphan();
+        janRecog.Orphan();
+        janStream.Orphan();
 
         //
         //  Release our ref count of the wrapper stream now. DON'T use SafeCOMFree
@@ -1157,7 +1157,7 @@ tCIDLib::TVoid TCIDSpReco::Terminate()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -1197,7 +1197,7 @@ tCIDLib::TVoid TCIDSpReco::Terminate()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 
@@ -1465,7 +1465,7 @@ TCIDSpReco::eEvMonThread(TThread& thrThis, tCIDLib::TVoid* const pData)
                     catch(TError& errToCatch)
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-                        TModule::LogEventObj(errToCatch);
+                        TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
                     }
                 }
             }
@@ -1553,7 +1553,7 @@ TRecoGramRuleJan::~TRecoGramRuleJan()
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
     }
 }

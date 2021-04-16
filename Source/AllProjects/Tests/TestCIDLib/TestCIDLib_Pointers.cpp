@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -74,7 +73,8 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
 
     // Create a counted pointer for a TTester object
     {
-        TCntPtr<TTester> cptrTest(new TTester(bGotDeleted));
+        // Throw in the use of the make new helper
+        TCntPtr<TTester> cptrTest = tCIDLib::cptrMakeNew<TTester>(bGotDeleted);
 
         // Make sure that we can access the point members via the operators
         cptrTest->m_i4Field1 = 1;
@@ -106,9 +106,9 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
             strmOut << CUR_LN << L"Test pointer was already deleted" << kCIDLib::EndLn;
 
         // The count should be 64 now
-        if (cptrTest.c4RefCount() != 64)
+        if (cptrTest.c4StrongCount() != 64)
         {
-            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4RefCount()
+            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4StrongCount()
                     << L" instead of 64" << kCIDLib::EndLn;
         }
 
@@ -121,9 +121,9 @@ static tCIDLib::TVoid TestBasicCountedPointer(TTextOutStream& strmOut)
             strmOut << CUR_LN << L"Test pointer was already deleted" << kCIDLib::EndLn;
 
         // Count should now be 1 again
-        if (cptrTest.c4RefCount() != 1)
+        if (cptrTest.c4StrongCount() != 1)
         {
-            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4RefCount()
+            strmOut << CUR_LN << L"Ref count was " << cptrTest.c4StrongCount()
                     << L" instead of 1" << kCIDLib::EndLn;
         }
     }

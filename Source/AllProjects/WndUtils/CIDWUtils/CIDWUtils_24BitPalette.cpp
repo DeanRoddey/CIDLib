@@ -44,8 +44,11 @@ AdvRTTIDecls(T24BitPalette,TCtrlWnd)
 // ---------------------------------------------------------------------------
 namespace CIDWUtils_24BitPalette
 {
-    const tCIDLib::TCard4   c4BorderWidth       = 2;
-    const tCIDLib::TCard4   c4AreaBorderWidth   = 2;
+    namespace
+    {
+        constexpr tCIDLib::TCard4   c4BorderWidth       = 2;
+        constexpr tCIDLib::TCard4   c4AreaBorderWidth   = 2;
+    }
 }
 
 
@@ -65,30 +68,8 @@ T24BPalChangeInfo::T24BPalChangeInfo(const  TRGBClr&    rgbColor
 {
 }
 
-T24BPalChangeInfo::T24BPalChangeInfo(const T24BPalChangeInfo& wnotToSrc) :
-
-    TCtrlNotify(wnotToSrc)
-    , m_rgbColor(wnotToSrc.m_rgbColor)
-{
-}
-
 T24BPalChangeInfo::~T24BPalChangeInfo()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  T24BPalChangeInfo: Public operators
-// ---------------------------------------------------------------------------
-T24BPalChangeInfo&
-T24BPalChangeInfo::operator=(const T24BPalChangeInfo& wnotToSrc)
-{
-    if (this == &wnotToSrc)
-        return *this;
-
-    TParent::operator=(wnotToSrc);
-    m_rgbColor  = wnotToSrc.m_rgbColor;
-    return *this;
 }
 
 

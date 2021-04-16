@@ -44,8 +44,11 @@ RTTIDecls(TCIDPackHdr,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDPack_Ctrl
 {
-    const tCIDLib::TCard1   c1HdrFmtVersion = 1;
-    const tCIDLib::TCard1   c1FlFmtVersion = 1;
+    namespace
+    {
+        const tCIDLib::TCard1   c1HdrFmtVersion = 1;
+        const tCIDLib::TCard1   c1FlFmtVersion = 1;
+    }
 };
 
 

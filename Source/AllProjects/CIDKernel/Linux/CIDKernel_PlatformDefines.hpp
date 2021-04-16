@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -27,11 +27,12 @@
 //
 
 
-#if __BYTE_ORDER == __LITTLE_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
 #define CIDLIB_LITTLEENDIAN
 #else
 #define CIDLIB_BIGENDIAN
 #endif
+
 
 // ---------------------------------------------------------------------------
 //  Use the CPU defines provided by the compiler to drive the CIDLib CPU
@@ -69,7 +70,20 @@
 #define CIDLIBPACK  4
 
 #define CIDLIB_PACK(v)  pack(push, v)
+
 #define CIDLIB_POPPACK  pack(pop)
+
+
+
+// ---------------------------------------------------------------------------
+//  Declare the global variables for argc and argv
+// ---------------------------------------------------------------------------
+namespace CIDKernel_SystemInfo_Linux
+{
+    extern int argc;
+    extern char** argv;
+}
+
 
 // ---------------------------------------------------------------------------
 //  Define our version of the magic main module macro. We need to grab argc
@@ -84,9 +98,35 @@ int main(int argc, char** argv) \
     extern char** CIDKernel_SystemInfo_Linux_argv; \
     CIDKernel_SystemInfo_Linux_argc = argc; \
     CIDKernel_SystemInfo_Linux_argv = argv; \
-    CIDLib_Init(); \
     TThread* pthrToStart = new thrCtor; \
     CIDLib_MakePrimary(pthrToStart); \
+    CIDLib_Init(); \
     pthrToStart->Start(); \
-    return pthrToStart->eWaitForDeath(); \
+    return int(pthrToStart->eWaitForDeath()); \
 }
+
+
+
+// ---------------------------------------------------------------------------
+//  This macro is used to check for debug being on or off. This is done for
+//  flexibility, instead of doing the ifdef(x) everywhere. This is driven
+//  by the make file for CIDBuild and by the tool driver that CIDBuild invokes
+//  for the actual code.
+// ---------------------------------------------------------------------------
+#if     (_DEBUG)
+#define CID_DEBUG_ON        1
+#define CID_DEBUG_OFF       0
+#else
+#define CID_DEBUG_ON        0
+#define CID_DEBUG_OFF       1
+#endif
+
+
+// ---------------------------------------------------------------------------
+//  These have no meaning on Linux. They are related to static analysis on the
+//  Windows platform.
+// ---------------------------------------------------------------------------
+#define COP
+#define CIP
+#define CIOP
+#define CIDLib_Suppress(wid)

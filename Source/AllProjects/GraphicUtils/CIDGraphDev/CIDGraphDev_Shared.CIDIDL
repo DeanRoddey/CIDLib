@@ -14,7 +14,7 @@
         <CIDIDL:Types>
             <!-- The background mixing modes -->
             <CIDIDL:Enum CIDIDL:Name="EBackMixModes" CIDIDL:XlatMap="BaseName"
-                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:TextStreamMap="BaseName"
                          CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
                 <CIDIDL:DocText>
                     The available background mixing modes
@@ -25,7 +25,7 @@
 
             <!-- Raster blit types -->
             <CIDIDL:Enum CIDIDL:Name="EBltTypes" CIDIDL:XlatMap="BaseName"
-                         CIDIDL:BinStream="Yes" 
+                         CIDIDL:BinStream="Yes"
                          CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
                 <CIDIDL:DocText>
                     The facility class' eCalcPlacement uses this. It returns the type
@@ -164,7 +164,7 @@
 
             <!-- The foreground mix modes -->
             <CIDIDL:Enum CIDIDL:Name="EMixModes" CIDIDL:XlatMap="BaseName"
-                         CIDIDL:TextStreamMap="BaseName" 
+                         CIDIDL:TextStreamMap="BaseName"
                          CIDIDL:FormatMap="BaseName" CIDIDL:IncDec="Inc">
                 <CIDIDL:DocText>
                     The foreground mix modes
@@ -225,7 +225,7 @@
             </CIDIDL:Enum>
 
 
-            <CIDIDL:Enum    CIDIDL:Name="ESysBmps" 
+            <CIDIDL:Enum    CIDIDL:Name="ESysBmps"
                             CIDIDL:BinStream="Yes" CIDIDL:AltMap="BaseName"
                             CIDIDL:IncDec="Inc">
                 <CIDIDL:DocText>

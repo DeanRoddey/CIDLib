@@ -38,88 +38,87 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TFacility,TObject)
 
-
-// ---------------------------------------------------------------------------
-//  Local types
-//
-//  We have to maintain a local list of all constructed facilities. This
-//  allows lookup of facility objects by name. Facility objects are all
-//  singletons, so this is a reasonably safe thing to do. Because of the very
-//  fundamental nature of facilities, we do a custom data structure. Since
-//  facilities never die, we really only have to add. But, we do implement
-//  the code to remove upon destruction just in case.
-// ---------------------------------------------------------------------------
-struct TFacListItem
-{
-    tCIDLib::THashVal   hshName;
-    TFacility*          pfacThis;
-    TFacListItem*       pfliNext;
-};
-
-
 namespace CIDLib_Facility
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  hshModulus
-    //      THe hash modulus used for hashing facility names.
-    //
-    //  pszVersionFormat
-    //      This is the format string for the version member. The provided maj,
-    //      min, and revision values are formatted into it during construction.
-    // -----------------------------------------------------------------------
-    const tCIDLib::THashVal     hshModulus = 29;
-    const tCIDLib::TCh* const   pszVersionFmt = L"%(1).%(2).%(3)";
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local types
+        //
+        //  We have to maintain a local list of all constructed facilities. This
+        //  allows lookup of facility objects by name. Facility objects are all
+        //  singletons, so this is a reasonably safe thing to do. Because of the very
+        //  fundamental nature of facilities, we do a custom data structure. Since
+        //  facilities never die, we really only have to add. But, we do implement
+        //  the code to remove upon destruction just in case.
+        // -----------------------------------------------------------------------
+        struct TFacListItem
+        {
+            tCIDLib::THashVal   hshName;
+            TFacility*          pfacThis;
+            TFacListItem*       pfliNext;
+        };
+
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  hshModulus
+        //      THe hash modulus used for hashing facility names.
+        //
+        //  pszVersionFormat
+        //      This is the format string for the version member. The provided maj,
+        //      min, and revision values are formatted into it during construction.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::THashVal         hshModulus = 29;
+        constexpr const tCIDLib::TCh* const pszVersionFmt = L"%(1).%(2).%(3)";
 
 
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  pfliHead
-    //      The head of the facility list.
-    // -----------------------------------------------------------------------
-    TFacListItem*               pfliHead = 0;
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  pfliHead
+        //      The head of the facility list.
+        // -----------------------------------------------------------------------
+        TFacListItem*        pfliHead = nullptr;
+
+
+        // -----------------------------------------------------------------------
+        //  We need some light locking here. Because of the fundamental nature of
+        //  modules and facilities, we use a lazy fault in scheme here.
+        // -----------------------------------------------------------------------
+        TCriticalSection* pcrsList()
+        {
+            static TCriticalSection crsList;
+            return &crsList;
+        }
+    }
 }
 
 
 // ---------------------------------------------------------------------------
 //  Local methods
 // ---------------------------------------------------------------------------
-static TCriticalSection* pcrsList()
-{
-    static TCriticalSection*   pcrsList = 0;
-
-    if (!pcrsList)
-    {
-        TBaseLock lockSync;
-        if (!pcrsList)
-            TRawMem::pExchangePtr(&pcrsList, new TCriticalSection);
-    }
-    return pcrsList;
-}
-
 static tCIDLib::TVoid AddToList(TFacility* const pfacNew)
 {
-    TFacListItem* pfliNew = new TFacListItem;
+    CIDLib_Facility::TFacListItem* pfliNew = new CIDLib_Facility::TFacListItem;
     pfliNew->hshName = pfacNew->strName().hshCalcHash(CIDLib_Facility::hshModulus);
     pfliNew->pfacThis = pfacNew;
 
     // Lock the list and add the new facility
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList());
 
     pfliNew->pfliNext = CIDLib_Facility::pfliHead;
     CIDLib_Facility::pfliHead = pfliNew;
 }
 
 
-static tCIDLib::TVoid RemoveFromList(TFacility* const pfacToRemove)
+static tCIDLib::TVoid RemoveFromList(const TFacility* const pfacToRemove)
 {
     // Lock the list while we search
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList());
 
-    TFacListItem* pfliCur = CIDLib_Facility::pfliHead;
-    TFacListItem* pfliPrev = 0;
+    CIDLib_Facility::TFacListItem* pfliCur = CIDLib_Facility::pfliHead;
+    CIDLib_Facility::TFacListItem* pfliPrev = nullptr;
     while (pfliCur)
     {
         if (pfliCur->pfacThis == pfacToRemove)
@@ -175,10 +174,10 @@ TFacility* TFacility::pfacFromName(const TString& strFacName)
     const tCIDLib::THashVal hshName = strFacName.hshCalcHash(CIDLib_Facility::hshModulus);
 
     // Lock the list while we search
-    TCritSecLocker lockList(pcrsList());
+    TCritSecLocker lockList(CIDLib_Facility::pcrsList());
 
     // Try to find the passed name in the local hash table
-    TFacListItem* pfliCur = CIDLib_Facility::pfliHead;
+    CIDLib_Facility::TFacListItem* pfliCur = CIDLib_Facility::pfliHead;
     while (pfliCur)
     {
         if (pfliCur->hshName == hshName)
@@ -249,16 +248,17 @@ TFacility::TFacility(   const   TString&            strFacName
     AddToList(this);
 }
 
+
+// This one is always a load, not a query, since it's from a path
 TFacility::TFacility(   const   TString&            strFacName
-                        , const TString&            strLoadPath
+                        , const TString&            strFromPath
                         , const tCIDLib::EModTypes  eModType
                         , const tCIDLib::TCard4     c4MajVer
                         , const tCIDLib::TCard4     c4MinVer
                         , const tCIDLib::TCard4     c4Revision
-                        , const tCIDLib::EModFlags  eFlags
-                        , const tCIDLib::TBoolean   bLoad) :
+                        , const tCIDLib::EModFlags  eFlags) :
 
-    TModule(strFacName, strLoadPath, eModType, eFlags, bLoad)
+    TModule(strFacName, strFromPath, eModType, c4MajVer, c4MinVer, eFlags)
     , m_c4MajVer(c4MajVer)
     , m_c4MinVer(c4MinVer)
     , m_c4Revision(c4Revision)

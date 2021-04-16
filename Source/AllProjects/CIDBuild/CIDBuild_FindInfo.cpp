@@ -58,8 +58,8 @@ TFindInfo::bFindAFile(  const   TBldStr&                strDirectory
 {
     // Just build the search spec and call the other version
     TBldStr strTmp(strDirectory);
-    if (strTmp.chLast() != L'\\')
-        strTmp.Append(L"\\");
+    if (strTmp.chLast() != kCIDBuild::chPathSep)
+        strTmp.Append(kCIDBuild::chPathSep);
     strTmp.Append(strFile);
 
     return bFindAFile(strTmp, fndiToFill, eMode);
@@ -74,8 +74,8 @@ TFindInfo::c4FindFiles( const   TBldStr&                strDirectory
 {
     // Just build the search spec and call the other version
     TBldStr strTmp(strDirectory);
-    if (strTmp.chLast() != L'\\')
-        strTmp.Append(L"\\");
+    if (strTmp.chLast() != kCIDBuild::chPathSep)
+        strTmp.Append(kCIDBuild::chPathSep);
     strTmp.Append(strFile);
 
     return c4FindFiles(strTmp, listToFill, eMode);

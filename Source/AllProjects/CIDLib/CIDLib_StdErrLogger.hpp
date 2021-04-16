@@ -43,6 +43,7 @@ class CIDLIBEXP TStdErrLogger : public TObject, public MLogger
         TStdErrLogger();
 
         TStdErrLogger(const TStdErrLogger&) = delete;
+        TStdErrLogger(TStdErrLogger&&) = delete;
 
         ~TStdErrLogger();
 
@@ -51,6 +52,7 @@ class CIDLIBEXP TStdErrLogger : public TObject, public MLogger
         //  Public operators
         // -------------------------------------------------------------------
         TStdErrLogger& operator=(const TStdErrLogger&) = delete;
+        TStdErrLogger& operator=(TStdErrLogger&&) = delete;
 
 
         // -------------------------------------------------------------------

@@ -157,7 +157,7 @@ TToolsDriver::PostLink( const   TProjectInfo&   projiTarget
         }
 
 
-        tCIDLib::TCh* apszParms[16];
+        const tCIDLib::TCh* apszParms[16];
         apszParms[0] = L"mt.exe";
         apszParms[1] = L"-nologo";
         apszParms[2] = L"-manifest";

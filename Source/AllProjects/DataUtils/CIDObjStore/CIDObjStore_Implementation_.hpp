@@ -199,6 +199,12 @@ class TCIDObjStoreImpl : public TObject
 
         tCIDLib::TCard4 c4ObjectsInStore() const;
 
+        tCIDLib::TCard4 c4QueryKeysInScope
+        (
+            const   TString&                strScope
+            ,       tCIDLib::TStrCollect&   colToFill
+        );
+
         tCIDLib::TCard4 c4QueryObjectsInScope
         (
             const   TString&                strScope
@@ -240,20 +246,20 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       TMemBuf&                mbufData
-            ,       tCIDLib::TCard4&        c4DataSize
+            , COP   tCIDLib::TCard4&        c4DataSize
             ,       TMemBuf&                mbufKey
-            ,       tCIDLib::TCard4&        c4KeySize
+            , COP   tCIDLib::TCard4&        c4KeySize
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             ,       TMemBuf&                mbufData
-            ,       tCIDLib::TCard4&        c4DataSize
+            , COP   tCIDLib::TCard4&        c4DataSize
             , const tCIDLib::TBoolean       bThrowIfNot
         );
 
@@ -333,16 +339,16 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TBoolean bLoadItemData
         (
             const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TMemBuf&                mbufKeyFill
-            ,       TStoreItemHdr&          hdrToFill
+            , COP   TMemBuf&                mbufToFill
+            , COP   TMemBuf&                mbufKeyFill
+            , COP   TStoreItemHdr&          hdrToFill
         );
 
         tCIDLib::TBoolean bLoadItemData
         (
             const   TOSStoreItem&           osiToLoad
-            ,       TMemBuf&                mbufToFill
-            ,       TStoreItemHdr&          hdrToFill
+            , COP   TMemBuf&                mbufToFill
+            , COP   TStoreItemHdr&          hdrToFill
         );
 
         tCIDLib::TVoid BuildIndex();
@@ -350,8 +356,8 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TCard4 c4CreateSeqData
         (
                     TVector<TOSSeqData>&    colToFill
-            ,       tCIDLib::TCard4&        c4IndexItems
-            ,       tCIDLib::TCard4&        c4FreeItems
+            , COP   tCIDLib::TCard4&        c4IndexItems
+            , COP   tCIDLib::TCard4&        c4FreeItems
             , const tCIDLib::TCard4         c4TargetOfs
         );
 
@@ -365,8 +371,8 @@ class TCIDObjStoreImpl : public TObject
         tCIDLib::TCard4 c4FindFreeSpace
         (
             const   tCIDLib::TCard4         c4Needed
-            ,       tCIDLib::TCard4&        c4ActualSz
-            ,       tCIDLib::TCard4&        c4Offset
+            , COP   tCIDLib::TCard4&        c4ActualSz
+            , COP   tCIDLib::TCard4&        c4Offset
         );
 
         tCIDLib::TVoid Compact

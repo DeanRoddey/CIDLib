@@ -51,6 +51,7 @@ class CIDLIBEXP MLogger
         //  Destructor.
         // -------------------------------------------------------------------
         MLogger(const MLogger&) = delete;
+        MLogger(MLogger&&) = delete;
 
         virtual ~MLogger() {}
 
@@ -59,6 +60,7 @@ class CIDLIBEXP MLogger
         //  Public operators
         // -------------------------------------------------------------------
         MLogger& operator=(const MLogger&) = delete;
+        MLogger& operator=(MLogger&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -66,7 +68,7 @@ class CIDLIBEXP MLogger
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid LogEvent
         (
-            const   TLogEvent&              logevToLog
+            const   TLogEvent&              logevSrc
         ) = 0;
 
 
@@ -74,7 +76,7 @@ class CIDLIBEXP MLogger
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        MLogger() {}
+        MLogger() = default;
 };
 
 #pragma CIDLIB_POPPACK

@@ -50,6 +50,7 @@ class TErrOptsDlg : public TDlgBox
         TErrOptsDlg();
 
         TErrOptsDlg(const TErrOptsDlg&) = delete;
+        TErrOptsDlg(TErrOptsDlg&&) = delete;
 
         ~TErrOptsDlg();
 
@@ -58,6 +59,7 @@ class TErrOptsDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TErrOptsDlg& operator=(const TErrOptsDlg&) = delete;
+        TErrOptsDlg& operator=(TErrOptsDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

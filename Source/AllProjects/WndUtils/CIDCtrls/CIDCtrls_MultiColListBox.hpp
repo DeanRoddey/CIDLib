@@ -567,6 +567,11 @@ class CIDCTRLSEXP TMultiColListBox : public TListWnd
             , const tCIDLib::TBoolean       bNewState
         );
 
+        tCIDLib::TVoid SetSortColumn
+        (
+            const   tCIDLib::TCard4         c4Index
+        );
+
         tCIDLib::TVoid SetUserDataAt
         (
             const   tCIDLib::TCard4         c4Index
@@ -814,7 +819,7 @@ class CIDCTRLSEXP TMultiColListBox : public TListWnd
         //      Defaults to 0, but can be changed. It's only used if the Sorted style
         //      is on. If ColSort style is also enabled, this is only the initial sort
         //      column, but the user can change it via the column headers. If sorting is
-        //      not enabled, this is meaningless and attempts to read it will throw.
+        //      not enabled, this is meaningless and attempts to read/write it will throw.
         //
         //  m_colList
         //      We manage the data for the list, and this is our list data. The row data is

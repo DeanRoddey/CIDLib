@@ -59,7 +59,7 @@ class CIDUPNPEXP TUPnPAudInService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -112,7 +112,7 @@ class CIDUPNPEXP TUPnPDevPropsService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -187,7 +187,7 @@ class CIDUPNPEXP TUPnPGrpMgmtService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------

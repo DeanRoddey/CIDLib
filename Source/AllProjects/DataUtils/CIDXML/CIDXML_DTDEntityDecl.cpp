@@ -88,34 +88,9 @@ TDTDEntityDecl::TDTDEntityDecl( const   tCIDLib::TCh* const pszEntityName
 {
 }
 
-TDTDEntityDecl::TDTDEntityDecl(const TDTDEntityDecl& xdeclToCopy) :
-
-    TXMLEntityDecl(xdeclToCopy)
-    , m_bFromIntSS(xdeclToCopy.m_bFromIntSS)
-    , m_bIsPE(xdeclToCopy.m_bIsPE)
-{
-}
-
 
 TDTDEntityDecl::~TDTDEntityDecl()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TDTDEntityDecl: Public operators
-// ---------------------------------------------------------------------------
-TDTDEntityDecl& TDTDEntityDecl::operator=(const TDTDEntityDecl& xdeclToAssign)
-{
-    if (this == &xdeclToAssign)
-        return *this;
-
-    TXMLEntityDecl::operator=(xdeclToAssign);
-
-    m_bFromIntSS    = xdeclToAssign.m_bFromIntSS;
-    m_bIsPE         = xdeclToAssign.m_bIsPE;
-
-    return *this;
 }
 
 

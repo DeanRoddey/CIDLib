@@ -78,7 +78,7 @@ TUPnPAsyncFinderItem::~TUPnPAsyncFinderItem()
 {
     // Clean up the kernel level object
     delete m_pkupnpdThis;
-    m_pkupnpdThis = 0;
+    m_pkupnpdThis = nullptr;
 }
 
 
@@ -132,7 +132,7 @@ tCIDLib::TBoolean
 TUPnPAsyncFinder::bListComplete(const TString& strSearchName) const
 {
     // Have to sync for this
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
 
     // Look up the search, throw if not found
     tCIDLib::TCard4 c4At;
@@ -151,7 +151,7 @@ TUPnPAsyncFinder::bQueryDevInfo(const   TString&            strUID
                                 ,       tCIDLib::TCard4&    c4SeqId) const
 {
     // We need to explicitly lock here since it's not a single op
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
 
     const TUPnPAsyncFinderItem* pkupnpafiRet = m_colDevList.pobjFindByKey
     (
@@ -186,7 +186,7 @@ TUPnPAsyncFinder::bWaitListComplete(const   TString&        strSearchName
     //  We reaquire each time before checking. Though we can do a quick
     //  check before we release to see if it's already set.
     //
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
 
     tCIDLib::TCard4 c4At;
     const TKeyValues* pkvalsCheck = pkvalsFindByName(strSearchName, c4At, kCIDLib::True);
@@ -195,7 +195,7 @@ TUPnPAsyncFinder::bWaitListComplete(const   TString&        strSearchName
         return kCIDLib::True;
 
     // Not set yet, so release and start waiting
-    mtxlSync.Release();
+    lockrSync.Release();
 
     const tCIDLib::TEncodedTime enctEnd = TTime::enctNowPlusMSs(c4WaitMillis);
     tCIDLib::TEncodedTime enctNow = TTime::enctNow();
@@ -212,7 +212,7 @@ TUPnPAsyncFinder::bWaitListComplete(const   TString&        strSearchName
         //  Reaquire the lock and check again. We give a second timeout, but
         //  it should never be even fractionally that long in the worst case.
         //
-        mtxlSync.Lock(1000);
+        lockrSync.Lock(1000);
         if (!pkvalsCheck->strVal2().bIsEmpty())
         {
             bRet = kCIDLib::True;
@@ -220,7 +220,7 @@ TUPnPAsyncFinder::bWaitListComplete(const   TString&        strSearchName
         }
 
         // Still not, so release again
-        mtxlSync.Release();
+        lockrSync.Release();
 
         // Get the current time and try again
         enctNow = TTime::enctNow();
@@ -249,7 +249,7 @@ TUPnPAsyncFinder::eSetupDevice( const   TString&            strUID
                                 ,       tCIDLib::TCard4&    c4SerialNum)
 {
     // We need to explicitly lock here since it's not a single op
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
 
     // Give back the latest serial number regardless
     c4SerialNum = m_c4SerialNum;
@@ -305,7 +305,7 @@ TUPnPAsyncFinder::QueryDevList(tCIDLib::TKValsCollect&  colToFill
 {
     colToFill.RemoveAll();
 
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
     TDevList::TCursor cursList(&m_colDevList);
     for (; cursList; ++cursList)
     {
@@ -341,7 +341,7 @@ TUPnPAsyncFinder::StartSearch(  const   TString&    strFindType
     //
     tCIDLib::TCard4 c4At;
     {
-        TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+        TLocker lockrSync(&m_colDevList);
         if (pkvalsFindByName(strSearchName, c4At, kCIDLib::False))
         {
             facCIDUPnP().ThrowErr
@@ -377,11 +377,8 @@ TUPnPAsyncFinder::StartSearch(  const   TString&    strFindType
     //  It worked so update our search list. We have to lock again. The second
     //  value we leave empty. That's the search complete flag.
     //
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
-    m_colSearches.objAdd
-    (
-        TKeyValues(strSearchName, kstrSearchID.pszValue(), TString::strEmpty())
-    );
+    TLocker lockrSync(&m_colDevList);
+    m_colSearches.objPlace(strSearchName, kstrSearchID.pszValue(), TString::strEmpty());
 }
 
 
@@ -400,7 +397,7 @@ tCIDLib::TVoid TUPnPAsyncFinder::StopSearch(const TString& strSearchName)
     const TKeyValues* pkvalsStop = 0;
     tCIDLib::TCard4 c4At;
     {
-        TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+        TLocker lockrSync(&m_colDevList);
         pkvalsStop = pkvalsFindByName(strSearchName, c4At, kCIDLib::False);
 
         // If not found, return now
@@ -424,7 +421,7 @@ tCIDLib::TVoid TUPnPAsyncFinder::StopSearch(const TString& strSearchName)
     }
 
     // It worked, so lock again and remove this search from our search list
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
     m_colSearches.RemoveAt(c4At);
 }
 
@@ -458,7 +455,7 @@ TUPnPAsyncFinder::bDeviceArrived(const  tCIDLib::TCh* const     pszUID
                                 , const tCIDLib::TCh* const     pszType
                                 ,       TKrnlUPnPDevice* const  pkupnpDev)
 {
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
     TString strUID(pszUID);
 
     //
@@ -512,7 +509,7 @@ TUPnPAsyncFinder::bDeviceArrived(const  tCIDLib::TCh* const     pszUID
 //
 tCIDLib::TVoid TUPnPAsyncFinder::DeviceRemoved(const tCIDLib::TCh* const pszUID)
 {
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
     const TString strKey(pszUID);
     if (m_colDevList.bRemoveKeyIfExists(strKey))
     {
@@ -531,7 +528,7 @@ tCIDLib::TVoid TUPnPAsyncFinder::DeviceRemoved(const tCIDLib::TCh* const pszUID)
 tCIDLib::TVoid
 TUPnPAsyncFinder::ListComplete(const tCIDLib::TCh* const pszSearchID)
 {
-    TMtxLocker mtxlSync(m_colDevList.pmtxLock());
+    TLocker lockrSync(&m_colDevList);
 
     const TString strID(pszSearchID);
 

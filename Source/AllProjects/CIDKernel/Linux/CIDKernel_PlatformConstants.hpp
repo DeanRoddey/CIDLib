@@ -7,8 +7,8 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd - 2019
 //
-//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and 
-//  the author (Dean Roddey.) It is licensed under the MIT Open Source 
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
 //  license:
 //
 //  https://opensource.org/licenses/MIT
@@ -33,39 +33,50 @@ namespace kCIDLib
     // -----------------------------------------------------------------------
     //  File system constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MaxPathLen    = 255;
-    const tCIDLib::TCh              chPathSeparator = L'/';
-    const tCIDLib::TCh* const       szPathSeparator = L"/";
-    const tCIDLib::TCh* const       szBadPathChars  = L"/;|<>";
-    const tCIDLib::TCh* const       pszAllFilesSpec = L"*";
-    const tCIDLib::TCh* const       pszAllDirsSpec  = L"*";
-    const tCIDLib::TCh              chExtSeparator  = L'.';
-    const tCIDLib::TCh* const       szExtSeparator  = L".";
-    const tCIDLib::TCh* const       szWhitespace    = L"\r\n\t\a\f\v ";
-    const tCIDLib::TCh* const       szExeExtension  = L"";
-    const tCIDLib::TCh* const       szLibraryPrefix = L"lib";
-    const tCIDLib::TCh* const       szLibrarySuffix = L".so";
+    constexpr tCIDLib::TCard4       c4MaxPathLen        = 255;
+    constexpr tCIDLib::TCh          chMultiPathSep      = L':';
+    const tCIDLib::TCh* const       pszMultiPathSep     = L":";
+    constexpr tCIDLib::TCh          chDefParmSep        = L'-';
+    const tCIDLib::TCh* const       pszAllFilesSpec     = L"*";
+    const tCIDLib::TCh* const       pszAllDirsSpec      = L"*";
+    const tCIDLib::TCh* const       szWhitespace        = L"\r\n\t\a\f\v ";
+    constexpr tCIDLib::TCh          chExtSeparator      = L'.';
+    const tCIDLib::TCh* const       szExtSeparator      = L".";
+    const tCIDLib::TCh* const       szExeExtension      = L"";
+    const tCIDLib::TCh* const       szLibExtension      = L".so";
+    const tCIDLib::TCh* const       szMultiPathSep      = L":";
+    constexpr tCIDLib::TCh          chPathSep           = L'/';
+    const tCIDLib::TCh* const       szPathSep           = L"/";
+    const tCIDLib::TCh* const       szSysExePath        = L"PATH";
+    const tCIDLib::TCh* const       szSysLibPath        = L"LD_LIBRARY_PATH";
 
 
     // -----------------------------------------------------------------------
     //  Memory related constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4MemPageSize   = 4096;
+    constexpr tCIDLib::TCard4       c4MemPageSize   = 4096;
+    constexpr tCIDLib::TCard4       c4CacheAlign    = 4;
+
+
+    // -----------------------------------------------------------------------
+    //  Our native character encoding
+    // -----------------------------------------------------------------------
+    const tCIDLib::TCh* const       pszNativeEncoding = L"UTF-32";
 
 
     // -----------------------------------------------------------------------
     //  Process and thread related constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TProcessId       pidInvalid      = 0;
-    const tCIDLib::TThreadId        tidInvalid      = 0;
+    constexpr tCIDLib::TProcessId   pidInvalid      = 0;
+    constexpr tCIDLib::TThreadId    tidInvalid      = 0;
 
 
     // -----------------------------------------------------------------------
     //  Socket oriented constants
     // -----------------------------------------------------------------------
-    const tCIDLib::TIPAddr          ipaLoopBack     = 0x0100007F;
-    const tCIDLib::TIPAddr          ipaAny          = 0;
-    const tCIDLib::TIPAddr          ipaBroadcast    = 0xFFFFFFFF;
+    constexpr tCIDLib::TIPAddr      ipaLoopBack     = 0x0100007F;
+    constexpr tCIDLib::TIPAddr      ipaAny          = 0;
+    constexpr tCIDLib::TIPAddr      ipaBroadcast    = 0xFFFFFFFF;
 
 
     // -----------------------------------------------------------------------
@@ -73,8 +84,35 @@ namespace kCIDLib
     //  and long char types. The Unicode char type is defined in a platform
     //  independent way.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4           c4SCharBytes    = 1;
-    const tCIDLib::TSCh             schMaxSChar     = char(0x7F);
-    const tCIDLib::TCard4           c4CharBytes     = sizeof(wchar_t);
-    const tCIDLib::TCh              chMaxChar       = wchar_t(0xFFFFFFFF);
+    constexpr tCIDLib::TCard4       c4SCharBytes    = 1;
+    constexpr tCIDLib::TSCh         schMaxSChar     = char(0x7F);
+    constexpr tCIDLib::TCard4       c4CharBytes     = sizeof(wchar_t);
+    constexpr tCIDLib::TCh          chMaxChar       = wchar_t(0xFFFFFFFF);
+
+
+    // -----------------------------------------------------------------------
+    //  Max handles we can wait on at once. It's one less than the max so
+    //  that we can have a slot for our own internal use.
+    // -----------------------------------------------------------------------
+    constexpr tCIDLib::TCard4       c4MaxWaitHandles = 63;
+
+
+    // -----------------------------------------------------------------------
+    //  Since we currently allow each platform to use its own wide character
+    //  format in memory, we need to have this
+    // -----------------------------------------------------------------------
+    #if defined(CIDLIB_LITTLEENDIAN)
+    constexpr tCIDLib::EBaseTextFmts        eWCCharFmt = tCIDLib::EBaseTextFmts::FourByte_LE;
+    #else
+    constexpr tCIDLib::EBaseTextFmts        eWCCharFmt = tCIDLib::EBaseTextFmts::FourByte_BE;
+    #endif    
+}
+
+
+namespace kCIDSock
+{
+    // -----------------------------------------------------------------------
+    //  Socket related constants
+    // -----------------------------------------------------------------------
+    constexpr tCIDLib::TCard4       c4MaxSelect     = 64;
 }

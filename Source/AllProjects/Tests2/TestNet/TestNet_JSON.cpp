@@ -73,7 +73,6 @@ TTest_JSON1::eRunTest(  TTextStringOutStream&   strmOut
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-
     // A very basic embedded file test
     try
     {

@@ -46,7 +46,7 @@ AdvRTTIDecls(TArea,TObject)
 // ---------------------------------------------------------------------------
 //  TArea: Public, static data
 // ---------------------------------------------------------------------------
-const TArea  TArea::areaEmpty(0, 0, 0, 0);
+const TArea  TArea::areaEmpty(0, 0, 0UL, 0UL);
 
 
 // ---------------------------------------------------------------------------
@@ -54,31 +54,19 @@ const TArea  TArea::areaEmpty(0, 0, 0, 0);
 // ---------------------------------------------------------------------------
 TArea& TArea::Nul_TArea()
 {
-    static TArea* pareaNull = nullptr;
-    if (!pareaNull)
-    {
-        TBaseLock lockInit;
-        if (!pareaNull)
-            TRawMem::pExchangePtr(&pareaNull, new TArea);
-    }
-    return *pareaNull;
+    static TArea areaNull;
+    return areaNull;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TArea: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TArea::TArea(   const   tCIDLib::THostRectl&    rectlSrc
-                , const tCIDLib::ERectlTypes    eInclusive)
+TArea::TArea(const tCIDLib::THostRectl& rectlSrc)
 {
-    FromRectl(rectlSrc, eInclusive);
+    FromRectl(rectlSrc);
 }
 
-
-//
-//  The LR in these ctors is assumed to be non-inclusive. So xL=1 and xR=2 means a
-//  width of 1. If they are the same, then it's 0.
-//
 TArea::TArea(   const   tCIDLib::THostPoint&    ptULeft
                 , const tCIDLib::THostPoint&    ptLRt) :
 
@@ -88,11 +76,10 @@ TArea::TArea(   const   tCIDLib::THostPoint&    ptULeft
     , m_c4CX(tCIDLib::MaxVal(ptULeft.i4X, ptLRt.i4X) - m_i4X)
     , m_c4CY(tCIDLib::MaxVal(ptULeft.i4Y, ptLRt.i4Y) - m_i4Y)
 {
-    m_c4CX++;
-    m_c4CY++;
 }
 
-TArea::TArea(const TPoint& pntULeft, const TPoint& pntLRt)
+TArea::TArea(const  TPoint&                 pntULeft
+            , const TPoint&                 pntLRt)
 {
     // Get the values out of the points for greater efficiency
     tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
@@ -148,10 +135,6 @@ TArea::TArea(   const   TPoint&         pntOrg
 {
 }
 
-TArea::~TArea()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TArea: Public operators
@@ -180,17 +163,14 @@ tCIDLib::TVoid TArea::operator|=(const TArea& areaToOR)
     if (&areaToOR == this)
         return;
 
-    tCIDLib::TInt4   i4L, i4R, i4B, i4T;
-
     //
     //  Take the smaller of the origin points and the larger of the upper
-    //  and right points. The LR values have to be increased by 1 for the
-    //  calculations, i.e. we want to work with non-inclusive L/R.
+    //  and right points.
     //
-    i4L = tCIDLib::MinVal(m_i4X, areaToOR.m_i4X);
-    i4T = tCIDLib::MinVal(m_i4Y, areaToOR.m_i4Y);
-    i4R = tCIDLib::MaxVal(i4Right(), areaToOR.i4Right()) + 1;
-    i4B = tCIDLib::MaxVal(i4Bottom(), areaToOR.i4Bottom()) + 1;
+    const tCIDLib::TInt4 i4L = tCIDLib::MinVal(m_i4X, areaToOR.m_i4X);
+    const tCIDLib::TInt4 i4T = tCIDLib::MinVal(m_i4Y, areaToOR.m_i4Y);
+    const tCIDLib::TInt4 i4R = tCIDLib::MaxVal(i4Right(), areaToOR.i4Right());
+    const tCIDLib::TInt4 i4B = tCIDLib::MaxVal(i4Bottom(), areaToOR.i4Bottom());
 
     m_i4X   = i4L;
     m_i4Y   = i4T;
@@ -219,10 +199,10 @@ tCIDLib::TVoid TArea::operator-=(const TArea& areaToSub)
         return;
 
     // To much simplify things, get both our right/bottom positions
-    tCIDLib::TInt4  i4ThisRight    = i4Right() + 1;
-    tCIDLib::TInt4  i4ThisBottom   = i4Bottom() + 1;
-    tCIDLib::TInt4  i4TestRight    = areaToSub.i4Right() + 1;
-    tCIDLib::TInt4  i4TestBottom   = areaToSub.i4Bottom() + 1;
+    tCIDLib::TInt4  i4ThisRight    = i4Right() ;
+    tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
+    tCIDLib::TInt4  i4TestRight    = areaToSub.i4Right();
+    tCIDLib::TInt4  i4TestBottom   = areaToSub.i4Bottom();
 
     //
     //  If his origin is is past our LR or his LR is before our origin,
@@ -243,12 +223,12 @@ tCIDLib::TVoid TArea::operator-=(const TArea& areaToSub)
     //  left.
     //
     if (areaToSub.m_i4X > m_i4X)
-        i4Right(areaToSub.m_i4X - 1);
+        i4Right(areaToSub.m_i4X);
     else if (areaToSub.m_i4X < m_i4X)
         i4Left(i4TestRight, kCIDLib::True);
 
     if (areaToSub.m_i4Y > m_i4Y)
-        i4Bottom(areaToSub.m_i4Y - 1);
+        i4Bottom(areaToSub.m_i4Y);
     else if (areaToSub.m_i4Y < m_i4Y)
         i4Top(i4TestBottom, kCIDLib::True);
 }
@@ -268,16 +248,14 @@ tCIDLib::TVoid TArea::operator&=(const TArea& areaToAND)
     if (&areaToAND == this)
         return;
 
-    tCIDLib::TInt4   i4L, i4T, i4R, i4B;
-
     //
     //  Take the larger of the origin points and the smaller of the upper
     //  and right points. Bump the L/R values for the calculations.
     //
-    i4L = tCIDLib::MaxVal(m_i4X, areaToAND.m_i4X);
-    i4T = tCIDLib::MaxVal(m_i4Y, areaToAND.m_i4Y);
-    i4R = tCIDLib::MinVal(i4Right(), areaToAND.i4Right()) + 1;
-    i4B = tCIDLib::MinVal(i4Bottom(), areaToAND.i4Bottom()) + 1;
+    const tCIDLib::TInt4 i4L = tCIDLib::MaxVal(m_i4X, areaToAND.m_i4X);
+    const tCIDLib::TInt4 i4T = tCIDLib::MaxVal(m_i4Y, areaToAND.m_i4Y);
+    const tCIDLib::TInt4 i4R = tCIDLib::MinVal(i4Right(), areaToAND.i4Right());
+    const tCIDLib::TInt4 i4B = tCIDLib::MinVal(i4Bottom(), areaToAND.i4Bottom());
 
     //
     //  See if there is any common area. If the right is less than the
@@ -305,16 +283,13 @@ tCIDLib::TBoolean TArea::operator==(const TArea& areaToTest) const
     if (this == &areaToTest)
         return kCIDLib::True;
 
-    if (m_i4X != areaToTest.m_i4X)
-        return kCIDLib::False;
-    if (m_i4Y != areaToTest.m_i4Y)
-        return kCIDLib::False;
-    if (m_c4CX != areaToTest.m_c4CX)
-        return kCIDLib::False;
-    if (m_c4CY != areaToTest.m_c4CY)
-        return kCIDLib::False;
-
-    return kCIDLib::True;
+    return
+    (
+        (m_i4X == areaToTest.m_i4X)
+        && (m_i4Y == areaToTest.m_i4Y)
+        && (m_c4CX == areaToTest.m_c4CX)
+        && (m_c4CY == areaToTest.m_c4CY)
+    );
 }
 
 tCIDLib::TBoolean TArea::operator!=(const TArea& areaToTest) const
@@ -448,10 +423,10 @@ tCIDLib::TBoolean TArea::bIntersects(const TArea& areaTest) const
         return kCIDLib::False;
 
     // Get the upper extremes of each area
-    tCIDLib::TInt4  i4ThisRight    = i4Right();
-    tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
-    tCIDLib::TInt4  i4TestRight    = areaTest.i4Right();
-    tCIDLib::TInt4  i4TestBottom   = areaTest.i4Bottom();
+    const tCIDLib::TInt4  i4ThisRight    = i4Right();
+    const tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
+    const tCIDLib::TInt4  i4TestRight    = areaTest.i4Right();
+    const tCIDLib::TInt4  i4TestBottom   = areaTest.i4Bottom();
 
     // Check the sides
     if (areaTest.m_i4X > i4ThisRight)
@@ -539,33 +514,29 @@ TArea::bParseFromText(  const   TString&            strText
     strTmp.Append(kCIDLib::chSpace);
     TStringTokenizer stokParse(&strText, strTmp);
 
-    tCIDLib::TBoolean bOk;
-    tCIDLib::TInt4 i4X;
-    tCIDLib::TInt4 i4Y;
-    tCIDLib::TCard4 c4CX;
-    tCIDLib::TCard4 c4CY;
+    tCIDLib::TBoolean bOk = kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4X = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TInt4 i4Y = TRawStr::i4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CX = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
     if (!stokParse.bGetNextToken(strTmp))
         return kCIDLib::False;
-    c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
+    const tCIDLib::TCard4 c4CY = TRawStr::c4AsBinary(strTmp.pszBuffer(), bOk, eRadix);
     if (!bOk)
         return kCIDLib::False;
 
@@ -633,11 +604,14 @@ tCIDLib::TBoolean TArea::bVertOverlap(const TArea& areaTest) const
 }
 
 
-// Make the bottom come out at this new bottom, by adjusting the origin
+//
+//  Make the bottom come out at this new bottom, by adjusting the origin. It is
+//  assumed to be non-inclusive.
+//
 tCIDLib::TVoid TArea::BottomAlign(const tCIDLib::TInt4 i4NewBottom)
 {
     // Set the origin to put the bottom at this new bottom
-    m_i4Y = (i4NewBottom - tCIDLib::TInt4(m_c4CY)) + 1;
+    m_i4Y = (i4NewBottom - tCIDLib::TInt4(m_c4CY));
 }
 
 
@@ -648,7 +622,7 @@ tCIDLib::TVoid TArea::BottomAlign(const tCIDLib::TInt4 i4NewBottom)
 tCIDLib::TVoid TArea::BottomJustifyIn(  const   TArea&              areaIn
                                         , const tCIDLib::TBoolean   bHCenter)
 {
-    m_i4Y = (areaIn.i4Bottom() - m_c4CY) + 1;
+    m_i4Y = (areaIn.i4Bottom() - m_c4CY);
     if (bHCenter)
     {
         m_i4X = areaIn.m_i4X + (areaIn.m_c4CX >> 1);
@@ -714,10 +688,29 @@ TArea::FromAreaScaled(  const   TArea&              areaSource
 }
 
 
-//
-//  Sets our origin and size from the passed UL/LR corner points. The LR is
-//  assumed to be non-inclusive, so xL=1 and xR=2 means it's width is 1.
-//
+// From the various edges. R/B must be non-inclusive
+tCIDLib::TVoid
+TArea::FromEdges(const  tCIDLib::TInt4  i4Left
+                , const tCIDLib::TInt4  i4Top
+                , const tCIDLib::TInt4  i4Right
+                , const tCIDLib::TInt4  i4Bottom)
+{
+    m_i4X = i4Left;
+    m_i4Y = i4Top;
+
+    if (i4Right < i4Left)
+        m_c4CX = tCIDLib::TCard4(i4Left - i4Right);
+    else
+        m_c4CX = tCIDLib::TCard4(i4Right - i4Left);
+
+    if (i4Bottom < i4Top)
+        m_c4CY = tCIDLib::TCard4(i4Top) - i4Bottom;
+    else
+        m_c4CY = tCIDLib::TCard4(i4Bottom - i4Top);
+}
+
+
+// Sets our origin and size from the passed UL/LR corner points. LR must be non-inclusive
 tCIDLib::TVoid
 TArea::FromPoints(const TPoint& pntULeft, const TPoint& pntLRight)
 {
@@ -744,6 +737,7 @@ TArea::FromPoints(const TPoint& pntULeft, const TPoint& pntLRight)
     }
 }
 
+// LR must be non-inclusive
 tCIDLib::TVoid
 TArea::FromPoints(  const   tCIDLib::THostPoint&    ptlULeft
                     , const tCIDLib::THostPoint&    ptlLRight)
@@ -772,14 +766,8 @@ TArea::FromPoints(  const   tCIDLib::THostPoint&    ptlULeft
 }
 
 
-//
-//  Sets our origin/size based on a host rectangle, which can be inclusive or non-
-//  inclusive. We just subtract left/top from right/bottom which is correct for a
-//  non-inclusive rectangle (effectively throwing away the extra pixel.) If it's
-//  inclusive then we increment the width/height.
-//
-tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc
-                                , const tCIDLib::ERectlTypes    eInclusive)
+// Sets our origin/size based on a host rectangle, which must be non-inclusive.
+tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc)
 {
     // We initially assume non-inclusive
     if (rectlSrc.i4Left > rectlSrc.i4Right)
@@ -802,13 +790,6 @@ tCIDLib::TVoid TArea::FromRectl(const   tCIDLib::THostRectl&    rectlSrc
     {
         m_i4Y  = rectlSrc.i4Bottom;
         m_c4CY = tCIDLib::TCard4(rectlSrc.i4Top - rectlSrc.i4Bottom);
-    }
-
-    // If the original was inclusive, then bump the values
-    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
-    {
-        m_c4CX++;
-        m_c4CY++;
     }
 }
 
@@ -840,7 +821,7 @@ TArea::ForceWithin(const TArea& areaToFit, const tCIDLib::TBoolean bTotal)
         //
         if (m_c4CX <= areaToFit.m_c4CX)
         {
-            m_i4X = areaToFit.i4Right() - tCIDLib::TInt4(m_c4CX - 1);
+            m_i4X = areaToFit.i4Right() - tCIDLib::TInt4(m_c4CX);
         }
          else
         {
@@ -864,7 +845,7 @@ TArea::ForceWithin(const TArea& areaToFit, const tCIDLib::TBoolean bTotal)
         //
         if (m_c4CY <= areaToFit.m_c4CY)
         {
-            m_i4Y = areaToFit.i4Bottom() - tCIDLib::TInt4(m_c4CY - 1);
+            m_i4Y = areaToFit.i4Bottom() - tCIDLib::TInt4(m_c4CY);
         }
          else
         {
@@ -903,15 +884,14 @@ TArea::FormatToText(        TString&            strTar
 // This is always inclusive, so if y=1 and cy=1, you get 1
 tCIDLib::TInt4 TArea::i4Bottom() const
 {
-    return m_i4Y + (tCIDLib::TInt4(m_c4CY) - 1);
+    return m_i4Y + tCIDLib::TInt4(m_c4CY);
 }
 
 
 //
-//  Set a new bototm . Assumed to be inclusive. So if the bottom is equal the
-//  top, it's a 1 pixel. You can't create an empty area this way.
+//  Set a new bototm . Assumed to be non-inclusive. So if the bottom is equal the
+//  top, it's zero.
 //
-
 tCIDLib::TInt4 TArea::i4Bottom(const tCIDLib::TInt4 i4NewBottom)
 {
     // Make sure that it is not less than the origin
@@ -929,7 +909,7 @@ tCIDLib::TInt4 TArea::i4Bottom(const tCIDLib::TInt4 i4NewBottom)
             , TInteger(m_i4Y)
         );
     }
-    m_c4CY = tCIDLib::TCard4(i4NewBottom - m_i4Y) + 1;
+    m_c4CY = tCIDLib::TCard4(i4NewBottom - m_i4Y);
     return i4NewBottom;
 }
 
@@ -967,12 +947,12 @@ tCIDLib::TInt4 TArea::i4Left(const  tCIDLib::TInt4      i4NewLeft
 // This is always inclusive! So if x=1 and cx=1, then you get 1
 tCIDLib:: TInt4 TArea::i4Right() const
 {
-    return m_i4X + (tCIDLib::TInt4(m_c4CX) - 1);
+    return m_i4X + tCIDLib::TInt4(m_c4CX);
 }
 
 
 //
-//  Set a new right side. Assumed to be inclusive. So if the right is equal the
+//  Set a new right side. Assumed to be non-inclusive. So if the right is equal the
 //  left, it's 0 pixel in size.
 //
 tCIDLib:: TInt4 TArea::i4Right(const tCIDLib::TInt4 i4NewXRight)
@@ -992,7 +972,7 @@ tCIDLib:: TInt4 TArea::i4Right(const tCIDLib::TInt4 i4NewXRight)
             , TInteger(m_i4X)
         );
     }
-    m_c4CX = tCIDLib::TCard4(i4NewXRight - m_i4X) + 1;
+    m_c4CX = tCIDLib::TCard4(i4NewXRight - m_i4X);
     return i4NewXRight;
 }
 
@@ -1082,8 +1062,8 @@ TArea::JustifyIn(   const   TArea&              areaTarget
             break;
 
         case tCIDLib::EHJustify::Right   :
-            //  Set the x origin of this area to (target.i4Right-cx)+1
-            m_i4X = (areaTarget.i4Right() - m_c4CX) + 1;
+            //  Set the x origin of this area to target.i4Right-cx
+            m_i4X = areaTarget.i4Right() - m_c4CX;
             break;
 
         case tCIDLib::EHJustify::Count :
@@ -1118,8 +1098,8 @@ TArea::JustifyIn(   const   TArea&              areaTarget
             break;
 
         case tCIDLib::EVJustify::Bottom :
-            //  Set the y origin of this area to (target.i4Bottom-cy)+1
-            m_i4Y = (areaTarget.i4Bottom() - m_c4CY) + 1;
+            //  Set the y origin of this area to target.i4Bottom-cy
+            m_i4Y = areaTarget.i4Bottom() - m_c4CY;
             break;
 
         case tCIDLib::EVJustify::Count :
@@ -1223,11 +1203,14 @@ TArea::ParseFromText(   const   TString&            strText
 }
 
 
-// Make the right come out at this new right, by adjusting the origin
+//
+//  Make the right come out at this new right, by adjusting the origin. It is
+//  assumed to be non-inclusive.
+//
 tCIDLib::TVoid TArea::RightAlign(const tCIDLib::TInt4 i4NewRight)
 {
     // Set the origin to put the right at this new right
-    m_i4X = (i4NewRight - m_c4CX) + 1;
+    m_i4X = (i4NewRight - m_c4CX);
 }
 
 
@@ -1238,7 +1221,7 @@ tCIDLib::TVoid TArea::RightAlign(const tCIDLib::TInt4 i4NewRight)
 tCIDLib::TVoid TArea::RightJustifyIn(const  TArea&              areaIn
                                     , const tCIDLib::TBoolean   bVCenter)
 {
-    m_i4X = (areaIn.i4Right() - m_c4CX) + 1;
+    m_i4X = (areaIn.i4Right() - m_c4CX);
     if (bVCenter)
     {
         m_i4Y = areaIn.m_i4Y + (areaIn.m_c4CY >> 1);
@@ -1419,12 +1402,20 @@ tCIDLib::TVoid TArea::TakeSmaller(const TSize& szOther)
 //  Convert the area to an array of host points, which can be passed to poly line
 //  host APIs to draw a line around the border of the area.
 //
-//  The right/bottom points will be non-inclusive
-//
-tCIDLib::TVoid TArea::ToPointArray(tCIDLib::THostPoint* const aptlTarget) const
+tCIDLib::TVoid
+TArea::ToPointArray(        tCIDLib::THostPoint* const  aptlTarget
+                    , const tCIDLib::ERectlTypes        eInclusive) const
 {
     tCIDLib::TInt4 i4R = i4Right();
     tCIDLib::TInt4 i4B = i4Bottom();
+
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
+    {
+        if (i4R > m_i4X)
+            i4R--;
+        if (i4B > m_i4Y)
+            i4B--;
+    }
 
     aptlTarget[0].i4X = m_i4X;
     aptlTarget[0].i4Y = i4B;
@@ -1441,16 +1432,24 @@ tCIDLib::TVoid TArea::ToPointArray(tCIDLib::THostPoint* const aptlTarget) const
 
 //
 //  Give the corner points of this area as host points or our own point objects.
-//  The points are we be set to non-inclusive, so if x=1 and cx=1 then the ULR.x
-//  is 2.
 //
-tCIDLib::TVoid TArea::ToCornerPoints(   tCIDLib::THostPoint&    ptlULeft
-                                        , tCIDLib::THostPoint&  ptlURight
-                                        , tCIDLib::THostPoint&  ptlLRight
-                                        , tCIDLib::THostPoint&  ptlLLeft) const
+tCIDLib::TVoid
+TArea::ToCornerPoints(          tCIDLib::THostPoint&    ptlULeft
+                        ,       tCIDLib::THostPoint&    ptlURight
+                        ,       tCIDLib::THostPoint&    ptlLRight
+                        ,       tCIDLib::THostPoint&    ptlLLeft
+                        , const tCIDLib::ERectlTypes    eInclusive) const
 {
     tCIDLib::TInt4 i4R = i4Right();
     tCIDLib::TInt4 i4B = i4Bottom();
+
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
+    {
+        if (i4R > m_i4X)
+            i4R--;
+        if (i4B > m_i4Y)
+            i4B--;
+    }
 
     ptlULeft.i4X  = m_i4X;
     ptlULeft.i4Y  = m_i4Y;
@@ -1465,13 +1464,23 @@ tCIDLib::TVoid TArea::ToCornerPoints(   tCIDLib::THostPoint&    ptlULeft
     ptlLLeft.i4Y = i4B;
 }
 
-tCIDLib::TVoid TArea::ToCornerPoints(   TPoint&     pntULeft
-                                        , TPoint&   pntURight
-                                        , TPoint&   pntLRight
-                                        , TPoint&   pntLLeft) const
+tCIDLib::TVoid
+TArea::ToCornerPoints(          TPoint&                 pntULeft
+                        ,       TPoint&                 pntURight
+                        ,       TPoint&                 pntLRight
+                        ,       TPoint&                 pntLLeft
+                        , const tCIDLib::ERectlTypes    eInclusive) const
 {
     tCIDLib::TInt4 i4R = i4Right();
     tCIDLib::TInt4 i4B = i4Bottom();
+
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
+    {
+        if (i4R > m_i4X)
+            i4R--;
+        if (i4B > m_i4Y)
+            i4B--;
+    }
 
     pntULeft.m_i4X  = m_i4X;
     pntULeft.m_i4Y  = m_i4Y;
@@ -1491,24 +1500,44 @@ tCIDLib::TVoid TArea::ToCornerPoints(   TPoint&     pntULeft
 //  Save as above but just converst to the upper left and lower right
 //  corners, from which the others can be inferred.
 //
-tCIDLib::TVoid TArea::ToPoints(TPoint& pntULeft, TPoint& pntLRight) const
+tCIDLib::TVoid
+TArea::ToPoints(        TPoint&                 pntULeft
+                ,       TPoint&                 pntLRight
+                , const tCIDLib::ERectlTypes    eInclusive) const
 {
     pntULeft.m_i4X = m_i4X;
     pntULeft.m_i4Y = m_i4Y;
 
     pntLRight.m_i4X = i4Right();
     pntLRight.m_i4Y = i4Bottom();
+
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
+    {
+        if (pntLRight.m_i4X > m_i4X)
+            pntLRight.m_i4X--;
+        if (pntLRight.m_i4Y > m_i4Y)
+            pntLRight.m_i4Y--;
+    }
 }
 
 tCIDLib::TVoid
-TArea::ToPoints(tCIDLib::THostPoint&    ptlULeft
-                , tCIDLib::THostPoint&  ptlLRight) const
+TArea::ToPoints(        tCIDLib::THostPoint&    ptlULeft
+                ,       tCIDLib::THostPoint&    ptlLRight
+                , const tCIDLib::ERectlTypes    eInclusive) const
 {
     ptlULeft.i4X = m_i4X;
     ptlULeft.i4Y = m_i4Y;
 
     ptlLRight.i4X = i4Right();
     ptlLRight.i4Y = i4Bottom();
+
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
+    {
+        if (ptlLRight.i4X > m_i4X)
+            ptlLRight.i4X--;
+        if (ptlLRight.i4Y > m_i4Y)
+            ptlLRight.i4Y--;
+    }
 }
 
 
@@ -1526,9 +1555,9 @@ tCIDLib::TVoid TArea::ToRawArea(tCIDLib::TRawArea& areaTarget) const
 
 //
 //  Convert our area to a host rectangle. They indicate whether the target rect should be
-//  inclusive or non-inclusive, which stupid Windows is really confusing about. We initially
-//  create an inclusive rect by setting it to our right/bottom values. If they want non-
-//  inclusive, we have to bump it to create that extra (unused) row/col.
+//  inclusive or non-inclusive. We initially create a non-inclusive rect by setting it to
+//  our right/bottom values. If they want inclusive, we have to bump it down. But we can
+//  only do that if we wouldn't invert, so they can lose info if they ask for inclusive.
 //
 //  We have a separate one that takes an offset, which is often convenient for callers to
 //  be able to add an offset while doing the conversion.
@@ -1541,39 +1570,38 @@ TArea::ToRectl(         tCIDLib::THostRectl&    rectlDest
     rectlDest.i4Left  = m_i4X;
     rectlDest.i4Top   = m_i4Y;
 
-    // These are initially inclusive
+    // These are initially non-inclusive
     rectlDest.i4Right = i4Right();
     rectlDest.i4Bottom = i4Bottom();
 
-    //
-    //  If the rectangle is to be non-inclusive, then we need to bump the
-    //  right and bottom because
-    //
-    if (eInclusive == tCIDLib::ERectlTypes::NonInclusive)
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
     {
-        rectlDest.i4Right++;
-        rectlDest.i4Bottom++;
+        if (rectlDest.i4Right > rectlDest.i4Left)
+            rectlDest.i4Right--;
+        if (rectlDest.i4Bottom > rectlDest.i4Top)
+            rectlDest.i4Bottom--;
     }
 }
 
 tCIDLib::TVoid
 TArea::ToRectl(         tCIDLib::THostRectl&    rectlDest
-                , const tCIDLib::ERectlTypes    eInclusive
-                , const TPoint&                 pntOffset) const
+                , const TPoint&                 pntOffset
+                , const tCIDLib::ERectlTypes    eInclusive) const
 {
     // Create a inclusive rectangle
     rectlDest.i4Left  = m_i4X + pntOffset.i4X();
     rectlDest.i4Top   = m_i4Y + pntOffset.i4Y();
 
-    // These are initially inclusive
-    rectlDest.i4Right = i4Right() + pntOffset.i4X();
-    rectlDest.i4Bottom= i4Bottom() + pntOffset.i4Y();
+    // These are initially non-inclusive
+    rectlDest.i4Right  = i4Right() + pntOffset.i4X();
+    rectlDest.i4Bottom = i4Bottom() + pntOffset.i4Y();
 
-    // If the rectangle is to be non-inclusive, then we need to bump the values
-    if (eInclusive == tCIDLib::ERectlTypes::NonInclusive)
+    if (eInclusive == tCIDLib::ERectlTypes::Inclusive)
     {
-        rectlDest.i4Right--;
-        rectlDest.i4Bottom--;
+        if (rectlDest.i4Right > rectlDest.i4Left)
+            rectlDest.i4Right--;
+        if (rectlDest.i4Bottom > rectlDest.i4Top)
+            rectlDest.i4Bottom--;
     }
 }
 
@@ -1678,7 +1706,7 @@ tCIDLib::TVoid
 TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
                         , const tCIDLib::TInt4  i4YOfs)
 {
-    tCIDLib::TBoolean  bNegX, bNegY;
+    tCIDLib::TBoolean  bNegX = kCIDLib::False, bNegY = kCIDLib::False;
 
     // Get copies of the values that we can abuse
     tCIDLib::TInt4  i4XAdj = i4XOfs;
@@ -1695,10 +1723,7 @@ TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
         bNegX = kCIDLib::True;
         i4XAdj *= -1;
     }
-     else
-    {
-        bNegX = kCIDLib::False;
-    }
+
     if (bNegX && (tCIDLib::TCard4(i4XAdj << 1) >= m_c4CX))
         i4XAdj = tCIDLib::TInt4(m_c4CX >> 1);
 
@@ -1707,10 +1732,7 @@ TArea::DoAdjustments(   const   tCIDLib::TInt4  i4XOfs
         bNegY = kCIDLib::True;
         i4YAdj *= -1;
     }
-     else
-    {
-        bNegY = kCIDLib::False;
-    }
+
     if (bNegY && (tCIDLib::TCard4(i4YAdj << 1) >= m_c4CY))
         i4YAdj = tCIDLib::TInt4(m_c4CY >> 1);
 

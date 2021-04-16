@@ -26,6 +26,9 @@
 //  base collection classes itself. The template classes that use it are
 //  derived from the collection classes.
 //
+//  These have no copy constructor, since we can't depend on copyability,
+//  but they can be moved.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -48,6 +51,7 @@ class CIDLIBEXP TSLstNode : public TObject
         //  Constructors and destructor
         // -------------------------------------------------------------------
         TSLstNode(const TSLstNode&) = delete;
+        TSLstNode(TSLstNode&&) = delete;
 
         ~TSLstNode();
 
@@ -56,6 +60,7 @@ class CIDLIBEXP TSLstNode : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSLstNode& operator=(const TSLstNode&) = delete;
+        TSLstNode& operator=(TSLstNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -108,9 +113,11 @@ class CIDLIBEXP TSLinkedList : public TObject
         // -------------------------------------------------------------------
         TSLinkedList();
 
+        TSLinkedList(const TSLinkedList&) = delete;
+
         TSLinkedList
         (
-            const   TSLinkedList&           colSrc
+                    TSLinkedList&&          listSrc
         );
 
         ~TSLinkedList();
@@ -120,6 +127,11 @@ class CIDLIBEXP TSLinkedList : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSLinkedList& operator=(const TSLinkedList&) = delete;
+
+        TSLinkedList& operator=
+        (
+                    TSLinkedList&&          listSrv
+        );
 
         tCIDLib::TBoolean operator==
         (

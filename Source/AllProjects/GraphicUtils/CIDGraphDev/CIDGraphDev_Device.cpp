@@ -86,14 +86,17 @@ RTTIDecls(TGraphDrawDev,TGraphicDevice)
 // ---------------------------------------------------------------------------
 namespace CIDGraphDev_Device
 {
-    // -----------------------------------------------------------------------
-    //  We may fault in a DD object if the client code invokes any of our
-    //  functionality that requires it. It may also not load, so we have a
-    //  flag to remember if we already tried it.
-    // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bTriedDDLoad = kCIDLib::False;
-    HINSTANCE           hDDraw;
-    IDirectDraw*        pDDraw = nullptr;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  We may fault in a DD object if the client code invokes any of our
+        //  functionality that requires it. It may also not load, so we have a
+        //  flag to remember if we already tried it.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomDDLoad;
+        HINSTANCE           hDDraw;
+        IDirectDraw*        pDDraw = nullptr;
+    }
 }
 
 
@@ -168,57 +171,55 @@ static tCIDLib::TCard4 c4AngleColor(const   tCIDLib::TFloat8    f8Angle
 // Faults in our DirectDraw support
 static tCIDLib::TVoid LoadDDraw()
 {
-    //
-    //  They shouldn't call us if it's already done, but just in case. Also,
-    //  if we've already tried and failed, then do nothing.
-    //
-    if (CIDGraphDev_Device::pDDraw || CIDGraphDev_Device::bTriedDDLoad)
-        return;
-
-    // Try to load the DLL. If it fails, we are done
-    CIDGraphDev_Device::hDDraw = ::LoadLibraryW(L"ddraw.dll");
-    if (!CIDGraphDev_Device::hDDraw)
+    // The caller already did one check, so assue we have to lock
+    TBaseLock lockInit;
+    if (!CIDGraphDev_Device::atomDDLoad)
     {
-        // Don't try again
-        CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
-        return;
+        // Try to load the DLL. If it fails, we are done
+        CIDGraphDev_Device::hDDraw = ::LoadLibrary(L"ddraw.dll");
+        if (!CIDGraphDev_Device::hDDraw)
+        {
+            // Don't try again
+            CIDGraphDev_Device::atomDDLoad.Set();
+            return;
+        }
+
+        // Alias the function pointer we'll extract
+        using DIRECTDRAWCREATE = HRESULT (WINAPI *)
+        (
+            GUID FAR *lpGUID, IDirectDraw **lplpDD, IUnknown FAR *pUnkOuter
+        );
+
+        // And try to load an instance of that function
+        DIRECTDRAWCREATE pfnDDCreate = (DIRECTDRAWCREATE)::GetProcAddress
+        (
+            CIDGraphDev_Device::hDDraw, "DirectDrawCreate"
+        );
+
+        // If it failed, then we give up
+        if (!pfnDDCreate)
+        {
+            // Don't try again
+            CIDGraphDev_Device::atomDDLoad.Set();
+            return;
+        }
+
+        // Looks like it worked, so try to create our instance
+        try
+        {
+            CIDGraphDev_Device::pDDraw = nullptr;
+            pfnDDCreate(0, &CIDGraphDev_Device::pDDraw, 0);
+        }
+
+        catch(...)
+        {
+            // Eat it and make sure pointer is zero
+            CIDGraphDev_Device::pDDraw = nullptr;
+        }
+
+        // Indicate last that we have tried it
+        CIDGraphDev_Device::atomDDLoad.Set();
     }
-
-    // Alias the function pointer we'll extract
-    using DIRECTDRAWCREATE = HRESULT (WINAPI *)
-    (
-        GUID FAR *lpGUID, IDirectDraw **lplpDD, IUnknown FAR *pUnkOuter
-    );
-
-    // And try to load an instance of that function
-    DIRECTDRAWCREATE pfnDDCreate = (DIRECTDRAWCREATE)::GetProcAddress
-    (
-        CIDGraphDev_Device::hDDraw, "DirectDrawCreate"
-    );
-
-    // If it failed, then we give up
-    if (!pfnDDCreate)
-    {
-        // Don't try again
-        CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
-        return;
-    }
-
-    // Looks like it worked, so try to create our instance
-    try
-    {
-        CIDGraphDev_Device::pDDraw = nullptr;
-        pfnDDCreate(0, &CIDGraphDev_Device::pDDraw, 0);
-    }
-
-    catch(...)
-    {
-        // Eat it and make sure pointer is zero
-        CIDGraphDev_Device::pDDraw = nullptr;
-    }
-
-    // Indicate last that we have tried it
-    CIDGraphDev_Device::bTriedDDLoad = kCIDLib::True;
 }
 
 
@@ -233,14 +234,8 @@ static tCIDLib::TVoid LoadDDraw()
 // ---------------------------------------------------------------------------
 TGraphicDevice& TGraphicDevice::Nul_TGraphicDevice()
 {
-    static TGraphicDevice* pgdevNull = nullptr;
-    if (!pgdevNull)
-    {
-        TBaseLock lockInit;
-        if (!pgdevNull)
-            TRawMem::pExchangePtr(&pgdevNull, new TGraphicDevice);
-    }
-    return *pgdevNull;
+    static TGraphicDevice gdevNull;
+    return gdevNull;
 }
 
 
@@ -381,13 +376,8 @@ tCIDLib::TVoid TGraphicDevice::OneTimeDeviceInit()
 tCIDLib::TVoid TGraphDrawDev::WaitRetrace()
 {
     // Fault in the DirectShow stuff if not done yet
-    if (!CIDGraphDev_Device::bTriedDDLoad)
-    {
-        // Lock and check again that no one beat us to it
-        TBaseLock lockInit;
-        if (!CIDGraphDev_Device::bTriedDDLoad)
-            LoadDDraw();
-    }
+    if (!CIDGraphDev_Device::atomDDLoad)
+        LoadDDraw();
 
     // If we got what we wanted, then do the wait, else we just don't wait
     if (CIDGraphDev_Device::pDDraw)
@@ -439,7 +429,7 @@ TArea TGraphDrawDev::areaBounds(const tCIDLib::TBoolean bReset) const
     }
 
     if ((c4Res & DCB_SET) == DCB_SET)
-        return TArea(rectlTmp, tCIDLib::ERectlTypes::Inclusive);
+        return TArea(rectlTmp);
 
     return TArea();
 }
@@ -471,7 +461,7 @@ TArea TGraphDrawDev::areaMLText(const   TString&        strText
         i4Len = tCIDLib::TInt4(c4Len);
 
     // This will update the rectangle to hold the new bottom
-    ::DrawTextExW
+    ::DrawTextEx
     (
         hdevThis()
         , (tCIDLib::TCh*)strText.pszBufferAt(c4Start)
@@ -482,7 +472,7 @@ TArea TGraphDrawDev::areaMLText(const   TString&        strText
     );
 
     // Get the temp rectangle into an area for return
-    return TArea(rectlTmp, tCIDLib::ERectlTypes::Inclusive);
+    return TArea(rectlTmp);
 }
 
 
@@ -1449,7 +1439,7 @@ TGraphDrawDev::DrawBitmapMasked(const   TBitmap&            bmpToDraw
 
 //
 //  Draw a box between the two points (upper left/lower right) with the indicated
-//  drawing radius. It's non-inclusive so we have to add one to the LR.
+//  drawing radius. We assume the passed points are non-inclusive.
 //
 tCIDLib::TVoid
 TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
@@ -1464,8 +1454,8 @@ TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
             hdevThis()
             , pntFrom.i4X()
             , pntFrom.i4Y()
-            , pntTo.i4X() + 1
-            , pntTo.i4Y() + 1
+            , pntTo.i4X()
+            , pntTo.i4Y()
             , c4Rounding
             , c4Rounding))
         {
@@ -1479,8 +1469,8 @@ TGraphDrawDev::DrawBox( const   TPoint&         pntFrom
             hdevThis()
             , pntFrom.i4X()
             , pntFrom.i4Y()
-            , pntTo.i4X() + 1
-            , pntTo.i4Y() + 1))
+            , pntTo.i4X()
+            , pntTo.i4Y()))
         {
             bRes = kCIDLib::False;
         }
@@ -1507,7 +1497,7 @@ tCIDLib::TVoid
 TGraphDrawDev::DrawBox(const TArea& areaBox, const tCIDLib::TCard4 c4Rounding)
 {
     TPoint pntUL, pntLR;
-    areaBox.ToPoints(pntUL, pntLR);
+    areaBox.ToPoints(pntUL, pntLR, tCIDLib::ERectlTypes::NonInclusive);
     DrawBox(pntUL, pntLR, c4Rounding);
 }
 
@@ -1522,7 +1512,7 @@ tCIDLib::TVoid TGraphDrawDev::DrawFocusArea(const TArea& areaToDraw)
     TPenJanitor janLine(this, &gpenLine);
 
     tCIDLib::THostRectl rectlDraw;
-    areaToDraw.ToRectl(rectlDraw, tCIDLib::ERectlTypes::NonInclusive);
+    areaToDraw.ToRectl(rectlDraw);
     if (!::DrawFocusRect(hdevThis(), (RECT*)&rectlDraw))
     {
         if (!bDevErrToIgnore())
@@ -1748,6 +1738,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -1830,6 +1823,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::ESeverities::Warn
                 , tCIDLib::EErrClasses::CantDo
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -1848,6 +1844,9 @@ TGraphDrawDev::DrawIconPart(const   TIcon&                  icoToDraw
                 , tCIDLib::EErrClasses::CantDo
                 , TString(L"Memory Device")
             );
+
+            // Won't happen, but makes analyzer happy
+            return;
         }
     }
 
@@ -2052,7 +2051,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             rgbEndFill = rgbEnd;
             areaBar.ScaleSize(f4Percent, 1.0);
             areaFill.ScaleSize(1.0 - f4Percent, 1.0);
-            areaFill.i4X(areaBar.i4Right() + 1);
+            areaFill.i4X(areaBar.i4Right());
             break;
 
         case tCIDLib::EDirs::Right :
@@ -2061,7 +2060,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             bIsVert = kCIDLib::True;
             areaFill.ScaleSize(1.0 - f4Percent, 1.0);
             areaBar.ScaleSize(f4Percent, 1.0);
-            areaBar.i4X(areaFill.i4Right() + 1);
+            areaBar.i4X(areaFill.i4Right());
             break;
 
         case tCIDLib::EDirs::Down :
@@ -2069,7 +2068,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             rgbEndFill = rgbEnd;
             areaBar.ScaleSize(1.0, f4Percent);
             areaFill.ScaleSize(1.0, 1.0 - f4Percent);
-            areaFill.i4Y(areaBar.i4Bottom() + 1);
+            areaFill.i4Y(areaBar.i4Bottom());
             bIsVert = kCIDLib::True;
             break;
 
@@ -2079,7 +2078,7 @@ TGraphDrawDev::DrawPBar(const   TBitmap&                bmpMask
             bIsVert = kCIDLib::True;
             areaFill.ScaleSize(1.0, 1.0 - f4Percent);
             areaBar.ScaleSize(1.0, f4Percent);
-            areaBar.i4Y(areaFill.i4Bottom() + 1);
+            areaBar.i4Y(areaFill.i4Bottom());
             bIsVert = kCIDLib::True;
             break;
 
@@ -2303,11 +2302,11 @@ TGraphDrawDev::DrawMText(const  TString&            strText
     {
         TArea areaText = areaMLText(strText, areaFormat.c4Width());
         areaText.JustifyIn(areaFormat, eHJustify, eVJustify);
-        areaText.ToRectl(rectDraw, tCIDLib::ERectlTypes::NonInclusive);
+        areaText.ToRectl(rectDraw);
     }
      else
     {
-        areaFormat.ToRectl(rectDraw, tCIDLib::ERectlTypes::NonInclusive);
+        areaFormat.ToRectl(rectDraw);
     }
 
     switch(eHJustify)
@@ -2331,7 +2330,7 @@ TGraphDrawDev::DrawMText(const  TString&            strText
     //
     TRegionJanitor janClip(this, areaFormat, tCIDGraphDev::EClipModes::And);
 
-    ::DrawTextExW
+    ::DrawTextEx
     (
         hdevThis()
         , (tCIDLib::TCh*)strText.pszBuffer()
@@ -2430,7 +2429,7 @@ TGraphDrawDev::DrawShadowText(const TString&            strText
     #endif
 
     tCIDLib::THostRectl rectlText;
-    areaFormat.ToRectl(rectlText, tCIDLib::ERectlTypes::NonInclusive);
+    areaFormat.ToRectl(rectlText);
     ::DrawShadowText
     (
         hdevThis()
@@ -2499,7 +2498,7 @@ TGraphDrawDev::DrawString(  const   TString&        strText
     //  This simple version just draws at the current position, using the
     //  current text attributes.
     //
-    if (!::TextOutW(hdevThis(), pntAlign.i4X(), pntAlign.i4Y(), strText.pszBufferAt(c4StartAt), c4Len))
+    if (!::TextOut(hdevThis(), pntAlign.i4X(), pntAlign.i4Y(), strText.pszBufferAt(c4StartAt), c4Len))
     {
         if (!bDevErrToIgnore())
         {
@@ -3155,7 +3154,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
         //
         tCIDLib::TCard4 c4Order = 2;
         TEXTMETRICW OurMetrics;
-        if (::GetTextMetricsW(hdevThis(), &OurMetrics))
+        if (::GetTextMetrics(hdevThis(), &OurMetrics))
         {
             if (OurMetrics.tmHeight < 20)
                 c4Order = 1;
@@ -3232,7 +3231,12 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
     if (bReflect)
     {
         pixaDraw.FlipVertically(areaZTar.i4Y(), areaZTar.i4Bottom());
-        pixaDraw.ScaleAlpha(tCIDLib::EDirs::Down, areaZTar.i4Y(), c4ReflRows);// areaZTar.i4Bottom());
+
+        // Tell it to pre-multiply as it goes
+        pixaDraw.ScaleAlpha
+        (
+            tCIDLib::EDirs::Down, areaZTar.i4Y(), c4ReflRows, kCIDLib::True
+        );
 
         TArea areaReflSrc(areaZTar);
         areaReflSrc.c4Height(c4ReflRows);
@@ -3265,7 +3269,7 @@ TGraphDrawDev::DrawStringFX(const   TString&                strText
         gdevDraw.SetTextColor(rgbClr1);
 
         {
-            TRegionJanitor janClip(this, areaZTar, tCIDGraphDev::EClipModes::And);
+            TRegionJanitor janClip2(this, areaZTar, tCIDGraphDev::EClipModes::And);
             if (bNoTextWrap)
             {
                 gdevDraw.DrawString(strText, areaZText);
@@ -3555,6 +3559,9 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , strMsg
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Now set it on us
@@ -3577,6 +3584,9 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , TString(L"Region")
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Clean up the temp region now that it's set
@@ -3605,6 +3615,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
@@ -3624,6 +3637,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // If there was no clip region, then return an invalid handle
@@ -3652,6 +3668,9 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , TString(L"Region")
         );
+
+        // Won't happen, but makes analyzer happy
+        return kCIDGraphDev::hrgnInvalid;
     }
 
     // And return the old one
@@ -3662,7 +3681,7 @@ TGraphDrawDev::hrgnSetClipRegion(const  tCIDGraphDev::EClipModes    eMode
 tCIDLib::TVoid TGraphDrawDev::InvertArea(const TArea& areaToInvert)
 {
     tCIDLib::THostRectl  rectlInvert;
-    areaToInvert.ToRectl(rectlInvert, tCIDLib::ERectlTypes::NonInclusive);
+    areaToInvert.ToRectl(rectlInvert);
 
     if (!::InvertRect(hdevThis(), reinterpret_cast<const RECT*>(&rectlInvert)))
     {
@@ -3688,7 +3707,7 @@ TGraphDrawDev::Fill(const TArea& areaToFill, const TGUIBrush& gbrToUse)
 {
     // Convert the area to a host rectangle
     tCIDLib::THostRectl  rectlFill;
-    areaToFill.ToRectl(rectlFill, tCIDLib::ERectlTypes::NonInclusive);
+    areaToFill.ToRectl(rectlFill);
 
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
     if (!::FillRect(hdevTarget, reinterpret_cast<RECT*>(&rectlFill), gbrToUse.hbrThis()))
@@ -3715,7 +3734,7 @@ TGraphDrawDev::Fill(const TArea& areaToFill, const TRGBClr& rgbToUse)
 {
     // Convert the area to a host rectangle
     tCIDLib::THostRectl  rectlFill;
-    areaToFill.ToRectl(rectlFill, tCIDLib::ERectlTypes::NonInclusive);
+    areaToFill.ToRectl(rectlFill);
 
     TSolidBrush gbrToUse(rgbToUse);
     tCIDGraphDev::TDeviceHandle hdevTarget = hdevThis();
@@ -3758,6 +3777,7 @@ TGraphDrawDev::Fill(const TGUIRegion& grgnToFill, const TRGBClr& rgbClr)
     }
 }
 
+// WE asume the points are non-inclusive
 tCIDLib::TVoid
 TGraphDrawDev::Fill(const   TPoint&     pntFrom
                     , const TPoint&     pntTo
@@ -5019,7 +5039,7 @@ TRGBClr TGraphDrawDev::rgbTextColor() const
 
 tCIDLib::TVoid TGraphDrawDev::ResetBoundsArea()
 {
-    if (!SetBoundsRect(hdevThis(), 0, DCB_RESET) & DCB_RESET)
+    if ((::SetBoundsRect(hdevThis(), 0, DCB_RESET) & DCB_RESET) == 0)
     {
         if (!bDevErrToIgnore())
         {
@@ -5062,10 +5082,10 @@ TGraphDrawDev::ScrollBits(  const   TArea&              areaToScroll
 {
     // Convert the areas to RECTs
     tCIDLib::THostRectl rectlScroll;
-    areaToScroll.ToRectl(rectlScroll, tCIDLib::ERectlTypes::NonInclusive);
+    areaToScroll.ToRectl(rectlScroll);
 
     tCIDLib::THostRectl rectlClip;
-    areaClip.ToRectl(rectlClip, tCIDLib::ERectlTypes::NonInclusive);
+    areaClip.ToRectl(rectlClip);
 
     if (bWaitRetrace)
         WaitRetrace();
@@ -5099,7 +5119,7 @@ TGraphDrawDev::ScrollBits(  const   TArea&              areaToScroll
     }
 
     // Convert the update rectangle back
-    areaUpdate.FromRectl(rectlUpdate, tCIDLib::ERectlTypes::NonInclusive);
+    areaUpdate.FromRectl(rectlUpdate);
 }
 
 
@@ -5262,8 +5282,8 @@ TGraphDrawDev::Stroke(  const   TArea&          areaToStroke
             hdevThis()
             , areaToStroke.i4X()
             , areaToStroke.i4Y()
-            , areaToStroke.i4Right() + 1
-            , areaToStroke.i4Bottom() + 1
+            , areaToStroke.i4Right()
+            , areaToStroke.i4Bottom()
             , c4Rounding
             , c4Rounding
         );
@@ -5275,8 +5295,8 @@ TGraphDrawDev::Stroke(  const   TArea&          areaToStroke
             hdevThis()
             , areaToStroke.i4X()
             , areaToStroke.i4Y()
-            , areaToStroke.i4Right() + 1
-            , areaToStroke.i4Bottom() + 1
+            , areaToStroke.i4Right()
+            , areaToStroke.i4Bottom()
         );
     }
 

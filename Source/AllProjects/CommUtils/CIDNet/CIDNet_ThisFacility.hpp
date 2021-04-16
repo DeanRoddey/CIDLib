@@ -48,37 +48,54 @@ class CIDNETEXP TFacCIDNet : public TFacility
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bTestLogFail
+        tCIDLib::TBoolean bIsKnownTextType
         (
-            const   tCIDNet::ELogFlags      eFlag
+            const   TString&                strType
         )   const;
 
-        tCIDLib::TBoolean bTestLogInfo
-        (
-            const   tCIDNet::ELogFlags      eFlag
-        )   const;
+        tCIDLib::TBoolean
+        bTestLogFail(const tCIDNet::ELogFlags eFlag) const
+        {
+            return bCheckLogFlags(tCIDLib::ESeverities::Failed, tCIDLib::TCard4(eFlag));
+        }
 
-        tCIDLib::TBoolean bTestLog
-        (
-            const   tCIDLib::ESeverities    eToCheck
-            , const tCIDNet::ELogFlags      eFlag
-        )   const;
+        tCIDLib::TBoolean
+        bTestLogInfo(const tCIDNet::ELogFlags eFlag) const
+        {
+            return bCheckLogFlags(tCIDLib::ESeverities::Info, tCIDLib::TCard4(eFlag));
+        }
 
-        tCIDLib::TBoolean bTestLog
-        (
-            const   TError&                 errToCheck
-            , const tCIDNet::ELogFlags      eFlag
-        )   const;
+        tCIDLib::TBoolean
+        bTestLog(const  tCIDLib::ESeverities    eToCheck
+                            , const tCIDNet::ELogFlags      eFlag) const
+        {
+            return bCheckLogFlags(eToCheck, tCIDLib::TCard4(eFlag));
+        }
 
-        tCIDLib::TBoolean bTestLogStatus
-        (
-            const   tCIDNet::ELogFlags      eFlag
-        )   const;
+        tCIDLib::TBoolean
+        bTestLog(const  TError&             errToCheck
+                            , const tCIDNet::ELogFlags  eFlag) const
+        {
+            return bCheckLogFlags(errToCheck, tCIDLib::TCard4(eFlag));
+        }
 
-        tCIDLib::TBoolean bTestLogWarn
+        tCIDLib::TBoolean
+        bTestLogStatus(const tCIDNet::ELogFlags eFlag) const
+        {
+            return bCheckLogFlags(tCIDLib::ESeverities::Status, tCIDLib::TCard4(eFlag));
+        }
+
+        tCIDLib::TBoolean
+        bTestLogWarn(const tCIDNet::ELogFlags eFlag) const
+        {
+            return bCheckLogFlags(tCIDLib::ESeverities::Warn, tCIDLib::TCard4(eFlag));
+        }
+
+        [[nodiscard]] TCIDDataSrc* pcdsMakeSocketSrc
         (
-            const   tCIDNet::ELogFlags      eFlag
-        )   const;
+            const   TString&                strName
+            , const TURL&                   urlSrc
+        );
 
         tCIDLib::TVoid ParseMultiPartMIME
         (
@@ -101,44 +118,3 @@ class CIDNETEXP TFacCIDNet : public TFacility
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// These just become calls to our parent class
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLogFail(const tCIDNet::ELogFlags eFlag) const
-{
-    return bCheckLogFlags(tCIDLib::ESeverities::Failed, tCIDLib::TCard4(eFlag));
-}
-
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLogInfo(const tCIDNet::ELogFlags eFlag) const
-{
-    return bCheckLogFlags(tCIDLib::ESeverities::Info, tCIDLib::TCard4(eFlag));
-}
-
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLog(const  tCIDLib::ESeverities    eToCheck
-                    , const tCIDNet::ELogFlags      eFlag) const
-{
-    return bCheckLogFlags(eToCheck, tCIDLib::TCard4(eFlag));
-}
-
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLog(const  TError&             errToCheck
-                    , const tCIDNet::ELogFlags  eFlag) const
-{
-    return bCheckLogFlags(errToCheck, tCIDLib::TCard4(eFlag));
-}
-
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLogStatus(const tCIDNet::ELogFlags eFlag) const
-{
-    return bCheckLogFlags(tCIDLib::ESeverities::Status, tCIDLib::TCard4(eFlag));
-}
-
-inline tCIDLib::TBoolean
-TFacCIDNet::bTestLogWarn(const tCIDNet::ELogFlags eFlag) const
-{
-    return bCheckLogFlags(tCIDLib::ESeverities::Warn, tCIDLib::TCard4(eFlag));
-}
-

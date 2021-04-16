@@ -132,9 +132,9 @@ TKrnlEnvironment::bCharsInValue(const   tCIDLib::TCh* const pszKey
 
 
 tCIDLib::TBoolean
-TKrnlEnvironment::bFind(const   tCIDLib::TCh* const pszKey
-                        ,       tCIDLib::TCh* const pszToFill
-                        , const tCIDLib::TCard4     c4MaxChars)
+TKrnlEnvironment::bFind(const   tCIDLib::TCh* const     pszKey
+                        ,       tCIDLib::TCh* const     pszToFill
+                        , const tCIDLib::TCard4         c4MaxChars)
 {
     //  Create an uppercased version of the key
     tCIDLib::TCh* pszUpKey = TRawStr::pszReplicate(pszKey);
@@ -149,6 +149,26 @@ TKrnlEnvironment::bFind(const   tCIDLib::TCh* const pszKey
         return kCIDLib::False;
 
     TRawStr::CopyStr(pszToFill, pszValue, c4MaxChars);
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TKrnlEnvironment::bFind(const   tCIDLib::TCh* const pszKey
+                        ,       TKrnlString&        kstrToFill)
+{
+    //  Create an uppercased version of the key
+    tCIDLib::TCh* pszUpKey = TRawStr::pszReplicate(pszKey);
+    TArrayJanitor<tCIDLib::TCh> janKey(pszUpKey);
+    TRawStr::pszUpperCase(pszUpKey);
+
+    // Lock the environment before we update it
+    TKrnlCritSecLocker crslAccess(s_pkcrsAccess);
+
+    const tCIDLib::TCh* pszValue = s_pkhshmEnv->pszValueForKey(pszUpKey);
+    if (!pszValue)
+        return kCIDLib::False;
+
+    kstrToFill.Set(pszValue);
     return kCIDLib::True;
 }
 

@@ -53,7 +53,7 @@ TGraphData::TGraphData( const   tCIDLib::TCard4 c4MaxSamples
     , m_c4SerialNum(c4InitSerialNum)
     , m_c4Head(0)
     , m_c4Tail(0)
-    , m_pf4Data(0)
+    , m_pf4Data(nullptr)
 {
     CIDAssert(c4MaxSamples > 0, L"Graphs must have at least one element");
 
@@ -61,23 +61,36 @@ TGraphData::TGraphData( const   tCIDLib::TCard4 c4MaxSamples
     m_pf4Data = new tCIDLib::TFloat4[m_c4MaxSamples];
 }
 
-TGraphData::TGraphData(const TGraphData& grdatToCopy) :
+TGraphData::TGraphData(const TGraphData& grdatSrc) :
 
-    m_c4MaxSamples(grdatToCopy.m_c4MaxSamples)
-    , m_c4SerialNum(grdatToCopy.m_c4SerialNum)
-    , m_c4Head(grdatToCopy.m_c4Head)
-    , m_c4Tail(grdatToCopy.m_c4Tail)
-    , m_pf4Data(0)
+    m_c4MaxSamples(grdatSrc.m_c4MaxSamples)
+    , m_c4SerialNum(grdatSrc.m_c4SerialNum)
+    , m_c4Head(grdatSrc.m_c4Head)
+    , m_c4Tail(grdatSrc.m_c4Tail)
+    , m_pf4Data(nullptr)
 {
     // Allocate the data array and copy over the data
     m_pf4Data = new tCIDLib::TFloat4[m_c4MaxSamples];
     TRawMem::CopyMemBuf
     (
         m_pf4Data
-        , grdatToCopy.m_pf4Data
-        , sizeof(m_pf4Data[0]) * (m_c4MaxSamples)
+        , grdatSrc.m_pf4Data
+        , sizeof(m_pf4Data[0]) * m_c4MaxSamples
     );
 }
+
+// Set up a 1 entry graph and invoke move operator
+TGraphData::TGraphData(TGraphData&& grdatSrc) :
+
+    m_c4MaxSamples(2)
+    , m_c4SerialNum(1)
+    , m_c4Head(0)
+    , m_c4Tail(0)
+    , m_pf4Data(new tCIDLib::TFloat4[2])
+{
+    *this = tCIDLib::ForceMove(grdatSrc);
+}
+
 
 TGraphData::~TGraphData()
 {
@@ -85,6 +98,48 @@ TGraphData::~TGraphData()
     delete [] m_pf4Data;
 }
 
+
+// ---------------------------------------------------------------------------
+//  TGraphData: Public operators
+// ---------------------------------------------------------------------------
+TGraphData& TGraphData::operator=(const TGraphData& grdatSrc)
+{
+    // Reallocate our buffer if not the same size
+    if (m_pf4Data && (m_c4MaxSamples != grdatSrc.m_c4MaxSamples))
+    {
+        delete [] m_pf4Data;
+        m_pf4Data = nullptr;
+    }
+    if (!m_pf4Data)
+        m_pf4Data = new tCIDLib::TFloat4[grdatSrc.m_c4MaxSamples];
+
+    m_c4MaxSamples = grdatSrc.m_c4MaxSamples;
+    m_c4Head = grdatSrc.m_c4Head;
+    m_c4SerialNum = grdatSrc.m_c4SerialNum;
+    m_c4Tail = grdatSrc.m_c4Tail;
+    TRawMem::CopyMemBuf
+    (
+        m_pf4Data
+        , grdatSrc.m_pf4Data
+        , sizeof(m_pf4Data[0]) * m_c4MaxSamples
+    );
+
+    return *this;
+}
+
+
+TGraphData& TGraphData::operator=(TGraphData&& grdatSrc)
+{
+    if (&grdatSrc != this)
+    {
+        tCIDLib::Swap(m_c4MaxSamples, grdatSrc.m_c4MaxSamples);
+        tCIDLib::Swap(m_c4SerialNum, grdatSrc.m_c4SerialNum);
+        tCIDLib::Swap(m_c4Head, grdatSrc.m_c4Head);
+        tCIDLib::Swap(m_c4Tail, grdatSrc.m_c4Tail);
+        tCIDLib::Swap(m_pf4Data, grdatSrc.m_pf4Data);
+    }
+    return *this;
+}
 
 // ---------------------------------------------------------------------------
 //  TGraphData: Public, non-virtual methods

@@ -169,15 +169,10 @@ class CIDXMLEXP TXMLEntityDecl : public TObject
             , const tCIDLib::TCh* const     pszEntityValue
         );
 
-        TXMLEntityDecl
-        (
-            const   TXMLEntityDecl&         xdeclToCopy
-        );
-
-        TXMLEntityDecl& operator=
-        (
-            const   TXMLEntityDecl&         xdeclToAssign
-        );
+        TXMLEntityDecl(const TXMLEntityDecl&) = default;
+        TXMLEntityDecl(TXMLEntityDecl&&) = default;
+        TXMLEntityDecl& operator=(const TXMLEntityDecl&) = default;
+        TXMLEntityDecl& operator=(TXMLEntityDecl&&) = default;
 
 
     private :

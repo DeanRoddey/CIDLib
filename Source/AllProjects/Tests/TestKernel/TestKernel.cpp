@@ -56,7 +56,7 @@ extern tCIDLib::TVoid TestPaths(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestRawStrings(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestRawMemory(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestSafeCounters(const tCIDLib::TCard4);
-extern tCIDLib::TVoid TestSemaphores(const tCIDLib::TCard4);
+extern tCIDLib::TVoid TestStrings(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestTime(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestThreads(const tCIDLib::TCard4);
 extern tCIDLib::TVoid TestCDROM(const tCIDLib::TCard4);
@@ -97,14 +97,14 @@ TOutStrm        strmOut;
 static TTestFuncRecord          aTestFunctions[] =
 {
         { TestEnums         , L"Enums"          , kCIDLib::False }
-    ,   { TestRawStrings    , L"Strings"        , kCIDLib::False }
+    ,   { TestRawStrings    , L"Raw Strings"    , kCIDLib::False }
+    ,   { TestStrings       , L"Krnl Strings"   , kCIDLib::False }
     ,   { TestFlagJanitors  , L"FlagJans"       , kCIDLib::False }
     ,   { TestRawMemory     , L"Memory"         , kCIDLib::False }
     ,   { TestHashMap       , L"HashMap"        , kCIDLib::False }
     ,   { TestEnvironment   , L"Environment"    , kCIDLib::False }
     ,   { TestEvents        , L"Events"         , kCIDLib::False }
     ,   { TestMutexes       , L"Mutexes"        , kCIDLib::False }
-    ,   { TestSemaphores    , L"Semaphores"     , kCIDLib::False }
     ,   { TestSafeCounters  , L"Counters"       , kCIDLib::False }
     ,   { TestTime          , L"Time"           , kCIDLib::False }
     ,   { TestPaths         , L"Paths"          , kCIDLib::False }
@@ -267,8 +267,8 @@ static tCIDLib::TVoid ShowSysInfo()
     if (!TKrnlIP::bQueryTCPVersion(c4TCPMaj, c4TCPMin))
         throw TKrnlError::kerrLast();
 
-    tCIDLib::TZStr128 szUser;
-    if (!TKrnlSysInfo::bQueryUserName(szUser, c4MaxBufChars(szUser)))
+    TKrnlString kstrUser;
+    if (!TKrnlSysInfo::bQueryUserName(kstrUser))
         throw TKrnlError::kerrLast();
 
     TKrnlString kstrIPHost;
@@ -315,14 +315,13 @@ static tCIDLib::TVoid ShowSysInfo()
             << L"        Node Name: " << TKrnlSysInfo::pszNodeName() << L"\n"
             << L"       Machine Id: " << szMachineId << L"\n"
             << L"   CIDLib Version: " << kCIDLib::pszVersion << "\n"
-            << L"         CPU Type: " << tCIDLib::TInt4(TKrnlSysInfo::eCPUType()) << "\n"
             << L"        CPU Count: " << TKrnlSysInfo::c4CPUCount() << "\n"
             << L"     Total Memory: " << c4TotalMem << "K\n"
             << L"     Avail Memory: " << c4AvailMem << "K\n"
             << L"       OS Version: " << c4OSMaj << L"." << c4OSMin << L"." << c4OSRev
                                       << L"  Build:" << c4OSBuild << L"\n"
             << L"        SSE Level: " << TKrnlSysInfo::c4SSELevel() << L"\n"
-            << L"     Current User: " << szUser << L"\n"
+            << L"     Current User: " << kstrUser.pszValue() << L"\n"
             << EndLn;
 
     strmOut << L"TCP/IP Information\n"
@@ -337,6 +336,11 @@ static tCIDLib::TVoid ShowSysInfo()
             throw TKrnlError::kerrLast();
         strmOut << kstrTmp.pszValue() << EndLn;
     }
+     else
+    {
+        strmOut << EndLn;
+    }
+
 
     strmOut << L"    Def IPV6 Addr: ";
     if (TKrnlIP::bIPV6Avail())
@@ -344,6 +348,10 @@ static tCIDLib::TVoid ShowSysInfo()
         if (!TKrnlIP::bTextFromIPAddr(kipaDefAddrV6, kstrTmp))
             throw TKrnlError::kerrLast();
         strmOut << kstrTmp.pszValue() << EndLn;
+    }
+     else
+    {
+        strmOut << EndLn;
     }
 
     // Set the format to hex
@@ -575,32 +583,6 @@ static tCIDLib::TVoid ShowSysInfo()
     }
 
 
-    // Iterate any media changers
-    const tCIDLib::TCard4 c4MaxChangers = 256;
-    tCIDLib::TCard4 c4ChangerCnt;
-    TKrnlMediaChanger::TMediaChgInfo aciList[c4MaxChangers];
-    if (TKrnlMediaChanger::bEnumChangers(aciList, c4MaxChangers, c4ChangerCnt))
-    {
-        strmOut << L"Available Media Changers\n"
-                << L"------------------------------------\n";
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChangerCnt; c4Index++)
-        {
-            strmOut << (c4Index + 1) << L". ";
-            const TKrnlMediaChanger::TMediaChgInfo& ciCur = aciList[c4Index];
-            strmOut << L"Volume: " << ciCur.achDevPath
-                    << L"\n   Id: " << ciCur.achProductId
-                    << L"\n   Number: " << ciCur.c4ChangerNum << L"\n";
-        }
-
-        if (!c4ChangerCnt)
-            strmOut << L"  [NONE FOUND]\n";
-    }
-     else
-    {
-        strmOut << L"Could not enumerate media changers\n";
-    }
-    strmOut << L"\n\n";
-
     // Show some of the special directories
     strmOut << L"Special Directories\n"
             << L"------------------------------------\n";
@@ -619,27 +601,21 @@ static tCIDLib::TVoid ShowSysInfo()
             , { tCIDLib::ESpecialPaths::ProgramFilesCommon, L"Common Program Files" }
         };
         const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aPaths);
-        tCIDLib::TCh achPath[kCIDLib::c4MaxPathLen + 1];
+
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             const TDirInfo& CurPath = aPaths[c4Index];
-            const tCIDLib::TBoolean bRes = TKrnlSysInfo::bQuerySpecialPath
-            (
-                achPath, kCIDLib::c4MaxPathLen, CurPath.ePath
-            );
+            const tCIDLib::TBoolean bRes = TKrnlSysInfo::bQuerySpecialPath(kstrTmp, CurPath.ePath);
 
             strmOut << L"  " << CurPath.pszName << L" = ";
             if (bRes)
-                strmOut << achPath;
+                strmOut << kstrTmp.pszValue();
             else
                 strmOut << L"  [UNKNOWN]";
             strmOut << L"\n";
         }
         strmOut << L"\n\n";
     }
-
-    // Do a little TTS testing
-    SpeechInfo();
 
     // Flush any remainder out now
     strmOut.flush();
@@ -678,7 +654,7 @@ tCIDLib::TBoolean bTestTypes()
 //  This is the program entry point. It will do some overall setup and
 //  announcement, then call each of the testing modules in the correct order.
 //
-tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
+int main(const int i4ArgC, tCIDLib::TSCh* apszArgs[])
 {
     // Turn off buffering for output stream
     strmOut.setf(std::ios::unitbuf, std::ios::unitbuf);
@@ -710,9 +686,9 @@ tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
         if (!kmodTestKernel.bQueryFromName
         (
             L"TestKernel"
-            , tCIDLib::EModTypes::Exe
             , kCIDLib::c4MajVersion
             , kCIDLib::c4MinVersion
+            , tCIDLib::EModTypes::Exe
             , tCIDLib::EModFlags::HasMsgFile))
         {
             throw TKrnlError::kerrLast();
@@ -767,13 +743,7 @@ tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
             }
         }
 
-        //
-        //  First of all just dump the system information values. This is
-        //  just for examining by eye. Its a local function.
-        //
-        ShowSysInfo();
-
-        strmOut << L"\n\nStarting Tests...\n\n";
+        strmOut << L"\nStarting Tests...\n\n";
 
         for (c4FnInd = 0; c4FnInd < c4TestFuncCount; c4FnInd++)
         {
@@ -801,6 +771,12 @@ tCIDLib::TSInt main(const tCIDLib::TInt4 i4ArgC, tCIDLib::TSCh* apszArgs[])
                 }
             }
         }
+
+        // Now do dumps of information we get from various sources
+        ShowSysInfo();
+
+        // Do a little TTS testing
+        SpeechInfo();
 
         strmOut << L"\nTests complete\n\n";
     }

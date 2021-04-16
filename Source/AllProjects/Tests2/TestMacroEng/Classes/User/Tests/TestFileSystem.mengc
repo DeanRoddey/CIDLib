@@ -96,15 +96,15 @@ Methods=[Public,Final]
         EndIf;
 
         //
-        //  If we don't limit it to normal dirs, we should get 4. There is
-        //  one hidden one plus the magic . and .. entries.
+        //  If we don't limit it to normal dirs, we should get 2. There is
+        //  one hidden one.
         //
         If (!m_FileSys.FindDirs(kBasePath, "*", False, m_List))
             m_Helper.PrintErr("FindDirs failed", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;
 
-        If (m_List.GetElemCount() != 4)
+        If (m_List.GetElemCount() != 2)
             m_Helper.PrintErr("FindDirs returned wrong count", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;

@@ -42,13 +42,7 @@
 //
 TFacCIDDBase& facCIDDBase()
 {
-    static TFacCIDDBase* pfacCIDDBase = nullptr;
-    if (!pfacCIDDBase)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDDBase)
-            pfacCIDDBase = new TFacCIDDBase;
-    }
-    return *pfacCIDDBase;
+    static TFacCIDDBase* pfacThis = new TFacCIDDBase();
+    return *pfacThis;
 }
 

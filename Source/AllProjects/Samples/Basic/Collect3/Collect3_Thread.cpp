@@ -119,7 +119,7 @@ tCIDLib::EExitCodes TColThread::eProcess()
         //  the collection because this requires multiple operations.
         //
         {
-            TMtxLocker lockCol(m_pcolToUse->pmtxLock());
+            TLocker lockrCol(m_pcolToUse);
 
             // Create a new value to add, between 0 and 500
             c4Value = randGen.c4GetNextNum() % 500;

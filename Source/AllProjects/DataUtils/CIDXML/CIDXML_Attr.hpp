@@ -80,10 +80,8 @@ class CIDXMLEXP TXMLAttr : public TObject
             , const tCIDLib::TBoolean       bExplicit
         );
 
-        TXMLAttr
-        (
-            const   TXMLAttr&               xattrToCopy
-        );
+        TXMLAttr(const TXMLAttr&) = default;
+        TXMLAttr(TXMLAttr&&) = default;
 
         ~TXMLAttr();
 
@@ -91,19 +89,17 @@ class CIDXMLEXP TXMLAttr : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLAttr& operator=
-        (
-            const   TXMLAttr&               xattrToAssign
-        );
+        TXMLAttr& operator=(const TXMLAttr&) = default;
+        TXMLAttr& operator=(TXMLAttr&&) = default;
 
         tCIDLib::TBoolean operator==
         (
-            const   TXMLAttr&               xattrToComp
+            const   TXMLAttr&               xattrSrc
         );
 
         tCIDLib::TBoolean operator!=
         (
-            const   TXMLAttr&               xattrToComp
+            const   TXMLAttr&               xattrSrc
         );
 
 

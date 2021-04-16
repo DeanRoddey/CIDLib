@@ -37,21 +37,23 @@ class TXMLValidator;
 //  CLASS: TXMLContentModel
 // PREFIX: xcm
 // ---------------------------------------------------------------------------
-class CIDXMLEXP TXMLContentModel : public TObject
+class CIDXMLEXP TXMLContentModel
 {
     public  :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TXMLContentModel(const TXMLContentModel&) = delete;
+        TXMLContentModel(TXMLContentModel&&) = delete;
 
-        ~TXMLContentModel() {}
+        virtual ~TXMLContentModel() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TXMLContentModel& operator=(const TXMLContentModel&) = delete;
+        TXMLContentModel& operator=(TXMLContentModel&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -75,14 +77,7 @@ class CIDXMLEXP TXMLContentModel : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TXMLContentModel() {}
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TXMLContentModel,TObject)
+        TXMLContentModel() = default;
 };
 
 #pragma CIDLIB_POPPACK

@@ -43,8 +43,8 @@ namespace CIDKernel_RawMemory
     // -----------------------------------------------------------------------
     //  We fault in the CRC table for the 3309 CRC algorithm, upon first use
     // -----------------------------------------------------------------------
-    tCIDLib::TCard4             ac43309Table[256];
-    volatile tCIDLib::TBoolean  b3309Init = kCIDLib::False;
+    tCIDLib::TCard4     ac43309Table[256];
+    TAtomicFlag         atomInit;
 }
 
 
@@ -169,11 +169,10 @@ TRawMem::hshHashBuffer3309( const   tCIDLib::THashVal       hshLast
                             , const tCIDLib::TVoid* const   pBuf
                             , const tCIDLib::TCard4         c4Bytes)
 {
-    // If we've not initialized the CRC table, do it now
-    if (!CIDKernel_RawMemory::b3309Init)
+    if (!CIDKernel_RawMemory::atomInit)
     {
         TBaseLock lockInit;
-        if (!CIDKernel_RawMemory::b3309Init)
+        if (!CIDKernel_RawMemory::atomInit)
         {
             tCIDLib::TCard4 c4Cur;
             for (tCIDLib::TCard4 c4EntryInd = 0; c4EntryInd < 256; c4EntryInd++)
@@ -190,16 +189,15 @@ TRawMem::hshHashBuffer3309( const   tCIDLib::THashVal       hshLast
             }
 
             // And lastly indicate we've faulted it in
-            CIDKernel_RawMemory::b3309Init = kCIDLib::True;
+            CIDKernel_RawMemory::atomInit.Set();
         }
     }
 
     // Get a byte based temp pointer that we can run upwards as we go
     const tCIDLib::TCard1* pc1Buf = reinterpret_cast<const tCIDLib::TCard1*>(pBuf);
 
-    // Get a copy of the last hash as a starting poin
+    // Get a copy of the last hash as a starting point
     tCIDLib::TCard4 c4Ret = hshLast;
-
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Bytes; c4Index++)
     {
         c4Ret = CIDKernel_RawMemory::ac43309Table[(c4Ret ^ pc1Buf[c4Index]) & 0xFF]
@@ -232,8 +230,8 @@ TRawMem::hshHashBufferAdler32(  const   tCIDLib::THashVal       hshAdler
     #define Do16(buf)    Do8(buf,0); Do8(buf,8);
 
     // Some constants uses in the calculation. Base is the largest 16 bit prime
-    const tCIDLib::TCard4 c4Base(65521);
-    const tCIDLib::TCard4 c4NMax(5552);
+    constexpr tCIDLib::TCard4 c4Base(65521);
+    constexpr tCIDLib::TCard4 c4NMax(5552);
 
     // If an empty buffer, return 1
     if (!c4Bytes)

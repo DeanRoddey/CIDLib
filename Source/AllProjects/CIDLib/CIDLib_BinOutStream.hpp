@@ -93,14 +93,16 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         //  Destructor
         // -------------------------------------------------------------------
         TOutStreamImpl(const TOutStreamImpl&) = delete;
+        TOutStreamImpl(TOutStreamImpl&&) = delete;
 
-        ~TOutStreamImpl() {}
+        ~TOutStreamImpl() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TOutStreamImpl& operator=(const TOutStreamImpl&) = delete;
+        TOutStreamImpl& operator=(TOutStreamImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -125,7 +127,7 @@ class CIDLIBEXP TOutStreamImpl : public TObject
         // -------------------------------------------------------------------
         //  Hidden Constructors
         // -------------------------------------------------------------------
-        TOutStreamImpl() {}
+        TOutStreamImpl() = default;
 
 
     private :
@@ -153,6 +155,7 @@ class CIDLIBEXP TBinOutStream : public TObject
         );
 
         TBinOutStream(const TBinOutStream&) = delete;
+        TBinOutStream(TBinOutStream&&) = delete;
 
         ~TBinOutStream();
 
@@ -241,6 +244,7 @@ class CIDLIBEXP TBinOutStream : public TObject
         );
 
         TBinOutStream& operator=(const TBinOutStream&) = delete;
+        TBinOutStream& operator=(TBinOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -567,7 +571,7 @@ TBinOutStream_WriteArray(       TBinOutStream&          strmOut
 //  operators are in CIDLib_Streamable.hpp since they have to be friends of
 //  the streamable mixin.
 // ---------------------------------------------------------------------------
-template <class T> tCIDLib::TVoid
+template <typename T> tCIDLib::TVoid
 PolymorphicWrite(const T* const pobjToWrite, TBinOutStream& strmToWriteTo)
 {
     strmToWriteTo.WriteClassInfo(pobjToWrite->clsIsA());
@@ -577,7 +581,8 @@ PolymorphicWrite(const T* const pobjToWrite, TBinOutStream& strmToWriteTo)
 
 // ---------------------------------------------------------------------------
 //  Create some short cut values for the special stream enum values. These
-//  are often used so having a short cut is very convenient.
+//  are often used so having a short cut is very convenient. There are some
+//  other but they need to be defined further down.
 // ---------------------------------------------------------------------------
 namespace kCIDLib
 {

@@ -20,7 +20,7 @@
 //
 // CAVEATS/GOTCHAS:
 //
-//  1)  The __enctTime field in the Win32 implementation is always a local
+//  1)  The m_enctTime field in the Win32 implementation is always a local
 //      time, i.e. we adjust any UTC times we get from the system to be local
 //      times.
 //
@@ -42,22 +42,203 @@
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
-TCIDKrnlModule::__bInitTermTime(const tCIDLib::EInitTerm eInitTerm)
+TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eInitTerm)
 {
     if (eInitTerm == tCIDLib::EInitTerm::Initialize)
     {
         ::tzset();
-
-        TKrnlTimeStamp::__bDST = daylight ? kCIDLib::True : kCIDLib::False;
-        TKrnlTimeStamp::__i4Offset = timezone / 60 / -60;
-
-        tCIDLib::TCard4 c4Index = TKrnlTimeStamp::__bDST ? 1 : 0;
-        TRawStr::pszConvert(tzname[c4Index], TKrnlTimeStamp::__szTZName, 32);
     }
 
     return kCIDLib::True;
 }
 
+
+// ---------------------------------------------------------------------------
+//  TKrnlTimeStamp: Public, static methods
+// ---------------------------------------------------------------------------
+
+// <TBD> Do we have this on Linux?
+tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
+{
+    return kCIDLib::False;
+}
+
+
+// <TBD> Do we have this on Linux?
+tCIDLib::TBoolean
+TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
+{
+    if (c4MicroSecs < 1000)
+        TKrnlThread::Sleep(1);
+    else
+        TKrnlThread::Sleep(c4MicroSecs / 1000);    
+}
+
+
+tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(tCIDLib::TBoolean& bDSTState)
+{
+    time_t tmCur = ::time(0);
+    if (tmCur == -1)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                
+    }
+
+    tm brokenTime;
+    if (::localtime_r(&tmCur, &brokenTime) == 0)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;        
+    }
+    bDSTState = brokenTime.tm_isdst != 0;
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean TKrnlTimeStamp::bTZOffset(tCIDLib::TInt4& i4Ofs)
+{
+    timeval tv;
+    struct timezone tz;
+
+    if (::gettimeofday(&tv, &tz))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                
+    }
+
+    i4Ofs = tz.tz_minuteswest;
+    return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean
+TKrnlTimeStamp::bTZName(tCIDLib::TCh* pszToFill, const tCIDLib::TCard4 c4MaxChars)
+{
+    timeval tv;
+    struct timezone tz;
+
+    if (::gettimeofday(&tv, &tz))
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                        
+    }
+
+    return TRawStr::bFormatVal(tCIDLib::TInt4(tz.tz_minuteswest), pszToFill, c4MaxChars);
+    return kCIDLib::True;
+}
+
+
+// For us this is the same as local to UTC
+tCIDLib::TBoolean
+TKrnlTimeStamp::bLocalToNative( const   tCIDLib::TEncodedTime& enctLocal
+                                ,       tCIDLib::TEncodedTime& enctNative)
+{
+    return bLocalToUTC(enctLocal, enctNative);
+}
+
+
+tCIDLib::TBoolean
+TKrnlTimeStamp::bLocalToUTC(const   tCIDLib::TEncodedTime& enctLocal
+                            ,       tCIDLib::TEncodedTime& enctNative)
+{
+    // Conver the local to the Linux type stame format
+    time_t LocalTime = time_t(enctLocal / kCIDLib::enctOneSecond);
+
+    struct tm GMTime;
+    if (::gmtime_r(&LocalTime, &GMTime) == 0)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                        
+    }
+
+    // And now multiply this back up
+    const time_t EpochTime = ::mktime(&GMTime);
+    enctNative = tCIDLib::TEncodedTime(EpochTime) * kCIDLib::enctOneSecond;
+    return kCIDLib::True;    
+}
+
+
+tCIDLib::TBoolean
+TKrnlTimeStamp::bUTCToLocal(const   tCIDLib::TEncodedTime& enctUTC
+                            ,       tCIDLib::TEncodedTime& enctLocal)
+{
+    // Conver the UTC to the Linux format
+    time_t UTCTime = time_t(enctUTC / kCIDLib::enctOneSecond);
+
+    struct tm LocalTime;
+    if (::localtime_r(&UTCTime, &LocalTime) == 0)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                        
+    }
+
+    // And now multiply this back up to the Epoch type style
+    const time_t EpochTime = ::mktime(&LocalTime);
+    enctLocal = tCIDLib::TEncodedTime(EpochTime) * kCIDLib::enctOneSecond;
+    return kCIDLib::True;    
+}
+
+
+// Return the curent millisecond tick count, 32 and 64 bit versions
+tCIDLib::TCard4 TKrnlTimeStamp::c4Millis()
+{
+    time_t tmCur = ::time(0);
+    if (tmCur == -1)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                
+    }
+
+    // Just return seconds time a thousand
+    return tCIDLib::TCard4(tmCur) * 1000;
+}
+
+tCIDLib::TCard8 TKrnlTimeStamp::c8Millis()
+{
+    time_t tmCur = ::time(0);
+    if (tmCur == -1)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                
+    }
+
+    // Just return seconds time a thousand
+    return tCIDLib::TCard8(tmCur) * 1000;
+}
+
+
+tCIDLib::TVoid
+TKrnlTimeStamp::CurNTPTime(         tCIDLib::TCard4&    c4Secs
+                            ,       tCIDLib::TCard4&    c4Fract
+                            , const tCIDLib::TBoolean   bNWOrder)
+{
+    time_t tmCur = ::time(0);
+    c4Secs = tCIDLib::TCard4(tmCur);
+    c4Fract = 0;    
+}
+
+
+tCIDLib::TEncodedTime TKrnlTimeStamp::enctNow()
+{
+    time_t tmCur = ::time(0);
+    return tCIDLib::TEncodedTime(tmCur) * kCIDLib::enctOneSecond;
+}
+
+
+tCIDLib::TEncodedTime TKrnlTimeStamp::enctNowUTC()
+{
+    time_t tmCur = ::time(0);
+
+    struct tm GMTime;
+    if (::gmtime_r(&tmCur, &GMTime) == 0)
+    {
+        TKrnlError::SetLastHostError(errno);
+        return kCIDLib::False;                        
+    }
+
+    // And now multiply this back up
+    const time_t EpochTime = ::mktime(&GMTime);
+}
 
 
 // ---------------------------------------------------------------------------
@@ -70,7 +251,7 @@ TKrnlTimeStamp::bAsDateInfo(tCIDLib::TCard4&        c4Year
                             , tCIDLib::EWeekDays&   eWeekDay) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -95,7 +276,7 @@ TKrnlTimeStamp::bAsTimeInfo(tCIDLib::TCard4&    c4Hour
                             , tCIDLib::TCard4&  c4Millis) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -117,7 +298,7 @@ tCIDLib::TBoolean
 TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
 {
     time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
+    TKrnlLinux::CIDFileTimeToLinuxFileTime(m_enctTime, LinuxTime);
 
     struct tm TimeStruct;
     if (!::gmtime_r(&LinuxTime, &TimeStruct))
@@ -149,7 +330,7 @@ TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
     TimeStruct.tm_min = c4Minute;
     TimeStruct.tm_hour = c4Hour;
     TimeStruct.tm_mday = c4Day;
-    TimeStruct.tm_mon = eMonth;
+    TimeStruct.tm_mon = int(eMonth);
     TimeStruct.tm_year = c4Year - 1900;
 
     time_t LinuxTime = ::mktime(&TimeStruct);
@@ -160,34 +341,15 @@ TKrnlTimeStamp::bFromDetails(const  tCIDLib::TCard4     c4Year
         return kCIDLib::False;
     }
 
-    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime - timezone, __enctTime);
+    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime - timezone, m_enctTime);
 
     return kCIDLib::True;
 }
-
-
-tCIDLib::TBoolean TKrnlTimeStamp::bJulianDate(tCIDLib::TCard4& c4ToFill) const
-{
-    time_t LinuxTime;
-    TKrnlLinux::CIDFileTimeToLinuxFileTime(__enctTime, LinuxTime);
-
-    struct tm TimeStruct;
-    if (!::gmtime_r(&LinuxTime, &TimeStruct))
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_InvalidValue);
-        return kCIDLib::False;
-    }
-
-    c4ToFill = TimeStruct.tm_yday;
-
-    return kCIDLib::True;
-}
-
 
 
 tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::TEncodedTime& enctNew)
 {
-    __enctTime = enctNew;
+    m_enctTime = enctNew;
     return kCIDLib::True;
 }
 
@@ -198,7 +360,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
     if (eSpecial == tCIDLib::ESpecialTimes::Base)
     {
         LinuxTime = 0;
-        TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, __enctTime);
+        TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, m_enctTime);
         return kCIDLib::True;
     }
 
@@ -244,7 +406,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
         }
     }
 
-    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, __enctTime);
+    TKrnlLinux::LinuxFileTimeToCIDFileTime(LinuxTime, m_enctTime);
 
     return kCIDLib::True;
 }
@@ -252,5 +414,5 @@ tCIDLib::TBoolean TKrnlTimeStamp::bSetTo(const tCIDLib::ESpecialTimes eSpecial)
 
 tCIDLib::TBoolean TKrnlTimeStamp::bValidate() const
 {
-    return __enctTime >= 0;
+    return m_enctTime >= 0;
 }

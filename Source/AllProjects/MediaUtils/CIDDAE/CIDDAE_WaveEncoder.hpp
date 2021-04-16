@@ -56,6 +56,7 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         TCIDDAEWaveDec();
 
         TCIDDAEWaveDec(const TCIDDAEWaveDec&) = delete;
+        TCIDDAEWaveDec(TCIDDAEWaveDec&&) = delete;
 
         ~TCIDDAEWaveDec();
 
@@ -64,6 +65,7 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWaveDec& operator=(const TCIDDAEWaveDec&) = delete;
+        TCIDDAEWaveDec& operator=(TCIDDAEWaveDec&&) = delete;
 
 
     protected :
@@ -74,16 +76,16 @@ class CIDDAEEXP TCIDDAEWaveDec : public TCIDDAEDecoder
         (
                     TMemBuf&                mbufToFill
             , const tCIDLib::TCard4         c4StartInd = 0
-        );
+        )   final;
 
-        tCIDLib::TVoid CleanupImpl();
+        tCIDLib::TVoid CleanupImpl() final;
 
-        tCIDLib::TVoid EndDecodeImpl();
+        tCIDLib::TVoid EndDecodeImpl() final;
 
         tCIDLib::TVoid StartDecodeImpl
         (
             const   TString&                strSrcFile
-        );
+        )   final;
 
 
     private :
@@ -143,6 +145,7 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         TCIDDAEWaveEnc();
 
         TCIDDAEWaveEnc(const TCIDDAEWaveEnc&) = delete;
+        TCIDDAEWaveEnc(TCIDDAEWaveEnc&&) = delete;
 
         ~TCIDDAEWaveEnc();
 
@@ -151,6 +154,7 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         //  Public operators
         // -------------------------------------------------------------------
         TCIDDAEWaveEnc& operator=(const TCIDDAEWaveEnc&) = delete;
+        TCIDDAEWaveEnc& operator=(TCIDDAEWaveEnc&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -160,18 +164,18 @@ class CIDDAEEXP TCIDDAEWaveEnc : public TCIDDAEEncoder
         (
             const   TString&                strCodec
             , const TString&                strFormat
-        )   const;
+        )   const final;
 
         tCIDLib::TCard4 c4QueryCodecNames
         (
                     tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
         tCIDLib::TCard4 c4QueryCodecFmtNames
         (
             const   TString&                strCodec
             ,       tCIDLib::TStrList&      colToFill
-        );
+        )   final;
 
 
     protected :

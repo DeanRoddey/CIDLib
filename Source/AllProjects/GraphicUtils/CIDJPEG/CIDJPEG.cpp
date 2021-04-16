@@ -36,14 +36,6 @@
 //
 TFacCIDJPEG& facCIDJPEG()
 {
-    static TFacCIDJPEG* pfacCIDJPEG = nullptr;
-    if (!pfacCIDJPEG)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDJPEG)
-            pfacCIDJPEG = new TFacCIDJPEG;
-    }
-    return *pfacCIDJPEG;
+    static TFacCIDJPEG* pfacThis = new TFacCIDJPEG();
+    return *pfacThis;
 }
-
-

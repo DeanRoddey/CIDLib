@@ -114,7 +114,7 @@ TTest_EndPoints::eRunTest(  TTextStringOutStream&   strmOut
         //
         TIPAddress ipaTest6(L"::1", tCIDSock::EAddrTypes::Unspec);
         TIPAddress ipaTest6b(L"::1", tCIDSock::EAddrTypes::IPV6);
-        TRawMem::SetMemBuf(ac1Data, tCIDLib::TCard1(0), 16);
+        TRawMem::SetMemBuf(ac1Data, kCIDLib::c1MinCard, 16);
         ac1Data[15] = 1;
 
         bRes = bTestAnAddress

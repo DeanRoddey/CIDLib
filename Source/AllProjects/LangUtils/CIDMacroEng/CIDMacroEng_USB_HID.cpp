@@ -45,12 +45,15 @@ RTTIDecls(TMEngUSBHIDInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_USBHIDClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strUSBHID(L"USBHID");
-    const TString   strUSBHIDClassPath(L"MEng.System.Runtime.USBHID");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strUSBHID(L"USBHID");
+        const TString   strUSBHIDClassPath(L"MEng.System.Runtime.USBHID");
+    }
 }
 
 
@@ -242,13 +245,13 @@ TMEngUSBHIDInfo::TMEngUSBHIDInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2EnumId_Errors(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Close(kMacroEng::c2BadId)
-    , m_c2MethId_FindDevice(kMacroEng::c2BadId)
-    , m_c2MethId_Open(kMacroEng::c2BadId)
-    , m_c2MethId_Read(kMacroEng::c2BadId)
-    , m_c2MethId_Write(kMacroEng::c2BadId)
+    , m_c2EnumId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindDevice(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Open(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Read(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Write(kCIDMacroEng::c2BadId)
     , m_c4ErrCloseFailed(kCIDLib::c4MaxCard)
     , m_c4ErrDevNotFound(kCIDLib::c4MaxCard)
     , m_c4ErrOpenFailed(kCIDLib::c4MaxCard)

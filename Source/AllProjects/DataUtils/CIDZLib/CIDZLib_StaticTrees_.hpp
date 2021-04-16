@@ -30,7 +30,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-const tCIDZLib_::TTreeVals atvStaticLTree[kCIDZLib_::c4LLCodes + 2] =
+constexpr tCIDZLib_::TTreeVals atvStaticLTree[kCIDZLib_::c4LLCodes + 2] =
 {
      {  12, 8 }, { 140, 8 }, {  76, 8 }, { 204, 8 }, {  44, 8 }
   ,  { 172, 8 }, { 108, 8 }, { 236, 8 }, {  28, 8 }, { 156, 8 }
@@ -93,7 +93,7 @@ const tCIDZLib_::TTreeVals atvStaticLTree[kCIDZLib_::c4LLCodes + 2] =
 };
 
 
-const tCIDZLib_::TTreeVals atvStaticDTree[kCIDZLib_::c4DistCodes] =
+constexpr tCIDZLib_::TTreeVals atvStaticDTree[kCIDZLib_::c4DistCodes] =
 {
     {  0, 5 }, { 16, 5}, {  8, 5 }, { 24, 5 }, {  4, 5 }
   , { 20, 5 }, { 12, 5}, { 28, 5 }, {  2, 5 }, { 18, 5 }
@@ -103,7 +103,7 @@ const tCIDZLib_::TTreeVals atvStaticDTree[kCIDZLib_::c4DistCodes] =
   , { 19, 5 }, { 11, 5}, { 27, 5 }, {  7, 5 }, { 23, 5 }
 };
 
-const tCIDLib::TCard1 ac1DistCode[kCIDZLib_::c4DistCodeLen] =
+constexpr tCIDLib::TCard1 ac1DistCode[kCIDZLib_::c4DistCodeLen] =
 {
      0,  1,  2,  3,  4,  4,  5,  5,  6,  6,  6,  6,  7,  7,  7,  7,  8,  8,  8,  8
   ,  8,  8,  8,  8,  9,  9,  9,  9,  9,  9,  9,  9, 10, 10, 10, 10, 10, 10, 10, 10
@@ -134,7 +134,7 @@ const tCIDLib::TCard1 ac1DistCode[kCIDZLib_::c4DistCodeLen] =
 };
 
 
-const tCIDLib::TCard1 ac1LengthCode[kCIDZLib_::c4MaxMatch - kCIDZLib_::c4MinMatch + 1] =
+constexpr tCIDLib::TCard1 ac1LengthCode[kCIDZLib_::c4MaxMatch - kCIDZLib_::c4MinMatch + 1] =
 {
      0,  1,  2,  3,  4,  5,  6,  7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 12, 12,
     13, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16,
@@ -152,14 +152,14 @@ const tCIDLib::TCard1 ac1LengthCode[kCIDZLib_::c4MaxMatch - kCIDZLib_::c4MinMatc
 };
 
 
-const tCIDLib::TSInt asBaseLength[kCIDZLib_::c4LengthCodes] =
+constexpr tCIDLib::TSInt asBaseLength[kCIDZLib_::c4LengthCodes] =
 {
       0,  1,  2,  3,  4,  5,  6,  7,  8,  10,  12,  14,  16,  20
     , 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 0
 };
 
 
-const tCIDLib::TSInt asBaseDist[kCIDZLib_::c4DistCodes] =
+constexpr tCIDLib::TSInt asBaseDist[kCIDZLib_::c4DistCodes] =
 {
         0,     1,     2,     3,     4,     6,     8,    12,    16,    24,
        32,    48,    64,    96,   128,   192,   256,   384,   512,   768,

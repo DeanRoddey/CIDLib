@@ -34,12 +34,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Since this is ad hoc included, we need a multiple inclusion avoidance mechanism.
-// ---------------------------------------------------------------------------
-#define CIDKERNEL_TYPE_CTRLS 1
-
-
-// ---------------------------------------------------------------------------
 //  In order to be able to share resource file format between the non-GUI resource
 //  compiler and the CIDCtrls facility that uses them, we put them here but make
 //  them look like they are CIDWnd stuff.
@@ -286,6 +280,7 @@ namespace tCIDCtrls
 
         // Common combos
         , HelperFrame           = 0x16CC0000
+        , HelperFrameNV         = 0x06CC0000
         , PaneContainer         = 0x52000000
         , StdFrameNV            = 0x02CC0000
         , StdFrame              = 0x12CC0000

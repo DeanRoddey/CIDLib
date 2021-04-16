@@ -42,6 +42,7 @@ class CIDZLIBEXP TFacCIDZLib : public TFacility
         TFacCIDZLib();
 
         TFacCIDZLib(const TFacCIDZLib&) = delete;
+        TFacCIDZLib(TFacCIDZLib&&) = delete;
 
         ~TFacCIDZLib();
 
@@ -50,6 +51,7 @@ class CIDZLIBEXP TFacCIDZLib : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDZLib& operator=(const TFacCIDZLib&) = delete;
+        TFacCIDZLib& operator=(TFacCIDZLib&&) = delete;
 
 
     private :

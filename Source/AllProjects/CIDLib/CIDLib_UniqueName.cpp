@@ -117,7 +117,7 @@ TString TUniqueName::strQueryNewName()
     TString strRet = m_strText;
     strRet.eReplaceToken(TCardinal(c4New), L'1');
 
-    return strRet;
+    return tCIDLib::ForceMove(strRet);
 }
 
 

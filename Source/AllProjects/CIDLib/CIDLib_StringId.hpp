@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 //   CLASS: TStringId
-//  PREFIX: bts
+//  PREFIX: strid
 // ---------------------------------------------------------------------------
 class CIDLIBEXP TStringId
 {
@@ -55,10 +55,8 @@ class CIDLIBEXP TStringId
 
         );
 
-        TStringId
-        (
-            const   TStringId&              stridSrc
-        );
+        TStringId(const TStringId&) = default;
+        TStringId(TStringId&&) = default;
 
         ~TStringId();
 
@@ -66,10 +64,8 @@ class CIDLIBEXP TStringId
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TStringId& operator=
-        (
-            const   TStringId&              stridSrc
-        );
+        TStringId& operator=(const TStringId&) = default;
+        TStringId& operator=(TStringId&&) = default;
 
         tCIDLib::TBoolean operator==
         (

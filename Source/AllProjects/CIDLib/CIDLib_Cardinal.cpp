@@ -52,14 +52,8 @@ AdvRTTIDecls(TLocCardinal64,TCardinal64)
 // ---------------------------------------------------------------------------
 TCardinal& TCardinal::Nul_TCardinal()
 {
-    static TCardinal* pcNull = nullptr;
-    if (!pcNull)
-    {
-        TBaseLock lockInit;
-        if (!pcNull)
-            TRawMem::pExchangePtr(&pcNull, new TCardinal);
-    }
-    return *pcNull;
+    static TCardinal cNull;
+    return cNull;
 }
 
 
@@ -107,7 +101,7 @@ TCardinal::TCardinal(   const   tCIDLib::TCard4     c4Val
 // ---------------------------------------------------------------------------
 //  TCardinal: Public operators
 // ---------------------------------------------------------------------------
-TCardinal& TCardinal::operator=(tCIDLib::TCard4 c4Src)
+TCardinal& TCardinal::operator=(const tCIDLib::TCard4 c4Src)
 {
     m_c4Val = c4Src;
     return *this;
@@ -256,14 +250,8 @@ tCIDLib::TVoid TCardinal::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 TCardinal64& TCardinal64::Nul_TCardinal64()
 {
-    static TCardinal64* pcNull = nullptr;
-    if (!pcNull)
-    {
-        TBaseLock lockInit;
-        if (!pcNull)
-            TRawMem::pExchangePtr(&pcNull, new TCardinal64);
-    }
-    return *pcNull;
+    static TCardinal64 cNull;
+    return cNull;
 }
 
 
@@ -440,12 +428,6 @@ TLocCardinal::TLocCardinal(const tCIDLib::TCard4 c4Val) :
 {
 }
 
-TLocCardinal::TLocCardinal(const TLocCardinal& cToCopy) :
-
-    TCardinal(cToCopy)
-{
-}
-
 TLocCardinal::~TLocCardinal()
 {
 }
@@ -454,14 +436,6 @@ TLocCardinal::~TLocCardinal()
 // ---------------------------------------------------------------------------
 //  TLocCardinal: Public operators
 // ---------------------------------------------------------------------------
-TLocCardinal& TLocCardinal::operator=(const TLocCardinal& cToAssign)
-{
-    if (this == &cToAssign)
-        return *this;
-    TParent::operator=(cToAssign);
-    return *this;
-}
-
 tCIDLib::TBoolean TLocCardinal::operator==(const TLocCardinal& cToTest) const
 {
     if (this == &cToTest)
@@ -543,12 +517,6 @@ TLocCardinal64::TLocCardinal64(const tCIDLib::TCard8& c8Val) :
 {
 }
 
-TLocCardinal64::TLocCardinal64(const TLocCardinal64& cToCopy) :
-
-    TCardinal64(cToCopy)
-{
-}
-
 TLocCardinal64::~TLocCardinal64()
 {
 }
@@ -557,25 +525,17 @@ TLocCardinal64::~TLocCardinal64()
 // ---------------------------------------------------------------------------
 //  TLocCardinal64: Public operators
 // ---------------------------------------------------------------------------
-TLocCardinal64& TLocCardinal64::operator=(const TLocCardinal64& cToAssign)
+tCIDLib::TBoolean TLocCardinal64::operator==(const TLocCardinal64& cSrc) const
 {
-    if (this == &cToAssign)
-        return *this;
-    TParent::operator=(cToAssign);
-    return *this;
-}
-
-tCIDLib::TBoolean TLocCardinal64::operator==(const TLocCardinal64& cToTest) const
-{
-    if (this == &cToTest)
+    if (this == &cSrc)
         return kCIDLib::True;
 
-    return TParent::operator==(cToTest);
+    return TParent::operator==(cSrc);
 }
 
-tCIDLib::TBoolean TLocCardinal64::operator!=(const TLocCardinal64& cToTest) const
+tCIDLib::TBoolean TLocCardinal64::operator!=(const TLocCardinal64& cSrc) const
 {
-    return !TParent::operator==(cToTest);
+    return !TParent::operator==(cSrc);
 }
 
 tCIDLib::TBoolean TLocCardinal64::operator<(const TLocCardinal64& cComp) const

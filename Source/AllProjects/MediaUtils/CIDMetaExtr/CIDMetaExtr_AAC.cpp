@@ -42,28 +42,31 @@ RTTIDecls(TCIDMetaExtrAAC,TCIDMetaExtror)
 // ---------------------------------------------------------------------------
 namespace CIDMetaExtr_AAC
 {
-    // Constants for the various box types we care about
-    const tCIDLib::TCard4   c4Box_DATA = 0x64617461;
-    const tCIDLib::TCard4   c4Box_FTYP = 0x66747970;
-    const tCIDLib::TCard4   c4Box_ILST = 0x696C7374;
-    const tCIDLib::TCard4   c4Box_META = 0X6D657461;
-    const tCIDLib::TCard4   c4Box_MOOV = 0x6D6F6F76;
-    const tCIDLib::TCard4   c4Box_UDTA = 0x75647461;
-    const tCIDLib::TCard4   c4Box_MVHD = 0x6d766864;
-    const tCIDLib::TCard4   c4Box_TKHD = 0x746B6864;
-    const tCIDLib::TCard4   c4Box_TRAK = 0x7472616B;
+    namespace
+    {
+        // Constants for the various box types we care about
+        constexpr tCIDLib::TCard4   c4Box_DATA = 0x64617461;
+        constexpr tCIDLib::TCard4   c4Box_FTYP = 0x66747970;
+        constexpr tCIDLib::TCard4   c4Box_ILST = 0x696C7374;
+        constexpr tCIDLib::TCard4   c4Box_META = 0X6D657461;
+        constexpr tCIDLib::TCard4   c4Box_MOOV = 0x6D6F6F76;
+        constexpr tCIDLib::TCard4   c4Box_UDTA = 0x75647461;
+        constexpr tCIDLib::TCard4   c4Box_MVHD = 0x6d766864;
+        constexpr tCIDLib::TCard4   c4Box_TKHD = 0x746B6864;
+        constexpr tCIDLib::TCard4   c4Box_TRAK = 0x7472616B;
 
-    const tCIDLib::TCard4   c4Box_ALB = 0xA9616C62;
-    const tCIDLib::TCard4   c4Box_ART = 0xA9617274;
-    const tCIDLib::TCard4   c4Box_GEN = 0xA967656E;
+        constexpr tCIDLib::TCard4   c4Box_ALB = 0xA9616C62;
+        constexpr tCIDLib::TCard4   c4Box_ART = 0xA9617274;
+        constexpr tCIDLib::TCard4   c4Box_GEN = 0xA967656E;
 
-    const tCIDLib::TCard4   c4Box_DAY = 0xA9646179;
-    const tCIDLib::TCard4   c4Box_NAM = 0xA96E616D;
+        constexpr tCIDLib::TCard4   c4Box_DAY = 0xA9646179;
+        constexpr tCIDLib::TCard4   c4Box_NAM = 0xA96E616D;
 
-    const tCIDLib::TCard4   c4Box_AART = 0x61415254;
-    const tCIDLib::TCard4   c4Box_COVR = 0x636F7672;
-    const tCIDLib::TCard4   c4Box_GNRE = 0x676E7265;
-    const tCIDLib::TCard4   c4Box_TRKN = 0x74726B6E;
+        constexpr tCIDLib::TCard4   c4Box_AART = 0x61415254;
+        constexpr tCIDLib::TCard4   c4Box_COVR = 0x636F7672;
+        constexpr tCIDLib::TCard4   c4Box_GNRE = 0x676E7265;
+        constexpr tCIDLib::TCard4   c4Box_TRKN = 0x74726B6E;
+    }
 }
 
 

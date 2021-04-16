@@ -111,9 +111,11 @@ tCIDLib::TVoid TTextFileInStream::Close()
 
 tCIDLib::TCard8 TTextFileInStream::c8CurSize() const
 {
-    if (!m_pstrmIn)
-        ThrowNotReady(CID_LINE);
-    return m_pstrmIn->c8CurSize();
+    if (m_pstrmIn)
+        return m_pstrmIn->c8CurSize();
+
+    ThrowNotReady(CID_LINE);
+    return 0;
 }
 
 
@@ -178,11 +180,11 @@ tCIDLib::TVoid TTextFileInStream::Open(const tCIDLib::EStdFiles eFile)
 
 const TString& TTextFileInStream::strFileName() const
 {
-    if (!m_pstrmIn)
-        ThrowNotReady(CID_LINE);
+    if (m_pstrmIn)
+        return m_pstrmIn->strFileName();
 
-    // Just delegate to the underlying binary file stream
-    return m_pstrmIn->strFileName();
+    ThrowNotReady(CID_LINE);
+    return TString::strEmpty();
 }
 
 
@@ -273,10 +275,11 @@ tCIDLib::TVoid TTextFileOutStream::Close()
 
 tCIDLib::TCard8 TTextFileOutStream::c8CurSize() const
 {
-    if (!m_pstrmOut)
-        ThrowNotReady(CID_LINE);
+    if (m_pstrmOut)
+        return m_pstrmOut->c8CurSize();
 
-    return m_pstrmOut->c8CurSize();
+    ThrowNotReady(CID_LINE);
+    return 0;
 }
 
 
@@ -340,11 +343,11 @@ tCIDLib::TVoid TTextFileOutStream::Open(const tCIDLib::EStdFiles eFile)
 
 const TString& TTextFileOutStream::strFileName() const
 {
-    if (!m_pstrmOut)
-        ThrowNotReady(CID_LINE);
+    if (m_pstrmOut)
+        return m_pstrmOut->strFileName();
 
-    // Just delegate to the underlying binary file stream
-    return m_pstrmOut->strFileName();
+    ThrowNotReady(CID_LINE);
+    return TString::strEmpty();
 }
 
 

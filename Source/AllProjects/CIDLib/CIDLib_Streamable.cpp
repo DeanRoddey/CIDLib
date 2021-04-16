@@ -46,13 +46,8 @@
 // ---------------------------------------------------------------------------
 MStreamable& MStreamable::Nul_MStreamable()
 {
-    static TPoint* pstrmblNull = nullptr;
-    if (!pstrmblNull)
-    {
-        TBaseLock lockInit;
-        if (!pstrmblNull)
-            TRawMem::pExchangePtr(&pstrmblNull, new TPoint);
-    }
-    return *pstrmblNull;
+    // This isn't a concrete class so we just use a point object which implements it
+    static TPoint mstrmblNull;
+    return mstrmblNull;
 }
 

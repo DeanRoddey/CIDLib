@@ -46,36 +46,39 @@ RTTIDecls(TUPnPGrpMgmtService, TUPnPService)
 // ---------------------------------------------------------------------------
 namespace CIDUPnP_SonosServices
 {
-    // -----------------------------------------------------------------------
-    //  The commands we use
-    // -----------------------------------------------------------------------
-    const TString   strAudInCmd_GetInLevel(L"GetLineInLevel");
-    const TString   strAudInCmd_SelAudio(L"SelectAudio");
+    namespace
+    {
+        // -------------------------------------------------------------------
+        //  The commands we use
+        // -------------------------------------------------------------------
+        const TString   strAudInCmd_GetInLevel(L"GetLineInLevel");
+        const TString   strAudInCmd_SelAudio(L"SelectAudio");
 
-    const TString   strDevPropsCmd_GetAPLinked(L"GetAutoplayLinkedZones");
-    const TString   strDevPropsCmd_GetAPRoomID(L"GetAutoplayRoomUUID");
-    const TString   strDevPropsCmd_GetAPVolume(L"GetAutoplayVolume");
+        const TString   strDevPropsCmd_GetAPLinked(L"GetAutoplayLinkedZones");
+        const TString   strDevPropsCmd_GetAPRoomID(L"GetAutoplayRoomUUID");
+        const TString   strDevPropsCmd_GetAPVolume(L"GetAutoplayVolume");
 
-    const TString   strDevPropsCmd_GetLEDState(L"GetLEDState");
-    const TString   strDevPropsCmd_GetZoneAttrs(L"GetZoneAttributes");
-    const TString   strDevPropsCmd_GetZoneInfo(L"GetZoneInfo");
-    const TString   strDevPropsCmd_SetLEDState(L"SetLEDState");
+        const TString   strDevPropsCmd_GetLEDState(L"GetLEDState");
+        const TString   strDevPropsCmd_GetZoneAttrs(L"GetZoneAttributes");
+        const TString   strDevPropsCmd_GetZoneInfo(L"GetZoneInfo");
+        const TString   strDevPropsCmd_SetLEDState(L"SetLEDState");
 
 
-    // -----------------------------------------------------------------------
-    //  State variables
-    // -----------------------------------------------------------------------
+        // -------------------------------------------------------------------
+        //  State variables
+        // -------------------------------------------------------------------
 
-    // Device properties service
-    const TString   strVar_Icon(L"Icon");
-    const TString   strVar_IsZoneBridge(L"IsZoneBridge");
-    const TString   strVar_LineInConn(L"LineInConnected");
-    const TString   strVar_ZoneName(L"ZoneName");
+        // Device properties service
+        const TString   strVar_Icon(L"Icon");
+        const TString   strVar_IsZoneBridge(L"IsZoneBridge");
+        const TString   strVar_LineInConn(L"LineInConnected");
+        const TString   strVar_ZoneName(L"ZoneName");
 
-    // Group coordinator service
-    const TString   strVar_GrpCoordIsLocal(L"GroupCoordinatorIsLocal");
-    const TString   strVar_LocalGrpUID(L"LocalGroupUUID");
-    const TString   strVar_VolAVTransUIRT(L"VolumeAVTransportURI");
+        // Group coordinator service
+        const TString   strVar_GrpCoordIsLocal(L"GroupCoordinatorIsLocal");
+        const TString   strVar_LocalGrpUID(L"LocalGroupUUID");
+        const TString   strVar_VolAVTransUIRT(L"VolumeAVTransportURI");
+    }
 }
 
 
@@ -210,9 +213,9 @@ tCIDLib::TBoolean TUPnPDevPropsService::bLEDState(const tCIDLib::TBoolean bToSet
 
     m_colInParms.RemoveAll();
     if (bToSet)
-        m_colInParms.objAdd(TString(L"On"));
+        m_colInParms.objPlace(L"On");
     else
-        m_colInParms.objAdd(TString(L"Off"));
+        m_colInParms.objPlace(L"Off");
 
     InvokeAction(strCmd, m_colInParms, m_colOutParms);
     CheckRetParmCnt(strCmd, m_colOutParms.c4ElemCount(), 0);

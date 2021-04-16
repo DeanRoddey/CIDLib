@@ -34,7 +34,7 @@
 //   CLASS: TRefDeque
 //  PREFIX: col
 // ---------------------------------------------------------------------------
-template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
+template <typename TElem> class TRefDeque : public TBasicDLinkedRefCol<TElem>
 {
     public  :
         // -------------------------------------------------------------------
@@ -49,8 +49,9 @@ template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
         {
         }
 
+        // Not copyable, only moveable
         TRefDeque(const TRefDeque&) = delete;
-        TRefDeque(TRefDeque&&) = delete;
+        TRefDeque(TRefDeque&&) = default;
 
         ~TRefDeque()
         {
@@ -59,14 +60,16 @@ template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+
+        // Not assignable, only moveable
         TRefDeque& operator=(const TRefDeque&) = delete;
-        TRefDeque& operator=(TRefDeque&&) = delete;
+        TRefDeque& operator=(TRefDeque&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Add(TElem* const pobjNew) override
+        tCIDLib::TVoid Add(TElem* const pobjNew) final
         {
             this->AddAtBottom(pobjNew);
         }
@@ -99,13 +102,13 @@ template <class TElem> class TRefDeque :  public TBasicDLinkedRefCol<TElem>
             return this->pobjPeekAtTop();
         }
 
-        TElem* pobjPopBottom()
+        [[nodiscard]] TElem* pobjPopBottom()
         {
             // Delegate to our parent
             return this->pobjGetFromBottom();
         }
 
-        TElem* pobjPopTop()
+        [[nodiscard]] TElem* pobjPopTop()
         {
             // Delegate to our parent
             return this->pobjGetFromTop();

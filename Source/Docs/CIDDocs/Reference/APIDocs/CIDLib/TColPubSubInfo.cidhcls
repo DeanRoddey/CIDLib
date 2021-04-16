@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE CppClass PUBLIC "urn:charmedquark.com:CIDLib-Documentation.DTD" "CIDLibDocs.DTD">
+
+<CppClass Class="TColPubSubInfo" Prefix="colpsi" Parent="TObject">
+
+    <Desc>
+        <P>This class is used by collections that support publish/subscribe. If you enable publishing on one of these collections, any time the collection is modified, one of these objects will be published, indicating what changed.</P>
+    </Desc>
+
+    <PubIntf>
+        <Enums>
+            <Enum Name="EEvents">
+                <Desc>These values are used to indicate what type of change event occurred. The event type tells you what values have valid information in them.</Desc>
+                <EnumVal Name="BlockAdded">
+                    <P>A contiguous block of new items were added.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of first item added</LItem>
+                        <LItem Ref="Index2">Count of items added</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="BlockChanged">
+                    <P>A contiguous block of items were modified.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of first item changed</LItem>
+                        <LItem Ref="Index2">Count of items changed</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="BlockRemoved">
+                    <P>A contiguous block of items were removed.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of first item removed</LItem>
+                        <LItem Ref="Index2">Count of items removed</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="ElemAdded">
+                    <P>A single new item was added.</P>
+                    <List>
+                        <LItem Ref="Index1">Index where the item was added</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="ElemChanged">
+                    <P>A single item was modified.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of the item changed</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="ElemMoved">
+                    <P>A single item was moved from index to another.</P>
+                    <List>
+                        <LItem Ref="Index1">Original index of the item</LItem>
+                        <LItem Ref="Index2">New index of the item</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="ElemRemoved">
+                    <P>A single item was removed.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of item removed</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="Loaded">
+                    <P>The contents of the collection were replaced</P>
+                    <List>
+                        <LItem Ref="Index1">Count of new items after replacement</LItem>
+                    </List>
+                </EnumVal>
+                <EnumVal Name="Reordered">
+                    <P>The same elements are present but they have been reordered, typically a sort where it would be very difficult to report the actual movement of each element</P>
+                </EnumVal>
+                <EnumVal Name="Swapped">
+                    <P>The position of two items were swapped. Don't assume the two indices are in any particular order.</P>
+                    <List>
+                        <LItem Ref="Index1">Index of one item</LItem>
+                        <LItem Ref="Index2">Index of the other item</LItem>
+                    </List>
+                </EnumVal>
+            </Enum>
+
+        </Enums>
+
+        <Ctors DefMethods="CopyCtor Dtor">
+            <Method Name="TColPubSubInfo">
+                <Desc>
+                    <P>The default constructor sets up an object that will cause an error if used, so you must assign some other objects to it at some point to set it up. Mostly this would be for creating a temporary to read in published info objects.</P>
+                </Desc>
+                <MethVar/>
+                <MethVar>
+                    <MethParam Name="eEvent" Type="EEvents"/>
+                    <MethParam Name="c4Index" Type="tCIDLib::TCard4" DefVal="0"/>
+                </MethVar>
+                <MethVar>
+                    <MethParam Name="eEvent" Type="EEvents"/>
+                    <MethParam Name="c4Index1" Type="tCIDLib::TCard4"/>
+                    <MethParam Name="c4Index2" Type="tCIDLib::TCard4"/>
+                </MethVar>
+            </Method>
+        </Ctors>
+
+        <Operators DefMethods="AssignOp"/>
+
+        <NVirtMeths>
+            <GetSet Name="c4Index1" RetType="tCIDLib::TCard4"/>
+            <GetSet Name="c4Index2" RetType="tCIDLib::TCard4"/>
+            <GetSet Name="eEvent" RetType="EEvent"/>
+        </NVirtMeths>
+
+    </PubIntf>
+
+</CppClass>

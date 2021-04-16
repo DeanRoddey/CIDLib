@@ -61,6 +61,7 @@ class CIDLIBEXP TBinaryFile : public TFileBase
         );
 
         TBinaryFile(const TBinaryFile&) = delete;
+        TBinaryFile(TBinaryFile&&) = delete;
 
         ~TBinaryFile();
 
@@ -69,6 +70,7 @@ class CIDLIBEXP TBinaryFile : public TFileBase
         //  Public operators
         // -------------------------------------------------------------------
         TBinaryFile& operator=(const TBinaryFile&) = delete;
+        TBinaryFile& operator=(TBinaryFile&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -139,12 +141,12 @@ class CIDLIBEXP TBinaryFile : public TFileBase
             const   tCIDLib::TInt8&         i8OffsetBy
         );
 
-        TBinInStream* pstrmMakeReadable
+        [[nodiscard]] TBinInStream* pstrmMakeReadable
         (
             const   tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::NoAdopt
         );
 
-        TBinOutStream* pstrmMakeWriteable
+        [[nodiscard]] TBinOutStream* pstrmMakeWriteable
         (
             const   tCIDLib::EAdoptOpts     eAdopt = tCIDLib::EAdoptOpts::NoAdopt
         );

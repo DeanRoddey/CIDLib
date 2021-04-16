@@ -38,38 +38,41 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Process_Win32
 {
-    struct TFindWndFiltered
+    namespace
     {
-        tCIDCtrls::TWndHandle   hwndFound;
-        tCIDLib::TProcessId     pidTarget;
-        tCIDLib::TBoolean       bOwned;
-        tCIDLib::TCard4         c4DontWantStyles;
-        tCIDLib::TCard4         c4WantStyles;
-        tCIDLib::TCard4         c4DontWantExStyles;
-        tCIDLib::TCard4         c4WantExStyles;
+        struct TFindWndFiltered
+        {
+            tCIDCtrls::TWndHandle   hwndFound;
+            tCIDLib::TProcessId     pidTarget;
+            tCIDLib::TBoolean       bOwned;
+            tCIDLib::TCard4         c4DontWantStyles;
+            tCIDLib::TCard4         c4WantStyles;
+            tCIDLib::TCard4         c4DontWantExStyles;
+            tCIDLib::TCard4         c4WantExStyles;
 
-        tCIDLib::TCard4         c4FoundStyles;
-        tCIDLib::TCard4         c4FoundExStyles;
-    };
+            tCIDLib::TCard4         c4FoundStyles;
+            tCIDLib::TCard4         c4FoundExStyles;
+        };
 
 
-    //
-    //  We provide a mechanism for supporting single instances of applications
-    //  being runnable. We create a shared memory buffer and put some info into
-    //  it. We need a a little structure for the data in the buffer.
-    //
-    //  pksmbHold is used to keep a copy around if we created the buffer, so
-    //  that we are the active instance until we die, at which time this
-    //  buffer will be released by the OS.
-    //
-    const tCIDLib::TCard4       c4SingleInstVer = 1;
-    struct   TSingleInstInfo
-    {
-        tCIDLib::TCard4         c4Version;
-        HANDLE                  hprocSingle;
-        tCIDLib::TProcessId     pidSingle;
-    };
-    TKrnlSharedMemBuf*          pksmbHold;
+        //
+        //  We provide a mechanism for supporting single instances of applications
+        //  being runnable. We create a shared memory buffer and put some info into
+        //  it. We need a a little structure for the data in the buffer.
+        //
+        //  pksmbHold is used to keep a copy around if we created the buffer, so
+        //  that we are the active instance until we die, at which time this
+        //  buffer will be released by the OS.
+        //
+        constexpr tCIDLib::TCard4   c4SingleInstVer = 1;
+        struct   TSingleInstInfo
+        {
+            tCIDLib::TCard4         c4Version;
+            HANDLE                  hprocSingle;
+            tCIDLib::TProcessId     pidSingle;
+        };
+        TKrnlSharedMemBuf*          pksmbHold;
+    }
 }
 
 
@@ -563,35 +566,14 @@ tCIDLib::TVoid TKrnlProcess::ExitProcess(const tCIDLib::EExitCodes eExitCode)
 }
 
 
+// Fault in our process handle
 const TProcessHandle& TKrnlProcess::hprocThis()
 {
-    static TProcessHandle* phprocThis = 0;
-
-    //
-    //  If the process handle object has not been created yet, then create it
-    //  with appropriate synchronization.
-    //
-    if (!phprocThis)
-    {
-        TBaseLock lockInit;
-        if (!phprocThis)
-        {
-            TProcessHandleImpl hprociTmp;
-            hprociTmp.hProcess = ::GetCurrentProcess();
-            hprociTmp.pidThis = ::GetCurrentProcessId();
-
-            //
-            //  We can't make the static volatile, since then the return
-            //  has to be volatile and so on. So we insure a memory
-            //  barrier by doing an interlocked exchange.
-            //
-            InterlockedExchangePointer
-            (
-                (void**)&phprocThis, new TProcessHandle(hprociTmp)
-            );
-        }
-    }
-    return *phprocThis;
+    static TProcessHandle hprocThis
+    (
+        TProcessHandleImpl(::GetCurrentProcess(), ::GetCurrentProcessId())
+    );
+    return hprocThis;
 }
 
 

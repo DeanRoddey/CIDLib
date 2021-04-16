@@ -31,7 +31,7 @@
 // ---------------------------------------------------------------------------
 //  Forward declarations
 // ---------------------------------------------------------------------------
-template <class TString> class TCollection;
+template <typename TString> class TCollection;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)

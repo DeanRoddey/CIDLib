@@ -46,12 +46,15 @@ RTTIDecls(TMEngVectorInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_VectorClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strVector(L"Vector");
-    const TString   strClassPath(L"MEng.System.Runtime.Vector");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strVector(L"Vector");
+        const TString   strClassPath(L"MEng.System.Runtime.Vector");
+    }
 }
 
 
@@ -271,12 +274,17 @@ TMEngVectorVal::InsertObject(       TCIDMacroEngine&        meOwner
                             ,       TMEngClassVal* const    pmecvToAdd
                             , const tCIDLib::TCard4         c4InsertAt)
 {
+    CIDAssert(pmecvToAdd != nullptr, L"Passed class value is null");
+
     // In this case, insert at the end is ok, so just check for greater than
     if (c4InsertAt > m_colElems.c4ElemCount())
     {
         // We own the passed object, so clean it up before we throw
         delete pmecvToAdd;
         m_pmeciBase->IndexErr(meOwner, c4InsertAt, meOwner.strClassPathForId(c2ClassId()));
+
+        // Won't happen, since the above, throws, but makes the analyzer happy
+        return;
     }
     m_colElems.InsertAt(pmecvToAdd, c4InsertAt);
 }
@@ -349,13 +357,13 @@ TMEngVectorInfo::TMEngVectorInfo(       TCIDMacroEngine&    meOwner
         , strParentClassPath
         , c2ElemId
     )
-    , m_c2MethId_AddObject(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetElemCount(kMacroEng::c2BadId)
-    , m_c2MethId_InsertObject(kMacroEng::c2BadId)
-    , m_c2MethId_IsEmpty(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveAll(kMacroEng::c2BadId)
-    , m_c2MethId_RemoveAt(kMacroEng::c2BadId)
+    , m_c2MethId_AddObject(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetElemCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_InsertObject(kCIDMacroEng::c2BadId)
+    , m_c2MethId_IsEmpty(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveAll(kCIDMacroEng::c2BadId)
+    , m_c2MethId_RemoveAt(kCIDMacroEng::c2BadId)
     , m_pmeciBase(0)
 {
     //

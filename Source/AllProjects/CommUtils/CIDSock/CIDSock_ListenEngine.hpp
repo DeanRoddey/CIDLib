@@ -107,6 +107,8 @@ class CIDSOCKEXP TSockLEngConn : public TObject
 
         TServerStreamSocket* psockConn();
 
+        TServerStreamSocket* psockOrphan();
+
         tCIDLib::TVoid Orphan();
 
 
@@ -174,6 +176,7 @@ class CIDSOCKEXP TSockListenerEng : public TObject
         TSockListenerEng();
 
         TSockListenerEng(const TSockListenerEng&) = delete;
+        TSockListenerEng(TSockListenerEng&&) = delete;
 
         ~TSockListenerEng();
 
@@ -182,6 +185,7 @@ class CIDSOCKEXP TSockListenerEng : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TSockListenerEng& operator=(const TSockListenerEng&) = delete;
+        TSockListenerEng& operator=(TSockListenerEng&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -204,6 +208,11 @@ class CIDSOCKEXP TSockListenerEng : public TObject
         );
 
         TSockLEngConn* pslecWait
+        (
+            const   tCIDLib::TCard4         c4WaitMSs
+        );
+
+        TUniquePtr<TSockLEngConn> uptrWait
         (
             const   tCIDLib::TCard4         c4WaitMSs
         );

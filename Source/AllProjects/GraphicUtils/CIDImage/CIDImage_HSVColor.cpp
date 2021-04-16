@@ -50,14 +50,8 @@ RTTIDecls(THSVClr,TObject)
 // ---------------------------------------------------------------------------
 THSVClr& THSVClr::Nul_THSVClr()
 {
-    static THSVClr* phsvNull = 0;
-    if (!phsvNull)
-    {
-        TBaseLock lockInit;
-        if (!phsvNull)
-            TRawMem::pExchangePtr(&phsvNull, new THSVClr);
-    }
-    return *phsvNull;
+    static THSVClr hsvNull;
+    return hsvNull;
 }
 
 

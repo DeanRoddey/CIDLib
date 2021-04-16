@@ -32,7 +32,7 @@
 namespace TKrnlSysInfo
 {
     // A simple structure used by the QuerySysId() method below
-    const tCIDLib::TCard4 c4SysIdCnt = 6;
+    constexpr tCIDLib::TCard4 c4SysIdCnt = 6;
     struct TSysId
     {
         tCIDLib::TCard4 ac4Vals[c4SysIdCnt];
@@ -42,7 +42,7 @@ namespace TKrnlSysInfo
     KRNLEXPORT tCIDLib::TBoolean bCmdLineArg
     (
         const   tCIDLib::TCard4         c4Index
-        , const tCIDLib::TCh*&          pszToFill
+        ,       TKrnlString&            kstrToFill
     );
 
     KRNLEXPORT tCIDLib::TBoolean bIsHostAdmin();
@@ -60,15 +60,13 @@ namespace TKrnlSysInfo
 
     KRNLEXPORT tCIDLib::TBoolean bQuerySpecialPath
     (
-                tCIDLib::TCh* const     pszBuffer
-        , const tCIDLib::TCard4         c4MaxChars
+                TKrnlString&            kstrToFill
         , const tCIDLib::ESpecialPaths  ePath
     );
 
     KRNLEXPORT tCIDLib::TBoolean bQueryUserName
     (
-                tCIDLib::TCh* const     pszBuffer
-        , const tCIDLib::TCard4         c4MaxChars
+                TKrnlString&            kstrToFill
     );
 
     KRNLEXPORT tCIDLib::TBoolean bRemoveCmdLineArg
@@ -89,8 +87,6 @@ namespace TKrnlSysInfo
     KRNLEXPORT tCIDLib::TCard4 c4SSELevel();
 
     KRNLEXPORT tCIDLib::TCard8 c8TotalPhysicalMem();
-
-    KRNLEXPORT tCIDLib::ECPUTypes eCPUType();
 
     KRNLEXPORT const tCIDLib::TCh* pszNodeName();
 

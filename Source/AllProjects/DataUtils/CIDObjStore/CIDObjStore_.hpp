@@ -41,28 +41,28 @@ namespace kCIDObjStore_
     // -----------------------------------------------------------------------
     //  Our current format version
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4FmtVersion    = 1;
+    constexpr tCIDLib::TCard4   c4FmtVersion    = 1;
 
 
     // -----------------------------------------------------------------------
     //  These bits are used in the store, to mark items with certain
     //  characteristics.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1Flag_Used     = 0x01;
+    constexpr tCIDLib::TCard1   c1Flag_Used     = 0x01;
 
 
     // -----------------------------------------------------------------------
     //  The modulus used when hashing index data
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4Modulus       = 109;
+    constexpr tCIDLib::TCard4   c4Modulus       = 109;
 
 
     // -----------------------------------------------------------------------
     //  The magic values we write at the start of free item or used item
     //  entries in the store.
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4FreeMagicVal  = 0xFEDCCDEF;
-    const tCIDLib::TCard4   c4UsedMagicVal  = 0xDEADBEEF;
+    constexpr tCIDLib::TCard4   c4FreeMagicVal  = 0xFEDCCDEF;
+    constexpr tCIDLib::TCard4   c4UsedMagicVal  = 0xDEADBEEF;
 };
 
 
@@ -112,5 +112,3 @@ namespace kCIDObjStore_
     // -----------------------------------------------------------------------
     const tCIDLib::TCard4   c4MinExpandSize   = 64 * 1024;
 }
-
-

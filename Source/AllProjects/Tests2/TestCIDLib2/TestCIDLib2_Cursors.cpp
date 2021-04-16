@@ -53,8 +53,8 @@ static tCIDLib::TBoolean bTestType(         TTextStringOutStream&   strmOut
                                     ,       TCol&                   colTest
                                     , const TElem&                  objTestVal)
 {
-    TCol::TCursor cursEmpty;
-    TCol::TNCCursor cursNCEmpty;
+    typename TCol::TCursor cursEmpty;
+    typename TCol::TNCCursor cursNCEmpty;
     if (cursEmpty.bIsValid() || cursNCEmpty.bIsValid())
     {
         strmOut << clnAt << L"Empty "
@@ -82,8 +82,8 @@ static tCIDLib::TBoolean bTestType(         TTextStringOutStream&   strmOut
     }
 
 
-    TCol::TCursor cursReal(&colTest);
-    TCol::TNCCursor cursNCReal(&colTest);
+    typename TCol::TCursor cursReal(&colTest);
+    typename TCol::TNCCursor cursNCReal(&colTest);
     if (!cursReal.bIsValid() || !cursNCReal.bIsValid())
     {
         strmOut << clnAt << L"Correctly ctor'd "
@@ -229,7 +229,7 @@ static tCIDLib::TBoolean bTestBiType(       TTextStringOutStream&   strmOut
                                     , const TTFWCurLn               clnAt
                                     ,       TCol&                   colTest)
 {
-    TCol::TCursor cursTest(&colTest);
+    typename TCol::TCursor cursTest(&colTest);
 
     // Count how many times we move forward before we are invalid
     tCIDLib::TCard4 c4Count = 0;

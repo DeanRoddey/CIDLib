@@ -99,7 +99,7 @@ tCIDLib::TVoid TAppShEngine::ActivateAll()
     //  Lock the mutex, then iterate the records and, for any that are marked
     //  inactive, set them to 'wait run' status.
     //
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Send a message about this
     ShellMessage(facCIDAppSh().strMsg(kAppShMsgs::midStatus_ActivatingAll));
@@ -117,7 +117,7 @@ tCIDLib::TVoid TAppShEngine::ActivateAll()
 tCIDLib::TVoid TAppShEngine::AddApp(TAppShRecord* const pasrToAdd)
 {
     // Lock the mutex while we update the collection
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  Put it into the list, sorted by app level. Within a level the order
@@ -172,13 +172,13 @@ tCIDLib::TCard4
 TAppShEngine::c4QueryAppsInfo(tCIDLib::TKVPList& colToFill)
 {
     // Lock while we do this, since the monitor thread stays active
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     tCIDLib::TCard4 c4Count = m_colRecs.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         TAppShRecord* const pasrCur = m_colRecs[c4Index];
-        colToFill.objAdd(TKeyValuePair(pasrCur->strApp(), pasrCur->strParms()));
+        colToFill.objPlace(pasrCur->strApp(), pasrCur->strParms());
     }
     return c4Count;
 }
@@ -187,7 +187,7 @@ TAppShEngine::c4QueryAppsInfo(tCIDLib::TKVPList& colToFill)
 tCIDLib::TVoid TAppShEngine::Cycle(const tCIDLib::TCard4 c4WaitFor)
 {
     // Lock while we do this, since the monitor thread stays active
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Send a message about this
     ShellMessage(facCIDAppSh().strMsg(kAppShMsgs::midStatus_CycleAll));
@@ -204,7 +204,7 @@ tCIDLib::TVoid TAppShEngine::Cycle(const tCIDLib::TCard4 c4WaitFor)
 tCIDLib::TVoid TAppShEngine::StartAll()
 {
     // Lock while we do this, since the monitor thread stays active
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Send a message about this
     ShellMessage(facCIDAppSh().strMsg(kAppShMsgs::midStatus_StartingAll));
@@ -226,7 +226,7 @@ tCIDLib::TVoid TAppShEngine::StartAll()
 tCIDLib::TVoid TAppShEngine::StopAll(const tCIDLib::TCard4 c4WaitFor)
 {
     // Lock while we do this, since the monitor thread stays active
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Send a message about this
     ShellMessage(facCIDAppSh().strMsg(kAppShMsgs::midStatus_StoppingAll));
@@ -379,7 +379,7 @@ TAppShEngine::eMonThread(TThread& thrThis, tCIDLib::TVoid*)
             //  if any of them are dead.
             //
             {
-                TMtxLocker lockSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
 
                 // If the list is empty, go back to the top
                 if (m_colRecs.bIsEmpty())

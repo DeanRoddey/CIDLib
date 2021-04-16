@@ -37,7 +37,7 @@ REM         the source controlled content is probably better. The UL one is
 REM         with underlines replacing periods.
 REM
 REM     CID_DEPENDS
-REM         The path to the CID_Dev\Depends directory, which has various dependencies
+REM         The path to the Depends directory, which has a small set of dependencies
 REM         we need to set up paths to and such.
 REM
 REM     CID_DRIVE
@@ -82,7 +82,7 @@ IF NOT "%5" == "" GOTO SHOW_USAGE
 REM ---------------------------------------------------------------------------
 REM Set this appropriately for the version to build
 REM ---------------------------------------------------------------------------
-SET CID_VERSION=5.4.1
+SET CID_VERSION=6.0.2
 SET CID_VERSIONUL=%CID_VERSION:.=_%
 
 
@@ -116,7 +116,7 @@ SET CIDLIB_SRCDIR=%3%4
 REM ---------------------------------------------------------------------------
 REM  Set up the dependencies path which we have to pass to the Visual C++ setup below
 REM ---------------------------------------------------------------------------
-SET CID_DEPENDS=%3%4\Depends
+SET CID_DEPENDS=%3%4\Source\Depends
 
 
 REM ---------------------------------------------------------------------------
@@ -135,7 +135,7 @@ GOTO SHOW_USAGE
 
 :PLAT_WIN7
 SET CID_PLATFORM=WIN32_WIN7
-SET LOGCHARMODE=UTF-16
+SET LOGCHARMODE=UTF-8
 GOTO DONE_PLAT
 
 :DONE_PLAT

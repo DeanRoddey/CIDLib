@@ -37,6 +37,7 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+
 // ---------------------------------------------------------------------------
 //  CLASS: TFacility
 // PREFIX: fac
@@ -84,13 +85,12 @@ class CIDLIBEXP TFacility : public TModule
         TFacility
         (
             const   TString&                strFacName
-            , const TString&                strLoadPath
+            , const TString&                strFromPath
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
             , const tCIDLib::TCard4         c4Revision
             , const tCIDLib::EModFlags      eFlags
-            , const tCIDLib::TBoolean       bLoad = kCIDLib::False
         );
 
         TFacility(const TFacility&) = delete;
@@ -107,13 +107,25 @@ class CIDLIBEXP TFacility : public TModule
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bLogFailures() const;
+        tCIDLib::TBoolean bLogFailures() const
+        {
+            return bShouldLogAt(tCIDLib::ESeverities::Failed);
+        }
 
-        tCIDLib::TBoolean bLogInfo() const;
+        tCIDLib::TBoolean bLogInfo() const
+        {
+            return bShouldLogAt(tCIDLib::ESeverities::Info);
+        }
 
-        tCIDLib::TBoolean bLogStatus() const;
+        tCIDLib::TBoolean bLogStatus() const
+        {
+            return bShouldLogAt(tCIDLib::ESeverities::Status);
+        }
 
-        tCIDLib::TBoolean bLogWarnings() const;
+        tCIDLib::TBoolean bLogWarnings() const
+        {
+            return bShouldLogAt(tCIDLib::ESeverities::Warn);
+        }
 
         tCIDLib::TBoolean bShouldLogAt
         (
@@ -244,26 +256,3 @@ class CIDLIBEXP TFacility : public TModule
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// Some inlined calls to our bShouldLogAg() method with specific levels
-inline tCIDLib::TBoolean TFacility::bLogFailures() const
-{
-    return bShouldLogAt(tCIDLib::ESeverities::Failed);
-}
-
-inline tCIDLib::TBoolean TFacility::bLogInfo() const
-{
-    return bShouldLogAt(tCIDLib::ESeverities::Info);
-}
-
-inline tCIDLib::TBoolean TFacility::bLogStatus() const
-{
-    return bShouldLogAt(tCIDLib::ESeverities::Status);
-}
-
-inline tCIDLib::TBoolean TFacility::bLogWarnings() const
-{
-    return bShouldLogAt(tCIDLib::ESeverities::Warn);
-}
-

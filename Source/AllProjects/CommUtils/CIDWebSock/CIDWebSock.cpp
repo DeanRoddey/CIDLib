@@ -58,13 +58,6 @@ RTTIDecls(TFacCIDWebSock,TFacility)
 // ---------------------------------------------------------------------------
 TFacCIDWebSock& facCIDWebSock()
 {
-    static TFacCIDWebSock* pfacCIDWebSock = nullptr;
-    if (!pfacCIDWebSock)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDWebSock)
-            pfacCIDWebSock = new TFacCIDWebSock;
-    }
-    return *pfacCIDWebSock;
+    static TFacCIDWebSock* pfacThis = new TFacCIDWebSock();
+    return *pfacThis;
 }
-

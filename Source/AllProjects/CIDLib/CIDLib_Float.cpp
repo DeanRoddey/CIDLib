@@ -50,14 +50,8 @@ AdvRTTIDecls(TLocFloat,TFloat)
 // ---------------------------------------------------------------------------
 TFloat& TFloat::Nul_TFloat()
 {
-    static TFloat* pfNull = nullptr;
-    if (!pfNull)
-    {
-        TBaseLock lockInit;
-        if (!pfNull)
-            TRawMem::pExchangePtr(&pfNull, new TFloat);
-    }
-    return *pfNull;
+    static TFloat fNull;
+    return fNull;
 }
 
 
@@ -307,12 +301,6 @@ TLocFloat::TLocFloat(const  tCIDLib::TInt4      i4Val
                     , const tCIDLib::TCard1     c1Precision
                     , const tCIDLib::ETrailFmts eStyle) :
     TFloat(i4Val, c1Precision, eStyle)
-{
-}
-
-TLocFloat::TLocFloat(const TLocFloat& fToCopy) :
-
-    TFloat(fToCopy)
 {
 }
 

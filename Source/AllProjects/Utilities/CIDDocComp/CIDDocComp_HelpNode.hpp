@@ -65,9 +65,10 @@ class THelpNode
             , const tCIDLib::TBoolean       bOptional
         );
 
-        tCIDLib::TVoid OutputNodes
+        tCIDLib::TVoid OutputHelpText
         (
                     TTextOutStream&         strmTar
+            , const tCIDLib::TBoolean       bIndented = kCIDLib::True
         )   const;
 
         tCIDLib::TVoid SetToText
@@ -89,6 +90,11 @@ class THelpNode
         (
             const   TXMLTreeElement&        xtnodeTbl
         );
+
+        tCIDLib::TVoid OutputNodes
+        (
+                    TTextOutStream&         strmTar
+        )   const;
 
         tCIDLib::TVoid OutputTableRow
         (

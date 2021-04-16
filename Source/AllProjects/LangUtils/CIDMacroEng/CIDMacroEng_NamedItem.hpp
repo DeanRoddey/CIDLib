@@ -52,19 +52,23 @@ class CIDMACROENGEXP TMEngNamedItem : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TBoolean operator==
         (
-            const   TMEngNamedItem&         meniToCompare
+            const   TMEngNamedItem&         meniSrc
         )   const;
 
-        tCIDLib::TBoolean operator!=
-        (
-            const   TMEngNamedItem&         meniToCompare
-        )   const;
+        tCIDLib::TBoolean operator!=(const TMEngNamedItem& meniSrc) const
+        {
+            // Just call the equality and negate the result
+            return !operator==(meniSrc);
+        }
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard2 c2Id() const;
+        tCIDLib::TCard2 c2Id() const
+        {
+            return m_c2Id;
+        }
 
         tCIDLib::TCard2 c2Id
         (
@@ -98,13 +102,17 @@ class CIDMACROENGEXP TMEngNamedItem : public TObject
 
         TMEngNamedItem
         (
-            const   TMEngNamedItem&         meniToCopy
+            const   TMEngNamedItem&         meniSrc
         );
 
-        tCIDLib::TVoid operator=
+        TMEngNamedItem(const TMEngNamedItem&&) = delete;
+
+        TMEngNamedItem& operator=
         (
-            const   TMEngNamedItem&         meniToAssign
+            const   TMEngNamedItem&         meniSrc
         );
+
+        TMEngNamedItem& operator=(TMEngNamedItem&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -142,24 +150,4 @@ class CIDMACROENGEXP TMEngNamedItem : public TObject
 };
 
 #pragma CIDLIB_POPPACK
-
-
-// ---------------------------------------------------------------------------
-//  TMEngNamedItem: Public operators
-// ---------------------------------------------------------------------------
-inline tCIDLib::TBoolean
-TMEngNamedItem::operator!=(const TMEngNamedItem& meniToComp) const
-{
-    // Just call the equality and negate the result
-    return !operator==(meniToComp);
-}
-
-// ---------------------------------------------------------------------------
-//  TMEngNamedItem: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TCard2 TMEngNamedItem::c2Id() const
-{
-    return m_c2Id;
-}
-
 

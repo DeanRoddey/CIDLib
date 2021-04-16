@@ -39,13 +39,16 @@ RTTIDecls(TMD5Hash,TObject)
 
 namespace CIDCrypto_MD5Hash
 {
-    // -----------------------------------------------------------------------
-    //  Local constants
-    //
-    //  c4HyphenOfs
-    //      The offset of the hypen in the formatted unique id string.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4HyphenOfs  = 16;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local constants
+        //
+        //  c4HyphenOfs
+        //      The offset of the hypen in the formatted unique id string.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4HyphenOfs  = 16;
+    }
 }
 
 
@@ -77,13 +80,6 @@ TMD5Hash::TMD5Hash(const TMemBuf& mbufBytes) :
 {
 }
 
-TMD5Hash::TMD5Hash(TMD5Hash&& mhashSrc) :
-
-    TMD5Hash()
-{
-    *this = tCIDLib::ForceMove(mhashSrc);
-}
-
 TMD5Hash::~TMD5Hash()
 {
 }
@@ -92,14 +88,6 @@ TMD5Hash::~TMD5Hash()
 // ---------------------------------------------------------------------------
 //  TMD5Hash: Public operators
 // ---------------------------------------------------------------------------
-TMD5Hash& TMD5Hash::operator=(TMD5Hash&& mhashSrc)
-{
-    if (this != &mhashSrc)
-        TParent::operator=(tCIDLib::ForceMove(mhashSrc));
-    return *this;
-}
-
-
 tCIDLib::TBoolean TMD5Hash::operator==(const TMD5Hash& mhashSrc) const
 {
     //
@@ -148,7 +136,7 @@ TMD5Hash::FormatToStr(TString& strToFill, const tCIDLib::TBoolean bAppend) const
 tCIDLib::TVoid TMD5Hash::ParseFormatted(const TString& strFormatted)
 {
     // Get a raw buffer to work with
-    tCIDLib::TCard1* pc1This = pc1Writeable();
+    tCIDLib::TCard1* pc1This = pc1HashW();
 
     // Check the length and that it has a hypen at the correct place
     if ((strFormatted.c4Length() != kCIDCrypto::c4UniqueIdStrLen)

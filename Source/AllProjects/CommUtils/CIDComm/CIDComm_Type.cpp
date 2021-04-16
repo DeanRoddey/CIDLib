@@ -36,7 +36,7 @@
 //  These are in the facility types namespace, so as to match the scheme that the
 //  IDL compiler generates.
 // ---------------------------------------------------------------------------
-const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
+TString tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
 {
     if ((eToXlat < tCIDComm::EDataBits::Min)
     ||  (eToXlat > tCIDComm::EDataBits::Max))
@@ -53,30 +53,26 @@ const TString& tCIDComm::strXlatEDataBits(const tCIDComm::EDataBits eToXlat)
         );
     }
 
-    static const TString* apstrValues[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)];
-    if (!apstrValues[0])
+    //
+    //  We can't use the enums as indicates on these because they are not
+    //  zero based, so just use a raw array. BE SURE to update this if the
+    //  enum definition changes down in CIDKernel_Types.hpp.
+    //
+    static const tCIDLib::TCh* const apszDataBits[tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Count)]
     {
-        TBaseLock lockInit;
-        if (!apstrValues[0])
-        {
-            tCIDLib::ForEachE<tCIDComm::EDataBits>
-            (
-                [](const tCIDComm::EDataBits eIndex)
-                {
-                    const tCIDLib::TCard4 c4Index
-                    (
-                        tCIDLib::c4EnumOrd(eIndex)
-                        - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
-                    );
-                    apstrValues[c4Index] = new TString(TInteger(tCIDLib::i4EnumOrd(eIndex)));
-                }
-            );
-        }
-    }
-    return *apstrValues
-    [
-        tCIDLib::c4EnumOrd(eToXlat) - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
-    ];
+        L"Four"
+        , L"Five"
+        , L"Six"
+        , L"Seven"
+        , L"Eight"
+    };
+    return TString
+    (
+        apszDataBits
+        [
+            tCIDLib::c4EnumOrd(eToXlat) - tCIDLib::c4EnumOrd(tCIDComm::EDataBits::Min)
+        ]
+    );
 }
 
 
@@ -96,13 +92,12 @@ const TString& tCIDComm::strXlatEParities(const tCIDComm::EParities eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EParities, tCIDComm::EParities::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EParities::None] = L"None";
             astrValues[tCIDComm::EParities::Odd] = L"Odd";
@@ -110,7 +105,7 @@ const TString& tCIDComm::strXlatEParities(const tCIDComm::EParities eToXlat)
             astrValues[tCIDComm::EParities::Mark] = L"Mark";
             astrValues[tCIDComm::EParities::Space] = L"Space";
 
-            bLoaded = kCIDLib::True;
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -133,19 +128,18 @@ const TString& tCIDComm::strXlatEPortDTR(const tCIDComm::EPortDTR eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EPortDTR, tCIDComm::EPortDTR::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EPortDTR::Disable] = L"Disable";
             astrValues[tCIDComm::EPortDTR::Enable] = L"Enable";
             astrValues[tCIDComm::EPortDTR::Handshake] = L"Handshake";
 
-            bLoaded = kCIDLib::True;
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -168,18 +162,19 @@ const TString& tCIDComm::strXlatEPortRTS(const tCIDComm::EPortRTS eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EPortRTS, tCIDComm::EPortRTS::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EPortRTS::Disable] = L"Disable";
             astrValues[tCIDComm::EPortRTS::Enable] = L"Enable";
             astrValues[tCIDComm::EPortRTS::Handshake] = L"Handshake";
             astrValues[tCIDComm::EPortRTS::Toggle] = L"Toggle";
+
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -202,17 +197,18 @@ const TString& tCIDComm::strXlatEStopBits(const tCIDComm::EStopBits eToXlat)
         );
     }
 
-    static tCIDLib::TBoolean bLoaded = kCIDLib::False;
     static TEArray<TString, tCIDComm::EStopBits, tCIDComm::EStopBits::Count>
-                                                          astrValues(TString::strEmpty());
-    if (!bLoaded)
+    astrValues(TString::strEmpty());
+    if (!astrValues.bIsLoaded())
     {
         TBaseLock lockInit;
-        if (!bLoaded)
+        if (!astrValues.bIsLoaded())
         {
             astrValues[tCIDComm::EStopBits::One] = L"1";
             astrValues[tCIDComm::EStopBits::OnePointFive] = L"1.5";
             astrValues[tCIDComm::EStopBits::Two] = L"2";
+
+            astrValues.SetLoaded();
         }
     }
     return astrValues[eToXlat];
@@ -224,7 +220,7 @@ const TString& tCIDComm::strXlatEStopBits(const tCIDComm::EStopBits eToXlat)
 //  Global functions
 // ---------------------------------------------------------------------------
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
 {
     strmToWriteTo << tCIDComm::strXlatEDataBits(eBits);
     return strmToWriteTo;
@@ -232,7 +228,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EDataBits eBits)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
 {
     strmToWriteTo << L"{";
 
@@ -316,7 +312,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EErrors eErr)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
 {
     strmToWriteTo << tCIDComm::strXlatEParities(eParity);
     return strmToWriteTo;
@@ -324,7 +320,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EParities eParity)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
 {
     strmToWriteTo << tCIDComm::strXlatEPortDTR(eDTR);
     return strmToWriteTo;
@@ -332,7 +328,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortDTR eDTR)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
 {
     strmToWriteTo << tCIDComm::strXlatEPortRTS(eRTS);
     return strmToWriteTo;
@@ -340,7 +336,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortRTS eRTS)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
 {
     if (ePortType == tCIDComm::EPortTypes::RS232)
         strmToWriteTo << L"RS-232";
@@ -365,7 +361,7 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EPortTypes ePortType)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EStopBits eBits)
+tCIDComm::operator<<(TTextOutStream& strmToWriteTo, const tCIDComm::EStopBits eBits)
 {
     strmToWriteTo << tCIDComm::strXlatEStopBits(eBits);
     return strmToWriteTo;

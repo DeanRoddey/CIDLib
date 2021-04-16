@@ -1417,11 +1417,7 @@ TPopupMenu::c4Process(  const   TWindow&            wndOwner
     if (!areaAvoid.bIsEmpty())
     {
         Params.cbSize = sizeof(TPMPARAMS);
-        areaAvoid.ToRectl
-        (
-            *reinterpret_cast<tCIDLib::THostRectl*>(&Params.rcExclude)
-            , tCIDLib::ERectlTypes::Inclusive
-        );
+        areaAvoid.ToRectl(*reinterpret_cast<tCIDLib::THostRectl*>(&Params.rcExclude));
         pParams = &Params;
     }
 

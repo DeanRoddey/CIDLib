@@ -35,6 +35,7 @@
 //  Magic macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_FixedSizePool,TTestFWTest)
+RTTIDecls(TTest_FixedSizePoolPtr,TTestFWTest)
 RTTIDecls(TTest_SimplePool,TTestFWTest)
 RTTIDecls(TTest_SimplePoolPtr,TTestFWTest)
 
@@ -65,6 +66,48 @@ class TTestFSPool : public TFixedSizePool<TString>
              strTar.Clear();
          }
 };
+
+
+//
+//  For testing fixed size pool pointers. Mostly we just let the parent class
+//  handle the work. We just need to pass along our pool to the parent ctor.
+//
+class TFSPoolItemPtr : public TFixedPoolPtr<TString>
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+
+        // We just need to pass along our pool and it will do the work
+        TFSPoolItemPtr() :
+
+            TFixedPoolPtr<TString>(&s_splTest)
+        {
+        }
+
+        TFSPoolItemPtr(const TFSPoolItemPtr&) = default;
+
+        TFSPoolItemPtr(TFSPoolItemPtr&&) = default;
+
+        ~TFSPoolItemPtr() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFSPoolItemPtr& operator=(const TFSPoolItemPtr&) = default;
+        TFSPoolItemPtr& operator=(TFSPoolItemPtr&&) = default;
+
+
+        // -------------------------------------------------------------------
+        //  For convenient testing, we just have a pool as a static. We keep it
+        //  public so the test can check its state.
+        // -------------------------------------------------------------------
+        static TTestFSPool s_splTest;
+};
+TTestFSPool TFSPoolItemPtr::s_splTest;
+
 
 
 // ---------------------------------------------------------------------------
@@ -329,6 +372,61 @@ TTest_FixedSizePool::eRunTest( TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"Allocated element count was wrong\n\n";
         return tTestFWLib::ETestRes::Failed;
     }
+
+    return tTestFWLib::ETestRes::Success;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_FixedSizePoolPtr
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_FixedSizePool1: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_FixedSizePoolPtr::TTest_FixedSizePoolPtr() :
+
+    TTestFWTest
+    (
+        L"Fixed Size Pool Pointer", L"Tests  the fixed size pool pointer class", 4
+    )
+{
+}
+
+TTest_FixedSizePoolPtr::~TTest_FixedSizePoolPtr()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_FixedSizePool: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_FixedSizePoolPtr::eRunTest(TTextStringOutStream&  strmOut
+                                , tCIDLib::TBoolean&    bWarning)
+{
+    // Create a few pointers, which should allocate strings for us
+	{
+		TFSPoolItemPtr spptr1;
+		TFSPoolItemPtr spptr2;
+		TFSPoolItemPtr spptr3;
+
+		// We hsould have three elements allocated now from the pool
+		if (TFSPoolItemPtr::s_splTest.c4ElemCount() != 3)
+		{
+			strmOut << TFWCurLn << L"Should have three reserved pool elements\n\n";
+			return tTestFWLib::ETestRes::Failed;
+		}
+	}
+
+	// Now there should be the full elements available now
+	if (TFSPoolItemPtr::s_splTest.c4ElemsAvail() != TFSPoolItemPtr::s_splTest.c4MaxElemCount())
+	{
+		strmOut << TFWCurLn << L"Reserved elements were not released by pointer objects\n\n";
+		return tTestFWLib::ETestRes::Failed;
+	}
 
     return tTestFWLib::ETestRes::Success;
 }

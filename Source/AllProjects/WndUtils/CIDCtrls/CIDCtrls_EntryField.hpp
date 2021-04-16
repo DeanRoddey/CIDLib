@@ -46,10 +46,8 @@ class CIDCTRLSEXP TEFChangeInfo : public TCtrlNotify
 
         );
 
-        TEFChangeInfo
-        (
-            const   TEFChangeInfo&         wnotToCopy
-        );
+        TEFChangeInfo(const TEFChangeInfo&) = default;
+        TEFChangeInfo(TEFChangeInfo&&) = default;
 
         ~TEFChangeInfo();
 
@@ -57,10 +55,8 @@ class CIDCTRLSEXP TEFChangeInfo : public TCtrlNotify
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TEFChangeInfo& operator=
-        (
-            const   TEFChangeInfo&         wnotToAssign
-        );
+        TEFChangeInfo& operator=(const TEFChangeInfo&) = default;
+        TEFChangeInfo& operator=(TEFChangeInfo&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -112,6 +108,9 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
         // -------------------------------------------------------------------
         TEntryField();
 
+        TEntryField(const TEntryField&) = delete;
+        TEntryField(TEntryField&&) = delete;
+
         ~TEntryField();
 
 
@@ -120,6 +119,13 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
         (
             const   tCIDCtrls::TWndHandle   hwndToUse
         );
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TEntryField& operator=(const TEntryField&) = delete;
+        TEntryField& operator=(TEntryField&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -143,9 +149,9 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const;
 
-        tCIDLib::TBoolean bGetSelectionIndices
+        [[nodiscard]] tCIDLib::TBoolean bGetSelectionIndices
         (
                     tCIDLib::TCard4&        c4StartInd
             ,       tCIDLib::TCard4&        c4EndInd
@@ -156,7 +162,7 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
                     TString&                strToFill
         )   const;
 
-        tCIDLib::TBoolean bReadOnly() const;
+        [[nodiscard]] tCIDLib::TBoolean bReadOnly() const;
 
         tCIDLib::TBoolean bReadOnly
         (
@@ -176,7 +182,7 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
             , const tCIDCtrls::EExWndStyles eExStyles = tCIDCtrls::EExWndStyles::None
         );
 
-        tCIDCtrls::EEFStyles eEFStyles() const;
+        [[nodiscard]] tCIDCtrls::EEFStyles eEFStyles() const;
 
         tCIDLib::TVoid InsertText
         (
@@ -204,7 +210,7 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
         //  We provide a templatized method to allow for typesafe registration
         //  of event handlers.
         // -------------------------------------------------------------------
-        template <class T> TNotHandlerBase*
+        template <typename T> TNotHandlerBase*
         pnothRegisterHandler(       T* const pTarget
                             ,       tCIDCtrls::EEvResponses (T::*pfnTarget)(TEFChangeInfo&)
                             , const tCIDLib::EEnds  eEnd = tCIDLib::EEnds::Last)
@@ -246,13 +252,6 @@ class CIDCTRLSEXP TEntryField : public TStdCtrlWnd
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TEntryField(const TEntryField&);
-        tCIDLib::TVoid operator=(const TEntryField&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //

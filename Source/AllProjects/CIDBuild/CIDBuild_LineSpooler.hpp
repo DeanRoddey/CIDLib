@@ -58,6 +58,7 @@ class TLineSpooler
         tCIDLib::TBoolean bReadLine
         (
                     TBldStr&                strToFill
+            , const tCIDLib::TBoolean       bDisableMacros = kCIDLib::False
         );
 
         tCIDLib::TCh chGetNext();
@@ -96,6 +97,8 @@ class TLineSpooler
         //      When we use the spooler to do things like scan headers for
         //      dependencies, we don't want to interpret $(x) type patterns as
         //      our macros, so we have to be able to turn off macro expansion.
+        //      The line reader also has a flag to disable on a per-line basis
+        //      in the normal scenario.
         //
         //  m_bStripSpace
         //      When used to read in .Projects files, its nice to have this

@@ -43,7 +43,10 @@ RTTIDecls(TResourceName,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ResourceName
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 
@@ -58,14 +61,8 @@ namespace CIDLib_ResourceName
 // ---------------------------------------------------------------------------
 TResourceName& TResourceName::Nul_TResourceName()
 {
-    static TResourceName* prsnNull = 0;
-    if (!prsnNull)
-    {
-        TBaseLock lockInit;
-        if (!prsnNull)
-            TRawMem::pExchangePtr(&prsnNull, new TResourceName);
-    }
-    return *prsnNull;
+    static TResourceName rsnNull;
+    return rsnNull;
 }
 
 
@@ -118,7 +115,11 @@ TResourceName::TResourceName(   const   TString&            strCompany
         , pidOfName
       )
 {
-    // Use something different from the one set above, to force an update
+    //
+    //  Use something different from the one set above, to force an update. The
+    //  actual type doesn't matter. It will get updated again if client calls
+    //  strFullName() with a different type.
+    //
     strFullName(tCIDLib::ENamedRscTypes::Mutex);
 }
 

@@ -51,7 +51,7 @@
 //   CLASS: TFundDeque
 //  PREFIX: fcol
 // -----------------------------------------------------------------------------
-template <class T> class TFundDeque : public TFundColBase, public MDuplicable
+template <typename T> class TFundDeque : public TFundColBase, public MDuplicable
 {
     public :
         // --------------------------------------------------------------------
@@ -88,6 +88,13 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             );
         }
 
+        TFundDeque(TFundDeque<T>&& fcolSrc) :
+
+            TFundDeque(1)
+        {
+            *this = tCIDLib::ForceMove(fcolSrc);
+        }
+
         ~TFundDeque()
         {
             delete [] m_ptElements;
@@ -119,6 +126,18 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             return *this;
         }
 
+        TFundDeque<T>& operator=(TFundDeque<T>&& fcolSrc)
+        {
+            if (&fcolSrc != this)
+            {
+                tCIDLib::Swap(m_c4MaxElements, fcolSrc.m_c4MaxElements);
+                tCIDLib::Swap(m_c4Head, fcolSrc.m_c4Head);
+                tCIDLib::Swap(m_c4Tail, fcolSrc.m_c4Tail);
+                tCIDLib::Swap(m_ptElements, fcolSrc.m_ptElements);
+            }
+            return *this;
+        }
+
         tCIDLib::TBoolean operator==(const TFundDeque<T>& fcolSrc)
         {
             if (this == &fcolSrc)
@@ -143,6 +162,7 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
             tCIDLib::TCard4 c4SrcInd = fcolSrc.m_c4Head;
             const tCIDLib::TCard4 c4SrcMax = fcolSrc.m_c4MaxElements;
             const T* const ptSrc = fcolSrc.m_ptElements;
+            CIDAssert(ptSrc != nullptr, L"Source elements list is null");
 
             while (c4ThisInd != m_c4Tail)
             {
@@ -493,7 +513,7 @@ template <class T> class TFundDeque : public TFundColBase, public MDuplicable
 #pragma CIDLIB_POPPACK
 
 
-template <class T> TBinInStream&
+template <typename T> TBinInStream&
 operator>>(TBinInStream& strmToReadFrom, TFundDeque<T>& fcolToStream)
 {
     // First we should get a stream marker
@@ -544,7 +564,7 @@ operator>>(TBinInStream& strmToReadFrom, TFundDeque<T>& fcolToStream)
 }
 
 
-template <class T> TBinOutStream&
+template <typename T> TBinOutStream&
 operator<<(TBinOutStream& strmToWriteTo, const TFundDeque<T>& fcolToStream)
 {
     // Store a stream marker for safety, then the max and current sizes

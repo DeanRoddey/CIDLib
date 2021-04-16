@@ -105,6 +105,15 @@ TChunkedFileChunk::TChunkedFileChunk(const TChunkedFileChunk& chflchSrc) :
 {
 }
 
+TChunkedFileChunk::TChunkedFileChunk(TChunkedFileChunk&& chflchSrc) :
+
+    m_bIsDataChange(kCIDLib::False)
+    , m_c4Bytes(0)
+    , m_mbufData(1, 1)
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileChunk& TChunkedFileChunk::operator=(const TChunkedFileChunk& chflchSrc)
 {
     if (this != &chflchSrc)
@@ -134,6 +143,19 @@ TChunkedFileChunk& TChunkedFileChunk::operator=(const TChunkedFileChunk& chflchS
     return *this;
 }
 
+TChunkedFileChunk& TChunkedFileChunk::operator=(TChunkedFileChunk&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        tCIDLib::Swap(m_bIsDataChange, chflchSrc.m_bIsDataChange);
+        tCIDLib::Swap(m_c4Bytes, chflchSrc.m_c4Bytes);
+
+        m_mbufData    = tCIDLib::ForceMove(chflchSrc.m_mbufData);
+        m_mhashChunk  = tCIDLib::ForceMove(chflchSrc.m_mhashChunk);
+        m_strId       = tCIDLib::ForceMove(chflchSrc.m_strId);
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -214,6 +236,13 @@ TChunkedFileData::TChunkedFileData(const TChunkedFileData& chflchSrc) :
 {
 }
 
+TChunkedFileData::TChunkedFileData(TChunkedFileData&& chflchSrc) :
+
+    TChunkedFileData()
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileData::~TChunkedFileData()
 {
 }
@@ -227,6 +256,15 @@ TChunkedFileData& TChunkedFileData::operator=(const TChunkedFileData& chflchSrc)
     if (this != &chflchSrc)
     {
         TParent::operator=(chflchSrc);
+    }
+    return *this;
+}
+
+TChunkedFileData& TChunkedFileData::operator=(TChunkedFileData&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
     }
     return *this;
 }
@@ -268,6 +306,13 @@ TChunkedFileExt::TChunkedFileExt(const TChunkedFileExt& chflchSrc) :
 {
 }
 
+TChunkedFileExt::TChunkedFileExt(TChunkedFileExt&& chflchSrc) :
+
+    TChunkedFileChunk(TString::strEmpty(), kCIDLib::False)
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileExt::~TChunkedFileExt()
 {
 }
@@ -281,6 +326,15 @@ TChunkedFileExt& TChunkedFileExt::operator=(const TChunkedFileExt& chflchSrc)
     if (this != &chflchSrc)
     {
         TParent::operator=(chflchSrc);
+    }
+    return *this;
+}
+
+TChunkedFileExt& TChunkedFileExt::operator=(TChunkedFileExt&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
     }
     return *this;
 }
@@ -324,6 +378,13 @@ TChunkedFileMeta::TChunkedFileMeta(const TChunkedFileMeta& chflchSrc) :
 {
 }
 
+TChunkedFileMeta::TChunkedFileMeta(TChunkedFileMeta&& chflchSrc) :
+
+    TChunkedFileMeta()
+{
+    *this = tCIDLib::ForceMove(chflchSrc);
+}
+
 TChunkedFileMeta::~TChunkedFileMeta()
 {
 }
@@ -338,6 +399,16 @@ TChunkedFileMeta& TChunkedFileMeta::operator=(const TChunkedFileMeta& chflchSrc)
     {
         TParent::operator=(chflchSrc);
         m_colValues = chflchSrc.m_colValues;
+    }
+    return *this;
+}
+
+TChunkedFileMeta& TChunkedFileMeta::operator=(TChunkedFileMeta&& chflchSrc)
+{
+    if (this != &chflchSrc)
+    {
+        TParent::operator=(tCIDLib::ForceMove(chflchSrc));
+        m_colValues = tCIDLib::ForceMove(chflchSrc.m_colValues);
     }
     return *this;
 }
@@ -438,7 +509,7 @@ TChunkedFileMeta::AddKey(const  TString&            strKey
 //
 tCIDLib::TVoid TChunkedFileMeta::AddKeys(const tCIDLib::TKVPFList& colToAdd)
 {
-    tCIDLib::TCard4 c4At;
+    tCIDLib::TCard4 c4At = 0;
 
     const tCIDLib::TCard4 c4Count = colToAdd.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -547,6 +618,7 @@ TChunkedFileMeta::bValueEquals( const   TString&            strKey
     if (bCaseSensitive)
         return (pkvalFind->strValue() == strCompare);
 
+    CIDLib_Suppress(6011) // We null checked above
     return pkvalFind->strValue().bCompareI(strCompare);
 }
 
@@ -636,6 +708,7 @@ TChunkedFileMeta::bSetValue(const   TString&            strKey
     }
 
     // If the value is different, store it and update our raw data
+    CIDLib_Suppress(6011) // We null checked above
     bFileChange = pkvalfFind->bFlag();
     if (strToSet != pkvalfFind->strValue())
     {
@@ -673,12 +746,11 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPList&  colNewVals
     tCIDLib::TBoolean bRegen = kCIDLib::False;
     bFileChange = kCIDLib::False;
 
-    tCIDLib::TCard4 c4At;
     const tCIDLib::TCard4 c4Count = colNewVals.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValuePair& kvalCur = colNewVals[c4Index];
-
+        tCIDLib::TCard4 c4At;
         TKeyValFPair* pkvalfFind = m_colValues.pobjKeyedBinarySearch
         (
             kvalCur.strKey(), &TKeyValFPair::eCompKeyI, c4At
@@ -696,8 +768,7 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPList&  colNewVals
                 , kvalCur.strKey()
             );
         }
-
-        if (pkvalfFind->strValue() != kvalCur.strValue())
+         else if (pkvalfFind->strValue() != kvalCur.strValue())
         {
             // The value is different so we need to store it and regen
             pkvalfFind->strValue(kvalCur.strValue());
@@ -723,12 +794,12 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPFList& colNewVals
     tCIDLib::TBoolean bRegen = kCIDLib::False;
     bFileChange = kCIDLib::False;
 
-    tCIDLib::TCard4 c4At;
     const tCIDLib::TCard4 c4Count = colNewVals.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValFPair& kvalfCur = colNewVals[c4Index];
 
+        tCIDLib::TCard4 c4At;
         TKeyValFPair* pkvalfFind = m_colValues.pobjKeyedBinarySearch
         (
             kvalfCur.strKey(), &TKeyValFPair::eCompKeyI, c4At
@@ -746,8 +817,7 @@ TChunkedFileMeta::bSetValues(const  tCIDLib::TKVPFList& colNewVals
                 , kvalfCur.strKey()
             );
         }
-
-        if (pkvalfFind->strValue() != kvalfCur.strValue())
+        else if (pkvalfFind->strValue() != kvalfCur.strValue())
         {
             // The value is different so we need to store it and regen
             pkvalfFind->strValue(kvalfCur.strValue());
@@ -800,7 +870,7 @@ tCIDLib::TVoid TChunkedFileMeta::QueryValues(tCIDLib::TKVPList& colToFill) const
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TKeyValFPair& kvalfCur = m_colValues[c4Index];
-        colToFill.objAdd(TKeyValuePair(kvalfCur.strKey(), kvalfCur.strValue()));
+        colToFill.objPlace(kvalfCur.strKey(), kvalfCur.strValue());
     }
 }
 
@@ -925,6 +995,7 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
 
     // Create a local short char buffer more than long enough for the longest chunk id
     const tCIDLib::TCard4 c4MaxChunkChars = 511;
+    CIDLib_Suppress(26494)
     tCIDLib::TSCh aschId[c4MaxChunkChars + 1];
 
     //
@@ -950,8 +1021,6 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
     //  Now we go through the rest of the chunks, starting at 1. The above left us at
     //  the start of the main data chunk.
     //
-    tCIDLib::TCard1 c1Eat;
-    tCIDLib::TCard4 c4CurSz;
     TString strCurId;
     for (tCIDLib::TCard4 c4Index = 1; c4Index < c4ChunkCnt; c4Index++)
     {
@@ -986,10 +1055,12 @@ TChunkedFile::ExtractInfo(  TBinInStream&               strmSrc
         colChunkIds.objAdd(strCurId);
 
         // Eat flags and check a frame marker
+        tCIDLib::TCard1 c1Eat;
         strmSrc >> c1Eat;
         strmSrc.CheckForFrameMarker(CID_FILE, CID_LINE);
 
         // And now we finally get the bytes in this chunk
+        tCIDLib::TCard4 c4CurSz;
         strmSrc >> c4CurSz;
         fcolChunkSzs.c4AddElement(c4CurSz);
 
@@ -1115,6 +1186,7 @@ TChunkedFile::TChunkedFile(const TChunkedFile& chflSrc) :
     , m_colChunks(tCIDLib::EAdoptOpts::Adopt, 32)
     , m_colLastHashes(32)
     , m_enctLastChange(chflSrc.m_enctLastChange)
+    , m_pchflchMeta(nullptr)
 {
     // Dup the chunks and hashes
     const tCIDLib::TCard4 c4Count = chflSrc.m_colChunks.c4ElemCount();
@@ -1134,6 +1206,13 @@ TChunkedFile::TChunkedFile(const TChunkedFile& chflSrc) :
         , L"First chunk of source chunked file is not a meta chunk"
     );
     m_pchflchMeta = static_cast<TChunkedFileMeta*>(m_colChunks[0]);
+}
+
+TChunkedFile::TChunkedFile(TChunkedFile&& chflSrc) :
+
+    TChunkedFile()
+{
+    *this = tCIDLib::ForceMove(chflSrc);
 }
 
 TChunkedFile::~TChunkedFile()
@@ -1187,6 +1266,20 @@ TChunkedFile& TChunkedFile::operator=(const TChunkedFile& chflSrc)
             , L"First chunk of source chunked file is not a meta chunk"
         );
         m_pchflchMeta = static_cast<TChunkedFileMeta*>(m_colChunks[0]);
+    }
+    return *this;
+}
+
+TChunkedFile& TChunkedFile::operator=(TChunkedFile&& chflSrc)
+{
+    if (&chflSrc != this)
+    {
+        tCIDLib::Swap(m_c4SerialNum, chflSrc.m_c4SerialNum);
+        tCIDLib::Swap(m_enctLastChange, chflSrc.m_enctLastChange);
+        tCIDLib::Swap(m_pchflchMeta, chflSrc.m_pchflchMeta);
+
+        m_colChunks = tCIDLib::ForceMove(chflSrc.m_colChunks);
+        m_colLastHashes = tCIDLib::ForceMove(chflSrc.m_colLastHashes);
     }
     return *this;
 }
@@ -1757,9 +1850,9 @@ tCIDLib::TVoid TChunkedFile::StreamFrom(TBinInStream& strmToReadFrom)
     // Use a helper to stream in the chunks
     TChunkList colChunks(tCIDLib::EAdoptOpts::Adopt, c4ChunkCnt);
     THashList  colHashes(c4ChunkCnt);
-    tCIDLib::TCard4 c4ChunkSz;
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChunkCnt; c4Index++)
     {
+        tCIDLib::TCard4 c4ChunkSz;
         TChunkedFileChunk* pchflchNew = pchflchStreamInChunk(strmToReadFrom, c4ChunkSz);
         colChunks.Add(pchflchNew);
         colHashes.objAdd(pchflchNew->mhashChunk());
@@ -1783,11 +1876,9 @@ tCIDLib::TVoid TChunkedFile::StreamFrom(TBinInStream& strmToReadFrom)
         ThrowFmtErr(L"Did not find file end marker", CID_LINE);
 
     //
-    //  It worked, so store the new data. We just ask our temp chunk list to give  all
-    //  of its elements to our member list to avoid duplicating the data.
+    //  It worked, so store the new data. We canjust do a move.
     //
-    m_colChunks.RemoveAll();
-    colChunks.GiveAllTo(m_colChunks);
+    m_colChunks = tCIDLib::ForceMove(colChunks);
     m_colLastHashes = colHashes;
     m_c4SerialNum = c4SerialNum;
     m_enctLastChange = enctLast;
@@ -1881,7 +1972,7 @@ TChunkedFile::pchflchFindById(  const   TString&            strToFind
 
 // All chunks are the same on disk so we have a helper to do this
 TChunkedFileChunk*
-TChunkedFile::pchflchStreamInChunk(TBinInStream& strmSrc, tCIDLib::TCard4& c4Bytes)
+TChunkedFile::pchflchStreamInChunk(TBinInStream& strmSrc, COP tCIDLib::TCard4& c4Bytes)
 {
     tCIDLib::TCard1 c1Marker;
 
@@ -1995,15 +2086,14 @@ TChunkedFile::StreamInHdr(  TBinInStream&               strmSrc
                             , tCIDLib::TEncodedTime&    enctLastChange
                             , tCIDLib::TCard4&          c4ChunkCnt)
 {
-    tCIDLib::TCard1 c1Val;
-    tCIDLib::TCard4 c4Val;
-
     // Check the file format marker at the start. If not valid, we are doomed
+    tCIDLib::TCard4 c4Val;
     strmSrc >> c4Val;
     if (c4Val != kCIDMData::c4ChunkFlId_FileStart)
         ThrowFmtErr(L"Did not find file start marker", CID_LINE);
 
     // Get the format version
+    tCIDLib::TCard1 c1Val;
     strmSrc >> c1Val;
     if (c1Val != kCIDMData::c1ChunkFl_FmtVersion)
         ThrowFmtErr(L"Unexpected file version %(1)", CID_LINE, TCardinal(c1Val));

@@ -197,7 +197,7 @@ TSpWrapperStream::Read(void *pBuffer, ULONG cbBuffer, ULONG *pcbRead)
     // If the stream is not in ready state, just return silence
     if (m_pstrmSrc->eState() != tCIDAudStream::EStrmStates::Ready)
     {
-        TRawMem::SetMemBuf(pBuffer, tCIDLib::TCard1(0), cbBuffer);
+        TRawMem::SetMemBuf(pBuffer, kCIDLib::c1MinCard, cbBuffer);
         return S_OK;
     }
 
@@ -239,7 +239,7 @@ TSpWrapperStream::Read(void *pBuffer, ULONG cbBuffer, ULONG *pcbRead)
     //  later.
     //
     if (m_bSuppressInput)
-        TRawMem::SetMemBuf(pBuffer, tCIDLib::TCard1(0), cbBuffer);
+        TRawMem::SetMemBuf(pBuffer, kCIDLib::c1MinCard, cbBuffer);
 
     #if CID_DEBUG_ON
     #if defined(WRITEOUTAUDIO)

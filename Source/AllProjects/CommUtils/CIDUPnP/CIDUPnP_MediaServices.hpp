@@ -167,13 +167,13 @@ class CIDUPNPEXP TUPnPAVTransService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid UPnPVarChanged
         (
             const   tCIDLib::TCh* const     pszVarName
             , const tCIDLib::TCh* const     pszVarVal
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -288,7 +288,7 @@ class CIDUPNPEXP TUPnPAVTransService : public TUPnPService
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid SvcReset() override;
+        tCIDLib::TVoid SvcReset() final;
 
 
     private :
@@ -369,13 +369,13 @@ class CIDUPNPEXP TUPnPContDirService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid UPnPVarChanged
         (
             const   tCIDLib::TCh* const     pszVarName
             , const tCIDLib::TCh* const     pszVarVal
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -499,13 +499,13 @@ class CIDUPNPEXP TUPnPRendCtrlService : public TUPnPService
         tCIDLib::TBoolean bCheckServiceType
         (
             const   TString&                strTypeID
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid UPnPVarChanged
         (
             const   tCIDLib::TCh* const     pszVarName
             , const tCIDLib::TCh* const     pszVarVal
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -543,7 +543,7 @@ class CIDUPNPEXP TUPnPRendCtrlService : public TUPnPService
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid SvcReset() override;
+        tCIDLib::TVoid SvcReset() final;
 
 
     private :

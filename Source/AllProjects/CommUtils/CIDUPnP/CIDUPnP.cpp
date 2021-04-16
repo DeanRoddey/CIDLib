@@ -50,13 +50,6 @@ template class CIDUPNPEXP TRefKeyedHashSet<TUPnPAsyncFinderItem, TString, TStrin
 // ---------------------------------------------------------------------------
 TFacCIDUPnP& facCIDUPnP()
 {
-    static TFacCIDUPnP* pfacCIDUPnP = nullptr;
-    if (!pfacCIDUPnP)
-    {
-        TBaseLock lockInit;
-        if (!pfacCIDUPnP)
-            pfacCIDUPnP = new TFacCIDUPnP;
-    }
-    return *pfacCIDUPnP;
+    static TFacCIDUPnP* pfacThis = new TFacCIDUPnP();
+    return *pfacThis;
 }
-

@@ -43,16 +43,19 @@ RTTIDecls(TCIDMacroEngine,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_Engine
 {
-    // -----------------------------------------------------------------------
-    //  A flag to handle local lazy init
-    // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   m_bLocalInit;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  A flag to handle local lazy init
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomInitDone;
 
 
-    // -----------------------------------------------------------------------
-    //  Some stats cache items we maintain
-    // -----------------------------------------------------------------------
-    TStatsCacheItem     m_sciMacroEngCount;
+        // -----------------------------------------------------------------------
+        //  Some stats cache items we maintain
+        // -----------------------------------------------------------------------
+        TStatsCacheItem     sciMacroEngCount;
+    }
 }
 
 
@@ -110,9 +113,9 @@ TCIDMacroEngine::TCIDMacroEngine() :
     m_bDebugMode(kCIDLib::False)
     , m_bInIDE(kCIDLib::False)
     , m_bValidation(kCIDLib::False)
-    , m_c2ArrayId(kMacroEng::c2BadId)
+    , m_c2ArrayId(kCIDMacroEng::c2BadId)
     , m_c2NextClassId(0)
-    , m_c2VectorId(kMacroEng::c2BadId)
+    , m_c2VectorId(kCIDMacroEng::c2BadId)
     , m_c4CallStackTop(0)
     , m_c4CurLine(0)
     , m_c4NextUniqueId(1)
@@ -138,19 +141,18 @@ TCIDMacroEngine::TCIDMacroEngine() :
     facCIDMacroEng();
 
     // Do local lazy init if required
-    if (!CIDMacroEng_Engine::m_bLocalInit)
+    if (!CIDMacroEng_Engine::atomInitDone)
     {
         TBaseLock lockInit;
-        if (!CIDMacroEng_Engine::m_bLocalInit)
+        if (!CIDMacroEng_Engine::atomInitDone)
         {
             TStatsCache::RegisterItem
             (
-                kMacroEng::pszStat_MEng_EngInstCount
+                kCIDMacroEng::pszStat_MEng_EngInstCount
                 , tCIDLib::EStatItemTypes::Counter
-                , CIDMacroEng_Engine::m_sciMacroEngCount
+                , CIDMacroEng_Engine::sciMacroEngCount
             );
-
-            CIDMacroEng_Engine::m_bLocalInit = kCIDLib::True;
+            CIDMacroEng_Engine::atomInitDone.Set();
         }
     }
 
@@ -161,13 +163,13 @@ TCIDMacroEngine::TCIDMacroEngine() :
     RegisterBuiltInClasses();
 
     // Increment the count of registered engines
-    TStatsCache::c8IncCounter(CIDMacroEng_Engine::m_sciMacroEngCount);
+    TStatsCache::c8IncCounter(CIDMacroEng_Engine::sciMacroEngCount);
 }
 
 TCIDMacroEngine::~TCIDMacroEngine()
 {
     // Decrement the count of registered engines
-    TStatsCache::c8DecCounter(CIDMacroEng_Engine::m_sciMacroEngCount);
+    TStatsCache::c8DecCounter(CIDMacroEng_Engine::sciMacroEngCount);
 
     try
     {
@@ -203,6 +205,44 @@ TCIDMacroEngine::~TCIDMacroEngine()
 // ---------------------------------------------------------------------------
 //  TCIDMacroEngine: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TVoid
+TCIDMacroEngine::AddBoolParm(       TParmList&          colTar
+                            , const TString&            strName
+                            , const tCIDLib::TBoolean   bConst)
+{
+    const TMEngClassInfo& meciBool = meciFind(L"MEng.Boolean");
+    colTar.Add
+    (
+        meciBool.pmecvMakeStorage
+        (
+            strName
+            , *this
+            , bConst ? tCIDMacroEng::EConstTypes::Const
+                     : tCIDMacroEng::EConstTypes::NonConst
+        )
+    );
+}
+
+tCIDLib::TVoid
+TCIDMacroEngine::AddStringParm(         TParmList&          colTar
+                                , const TString&            strName
+                                , const tCIDLib::TBoolean   bConst)
+{
+    const TMEngClassInfo& meciString = meciFind(L"MEng.String");
+    colTar.Add
+    (
+        meciString.pmecvMakeStorage
+        (
+            strName
+            , *this
+            , bConst ? tCIDMacroEng::EConstTypes::Const
+                     : tCIDMacroEng::EConstTypes::NonConst
+        )
+    );
+}
+
+
 tCIDLib::TBoolean
 TCIDMacroEngine::bAreEquivCols( const   tCIDLib::TCard2     c2ClassId1
                                 , const tCIDLib::TCard2     c2ClassId2
@@ -273,7 +313,7 @@ TCIDMacroEngine::bFormatNextCallFrame(  TTextOutStream&     strmTarget
     //  If the previous id is max card, then we are to do the first one.
     //  Else, we are working down and need to find the previous one.
     //
-    TMEngCallStackItem* pmecsiCur;
+    TMEngCallStackItem* pmecsiCur = nullptr;
     if (c4PrevInd == kCIDLib::c4MaxCard)
     {
         // If we don't have any entries, nothing to do
@@ -383,6 +423,9 @@ TCIDMacroEngine::bInvokeDefCtor(        TMEngClassVal&      mecvTarget
                 , tCIDLib::EErrClasses::NotFound
                 , meciTarget.strClassPath()
             );
+
+            // Won't happen but makes analyzer happy
+            return kCIDLib::False;
         }
 
         //
@@ -496,7 +539,7 @@ TCIDMacroEngine::bIsLiteralClass(const tCIDLib::TCard2 c2IdToCheck) const
     if (c2IdToCheck >= tCIDLib::TCard2(tCIDMacroEng::EIntrinsics::Count))
         return kCIDLib::False;
 
-    tCIDLib::TBoolean bRet;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     switch(tCIDMacroEng::EIntrinsics(c2IdToCheck))
     {
         case tCIDMacroEng::EIntrinsics::Boolean :
@@ -657,7 +700,7 @@ TCIDMacroEngine::c2FindClassId( const   TString&            strClassPath
                 , strClassPath
             );
         }
-        return kMacroEng::c2BadId;
+        return kCIDMacroEng::c2BadId;
     }
     return pmeciRet->c2Id();
 }
@@ -921,7 +964,7 @@ tCIDLib::TVoid TCIDMacroEngine::CheckIDEReq()
     if (!c4Index)
         return;
 
-    TMEngCallStackItem* pmecsiCur;
+    TMEngCallStackItem* pmecsiCur = nullptr;
     do
     {
         c4Index--;
@@ -937,29 +980,20 @@ tCIDLib::TVoid TCIDMacroEngine::CheckIDEReq()
         return;
 
     // Get out the info we need
-    const TMEngClassInfo*       pmeciCaller;
-    const TMEngOpMethodImpl*    pmethCaller;
-    const TMEngMethodInfo*      pmethiCaller;
-    TMEngClassVal*              pmecvCaller;
-    tCIDLib::TCard4             c4CallIP;
+    const TMEngClassInfo*       pmeciCaller = nullptr;
+    const TMEngOpMethodImpl*    pmethCaller = nullptr;
+    const TMEngMethodInfo*      pmethiCaller = nullptr;
+    TMEngClassVal*              pmecvCaller = nullptr;
+    tCIDLib::TCard4             c4CallIP = kCIDLib::c4MaxCard;
 
     tCIDLib::TCard4 c4CallLine = pmecsiCur->c4QueryCallerInfo
     (
-        pmeciCaller
-        , pmethiCaller
-        , pmethCaller
-        , pmecvCaller
-        , c4CallIP
+        pmeciCaller, pmethiCaller, pmethCaller, pmecvCaller, c4CallIP
     );
 
     tCIDMacroEng::EDbgActs eAct = m_pmedbgToUse->eAtLine
     (
-        *pmeciCaller
-        , *pmethiCaller
-        , *pmethCaller
-        , *pmecvCaller
-        , c4CallLine
-        , c4CallIP
+        *pmeciCaller, *pmethiCaller, *pmethCaller, *pmecvCaller, c4CallLine, c4CallIP
     );
 
     //
@@ -1022,11 +1056,9 @@ TCIDMacroEngine::CheckStackTop( const   tCIDLib::TCard2         c2ExpectedClassI
 
     if (mecvVal.eConst() != eConst)
     {
-        tCIDLib::TErrCode errcToThrow;
+        tCIDLib::TErrCode errcToThrow = kMEngErrs::errcEng_NotNConstStackItem;
         if (eConst == tCIDMacroEng::EConstTypes::Const)
             errcToThrow = kMEngErrs::errcEng_NotConstStackItem;
-        else
-            errcToThrow = kMEngErrs::errcEng_NotNConstStackItem;
 
         facCIDMacroEng().ThrowErr
         (
@@ -1196,11 +1228,11 @@ eResolveClassName(  const   TString&                        strName
     //  2. Relative
     //  3. Relative plus nested
     //
-    enum ETypes
+    enum class ETypes
     {
-        EType_Fully
-        , EType_Relative
-        , EType_Nested
+        Fully
+        , Relative
+        , Nested
     };
 
     // Insure that the collection is non-adopting
@@ -1220,9 +1252,9 @@ eResolveClassName(  const   TString&                        strName
     colMatches.RemoveAll();
 
     // First we figure out which scenario we are looking at.
-    ETypes eType;
-    tCIDLib::TCard4 c4Pos1;
-    tCIDLib::TCard4 c4Pos2;
+    ETypes eType = ETypes::Fully;
+    tCIDLib::TCard4 c4Pos1 = 0;
+    tCIDLib::TCard4 c4Pos2 = 0;
     if (strName.bFirstOccurrence(kCIDLib::chPeriod, c4Pos1))
     {
         //
@@ -1233,21 +1265,21 @@ eResolveClassName(  const   TString&                        strName
         if (!strName.bStartsWithI(L"MEng")
         &&  !strName.bNextOccurrence(kCIDLib::chPeriod, c4Pos2))
         {
-            eType = EType_Nested;
+            eType = ETypes::Nested;
         }
          else
         {
-            eType = EType_Fully;
+            eType = ETypes::Fully;
         }
     }
      else
     {
         // No periods so must be relative
-        eType = EType_Relative;
+        eType = ETypes::Relative;
     }
 
-    tCIDMacroEng::EClassMatches eRet;
-    if (eType == EType_Fully)
+    tCIDMacroEng::EClassMatches eRet = tCIDMacroEng::EClassMatches::NotFound;
+    if (eType == ETypes::Fully)
     {
         TMEngClassInfo* pmeciTarget = pmeciFind(strName);
         if (!pmeciTarget)
@@ -1256,15 +1288,15 @@ eResolveClassName(  const   TString&                        strName
         colMatches.Add(pmeciTarget);
         eRet = tCIDMacroEng::EClassMatches::Unique;
     }
-     else if (eType == EType_Nested)
+     else if (eType == ETypes::Nested)
     {
         // Get out the first part of the name
         TString strFind(strName);
-        if (eType == EType_Nested)
+        if (eType == ETypes::Nested)
             strFind.Cut(c4Pos1);
 
         // Make sure it's unique and remember which one we hit, if any
-        TMEngClassInfo* pmeciCur = 0;
+        TMEngClassInfo* pmeciCur = nullptr;
         tCIDLib::TCard4 c4HitCount = 0;
         const tCIDLib::TCard4 c4Count = m_colClassesById.c4ElemCount();
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
@@ -1365,6 +1397,7 @@ TCIDMacroEngine::ExpandFilePath(const   TString&    strMacroPath
     //  forward slashes instead of back. So if the native path sep
     //  isn't forward, then replace them with the native one.
     //
+    #pragma warning(suppress : 6326) // chPathSep is per-platform, so this is legit check
     if (kCIDLib::chPathSep != L'/')
     {
         TString strTmp(strMacroPath);
@@ -2101,10 +2134,10 @@ TCIDMacroEngine::pmeciLastMacroCaller(tCIDLib::TCard4& c4Line)
     //
     tCIDLib::TCard4 c4Index = m_c4CallStackTop;
     if (!c4Index)
-        return 0;
+        return nullptr;
 
-    TMEngCallStackItem* pmecsiCur;
-    const TMEngClassInfo* pmeciRet = 0;
+    TMEngCallStackItem* pmecsiCur = nullptr;
+    const TMEngClassInfo* pmeciRet = nullptr;
     do
     {
         c4Index--;
@@ -2126,8 +2159,7 @@ TCIDMacroEngine::pmeciLoadExternalClass(const TString& strClassPathToLoad)
 {
     TMEngClassInfo* pmeciRet = m_colClasses.pobjFindByKey
     (
-        strClassPathToLoad
-        , kCIDLib::False
+        strClassPathToLoad, kCIDLib::False
     );
 
     // If already loaded, we are done
@@ -3035,7 +3067,7 @@ tCIDLib::TVoid TCIDMacroEngine::UnknownException()
 
 
 tCIDLib::TVoid
-TCIDMacroEngine::ValidateCallFrame(         TMEngClassVal&  mecvInstance
+TCIDMacroEngine::ValidateCallFrame( const   TMEngClassVal&  mecvInstance
                                     , const tCIDLib::TCard2 c2MethodId) const
 {
     // The call stack obviously cannot be empty
@@ -3299,10 +3331,10 @@ TCIDMacroEngine::FormatAFrame(          TTextOutStream& strmTarget
     {
         // Get the description of the parameter and the type and value
         const TMEngParmInfo& mepiCur = methiCur.mepiFind(c2ParmId);
-        const TMEngClassInfo& meciCur = *m_colClassesById[mepiCur.c2ClassId()];
+        const TMEngClassInfo& meciCur2 = *m_colClassesById[mepiCur.c2ClassId()];
 
         strmTarget  << mepiCur.eDir() << kCIDLib::chSpace
-                    << meciCur.strClassPath() << kCIDLib::chSpace
+                    << meciCur2.strClassPath() << kCIDLib::chSpace
                     << mepiCur.strName();
 
         c4ParmStack++;
@@ -3356,9 +3388,9 @@ TCIDMacroEngine::pmecvGet(  const   TString&                    strName
     //
     tCIDMacroEng::TClassValList& colList = *cptrList;
     const tCIDLib::TCard4 c4Count = colList.c4ElemCount();
-    tCIDLib::TCard4 c4Index;
-    TMEngClassVal* pmecvRet = 0;
-    for (c4Index = 0; c4Index < c4Count; c4Index++)
+    tCIDLib::TCard4 c4Index = 0;
+    TMEngClassVal* pmecvRet = nullptr;
+    for (; c4Index < c4Count; c4Index++)
     {
         pmecvRet = colList[c4Index];
 

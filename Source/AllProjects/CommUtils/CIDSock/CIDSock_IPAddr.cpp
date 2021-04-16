@@ -43,31 +43,34 @@ RTTIDecls(TIPEndPoint,TIPAddress)
 // ---------------------------------------------------------------------------
 namespace CIDSock_IPAddr
 {
-    // -----------------------------------------------------------------------
-    //  The streaming format version for the IP address class
-    //
-    //  Version 2 -
-    //      We started storing the host name along with the address info
-    //
-    //  Version 3 -
-    //      The changes required for the IP V4/6 agnosticism, so we have to
-    //      store a variable sized byte array for the address info.
-    //
-    //  Version 4 -
-    //      We need to store the scope id as well, which is required for some
-    //      IPV6 addresses.
-    //
-    //  Version 5 -
-    //      And, again, we failed to store the flow info value of an IPV6
-    //      address, so that was added as well.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
+    namespace
+    {
+        // -------------------------------------------------------------------
+        //  The streaming format version for the IP address class
+        //
+        //  Version 2 -
+        //      We started storing the host name along with the address info
+        //
+        //  Version 3 -
+        //      The changes required for the IP V4/6 agnosticism, so we have to
+        //      store a variable sized byte array for the address info.
+        //
+        //  Version 4 -
+        //      We need to store the scope id as well, which is required for some
+        //      IPV6 addresses.
+        //
+        //  Version 5 -
+        //      And, again, we failed to store the flow info value of an IPV6
+        //      address, so that was added as well.
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
 
 
-    // -----------------------------------------------------------------------
-    //  The straeming format version for the IP end point class
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1EndPntFmtVersion = 1;
+        // -------------------------------------------------------------------
+        //  The straeming format version for the IP end point class
+        // -------------------------------------------------------------------
+        const tCIDLib::TCard1   c1EndPntFmtVersion = 1;
+    }
 }
 
 
@@ -82,14 +85,8 @@ namespace CIDSock_IPAddr
 // ---------------------------------------------------------------------------
 TIPAddress& TIPAddress::Nul_TIPAddress()
 {
-    static TIPAddress* pipaNull = 0;
-    if (!pipaNull)
-    {
-        TBaseLock lockInit;
-        if (!pipaNull)
-            TRawMem::pExchangePtr(&pipaNull, new TIPAddress);
-    }
-    return *pipaNull;
+    static TIPAddress ipaNull;
+    return ipaNull;
 }
 
 
@@ -187,23 +184,23 @@ TIPAddress::~TIPAddress()
 
 
 // ---------------------------------------------------------------------------
-//  TIPAddress: Public, non-virtual methods
+//  TIPAddress: Public operators
 // ---------------------------------------------------------------------------
 
 //
 //  This form cannot specific a particular IP address type if a host name
 //  lookup is done.
 //
-TIPAddress& TIPAddress::operator=(const TString& strAddrToAssign)
+TIPAddress& TIPAddress::operator=(const TString& strAddr)
 {
-    SetAddr(strAddrToAssign, tCIDSock::EAddrTypes::Unspec);
+    SetAddr(strAddr, tCIDSock::EAddrTypes::Unspec);
     return *this;
 }
 
 
-TIPAddress& TIPAddress::operator=(const TKrnlIPAddr& kipaToAssign)
+TIPAddress& TIPAddress::operator=(const TKrnlIPAddr& kipaSrc)
 {
-    SetAddr(kipaToAssign);
+    SetAddr(kipaSrc);
     return *this;
 }
 
@@ -394,7 +391,7 @@ tCIDLib::TVoid TIPAddress::StreamFrom(TBinInStream& strmToReadFrom)
         //  It's the new 4/6 agnostic format. Stream in the type and the
         //  data bytes and set them on the IP address object.
         //
-        tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes];
+        tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes] = {0, };
         tCIDLib::TCard4 c4Count;
         tCIDSock::EAddrTypes eType;
 
@@ -450,7 +447,7 @@ tCIDLib::TVoid TIPAddress::StreamFrom(TBinInStream& strmToReadFrom)
         //  kernel IP. It will have been stored in the network order, which
         //  is what we want to store in the new form.
         //
-        tCIDLib::TCard4 c4OldAddr;
+        tCIDLib::TCard4 c4OldAddr = 0;
         if (c1FmtVersion == 1)
         {
             // For V1, read the addr into a temp and call the setter method
@@ -631,14 +628,8 @@ TIPAddress::SetAddr(const   TString&                strIPAddress
 // ---------------------------------------------------------------------------
 TIPEndPoint& TIPEndPoint::Nul_TIPEndPoint()
 {
-    static TIPEndPoint* pipepNull = nullptr;
-    if (!pipepNull)
-    {
-        TBaseLock lockInit;
-        if (!pipepNull)
-            TRawMem::pExchangePtr(&pipepNull, new TIPEndPoint);
-    }
-    return *pipepNull;
+    static TIPEndPoint ipepNull;
+    return ipepNull;
 }
 
 
@@ -686,7 +677,7 @@ TIPEndPoint::TIPEndPoint(const  TIPAddress&         ipaThis
 {
 }
 
-TIPEndPoint::TIPEndPoint(const  tCIDSock::ESpecAddrs eAddr
+TIPEndPoint::TIPEndPoint(const  tCIDSock::ESpecAddrs    eAddr
                         , const tCIDSock::EAddrTypes    eType
                         , const tCIDLib::TIPPortNum     ippnThis) :
 
@@ -842,7 +833,7 @@ TIPEndPoint::hshEndPoint(const tCIDLib::TCard4 c4Modulus) const
     //  We have to come up with some sort of hash here. We will use the bytes
     //  of the IP address data and the port number. Put
     //
-    tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes + 4];
+    tCIDLib::TCard1 ac1Data[kCIDSock::c4MaxIPAddrBytes + 4] = {0, };
     tCIDLib::TCard4 c4Sz = kipaThis().c4Count();
 
     // Put the IP address bytes in first

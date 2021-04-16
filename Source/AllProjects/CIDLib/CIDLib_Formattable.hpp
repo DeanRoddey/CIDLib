@@ -50,8 +50,6 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        MFormattable() = default;
-
         virtual ~MFormattable() = default;
 
 
@@ -64,7 +62,7 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         friend TTextOutStream& operator<<
         (
-                    TTextOutStream&         strmToWriteTo
+            CIOP    TTextOutStream&         strmToWriteTo
             , const MFormattable&           fmtblToWrite
         );
 
@@ -73,8 +71,11 @@ class CIDLIBEXP MFormattable
         //  Hidden but available so that our derived classes can have default
         //  generated copy and assignment.
         // -------------------------------------------------------------------
+        MFormattable() = default;
         MFormattable(const MFormattable&) = default;
+        MFormattable(MFormattable&&) = default;
         MFormattable& operator=(const MFormattable&) = default;
+        MFormattable& operator=(MFormattable&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -82,7 +83,7 @@ class CIDLIBEXP MFormattable
         // -------------------------------------------------------------------
         virtual tCIDLib::TVoid FormatTo
         (
-                    TTextOutStream&         strmDest
+            CIOP    TTextOutStream&         strmDest
         )   const = 0;
 
 
@@ -100,8 +101,7 @@ class CIDLIBEXP MFormattable
 //  Provide the global operators that allow any streamable object to be
 //  formatted out to a text stream. This is what the outside world uses.
 // ---------------------------------------------------------------------------
-inline TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const MFormattable& fmtblToWrite)
+inline TTextOutStream& operator<<(CIOP TTextOutStream& strmToWriteTo, const MFormattable& fmtblToWrite)
 {
     fmtblToWrite.FormatTo(strmToWriteTo);
     return strmToWriteTo;

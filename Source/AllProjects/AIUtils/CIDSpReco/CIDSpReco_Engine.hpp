@@ -67,6 +67,7 @@ class CIDSPRECOEXP TCIDSpReco : public TObject
         );
 
         TCIDSpReco(const TCIDSpReco&) = delete;
+        TCIDSpReco(TCIDSpReco&&) = delete;
 
         ~TCIDSpReco();
 
@@ -75,6 +76,7 @@ class CIDSPRECOEXP TCIDSpReco : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TCIDSpReco& operator=(const TCIDSpReco&) = delete;
+        TCIDSpReco& operator=(TCIDSpReco&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -252,6 +254,7 @@ class CIDSPRECOEXP TRecoGramRuleJan
         );
 
         TRecoGramRuleJan(const TRecoGramRuleJan&) = delete;
+        TRecoGramRuleJan(TRecoGramRuleJan&&) = delete;
 
         ~TRecoGramRuleJan();
 
@@ -260,6 +263,7 @@ class CIDSPRECOEXP TRecoGramRuleJan
         //  Public operators
         // -------------------------------------------------------------------
         TRecoGramRuleJan& operator=(const TRecoGramRuleJan&) = delete;
+        TRecoGramRuleJan& operator=(TRecoGramRuleJan&&) = delete;
 
 
         // -------------------------------------------------------------------

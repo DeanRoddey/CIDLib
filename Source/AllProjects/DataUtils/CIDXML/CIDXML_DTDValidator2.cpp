@@ -186,7 +186,7 @@ tCIDLib::TBoolean TDTDValidator::bParseElemCM(TDTDElemDecl& xdeclToFill)
     //  We can make these much faster by just maintaining a list of element
     //  ids, instead of building a complicated DFA.
     //
-    tCIDLib::TBoolean   bResult;
+    tCIDLib::TBoolean bResult = kCIDLib::False;
     if (xemOwner().bSkippedString(L"#PCDATA"))
     {
         xdeclToFill.eModel(tCIDXML::EElemModels::Mixed);
@@ -516,7 +516,7 @@ tCIDLib::TVoid TDTDValidator::ParseAttrList()
             //  have to cast the lookup return since it returns as the base
             //  attr def class.
             //
-            tCIDLib::TBoolean bIgnored;
+            tCIDLib::TBoolean bIgnored = kCIDLib::False;
             TDTDAttrDef* pxadCur = static_cast<TDTDAttrDef*>
             (
                 pxdeclCur->pxadFindAttrDef(strName)
@@ -536,7 +536,6 @@ tCIDLib::TVoid TDTDValidator::ParseAttrList()
             {
                 pxadCur = new TDTDAttrDef(strName);
                 pxdeclCur->AddAttrDef(pxadCur);
-                bIgnored = kCIDLib::False;
             }
 
             // We have to have space or a PE ref here
@@ -1418,7 +1417,7 @@ TDTDValidator::ParseExtEntity(const tCIDLib::TBoolean bExpectDecl)
             ExpandPEntityRef(kCIDLib::True, tCIDXML::EPERefOpts::None);
             continue;
         }
-         else if (!bExpectDecl & (chNext == kCIDLib::chCloseBracket))
+         else if (!bExpectDecl && (chNext == kCIDLib::chCloseBracket))
         {
             // Eat the close bracket
             xemOwner().chGetNext();

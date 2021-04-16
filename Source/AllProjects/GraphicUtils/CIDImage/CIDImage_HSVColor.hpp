@@ -100,21 +100,30 @@ class CIDIMGEXP THSVClr :
             , const tCIDLib::TCh            chSepChar = L','
         );
 
-        tCIDLib::TFloat4 f4Hue() const;
+        tCIDLib::TFloat4 f4Hue() const
+        {
+            return m_f4Hue;
+        }
 
         tCIDLib::TFloat4 f4Hue
         (
             const   tCIDLib::TFloat4        f4ToSet
         );
 
-        tCIDLib::TFloat4 f4Saturation() const;
+        tCIDLib::TFloat4 f4Saturation() const
+        {
+            return m_f4Saturation;
+        }
 
         tCIDLib::TFloat4 f4Saturation
         (
             const   tCIDLib::TFloat4        f4ToSet
         );
 
-        tCIDLib::TFloat4 f4Value() const;
+        tCIDLib::TFloat4 f4Value() const
+        {
+            return m_f4Value;
+        }
 
         tCIDLib::TFloat4 f4Value
         (
@@ -142,7 +151,12 @@ class CIDIMGEXP THSVClr :
             , const tCIDLib::TFloat4        f4Value
         );
 
-        tCIDLib::TVoid ToBlack();
+        tCIDLib::TVoid ToBlack()
+        {
+            m_f4Hue = 0;
+            m_f4Saturation = 0;
+            m_f4Value = 0;
+        }
 
         tCIDLib::TVoid ToRGB
         (
@@ -193,30 +207,4 @@ class CIDIMGEXP THSVClr :
 };
 
 #pragma CIDLIB_POPPACK
-
-// ---------------------------------------------------------------------------
-//  THSVClr: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-inline tCIDLib::TFloat4 THSVClr::f4Hue() const
-{
-    return m_f4Hue;
-}
-
-inline tCIDLib::TFloat4 THSVClr::f4Saturation() const
-{
-    return m_f4Saturation;
-}
-
-inline tCIDLib::TFloat4 THSVClr::f4Value() const
-{
-    return m_f4Value;
-}
-
-inline tCIDLib::TVoid THSVClr::ToBlack()
-{
-    m_f4Hue = 0;
-    m_f4Saturation = 0;
-    m_f4Value = 0;
-}
-
 

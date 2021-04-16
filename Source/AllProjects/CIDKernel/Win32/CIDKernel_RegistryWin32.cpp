@@ -568,7 +568,7 @@ TKrnlWin32Registry::hkeyOpenPath(const  tCIDKernel::ERootKeys       eKey
     if (!kllstPath.bResetCursor())
         return hkeyRet;
 
-    TKrnlString* pkstrScope;
+    TKrnlString* pkstrScope = nullptr;
     while (kllstPath.bNext(pkstrScope))
     {
         //

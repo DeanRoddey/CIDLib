@@ -46,7 +46,7 @@ namespace CIDLogSrv_Impl
     // -----------------------------------------------------------------------
     //  A magic marker value we use in the log file
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4DeadBeef    = 0xDEADBEEF;
+    constexpr tCIDLib::TCard4       c4DeadBeef    = 0xDEADBEEF;
 
 
     // -----------------------------------------------------------------------
@@ -60,10 +60,8 @@ namespace CIDLogSrv_Impl
     // -----------------------------------------------------------------------
     const tCIDLib::EFileFlags   eLogFileFlags = tCIDLib::EFileFlags
     (
-        tCIDLib::eOREnumBits
-        (
-            tCIDLib::EFileFlags::WriteThrough, tCIDLib::EFileFlags::RandomAccess
-        )
+        tCIDLib::EFileFlags::WriteThrough
+        | tCIDLib::EFileFlags::RandomAccess
     );
 }
 
@@ -89,10 +87,16 @@ class TLogSrvQNode : public TSLstNode
         {
         }
 
+        TLogSrvQNode(const TLogSrvQNode&) = delete;
+        TLogSrvQNode(TLogSrvQNode&&) = delete;
+
         ~TLogSrvQNode()
         {
             delete m_plogevData;
         }
+
+        TLogSrvQNode& operator=(const TLogSrvQNode&) = delete;
+        TLogSrvQNode& operator=(TLogSrvQNode&&) = delete;
 
         tCIDLib::TCard4 m_c4Index;
         TLogEvent*      m_plogevData;
@@ -109,7 +113,9 @@ class TLogSrvQNode : public TSLstNode
 // ---------------------------------------------------------------------------
 TCIDLogServerImpl::TCIDLogServerImpl() :
 
-    m_c4FreesUsed(0)
+    m_aFreeList()
+    , m_aKeyList()
+    , m_c4FreesUsed(0)
     , m_c4LastFlushSeq(1)
     , m_c4KeysUsed(0)
     , m_c4Seq(1)
@@ -136,7 +142,7 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
                                     , TVector<TLogEvent>&   colToFill)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  If the passed message id is the same as our current id, then we
@@ -176,22 +182,19 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
     //  Else, search the list for where we need to start feeding items
     //  out, and give him those items.
     //
-    TLogSrvQNode* pnodeCur = 0;
+    TLogSrvQNode* pnodeCur = nullptr;
     if (c4NextEventId < pnodeHead->m_c4Index)
     {
         if (c4NextEventId)
         {
-            colToFill.objAdd
+            colToFill.objPlace
             (
-                TError
-                (
-                    facCIDLogSrv.strName()
-                    , CID_FILE
-                    , CID_LINE
-                    , facCIDLogSrv.strMsg(kLogSErrs::errcLive_EventsMissed)
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::OutOfSync
-                )
+                facCIDLogSrv.strName()
+                , CID_FILE
+                , CID_LINE
+                , facCIDLogSrv.strMsg(kLogSErrs::errcLive_EventsMissed)
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::OutOfSync
             );
         }
 
@@ -201,17 +204,14 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
      else if (c4NextEventId > pnodeTail->m_c4Index)
     {
         // Fake an event into the list to tell him what happened
-        colToFill.objAdd
+        colToFill.objPlace
         (
-            TError
-            (
-                facCIDLogSrv.strName()
-                , CID_FILE
-                , CID_LINE
-                , facCIDLogSrv.strMsg(kLogSErrs::errcLive_OutOfSync)
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::OutOfSync
-            )
+            facCIDLogSrv.strName()
+            , CID_FILE
+            , CID_LINE
+            , facCIDLogSrv.strMsg(kLogSErrs::errcLive_OutOfSync)
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::OutOfSync
         );
         // Don't give him anything else back, but we'll resync him now
     }
@@ -231,21 +231,17 @@ TCIDLogServerImpl::bGetLiveEvents(  tCIDLib::TCard4&        c4NextEventId
         //
         if (!pnodeCur)
         {
-            colToFill.objAdd
+            colToFill.objPlace
             (
-                TError
+                facCIDLogSrv.strName()
+                , CID_FILE
+                , CID_LINE
+                , facCIDLogSrv.strMsg
                 (
-                    facCIDLogSrv.strName()
-                    , CID_FILE
-                    , CID_LINE
-                    , facCIDLogSrv.strMsg
-                      (
-                        kLogSErrs::errcLive_BadId
-                        , TCardinal(c4NextEventId)
-                      )
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::NotFound
+                    kLogSErrs::errcLive_BadId, TCardinal(c4NextEventId)
                 )
+                , tCIDLib::ESeverities::Failed
+                , tCIDLib::EErrClasses::NotFound
             );
         }
     }
@@ -273,7 +269,7 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
                                 , const tCIDLib::TCard4     c4MaxToReturn)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // If we have no keys, then we are done now
     if (!m_c4KeysUsed)
@@ -390,7 +386,7 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
                                 , const tCIDLib::TCard4     c4MaxToReturn)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // If we have no keys, then we are done now
     if (!m_c4KeysUsed)
@@ -541,28 +537,28 @@ TCIDLogServerImpl::c4QueryEvents(       TVector<TLogEvent>& colToFill
     const tCIDLib::TBoolean bThreadAll = (strThreadExpr == L"*");
 
     // And now create those expressions that we need to
-    TRegEx* pregxHostExpr = 0;
+    TRegEx* pregxHostExpr = nullptr;
     if (!bHostAll)
         pregxHostExpr = new TRegEx(strHostExpr);
     TJanitor<TRegEx> janHost(pregxHostExpr);
 
-    TRegEx* pregxFacExpr = 0;
+    TRegEx* pregxFacExpr = nullptr;
     if (!bFacAll)
         pregxFacExpr = new TRegEx(strFacExpr);
     TJanitor<TRegEx> janFac(pregxFacExpr);
 
-    TRegEx* pregxProcExpr = 0;
+    TRegEx* pregxProcExpr = nullptr;
     if (!bProcAll)
         pregxProcExpr = new TRegEx(strProcExpr);
     TJanitor<TRegEx> janProc(pregxProcExpr);
 
-    TRegEx* pregxThreadExpr = 0;
+    TRegEx* pregxThreadExpr = nullptr;
     if (!bThreadAll)
         pregxThreadExpr = new TRegEx(strThreadExpr);
     TJanitor<TRegEx> janThread(pregxThreadExpr);
 
     // Lock the mutex now before we go further
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  Figure out the real max. If its larger than the number of events
@@ -733,7 +729,7 @@ TCIDLogServerImpl::DebugDump(tCIDLib::TCard4& c4BufSz, THeapBuf& mbufData)
     // Run through all of the items and make sure we can read them in
     {
         // Lock the mutex during this
-        TMtxLocker lockSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         // This is just for debugging purposes, so leave it out otherwise
         // DumpDebugInfo(strmOut);
@@ -836,10 +832,10 @@ TCIDLogServerImpl::DebugDump(tCIDLib::TCard4& c4BufSz, THeapBuf& mbufData)
 }
 
 
-tCIDLib::TVoid TCIDLogServerImpl::LogSingle(const TLogEvent&  logevToSend)
+tCIDLib::TVoid TCIDLogServerImpl::LogSingle(const TLogEvent& logevToSend)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     WriteOne(logevToSend);
 }
 
@@ -847,7 +843,7 @@ tCIDLib::TVoid TCIDLogServerImpl::LogSingle(const TLogEvent&  logevToSend)
 tCIDLib::TVoid TCIDLogServerImpl::LogMultiple(const TBag<TLogEvent>& colToSend)
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     TBag<TLogEvent>::TCursor cursFmt(&colToSend);
     if (cursFmt.bReset())
     {
@@ -862,14 +858,14 @@ tCIDLib::TVoid TCIDLogServerImpl::LogMultiple(const TBag<TLogEvent>& colToSend)
 tCIDLib::TVoid TCIDLogServerImpl::RemoveAll()
 {
     // Lock the mutex first
-    TMtxLocker lockSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Get the current file size
     const tCIDLib::TCard4 c4CurSize = tCIDLib::TCard4(m_flLog.c8CurSize());
 
     // Zero out our key and free list arrays.
-    TRawMem::SetMemBuf(m_aFreeList, tCIDLib::TCard1(0), kCIDLogSrv::c4FreeListSize);
-    TRawMem::SetMemBuf(m_aKeyList, tCIDLib::TCard1(0), kCIDLogSrv::c4KeyListSize);
+    TRawMem::SetMemBuf(m_aFreeList, kCIDLib::c1MinCard, kCIDLogSrv::c4FreeListSize);
+    TRawMem::SetMemBuf(m_aKeyList, kCIDLib::c1MinCard, kCIDLogSrv::c4KeyListSize);
 
     //
     //  Then set up a single entry in the free list which holds all of
@@ -926,9 +922,9 @@ tCIDLib::TVoid TCIDLogServerImpl::Initialize()
     //
     ReadHeader();
 
-#if CID_DEBUG_ON
-//    DebugDump(kCIDLib::True);
-#endif
+    #if CID_DEBUG_ON
+    //    DebugDump(kCIDLib::True);
+    #endif
 
     // And now start up the flusher thread
     m_thrFlusher.Start();
@@ -952,10 +948,7 @@ tCIDLib::TVoid TCIDLogServerImpl::Terminate()
     }
 
     // Flush out the header info, just in case
-    WriteHeader
-    (
-        m_flLog, m_c4Seq, m_c4KeysUsed, m_c4FreesUsed, m_aKeyList, m_aFreeList
-    );
+    WriteHeader(m_flLog, m_c4Seq, m_c4KeysUsed, m_c4FreesUsed, m_aKeyList, m_aFreeList);
 
     // And close it to make sure its all flushed out
     m_flLog.Close();
@@ -1052,15 +1045,10 @@ TCIDLogServerImpl::AddToLiveQueue(const TLogEvent& logevToAdd)
      else
     {
         // Calc the cutoff time
-        const tCIDLib::TEncodedTime enctCutoff = TTime::enctNow()
-                                                 - enctCutoffRange;
+        const tCIDLib::TEncodedTime enctCutoff = TTime::enctNow() - enctCutoffRange;
 
         // Get the head node
-        TLogSrvQNode* pnodeTmp = static_cast<TLogSrvQNode*>
-        (
-            m_colLiveData.pnodeHead()
-        );
-
+        TLogSrvQNode* pnodeTmp = static_cast<TLogSrvQNode*>(m_colLiveData.pnodeHead());
         if (pnodeTmp->m_plogevData->enctLogged() < enctCutoff)
         {
             // Move the head node to the tail
@@ -1097,8 +1085,7 @@ TCIDLogServerImpl::AddToLiveQueue(const TLogEvent& logevToAdd)
 //  list items, which happens quite a lot. It will try to get one big enough
 //  to hold the passed byte count, but it will do the whole list.
 //
-tCIDLib::TCard4
-TCIDLogServerImpl::c4CompactFreeList(const tCIDLib::TCard4 c4Needed)
+tCIDLib::TCard4 TCIDLogServerImpl::c4CompactFreeList(const tCIDLib::TCard4 c4Needed)
 {
     //
     //  If at this point we have less than 64 free entries, don't bother
@@ -1164,16 +1151,13 @@ TCIDLogServerImpl::c4CompactFreeList(const tCIDLib::TCard4 c4Needed)
         //  to the end of the original range. We don't want to sort the
         //  whole thing since all the trailing ones have an offset of zero.
         //
-        TArrayOps::TSort<tCIDLogSrv::TFreeItem>
-        (
-            pFreeList, m_c4FreesUsed, eCompFreeItem
-        );
+        TArrayOps::TSort<tCIDLogSrv::TFreeItem>(pFreeList, m_c4FreesUsed, eCompFreeItem);
 
         // And zero out the unused parts now and flush out the header
         TRawMem::SetMemBuf
         (
             &pFreeList[c4FreeCount]
-            , tCIDLib::TCard1(0)
+            , kCIDLib::c1MinCard
             , (kCIDLogSrv::c4MaxFrees - c4FreeCount)
                 * sizeof(tCIDLogSrv::TFreeItem)
         );
@@ -1194,7 +1178,7 @@ TCIDLogServerImpl::c4CompactFreeList(const tCIDLib::TCard4 c4Needed)
         //  If we created one that's big enough, don't bother with the full
         //  compaction.
         //
-        tCIDLib::TCard4 c4FIndex = 0;
+        c4FIndex = 0;
         while (c4FIndex < m_c4FreesUsed)
         {
             if (pFreeList[c4FIndex].c4Size >= c4Needed)
@@ -1229,10 +1213,11 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4Expand()
     // We'll expand by a pretermined K at a time
     try
     {
-        tCIDLib::TCard1 ac1Dummy[4096];
-        TRawMem::SetMemBuf(ac1Dummy, tCIDLib::TCard1(0), 4096);
+        constexpr tCIDLib::TCard4 c4BufSz = 4096;
+        tCIDLib::TCard1 ac1Dummy[c4BufSz];
+        TRawMem::SetMemBuf(ac1Dummy, kCIDLib::c1MinCard, c4BufSz);
         for (tCIDLib::TCard4 c4Ks = 0; c4Ks < kCIDLogSrv::c4ExpandK; c4Ks += 4)
-            m_flLog.c4WriteBuffer(ac1Dummy, 4096);
+            m_flLog.c4WriteBuffer(ac1Dummy, c4BufSz);
     }
 
     catch(...)
@@ -1489,13 +1474,10 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
         {
             RemoveAll();
         }
-         else if (c4KeyCount - c4Removed)
+         else
         {
             // Resort the list by ofs to push the freed up ones to the end
-            TArrayOps::TSort<tCIDLogSrv::TKeyItem>
-            (
-                pKeyList, c4KeyCount, eKeyCompOfs
-            );
+            TArrayOps::TSort<tCIDLogSrv::TKeyItem>(pKeyList, c4KeyCount, eKeyCompOfs);
 
             // Adjust the keys by the number we've removed
             c4KeyCount -= c4Removed;
@@ -1509,13 +1491,10 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
             //
             if (c4FreeCount > 256)
             {
-                TArrayOps::TSort<tCIDLogSrv::TFreeItem>
-                (
-                    pFreeList, c4FreeCount, eCompFreeItem
-                );
+                TArrayOps::TSort<tCIDLogSrv::TFreeItem>(pFreeList, c4FreeCount, eCompFreeItem);
 
-                tCIDLib::TCard4 c4Index = 0;
-                tCIDLib::TCard4 c4Removed = 0;
+                c4Index = 0;
+                c4Removed = 0;
                 while (c4Index < c4FreeCount)
                 {
                     //
@@ -1524,7 +1503,7 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
                     //  go.
                     //
                     tCIDLogSrv::TFreeItem& itemCur = pFreeList[c4Index++];
-                    tCIDLib::TCard4 c4NextOfs = itemCur.c4Ofs + itemCur.c4Size;
+                    c4NextOfs = itemCur.c4Ofs + itemCur.c4Size;
                     while ((c4Index < c4FreeCount)
                     &&     (pFreeList[c4Index].c4Ofs == c4NextOfs))
                     {
@@ -1549,24 +1528,21 @@ tCIDLib::TCard4 TCIDLogServerImpl::c4TossOldest(const tCIDLib::TCard4 c4ToToss)
                 //
                 if (c4Removed)
                 {
-                    TArrayOps::TSort<tCIDLogSrv::TFreeItem>
-                    (
-                        pFreeList, c4FreeCount, eCompFreeItem
-                    );
+                    TArrayOps::TSort<tCIDLogSrv::TFreeItem>(pFreeList, c4FreeCount, eCompFreeItem);
                     c4FreeCount -= c4Removed;
                 }
             }
 
             //
-            //  Ok, update our actual values with the stuff we just write. To
+            //  Ok, update our actual values with the stuff we just wrote. To
             //  get clean data, we zero out lists out first, then copy only
             //  the used items from the temp lists.
             //
             m_c4KeysUsed = c4KeyCount;
             m_c4FreesUsed = c4FreeCount;
 
-            TRawMem::SetMemBuf(m_aKeyList, tCIDLib::TCard1(0), kCIDLogSrv::c4KeyListSize);
-            TRawMem::SetMemBuf(m_aFreeList, tCIDLib::TCard1(0), kCIDLogSrv::c4FreeListSize);
+            TRawMem::SetMemBuf(m_aKeyList, kCIDLib::c1MinCard, kCIDLogSrv::c4KeyListSize);
+            TRawMem::SetMemBuf(m_aFreeList, kCIDLib::c1MinCard, kCIDLogSrv::c4FreeListSize);
             TRawMem::CopyMemBuf(m_aFreeList, pFreeList, m_c4FreesUsed * sizeof(tCIDLogSrv::TFreeItem));
             TRawMem::CopyMemBuf(m_aKeyList, pKeyList, m_c4KeysUsed * sizeof(tCIDLogSrv::TKeyItem));
 
@@ -1604,21 +1580,16 @@ tCIDLib::TVoid TCIDLogServerImpl::CompactFile()
         //  they each have their own offset/size info, and it doesn't really
         //  matter what the order is.
         //
-        TArrayOps::TSort<tCIDLogSrv::TKeyItem>
-        (
-            m_aKeyList, m_c4KeysUsed, eKeyCompOfs
-        );
+        TArrayOps::TSort<tCIDLogSrv::TKeyItem>(m_aKeyList, m_c4KeysUsed, eKeyCompOfs);
 
-        //
-        //  Create and zero ut new free and key lists
-        //
+        // Create and zero out new free and key lists
         tCIDLogSrv::TFreeItem* pFreeList = new tCIDLogSrv::TFreeItem[kCIDLogSrv::c4MaxFrees];
         TArrayJanitor<tCIDLogSrv::TFreeItem> janFree(pFreeList);
-        TRawMem::SetMemBuf(pFreeList, tCIDLib::TCard1(0), kCIDLogSrv::c4FreeListSize);
+        TRawMem::SetMemBuf(pFreeList, kCIDLib::c1MinCard, kCIDLogSrv::c4FreeListSize);
 
         tCIDLogSrv::TKeyItem* pKeyList = new tCIDLogSrv::TKeyItem[kCIDLogSrv::c4MaxKeys];
         TArrayJanitor<tCIDLogSrv::TKeyItem> janKey(pKeyList);
-        TRawMem::SetMemBuf(pKeyList, tCIDLib::TCard1(0), kCIDLogSrv::c4KeyListSize);
+        TRawMem::SetMemBuf(pKeyList, kCIDLib::c1MinCard, kCIDLogSrv::c4KeyListSize);
 
         // Now create the temp file
         TBinaryFile flTmp;
@@ -1644,7 +1615,8 @@ tCIDLib::TVoid TCIDLogServerImpl::CompactFile()
         //  out contiguous items. We put in a new item in our temp key list
         //  for each new item, at their new location.
         //
-        THeapBuf mbufIO(8192, 8192);
+        constexpr tCIDLib::TCard4 c4IOBufSz = 8192;
+        THeapBuf mbufIO(c4IOBufSz, c4IOBufSz);
         tCIDLib::TCard4 c4NextOfs = 0;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4KeysUsed; c4Index++)
         {
@@ -1656,7 +1628,7 @@ tCIDLib::TVoid TCIDLogServerImpl::CompactFile()
             while (c4Left)
             {
 
-                tCIDLib::TCard4 c4ThisTime = tCIDLib::MinVal(c4Left, 8192UL);
+                tCIDLib::TCard4 c4ThisTime = tCIDLib::MinVal(c4Left, c4IOBufSz);
                 m_flLog.c4ReadBuffer(mbufIO, c4ThisTime);
                 flTmp.c4WriteBuffer(mbufIO, c4ThisTime);
                 c4Left -= c4ThisTime;
@@ -1689,22 +1661,11 @@ tCIDLib::TVoid TCIDLogServerImpl::CompactFile()
         //  the file, minus the now used part.
         //
         pFreeList[0].c4Ofs = c4NextOfs;
-        pFreeList[0].c4Size =
-        (
-            tCIDLib::TCard4(flTmp.c8CurSize()) - kCIDLogSrv::c4StoreOfs
-        );
+        pFreeList[0].c4Size = tCIDLib::TCard4(flTmp.c8CurSize()) - kCIDLogSrv::c4StoreOfs;
         pFreeList[0].c4Size -= c4NextOfs;
 
         // Write out the correct header data now
-        WriteHeader
-        (
-            flTmp
-            , m_c4Seq
-            , m_c4KeysUsed
-            , 1
-            , pKeyList
-            , pFreeList
-        );
+        WriteHeader(flTmp, m_c4Seq, m_c4KeysUsed, 1, pKeyList, pFreeList);
 
         // And update our lists now
         m_c4FreesUsed = 1;
@@ -1842,8 +1803,8 @@ tCIDLib::TVoid TCIDLogServerImpl::DumpDebugInfo(TTextOutStream& strmOut)
     //
     tCIDLib::TCard4         c4NextOfs = 0;
     tCIDLib::TCard4         c4CurSize = 0;
-    tCIDLogSrv::TKeyItem*   pitemKey;
-    tCIDLogSrv::TFreeItem*  pitemFree;
+    tCIDLogSrv::TKeyItem*   pitemKey = nullptr;
+    tCIDLogSrv::TFreeItem*  pitemFree = nullptr;
 
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
@@ -1904,7 +1865,7 @@ TCIDLogServerImpl::eFlusherThread(TThread& thrThis, tCIDLib::TVoid*)
 
             // Lock the mutex and see if we need to save the header
             {
-                TMtxLocker lockSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
 
                 // If new stuff has arrived, then store it out
                 if (m_c4LastFlushSeq != m_c4Seq)
@@ -2015,8 +1976,8 @@ tCIDLib::TVoid TCIDLogServerImpl::InitializeLogFile(const TString& strFileName)
         );
 
         // Zero out our key and free list arrays.
-        TRawMem::SetMemBuf(m_aFreeList, tCIDLib::TCard1(0), kCIDLogSrv::c4FreeListSize);
-        TRawMem::SetMemBuf(m_aKeyList, tCIDLib::TCard1(0), kCIDLogSrv::c4KeyListSize);
+        TRawMem::SetMemBuf(m_aFreeList, kCIDLib::c1MinCard, kCIDLogSrv::c4FreeListSize);
+        TRawMem::SetMemBuf(m_aKeyList, kCIDLib::c1MinCard, kCIDLogSrv::c4KeyListSize);
 
         //
         //  Then set up a single entry in the free list which holds all of
@@ -2033,15 +1994,7 @@ tCIDLib::TVoid TCIDLogServerImpl::InitializeLogFile(const TString& strFileName)
         m_c4FreesUsed = 1;
 
         // And now write out the header data
-        WriteHeader
-        (
-            m_flLog
-            , m_c4Seq
-            , m_c4KeysUsed
-            , m_c4FreesUsed
-            , m_aKeyList
-            , m_aFreeList
-        );
+        WriteHeader(m_flLog, m_c4Seq, m_c4KeysUsed, m_c4FreesUsed, m_aKeyList, m_aFreeList);
 
         //
         //  Create a zeroed dummy buffer and write out the initial chunk of

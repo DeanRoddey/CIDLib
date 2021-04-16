@@ -247,7 +247,10 @@ static tCIDLib::TVoid TestConversions()
     //  Now test the versions that convert into a buffer. We test that they
     //  treat the buffer length correctly.
     //
-    //  Put marks beyond the nul to test for overwrites
+    //  Put marks beyond the nul to test for overwrites. The conversion methods
+    //  assume the bufer is one larger than the actual count, so that they can
+    //  always null termiante. So we pass 4 as the max, which should terminate in
+    //  in the 5th byte (offset 4), not touching the marker bytes.
     //
     tCIDLib::TCh  szUNIString[6];
     tCIDLib::TSCh szANSIString[6];
@@ -265,7 +268,6 @@ static tCIDLib::TVoid TestConversions()
 
     if (strncmp(szANSIString, pszANSIString, 4))
         strmOut << CUR_LN << L"Target ANSI string != to start of original\n";
-
 
     // Now go the other way, from ANSI to UNI
     TRawStr::pszConvert(pszANSIString, szUNIString, 4);

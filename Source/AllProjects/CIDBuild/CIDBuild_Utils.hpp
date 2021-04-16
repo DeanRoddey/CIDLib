@@ -34,7 +34,7 @@
 //  Forward references
 // ---------------------------------------------------------------------------
 class TFindInfo;
-template <class T> class TList;
+template <typename T> class TList;
 
 
 // ---------------------------------------------------------------------------
@@ -42,6 +42,80 @@ template <class T> class TList;
 // ---------------------------------------------------------------------------
 namespace TUtils
 {
+    //
+    //  These are platform independent, or implemented in terms of other
+    //  per-platform stuff.
+    //
+    tCIDLib::TBoolean bCopyAll
+    (
+        const   TBldStr&                    strSrcDir
+        , const TBldStr&                    strTargetDir
+    );
+
+    tCIDLib::TBoolean bCopyFile
+    (
+        const   TBldStr&                    strSourceName
+        , const TBldStr&                    strSourceDir
+        , const TBldStr&                    strTargetName
+        , const TBldStr&                    strTargetDir
+        , const tCIDLib::TBoolean           bFailIfExists = false
+    );
+
+    tCIDLib::TBoolean bFindNVParts
+    (
+        const   TBldStr&                    strSource
+        ,       TBldStr&                    strName
+        ,       TBldStr&                    strValue
+    );
+
+    tCIDLib::TBoolean bIsHppFile
+    (
+        const   TBldStr&                    strFileName
+    );
+
+    tCIDLib::TBoolean bIsPrivateHeader
+    (
+        const   TBldStr&                    strToTest
+    );
+
+    tCIDLib::TBoolean bReplicateTree
+    (
+        const   TBldStr&                    strSrcDir
+        , const TBldStr&                    strTargetDir
+    );
+
+    tCIDLib::TBoolean bUpdateOutputFile
+    (
+        const   TBldStr&                    strNewFile
+        , const TBldStr&                    strOldFile
+    );
+
+    tCIDLib::TBoolean bXlatBool
+    (
+        const   TBldStr&                    strValue
+        ,       tCIDLib::TBoolean&          bToFill
+    );
+
+    tCIDLib::TVoid CompletePath
+    (
+        const   TBldStr&                    strWCSpec
+        , const TBldStr&                    strFileFound
+        ,       TBldStr&                    strFullName
+    );
+
+    tCIDLib::TVoid FindPathParts
+    (
+        const   TBldStr&                    strSource
+        ,       tCIDLib::TCard4&            c4Name
+        ,       tCIDLib::TCard4&            c4Extension
+    );
+
+
+
+    //
+    //  These are per-platform, and implemented in each per-platform
+    //  directory.
+    //
     tCIDLib::TBoolean bExists
     (
         const   TBldStr&                    strFile
@@ -59,25 +133,10 @@ namespace TUtils
         , const tCIDLib::TCard4             c4Count
     );
 
-    tCIDLib::TBoolean bCopyAll
-    (
-        const   TBldStr&                    strSrcDir
-        , const TBldStr&                    strTargetDir
-    );
-
     tCIDLib::TBoolean bCopyFile
     (
         const   TBldStr&                    strSourceName
         , const TBldStr&                    strTargetName
-        , const tCIDLib::TBoolean           bFailIfExists = false
-    );
-
-    tCIDLib::TBoolean bCopyFile
-    (
-        const   TBldStr&                    strSourceName
-        , const TBldStr&                    strSourceDir
-        , const TBldStr&                    strTargetName
-        , const TBldStr&                    strTargetDir
         , const tCIDLib::TBoolean           bFailIfExists = false
     );
 
@@ -88,17 +147,10 @@ namespace TUtils
 
     tCIDLib::TBoolean bExec
     (
-        const   tCIDLib::TCh* const *       apszParams
+        const   tCIDLib::TCh**              apszParams
         , const tCIDLib::TCard4             c4Count
         ,       tCIDLib::TCard4&            c4Result
         , const tCIDLib::TCard4             c4Flags
-    );
-
-    tCIDLib::TBoolean bFindNVParts
-    (
-        const   TBldStr&                    strSource
-        ,       TBldStr&                    strName
-        ,       TBldStr&                    strValue
     );
 
     tCIDLib::TBoolean bGetEnvVar
@@ -112,16 +164,6 @@ namespace TUtils
         const   TBldStr&                    strFileName
     );
 
-    tCIDLib::TBoolean bIsHppFile
-    (
-        const   TBldStr&                    strFileName
-    );
-
-    tCIDLib::TBoolean bIsPrivateHeader
-    (
-        const   TBldStr&                    strToTest
-    );
-
     tCIDLib::TBoolean bMakeDir
     (
         const   TBldStr&                    strToMake
@@ -133,10 +175,20 @@ namespace TUtils
         , const TBldStr&                    strToMake
     );
 
-    tCIDLib::TBoolean bReplicateTree
+    tCIDLib::TBoolean bParseInclExclLists
     (
-        const   TBldStr&                    strSrcDir
-        , const TBldStr&                    strTargetDir
+        const   TBldStr&                    strSrc
+        ,       tCIDBuild::TStrList&        listProjIncl
+        ,       tCIDBuild::TStrList&        listProjExcl
+        ,       TBldStr&                    strError
+    );
+
+    tCIDLib::TBoolean bParseInclExclLists
+    (
+                tCIDBuild::TStrList::TCursor& cusrSrc
+        ,       tCIDBuild::TStrList&        listProjIncl
+        ,       tCIDBuild::TStrList&        listProjExcl
+        ,       TBldStr&                    strError
     );
 
     tCIDLib::TBoolean bRunCmdLine
@@ -146,16 +198,25 @@ namespace TUtils
         , const tCIDLib::TBoolean           bLowPrio = kCIDLib::False
     );
 
-    tCIDLib::TBoolean bUpdateOutputFile
+    tCIDLib::TBoolean bSupportsPlatform
     (
-        const   TBldStr&                    strNewFile
-        , const TBldStr&                    strOldFile
+        const   TBldStr&                    strToCheck
+        , const tCIDBuild::TStrList&        listInclude
+        , const tCIDBuild::TStrList&        listExclude
     );
 
-    tCIDLib::TBoolean bXlatBool
+    tCIDLib::TBoolean bSupportsThisPlatform
     (
-        const   TBldStr&                    strValue
-        ,       tCIDLib::TBoolean&          bToFill
+        const   tCIDBuild::TStrList&        listInclude
+        , const tCIDBuild::TStrList&        listExclude
+    );
+
+    tCIDLib::TBoolean bTokenize
+    (
+        const   TBldStr&                    strSrc
+        , const TBldStr&                    strSpecial
+        , const TBldStr&                    strSpace
+        ,       tCIDBuild::TStrList&        listTokens
     );
 
     tCIDLib::TVoid Beep
@@ -170,25 +231,6 @@ namespace TUtils
     (
         const   TBldStr&                    strOrgName
         ,       TBldStr&                    strFullName
-    );
-
-    tCIDLib::TVoid CompletePath
-    (
-        const   TBldStr&                    strWCSpec
-        , const TBldStr&                    strFileFound
-        ,       TBldStr&                    strFullName
-    );
-
-    tCIDLib::TVoid FindPathParts
-    (
-        const   TBldStr&                    strSource
-        ,       tCIDLib::TCard4&            c4Name
-        ,       tCIDLib::TCard4&            c4Extension
-    );
-
-    tCIDLib::TVoid MakeTmpFileName
-    (
-                TBldStr&                    strToFill
     );
 
     tCIDLib::TVoid QueryCurDir

@@ -9,22 +9,25 @@
 ;
 ;   DISPLAY     = Console
 ;   MSGFILE     = No
+;   OPTIONS     =
 ;   PLATFORMDIR = No
+;   PURECPP     = Yes
 ;   RESFILE     = No
-;   RTL         = Multi/Dynamic
 ;   TYPE        = Executable
 ;   USESYSLIBS  = No
 ;   VARARGS     = No
 ;   VERSIONED   = No
 ;
-;   PLATFORMOPTS=
-;   EXCLUDEPLATS=
-;   INCLUDEPLATS=
-;
 ;   This one is just a hint to the release creation code that this one is a
 ;   sample. It might be treated differently in a packaging process.
 ;
 ;   SAMPLE      = No
+;
+; NOTES:
+;   1- PURECPP is temporary for those things that have platform specific
+;       bits but haven't been split into per-platform implementations. When
+;       that is done it will be assumed that the per-platfrom files always
+;       need permissive flags and the platform independent stuff doesn't.
 ;
 ; MODIFICATION LOG:
 ;
@@ -82,19 +85,17 @@ PROJECT=CIDKernel
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
 
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-            PERMISSIVE  = Yes
-        END PLATFORM
-    END PLATFORMOPTS
+    OPTIONS [Win32_*]
+        PERMISSIVE  = Yes
+    END OPTIONS
 
-    INCLUDEPATHS
+    INCLUDEPATHS [Win32_*]
         .\Win32\ASPI
     END INCLUDEPATHS
 
@@ -262,10 +263,6 @@ PROJECT=CIDImage
         VERSIONED   = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDMath
@@ -304,6 +301,7 @@ PROJECT=CIDJPEG
         DIRECTORY   = GraphicUtils\CIDJPEG
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -312,12 +310,6 @@ PROJECT=CIDJPEG
         CIDLib
         CIDImage
     END DEPENDENTS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     INCLUDEPATHS
         .\JLibInc
@@ -348,12 +340,14 @@ END PROJECT
 ;  Our 'AI' oriented facility and some stuff that supports it.
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDSpReco
+; Windows only for now
+PROJECT=CIDSpReco [WIN32_*]
     SETTINGS
         DIRECTORY   = AIUtils\CIDSpReco
         DISPLAY     = N/A
         EXPORT      = CIDSPRECOEXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -363,12 +357,9 @@ PROJECT=CIDSpReco
         CIDXML
     END DEPENDENTS
 
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-            PERMISSIVE  = Yes
-        END PLATFORM
-    END PLATFORMOPTS
+    OPTIONS [WIN32_*]
+        PERMISSIVE  = Yes
+    END OPTIONS
 
     IDLFILES
         IDLFILE
@@ -392,7 +383,6 @@ PROJECT=CIDAI
     DEPENDENTS
         CIDMath
         CIDXML
-        ; CIDSpReco
     END DEPENDENTS
 
     IDLFILES
@@ -410,27 +400,19 @@ END PROJECT
 ;   that works in terms of them.
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDGraphDev
+PROJECT=CIDGraphDev [Win32_*]
+
     SETTINGS
         DIRECTORY   = GraphicUtils\CIDGraphDev
         DISPLAY     = N/A
         EXPORT      = CIDGRDEVEXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -450,27 +432,18 @@ PROJECT=CIDGraphDev
 END PROJECT
 
 
-PROJECT=CIDCtrls
+PROJECT=CIDCtrls [Win32_*]
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls
         DISPLAY     = N/A
         EXPORT      = CIDCTRLSEXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -490,28 +463,18 @@ PROJECT=CIDCtrls
 END PROJECT
 
 
-PROJECT=CIDAdvGraph
+PROJECT=CIDAdvGraph [Win32_*]
     SETTINGS
-
         DIRECTORY   = GraphicUtils\CIDAdvGraph
         DISPLAY     = N/A
         EXPORT      = CIDADVGREXP
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
 ;        IDLFILE
@@ -530,25 +493,17 @@ PROJECT=CIDAdvGraph
 END PROJECT
 
 
-PROJECT=CIDWUtils
+PROJECT=CIDWUtils [Win32_*]
+
     SETTINGS
         DIRECTORY   = WndUtils\CIDWUtils
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDMData
@@ -559,23 +514,15 @@ PROJECT=CIDWUtils
 END PROJECT
 
 
-PROJECT=CIDResEd
+PROJECT=CIDResEd [Win32_*]
+
     SETTINGS
         DIRECTORY   = Utilities\CIDResEd
         DISPLAY     = GUI
         MSGFILE     = Yes
+        PURECPP     = No
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-           PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -598,27 +545,19 @@ END PROJECT
 ;   Data processing/storage related facilities
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDDBase
+;; Win32 only for now
+PROJECT=CIDDBase [Win32_*]
+
     SETTINGS
         DIRECTORY   = DataUtils\CIDDBase
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         PLATFORMDIR = Yes
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
@@ -690,12 +629,15 @@ END PROJECT
 ;   Security related facilities
 ; ----------------------------------------------------------------------------
 
-PROJECT=CIDSChan
+; Win32 only for now
+PROJECT=CIDSChan [Win32_*]
+
     SETTINGS
         DIRECTORY   = SecureUtils\CIDSChan
         DISPLAY     = N/A
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -707,17 +649,6 @@ PROJECT=CIDSChan
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
-
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -775,7 +706,8 @@ PROJECT=CIDSock
 END PROJECT
 
 
-PROJECT=CIDSIP
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=CIDSIP [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDSIP
         DISPLAY     = N/A
@@ -795,7 +727,8 @@ PROJECT=CIDSIP
 END PROJECT
 
 
-PROJECT=CIDNet
+; Win32 until we can get CIDSChan supported on Linux
+PROJECT=CIDNet [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDNet
         DISPLAY     = N/A
@@ -824,7 +757,8 @@ PROJECT=CIDNet
 END PROJECT
 
 
-PROJECT=CIDUPnP
+; Win32 only until we can get CIDNet (actually CIDSChan which it needs)
+PROJECT=CIDUPnP [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDUPnP
         DISPLAY     = N/A
@@ -852,7 +786,8 @@ PROJECT=CIDUPnP
 END PROJECT
 
 
-PROJECT=CIDWebSock
+; Win32 only until we get CIDSChan going on Linux
+PROJECT=CIDWebSock [WIN32_*]
     SETTINGS
         DIRECTORY   = CommUtils\CIDWebSock
         DISPLAY     = N/A
@@ -886,14 +821,19 @@ END PROJECT
 ;   Media related facilities
 ; ----------------------------------------------------------------------------
 
+;
 ;  A framework for streaming audio in from sources and out to targets.
-PROJECT=CIDAudStream
+;  Win32 only for now.
+;
+PROJECT=CIDAudStream [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDAudStream
         DISPLAY     = N/A
         EXPORT      = CIDAUDSTREAMEXP
         MSGFILE     = Yes
         PLATFORMDIR = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
@@ -905,17 +845,6 @@ PROJECT=CIDAudStream
             NAMEEXT = Shared
         END IDLFILE
     END IDLFILES
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
-
-    ; This one has per-platform implementations but only Win32 so far
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -931,26 +860,19 @@ END PROJECT
 ;  external headers specially here since we provide some wrappers around
 ;  system media stuff.
 ;
-PROJECT=CIDDAE
+; For now only Win32. Needs to have some stuff split out into per-platform
+;
+PROJECT=CIDDAE [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDDAE
         DISPLAY     = N/A
         EXPORT      = CIDDAEEXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -964,37 +886,24 @@ PROJECT=CIDDAE
         CIDLib
     END DEPENDENTS
 
-    INCLUDEPATHS
-        $(CID_WMFSDKDIR)\Include
-    END INCLUDEPATHS
-
 END PROJECT
 
 
 ;
 ;  Metadata extraction. It provides classes to extra metadata tag info from
-;  various media formats.
+;  various media formats. Win32 only for now
 ;
-PROJECT=CIDMetaExtr
+PROJECT=CIDMetaExtr [Win32_*]
+
     SETTINGS
         DIRECTORY   = MediaUtils\CIDMetaExtr
         DISPLAY     = N/A
         EXPORT      = CIDMETAEXTREXP
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     IDLFILES
         IDLFILE
@@ -1013,8 +922,11 @@ PROJECT=CIDMetaExtr
 END PROJECT
 
 
-; Implements the RTP/RTCP standards (just early work so far)
-PROJECT=CIDRTP
+;
+;   Implements the RTP/RTCP standards (just early work so far). It's Win32
+;   only until we get CIDNet (actually CIDSchan which it needs) going on Linux.
+;
+PROJECT=CIDRTP [WIN32_*]
     SETTINGS
         DIRECTORY   = MediaUtils\CIDRTP
         DISPLAY     = N/A
@@ -1039,31 +951,26 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;  Higher level GUI related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDWebBrowser
+
+; Win32 only for now
+PROJECT=CIDWebBrowser [Win32_*]
+
     SETTINGS
         DIRECTORY   = WndUtils\CIDWebBrowser
         DISPLAY     = N/A
         MSGFILE     = Yes
+        PURECPP     = No
         TYPE        = SharedLib
         USESYSLIBS  = Yes
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
-    PLATFORMOPTS
-        PLATFORM=WIN32_*
-            PUREANSI    = No
-        END PLATFORM
-    END PLATFORMOPTS
 
     DEPENDENTS
         CIDKernel
         CIDLib
         CIDCtrls
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1071,7 +978,10 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Program execution related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDAppSh
+
+; Win32 only for now
+PROJECT=CIDAppSh  [Win32_*]
+
     SETTINGS
         DIRECTORY   = ExecUtils\CIDAppSh
         DISPLAY     = N/A
@@ -1079,11 +989,6 @@ PROJECT=CIDAppSh
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    ; For now only Win32. Needs to have some stuff split out into per-platform
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDXML
@@ -1097,7 +1002,9 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;   Language related facilities
 ; ----------------------------------------------------------------------------
-PROJECT=CIDMacroEng
+
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=CIDMacroEng [WIN32_*]
     SETTINGS
         DIRECTORY   = LangUtils\CIDMacroEng
         DISPLAY     = N/A
@@ -1129,7 +1036,9 @@ PROJECT=CIDMacroEng
 END PROJECT
 
 
-PROJECT=CIDMacroDbg
+; Win32 only
+PROJECT=CIDMacroDbg [Win32_*]
+
     SETTINGS
         DIRECTORY   = LangUtils\CIDMacroDbg
         DISPLAY     = N/A
@@ -1138,10 +1047,6 @@ PROJECT=CIDMacroDbg
         TYPE        = SharedLib
         VERSIONED   = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDEncode
@@ -1153,17 +1058,14 @@ PROJECT=CIDMacroDbg
 END PROJECT
 
 
-PROJECT=TestMacroDbg
+PROJECT=TestMacroDbg [Win32_*]
+
     SETTINGS
         DIRECTORY   = Tests\TestMacroDbg
         DISPLAY     = GUI
         MSGFILE     = Yes
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDCtrls
@@ -1251,7 +1153,6 @@ PROJECT=CIDNameSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDNameSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     IDLFILES
@@ -1272,7 +1173,6 @@ PROJECT=CIDLogSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDLogSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     DEPENDENTS
@@ -1286,7 +1186,6 @@ PROJECT=CIDCfgSrv
     SETTINGS
         DIRECTORY   = OrbUtils\CIDCfgSrv
         MSGFILE     = Yes
-        TYPE        = Service
     END SETTINGS
 
     IDLFILES
@@ -1320,6 +1219,7 @@ PROJECT=CIDNSAdmin
     DEPENDENTS
         CIDOrbUC
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1333,20 +1233,18 @@ PROJECT=CIDLogAdmin
         CIDRegX
         CIDOrbUC
     END DEPENDENTS
+
 END PROJECT
 
 
-PROJECT=CIDLogMon
+PROJECT=CIDLogMon [Win32_*]
+
     SETTINGS
         DIRECTORY   = OrbUtils\CIDLogMon
         DISPLAY     = GUI
         MSGFILE     = Yes
         RESFILE     = Yes
     END SETTINGS
-
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDOrbUC
@@ -1393,6 +1291,7 @@ PROJECT=GenXMLChTable
 END PROJECT
 
 
+
 ; ----------------------------------------------------------------------------
 ;   The test framework and the library shared by the framework and the test
 ;   programs.
@@ -1431,7 +1330,8 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 
 ; Cryptography libraries
-PROJECT=TestCrypto
+; Win32 only until we get CIDSChan going on Linux
+PROJECT=TestCrypto [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestCrypto
     END SETTINGS
@@ -1506,7 +1406,8 @@ PROJECT=TestCIDMData
 END PROJECT
 
 ; Macro engine
-PROJECT=TestMacroEng
+; Win32 only until we get some stuff underlying CIDMacroEng ready for Linux
+PROJECT=TestMacroEng [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestMacroEng
     END SETTINGS
@@ -1519,7 +1420,8 @@ PROJECT=TestMacroEng
 END PROJECT
 
 ; URLs, IP end points and address, sockets, etc...
-PROJECT=TestNet
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=TestNet [WIN32_*]
     SETTINGS
         DIRECTORY   = Tests2\TestNet
     END SETTINGS
@@ -1552,7 +1454,7 @@ PROJECT=TestORB
 
     IDLFILES
         IDLFILE
-            SRCFILE = TestOrb_Loopback
+            SRCFILE = TestORB_Loopback
             GEN     = CLIENT,SERVER
             NAMEEXT = Loopback
         END IDLFILE
@@ -1605,7 +1507,7 @@ PROJECT=TestAI
     END DEPENDENTS
 END PROJECT
 
-; Higher level sterss tests
+; Higher level stress tests
 PROJECT=StressTests
     SETTINGS
         DIRECTORY   = Tests2\StressTests
@@ -1615,6 +1517,21 @@ PROJECT=StressTests
         CIDLib
         CIDMath
         CIDObjStore
+        TestFWLib
+    END DEPENDENTS
+END PROJECT
+
+; Server stress tests
+PROJECT=TestServers
+    SETTINGS
+        DIRECTORY   = Tests2\TestServers
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+        CIDCrypto
         TestFWLib
     END DEPENDENTS
 END PROJECT
@@ -1632,13 +1549,17 @@ PROJECT=Tests2
         TestMathLib
         TestCIDEncode
         TestRegX
-        TestCrypto
         TestXML
         TestCIDMData
-        TestNet
         TestObjStore
         TestORB
         StressTests
+        TestServers
+    END DEPENDENTS
+
+    DEPENDENTS [WIN32_*]
+        TestCrypto
+        TestNet
     END DEPENDENTS
 
 END PROJECT
@@ -1676,7 +1597,22 @@ PROJECT=TestCIDLib
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestCIDCtrls
+
+PROJECT=LogStressTest
+    SETTINGS
+        DIRECTORY   = Tests\LogStressTest
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDOrb
+        CIDOrbUC
+    END DEPENDENTS
+
+END PROJECT
+
+
+PROJECT=TestCIDCtrls [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls
@@ -1685,17 +1621,13 @@ PROJECT=TestCIDCtrls
         RESFILE     = Yes
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
         ; CIDWUtils
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestCIDCtrls2
+PROJECT=TestCIDCtrls2 [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestCIDCtrls2
@@ -1704,16 +1636,12 @@ PROJECT=TestCIDCtrls2
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-PROJECT=TestScroll
+PROJECT=TestScroll [Win32_*]
 
     SETTINGS
         DIRECTORY   = WndUtils\CIDCtrls\TestScroll
@@ -1722,9 +1650,18 @@ PROJECT=TestScroll
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=TestGraphArea [Win32_*]
+
+    SETTINGS
+        DIRECTORY   = Tests\TestGraphArea
+        DISPLAY     = GUI
+    END SETTINGS
 
     DEPENDENTS
         CIDCtrls
@@ -1745,10 +1682,11 @@ PROJECT=Beeper
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
-PROJECT=CDROM1
+PROJECT=CDROM1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\CDROM1
         SAMPLE      = Yes
@@ -1760,6 +1698,7 @@ PROJECT=CDROM1
         CIDJPEG
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1772,6 +1711,7 @@ PROJECT=Collect1
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1784,6 +1724,7 @@ PROJECT=Collect2
     DEPENDENTS
         CIDLib
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1796,6 +1737,7 @@ PROJECT=Collect3
     DEPENDENTS
         CIDMath
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1808,6 +1750,7 @@ PROJECT=Collect4
     DEPENDENTS
         CIDMath
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1820,6 +1763,7 @@ PROJECT=Crypto1
     DEPENDENTS
         CIDCrypto
     END DEPENDENTS
+
 END PROJECT
 
 
@@ -1833,46 +1777,42 @@ PROJECT=CvtImgToTrans
         CIDImage
         CIDPNG
     END DEPENDENTS
+
 END PROJECT
 
 
-PROJECT=DAE1
+; Win32 for now
+PROJECT=DAE1 [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\DAE1
         SAMPLE      = Yes
     END SETTINGS
 
-    ; For now only Win32 until CIDDAE gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
+PROJECT=DAE2 [Win32_*]
 
-PROJECT=DAE2
     SETTINGS
         DIRECTORY   = Samples\Basic\DAE2
         SAMPLE      = Yes
     END SETTINGS
 
-    ; For now only Win32 until CIDDAE gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDLib
         CIDDAE
     END DEPENDENTS
+
 END PROJECT
 
 
-PROJECT=EnumMons
+PROJECT=EnumMons [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\EnumMons
         SAMPLE      = Yes
@@ -1922,7 +1862,8 @@ PROJECT=FileSys3
 END PROJECT
 
 
-PROJECT=HTTPClient1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=HTTPClient1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\HTTPClient1
         SAMPLE      = Yes
@@ -1931,7 +1872,6 @@ PROJECT=HTTPClient1
     DEPENDENTS
         CIDEncode
         CIDNet
-        CIDSChan
     END DEPENDENTS
 END PROJECT
 
@@ -1978,7 +1918,8 @@ PROJECT=MakePreviews
 END PROJECT
 
 
-PROJECT=HTTPSrv1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=HTTPSrv1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\HTTPSrv1
         SAMPLE      = Yes
@@ -1992,7 +1933,8 @@ PROJECT=HTTPSrv1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=JSON1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=JSON1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\JSON1
         SAMPLE      = Yes
@@ -2004,7 +1946,7 @@ PROJECT=JSON1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=SpReco1
+PROJECT=SpReco1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SpReco1
         SAMPLE      = Yes
@@ -2015,16 +1957,13 @@ PROJECT=SpReco1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=MetaExtract
+; Win32 only for now
+PROJECT=MetaExtract [Win32_*]
+
     SETTINGS
         DIRECTORY   = Samples\Basic\MetaExtract
         SAMPLE      = Yes
     END SETTINGS
-
-    ; For now only Win32 until CIDMetaExtr gets sorted out for portability
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
 
     DEPENDENTS
         CIDLib
@@ -2118,7 +2057,7 @@ PROJECT=RTTI1
     END DEPENDENTS
 END PROJECT
 
-PROJECT=SpGrammarComp
+PROJECT=SpGrammarComp [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SpGrammarComp
         SAMPLE      = Yes
@@ -2141,7 +2080,8 @@ PROJECT=Speech
 END PROJECT
 
 
-PROJECT=SMTP1
+; Win32 only until we get CIDNet going on Linux (actually CIDSChan which it needs)
+PROJECT=SMTP1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\SMTP1
         SAMPLE      = Yes
@@ -2263,7 +2203,7 @@ PROJECT=Streams6
 END PROJECT
 
 
-PROJECT=UPnP1
+PROJECT=UPnP1 [WIN32_*]
     SETTINGS
         DIRECTORY   = Samples\Basic\UPnP1
         SAMPLE      = Yes
@@ -2330,6 +2270,20 @@ END PROJECT
 ;  Some intermediate samples
 ; ----------------------------------------------------------------------------
 
+PROJECT=CML1 [WIN32_*]
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\CML1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDMacroEng
+    END DEPENDENTS
+
+END PROJECT
+
 PROJECT=Interview1
 
     SETTINGS
@@ -2340,6 +2294,19 @@ PROJECT=Interview1
     DEPENDENTS
         CIDLib
         CIDMData
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=Interview2
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Interview2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
     END DEPENDENTS
 
 END PROJECT
@@ -2446,7 +2413,20 @@ PROJECT=ORB1Samp
 END PROJECT
 
 
-PROJECT=Window1
+PROJECT=ThreadPool1
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\ThreadPool1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+    END DEPENDENTS
+
+END PROJECT
+
+PROJECT=Window1 [Win32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\Window1
@@ -2455,16 +2435,12 @@ PROJECT=Window1
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
-
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
 
-PROJECT=Window2
+PROJECT=Window2 [Win32_*]
 
     SETTINGS
         DIRECTORY   = Samples\Intermediate\Window2
@@ -2473,11 +2449,36 @@ PROJECT=Window2
         RESFILE     = No
     END SETTINGS
 
-    INCLUDEPLATS
-        Win32
-    END INCLUDEPLATS
+    DEPENDENTS
+        CIDCtrls
+    END DEPENDENTS
+END PROJECT
+
+PROJECT=Window3 [Win32_*]
+
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\Window3
+        DISPLAY     = GUI
+        MSGFILE     = Yes
+        RESFILE     = Yes
+    END SETTINGS
 
     DEPENDENTS
         CIDCtrls
     END DEPENDENTS
 END PROJECT
+
+; ----------------------------------------------------------------------------
+;  A junk project for temporary work. Only enabled when needed.
+; ----------------------------------------------------------------------------
+;PROJECT=Tmp
+;    SETTINGS
+;        DIRECTORY   = Samples\Tmp
+;        SAMPLE      = Yes
+;    END SETTINGS
+;
+;    DEPENDENTS
+;        CIDLib
+;        CIDImgFact
+;    END DEPENDENTS
+;END PROJECT

@@ -132,6 +132,42 @@ TTextMBufInStream(  const   TMemBuf* const          pmbufToUse
     AdoptStream(pstrmThis);
 }
 
+TTextMBufInStream::
+TTextMBufInStream(          THeapBuf&&              mbufToUse
+                    , const tCIDLib::TCard4         c4InitLogicalEnd
+                    ,       TTextConverter* const   ptcvtToAdopt) :
+
+    TTextInStream(ptcvtToAdopt)
+    , m_pstrmiBuf(nullptr)
+{
+    TBinInStream* pstrmThis = nullptr;
+    try
+    {
+        m_pstrmiBuf = new TMemInStreamImpl
+        (
+            tCIDLib::ForceMove(mbufToUse), c4InitLogicalEnd
+        );
+        pstrmThis = new TBinInStream(m_pstrmiBuf);
+    }
+
+    catch(TError& errToCatch)
+    {
+        errToCatch.AddStackLevel(CID_FILE, CID_LINE);
+
+        if (pstrmThis)
+        {
+            delete pstrmThis;
+        }
+         else if (m_pstrmiBuf)
+        {
+            delete m_pstrmiBuf;
+        }
+        throw;
+    }
+
+    AdoptStream(pstrmThis);
+}
+
 TTextMBufInStream::TTextMBufInStream(const TTextMBufOutStream& strmToSyncWith) :
 
     TTextInStream(::pDupObject<TTextConverter>(strmToSyncWith.tcvtThis()))
@@ -192,7 +228,7 @@ TTextMBufOutStream( const   tCIDLib::TCard4         c4InitSize
     TBinOutStream* pstrmThis = nullptr;
     try
     {
-        // Create the system memory buffer and then a binary stream impl for it
+        // Create the memory buffer and then a binary stream impl for it
         pmbufData = new THeapBuf
         (
             c4InitSize

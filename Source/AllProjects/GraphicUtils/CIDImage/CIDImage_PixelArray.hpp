@@ -100,7 +100,7 @@ class CIDIMGEXP TPixelArray :
             , const tCIDLib::TCard4         c4Height
             , const tCIDImage::EPixFmts     eFmt
             , const tCIDImage::EBitDepths   eBitDepth
-            , const tCIDLib::TCard4         c4LineBytePadding = 4
+            , const tCIDLib::TCard4         c4LineBytePadding = kCIDImage::c4LinePadding
         );
 
         static tCIDLib::TCard4 c4CalcLineWidth
@@ -108,7 +108,7 @@ class CIDIMGEXP TPixelArray :
             const   tCIDLib::TCard4         c4Width
             , const tCIDImage::EPixFmts     eFmt
             , const tCIDImage::EBitDepths   eBitDepth
-            , const tCIDLib::TCard4         c4LineBytePadding = 4
+            , const tCIDLib::TCard4         c4LineBytePadding = kCIDImage::c4LinePadding
         );
 
         static tCIDLib::TCard4 c4ValidateFmt
@@ -144,12 +144,18 @@ class CIDIMGEXP TPixelArray :
 
         TPixelArray
         (
-            const   TCIDImage&              imgSource
+            const   TCIDImage&              imgSrc
         );
 
         TPixelArray
         (
             const   TPixelArray&            pixaSrc
+        );
+
+
+        TPixelArray
+        (
+                    TPixelArray&&           pixaSrc
         );
 
         ~TPixelArray();
@@ -161,6 +167,11 @@ class CIDIMGEXP TPixelArray :
         TPixelArray& operator=
         (
             const   TPixelArray&            pixaSrc
+        );
+
+        TPixelArray& operator=
+        (
+                    TPixelArray&&           pixaSrc
         );
 
 
@@ -283,7 +294,7 @@ class CIDIMGEXP TPixelArray :
         tCIDLib::TVoid GaussianBlur
         (
             const   tCIDLib::TCard4         c4Order
-            ,       TPixelArray* const      ppixaTmp = 0
+            ,       TPixelArray* const      ppixaTmp = nullptr
         );
 
         tCIDLib::TVoid GaussianBlur
@@ -291,7 +302,7 @@ class CIDIMGEXP TPixelArray :
             const   tCIDLib::TCard4         c4Order
             , const tCIDLib::TCard4         c4MaxWidth
             , const tCIDLib::TCard4         c4MaxHeight
-            ,       TPixelArray* const      ppixaTmp = 0
+            ,       TPixelArray* const      ppixaTmp = nullptr
         );
 
         tCIDLib::TVoid InvertAlphaChannel();
@@ -397,6 +408,7 @@ class CIDIMGEXP TPixelArray :
                     tCIDLib::EDirs          eDir
             , const tCIDLib::TCard4         c4StartInd
             , const tCIDLib::TCard4         c4EndInd
+            , const tCIDLib::TBoolean       bPremultiply
         );
 
         tCIDLib::TVoid SetAll

@@ -51,6 +51,7 @@ class CIDXMLEXP TXMLContextStack : public TObject
         TXMLContextStack();
 
         TXMLContextStack(const TXMLContextStack&) = delete;
+        TXMLContextStack(TXMLContextStack&&) = delete;
 
         ~TXMLContextStack();
 
@@ -59,6 +60,7 @@ class CIDXMLEXP TXMLContextStack : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TXMLContextStack& operator=(const TXMLContextStack&) = delete;
+        TXMLContextStack& operator=(TXMLContextStack&&) = delete;
 
 
         // -------------------------------------------------------------------

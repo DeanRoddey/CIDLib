@@ -7,9 +7,25 @@
 
         <PageLink FileName="Overview"/>
 
+        <PageLink FileName="MDuplicable" PageType="CppClass"/>
         <PageLink FileName="MFormattable" PageType="CppClass"/>
+        <PageLink FileName="MStreamable" PageType="CppClass"/>
+        <PageLink FileName="MLogger" PageType="CppClass"/>
+        <PageLink FileName="TArea" PageType="CppClass"/>
+        <PageLink FileName="TAudio" PageType="Namespace"/>
+        <PageLink FileName="TBase64" PageType="CppClass"/>
+        <PageLink FileName="TCIDModuleInfo" PageType="CppClass"/>
+        <PageLink FileName="TColCursor" PageType="CppClass"/>
+        <PageLink FileName="TCollectionBase" PageType="CppClass"/>
+        <PageLink FileName="TColPubSubInfo" PageType="CppClass"/>
+        <PageLink FileName="TCursorBase" PageType="CppClass"/>
         <PageLink FileName="TDirChangeInfo" PageType="CppClass"/>
+        <PageLink FileName="TLogEvent" PageType="CppClass"/>
         <PageLink FileName="TMemBuf" PageType="CppClass"/>
+        <PageLink FileName="TModule" PageType="CppClass"/>
+        <PageLink FileName="TMutex" PageType="CppClass"/>
+        <PageLink FileName="TMtxLocker" PageType="CppClass"/>
+        <PageLink FileName="TNativeWCConverter" PageType="CppClass"/>
         <PageLink FileName="TStrCat" PageType="CppClass"/>
         <PageLink FileName="TString" PageType="CppClass"/>
         <PageLink FileName="TStringTokenizer" PageType="CppClass"/>

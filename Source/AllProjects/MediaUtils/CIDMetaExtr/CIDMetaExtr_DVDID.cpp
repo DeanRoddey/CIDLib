@@ -43,7 +43,7 @@ RTTIDecls(TCIDDVDID,TObject)
 namespace CIDMetaExtr_DVDID
 {
     // A lookup table with the CRC replacement values
-    const tCIDLib::TCard8 ac8table[] =
+    constexpr tCIDLib::TCard8 ac8table[] =
     {
         0x0000000000000000, 0x0809E8A2969451E9, 0x1013D1452D28A3D2, 0x181A39E7BBBCF23B
       , 0x2027A28A5A5147A4, 0x282E4A28CCC5164D, 0x303473CF7779E476, 0x383D9B6DE1EDB59F

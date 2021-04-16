@@ -63,6 +63,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         TFacCIDOrbUC();
 
         TFacCIDOrbUC(const TFacCIDOrbUC&) = delete;
+        TFacCIDOrbUC(TFacCIDOrbUC&&) = delete;
 
         ~TFacCIDOrbUC();
 
@@ -71,6 +72,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDOrbUC& operator=(const TFacCIDOrbUC&) = delete;
+        TFacCIDOrbUC& operator=(TFacCIDOrbUC&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -94,7 +96,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  insure they are going to the name server and getting the freshest
         //  info.
         // -------------------------------------------------------------------
-        template <class T> T*
+        template <typename T> [[nodiscard]] T*
         porbcMakeClient(const   TString&            strNSBinding
                         , const tCIDLib::TCard4     c4WaitMillis = 0
                         , const tCIDLib::TBoolean   bNoCache = kCIDLib::False
@@ -117,7 +119,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                 catch(TError& errToCatch)
                 {
-                    if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                    if (bLogWarnings() && !errToCatch.bLogged())
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                         TModule::LogEventObj(errToCatch);
@@ -141,10 +143,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 //  Either not cached or the cached one wouldn't work, so do a
                 //  lookup. If we get it, try to create the proxy.
                 //
-                if (facCIDOrbUC().bGetNSObject( strNSBinding
-                                                , ooidSrv
-                                                , enctEnd
-                                                , bQuickTest))
+                if (bGetNSObject( strNSBinding, ooidSrv, enctEnd, bQuickTest))
                 {
                     try
                     {
@@ -153,7 +152,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                     catch(TError& errToCatch)
                     {
-                        if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                        if (bLogWarnings() && !errToCatch.bLogged())
                         {
                             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                             TModule::LogEventObj(errToCatch);
@@ -166,7 +165,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             return porbcRet;
         }
 
-        template <class T> T*
+        template <typename T> [[nodiscard]] T*
         porbcMakeClient(        tCIDOrbUC::TNSrvProxy&  orbcNS
                         , const TString&                strNSBinding
                         , const tCIDLib::TCard4         c4WaitMillis = 0
@@ -190,7 +189,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                 catch(TError& errToCatch)
                 {
-                    if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                    if (bLogWarnings() && !errToCatch.bLogged())
                     {
                         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                         TModule::LogEventObj(errToCatch);
@@ -215,11 +214,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
                 //  lookup. If we get it, try to create the proxy. If this fails
                 //  we let it throw.
                 //
-                if (facCIDOrbUC().bGetNSObject( orbcNS
-                                                , strNSBinding
-                                                , ooidSrv
-                                                , enctEnd
-                                                , bQuickTest))
+                if (bGetNSObject(orbcNS, strNSBinding, ooidSrv, enctEnd, bQuickTest))
                 {
                     try
                     {
@@ -228,7 +223,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
                     catch(TError& errToCatch)
                     {
-                        if (facCIDOrbUC().bLogWarnings() && !errToCatch.bLogged())
+                        if (bLogWarnings() && !errToCatch.bLogged())
                         {
                             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
                             TModule::LogEventObj(errToCatch);
@@ -285,18 +280,18 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             , const tCIDLib::TBoolean       bQuickTest = kCIDLib::False
         );
 
-        tCIDLib::TBoolean bNSBindingExists
+        [[nodiscard]] tCIDLib::TBoolean bNSBindingExists
         (
             const   TString&                strToCheck
         );
 
-        tCIDLib::TBoolean bNSBindingExists
+        [[nodiscard]] tCIDLib::TBoolean bNSBindingExists
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
             , const TString&                strToCheck
         );
 
-        tCIDLib::TBoolean bNSScopeExists
+        [[nodiscard]] tCIDLib::TBoolean bNSScopeExists
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
             , const TString&                strToCheck
@@ -304,7 +299,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
         tCIDLib::TVoid DoRebindCycle();
 
-        tCIDLib::TIPPortNum ippnNS() const;
+        [[nodiscard]] tCIDLib::TIPPortNum ippnNS() const;
 
         tCIDLib::TVoid IncFailedRebinds();
 
@@ -339,7 +334,7 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
             const   tCIDLib::TCard4         c4WaitUpTo = 0
         );
 
-        TCIDNameSrvClientProxy* porbcMakeNSProxy
+        [[nodiscard]] TCIDNameSrvClientProxy* porbcMakeNSProxy
         (
             const   tCIDLib::TCard4         c4WaitUpTo = 0
         );
@@ -381,6 +376,11 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
 
         tCIDLib::TVoid StopRebinder() noexcept;
 
+        tCIDLib::TVoid UnbindObjs
+        (
+            const   tCIDLib::TStrCollect&   colBindings
+        );
+
         tCIDLib::TVoid UpdateExtraNSVal
         (
             const   TString&                strNodePath
@@ -412,13 +412,13 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         tCIDLib::TBoolean bDoBindingPass
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
-            ,       tCIDLib::TBoolean&      bChanges
+            , COP   tCIDLib::TBoolean&      bChanges
         );
 
         tCIDLib::TBoolean bDoLeaseRenewal
         (
                     tCIDOrbUC::TNSrvProxy&  orbcNS
-            ,       tCIDLib::TBoolean&      bChanges
+            , COP   tCIDLib::TBoolean&      bChanges
         );
 
         tCIDLib::EExitCodes eBinderThread
@@ -495,16 +495,16 @@ class CIDORBUCEXP TFacCIDOrbUC : public TFacility
         //  m_thrRebinder
         //      This is the rebinding thread that does all of the work.
         // -------------------------------------------------------------------
-        volatile tCIDLib::TBoolean  m_bInitialized;
-        tCIDLib::TCard8             m_c8LastNSCookie;
-        TBindList                   m_colList;
-        tCIDLib::TEncodedTime       m_enctLastNSCheck;
-        tCIDLib::TIPPortNum         m_ippnNS;
-        TLogEvent                   m_logevLast;
-        TMutex                      m_mtxSync;
-        TStatsCacheItem             m_sciRebindFailures;
-        TString                     m_strNSHost;
-        TThread                     m_thrRebinder;
+        TAtomicFlag             m_atomInitDone;
+        tCIDLib::TCard8         m_c8LastNSCookie;
+        TBindList               m_colList;
+        tCIDLib::TEncodedTime   m_enctLastNSCheck;
+        tCIDLib::TIPPortNum     m_ippnNS;
+        TLogEvent               m_logevLast;
+        TMutex                  m_mtxSync;
+        TStatsCacheItem         m_sciRebindFailures;
+        TString                 m_strNSHost;
+        TThread                 m_thrRebinder;
 
 
         // -------------------------------------------------------------------

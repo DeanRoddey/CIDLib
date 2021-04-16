@@ -46,6 +46,8 @@
 
         <Note>You can also do post-fix increment where needed, though it is considerably less performant because it has to create a copy of the cursor and return it just to then be thrown away after it is used. So use prefix any time you can.</Note>
 
+        <Note>It is not an error to increment or decrement a cursor when it is already at the end of the collection. It just does nothing. You should be checking the cursor validity to know when you hit the end.</Note>
+
 
         <SecTitle>Cursor Validity</SecTitle>
 

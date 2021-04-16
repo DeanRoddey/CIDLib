@@ -44,6 +44,11 @@ class CIDXMLEXP MXMLDTDEvents
         // -------------------------------------------------------------------
         //  Destructor
         // -------------------------------------------------------------------
+        MXMLDTDEvents(const MXMLDTDEvents&) = delete;
+        MXMLDTDEvents(MXMLDTDEvents&&) = delete;
+        MXMLDTDEvents& operator=(const MXMLDTDEvents&) = delete;
+        MXMLDTDEvents& operator=(MXMLDTDEvents&&) = delete;
+
         virtual ~MXMLDTDEvents()
         {
         }
@@ -142,14 +147,6 @@ class CIDXMLEXP MXMLDTDEvents
         MXMLDTDEvents()
         {
         }
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        MXMLDTDEvents(const MXMLDTDEvents&);
-        tCIDLib::TVoid operator=(const MXMLDTDEvents&);
 };
 
 #pragma CIDLIB_POPPACK

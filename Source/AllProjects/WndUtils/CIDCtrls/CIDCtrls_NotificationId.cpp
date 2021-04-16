@@ -43,10 +43,13 @@ RTTIDecls(TNotificationId,TObject)
 
 namespace CIDCtrls_NotificationId
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    // -----------------------------------------------------------------------
-    const tCIDLib::THashVal hshModulus = 109;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::THashVal hshModulus = 109;
+    }
 }
 
 
@@ -141,15 +144,14 @@ TNotificationId& TNotificationId::operator=(const TNotificationId& nidToAssign)
 tCIDLib::TBoolean
 TNotificationId::operator==(const TNotificationId& nidToCompare) const
 {
-    if (this == &nidToCompare)
-        return kCIDLib::True;
+    if (this != &nidToCompare)
+    {
+        if (m_hshId != nidToCompare.m_hshId)
+            return kCIDLib::False;
 
-    if (m_hshId != nidToCompare.m_hshId)
-        return kCIDLib::False;
-
-    if (!TRawStr::bCompareStr(nidToCompare.m_szId, m_szId))
-        return kCIDLib::False;
-
+        if (!TRawStr::bCompareStr(nidToCompare.m_szId, m_szId))
+            return kCIDLib::False;
+    }
     return kCIDLib::True;
 }
 
@@ -157,15 +159,6 @@ tCIDLib::TBoolean
 TNotificationId::operator!=(const TNotificationId& nidToCompare) const
 {
     return !operator==(nidToCompare);
-}
-
-
-// ---------------------------------------------------------------------------
-//  TNotificationId: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::THashVal TNotificationId::hshId() const
-{
-    return m_hshId;
 }
 
 

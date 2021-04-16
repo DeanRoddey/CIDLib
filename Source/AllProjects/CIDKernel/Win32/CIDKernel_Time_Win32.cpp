@@ -42,10 +42,9 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_Time_Win32
 {
-    volatile tCIDLib::TBoolean  bHighResInit = kCIDLib::False;
-    volatile tCIDLib::TBoolean  bHighResAvail = kCIDLib::False;
-    tCIDLib::TCard4             c4MinUSecs;
-    tCIDLib::TInt8              i8TicksPerUSec;
+    tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
+    tCIDLib::TCard4     c4MinUSecs;
+    tCIDLib::TInt8      i8TicksPerUSec;
 }
 
 
@@ -92,6 +91,27 @@ tCIDLib::TBoolean TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eState)
             FlTime.dwLowDateTime, FlTime.dwHighDateTime
         );
         #endif
+
+        // See if highe perf timers are available
+        LARGE_INTEGER Freq;
+        if (::QueryPerformanceFrequency(&Freq))
+        {
+            // Make sure we actually have counter support also
+            LARGE_INTEGER TestTicks;
+            if (::QueryPerformanceCounter(&TestTicks))
+            {
+                //
+                //  We allow sleeps for microsecond intervals, so calculate
+                //  the ticks per microsecond.
+                //
+                CIDKernel_Time_Win32::i8TicksPerUSec = Freq.QuadPart / 1000000;
+                CIDKernel_Time_Win32::bHighResAvail = kCIDLib::True;
+            }
+        }
+         else
+        {
+            CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
+        }
     }
     return kCIDLib::True;
 }
@@ -117,34 +137,6 @@ const tCIDLib::TEncodedTime TKrnlTimeStamp::enctNTPOfs  = 116444738208988800;
 //
 tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
 {
-    // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::bHighResInit)
-    {
-        TBaseLock lockInit;
-        if (!CIDKernel_Time_Win32::bHighResInit)
-        {
-            LARGE_INTEGER Freq;
-            if (::QueryPerformanceFrequency(&Freq))
-            {
-                // Make sure we actually have counter support also
-                LARGE_INTEGER TestTicks;
-                if (::QueryPerformanceCounter(&TestTicks))
-                {
-                    //
-                    //  We allow sleeps for microsecond intervals, so calculate
-                    //  the ticks per microsecond.
-                    //
-                    CIDKernel_Time_Win32::i8TicksPerUSec = Freq.QuadPart / 1000000;
-                    CIDKernel_Time_Win32::bHighResAvail = kCIDLib::True;
-                }
-            }
-             else
-            {
-                CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
-            }
-            CIDKernel_Time_Win32::bHighResInit = kCIDLib::True;
-        }
-    }
     return CIDKernel_Time_Win32::bHighResAvail;
 }
 
@@ -152,14 +144,6 @@ tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
 tCIDLib::TBoolean
 TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
 {
-    // If we've not initializd the high res timer stuff yet, then do so
-    if (!CIDKernel_Time_Win32::bHighResInit)
-    {
-        TBaseLock lockInit;
-        if (!CIDKernel_Time_Win32::bHighResInit)
-            bHighResTimerAvailable();
-    }
-
     // If no support, then just sleep for millis
     if (!CIDKernel_Time_Win32::bHighResAvail)
     {
@@ -202,7 +186,7 @@ TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
 
 
 // Return the daylist savings time state
-tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(tCIDLib::TBoolean& bDSTState)
+tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(COP tCIDLib::TBoolean& bDSTState)
 {
     // Query time zone information
     TIME_ZONE_INFORMATION TZInfo;
@@ -219,6 +203,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(tCIDLib::TBoolean& bDSTState)
     }
      else
     {
+        bDSTState = kCIDLib::False;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcTm_LoadTZInfo);
         return kCIDLib::False;
     }
@@ -228,7 +213,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(tCIDLib::TBoolean& bDSTState)
 
 
 // Return the time zone offset
-tCIDLib::TBoolean TKrnlTimeStamp::bTZOffset(tCIDLib::TInt4& i4Ofs)
+tCIDLib::TBoolean TKrnlTimeStamp::bTZOffset(COP tCIDLib::TInt4& i4Ofs)
 {
     TIME_ZONE_INFORMATION TZInfo;
     tCIDLib::TCard4 c4Res = ::GetTimeZoneInformation(&TZInfo);
@@ -244,6 +229,7 @@ tCIDLib::TBoolean TKrnlTimeStamp::bTZOffset(tCIDLib::TInt4& i4Ofs)
     }
      else
     {
+        i4Ofs = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcTm_LoadTZInfo);
         return kCIDLib::False;
     }
@@ -290,7 +276,7 @@ TKrnlTimeStamp::bTZName(tCIDLib::TCh* pszToFill, const tCIDLib::TCard4 c4MaxChar
 //
 tCIDLib::TBoolean
 TKrnlTimeStamp::bLocalToNative( const   tCIDLib::TEncodedTime& enctLocal
-                                ,       tCIDLib::TEncodedTime& enctNative)
+                                , COP   tCIDLib::TEncodedTime& enctNative)
 {
     FILETIME LocTime;
     LocTime.dwLowDateTime = TRawBits::c4Low32From64(enctLocal);
@@ -318,7 +304,7 @@ TKrnlTimeStamp::bLocalToNative( const   tCIDLib::TEncodedTime& enctLocal
 //
 tCIDLib::TBoolean
 TKrnlTimeStamp::bLocalToUTC(const   tCIDLib::TEncodedTime& enctLocal
-                            ,       tCIDLib::TEncodedTime& enctUTC)
+                            , COP   tCIDLib::TEncodedTime& enctUTC)
 {
     FILETIME LocTime;
     LocTime.dwLowDateTime = TRawBits::c4Low32From64(enctLocal);
@@ -327,6 +313,7 @@ TKrnlTimeStamp::bLocalToUTC(const   tCIDLib::TEncodedTime& enctLocal
     FILETIME UTCTime;
     if (!::LocalFileTimeToFileTime(&LocTime, &UTCTime))
     {
+        enctUTC = 0;
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
@@ -337,7 +324,7 @@ TKrnlTimeStamp::bLocalToUTC(const   tCIDLib::TEncodedTime& enctLocal
 
 tCIDLib::TBoolean
 TKrnlTimeStamp::bUTCToLocal(const   tCIDLib::TEncodedTime& enctUTC
-                            ,       tCIDLib::TEncodedTime& enctLocal)
+                            , COP   tCIDLib::TEncodedTime& enctLocal)
 {
     FILETIME UTCTime;
     UTCTime.dwLowDateTime = TRawBits::c4Low32From64(enctUTC);
@@ -346,6 +333,7 @@ TKrnlTimeStamp::bUTCToLocal(const   tCIDLib::TEncodedTime& enctUTC
     FILETIME LocTime;
     if (!::FileTimeToLocalFileTime(&UTCTime, &LocTime))
     {
+        enctLocal = 0;
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
@@ -371,8 +359,8 @@ tCIDLib::TCard8 TKrnlTimeStamp::c8Millis()
 //  since 1900, UTC.
 //
 tCIDLib::TVoid
-TKrnlTimeStamp::CurNTPTime(         tCIDLib::TCard4&    c4Secs
-                            ,       tCIDLib::TCard4&    c4Fract
+TKrnlTimeStamp::CurNTPTime( COP     tCIDLib::TCard4&    c4Secs
+                            , COP   tCIDLib::TCard4&    c4Fract
                             , const tCIDLib::TBoolean   bNWOrder)
 {
     // Get the UTC time
@@ -465,10 +453,10 @@ tCIDLib::TEncodedTime TKrnlTimeStamp::enctNowUTC()
 
 // Break out the date related fields from our current time stamp
 tCIDLib::TBoolean
-TKrnlTimeStamp::bAsDateInfo(tCIDLib::TCard4&        c4Year
-                            , tCIDLib::EMonths&     eMonth
-                            , tCIDLib::TCard4&      c4Day
-                            , tCIDLib::EWeekDays&   eWeekDay) const
+TKrnlTimeStamp::bAsDateInfo(COP     tCIDLib::TCard4&      c4Year
+                            , COP   tCIDLib::EMonths&     eMonth
+                            , COP   tCIDLib::TCard4&      c4Day
+                            , COP   tCIDLib::EWeekDays&   eWeekDay) const
 {
     // Get our time into the file time, adjusting for our portable base
     FILETIME    FlTime;
@@ -483,6 +471,10 @@ TKrnlTimeStamp::bAsDateInfo(tCIDLib::TCard4&        c4Year
     SYSTEMTIME  SysTime;
     if (!::FileTimeToSystemTime(&FlTime, &SysTime))
     {
+        c4Year = 0;
+        eMonth = tCIDLib::EMonths::Count;
+        c4Day = 0;
+        eWeekDay = tCIDLib::EWeekDays::Count;
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
@@ -497,10 +489,10 @@ TKrnlTimeStamp::bAsDateInfo(tCIDLib::TCard4&        c4Year
 
 // Break out the time related fields from our current time stamp
 tCIDLib::TBoolean
-TKrnlTimeStamp::bAsTimeInfo(tCIDLib::TCard4&    c4Hour
-                            , tCIDLib::TCard4&  c4Minute
-                            , tCIDLib::TCard4&  c4Second
-                            , tCIDLib::TCard4&  c4Millis) const
+TKrnlTimeStamp::bAsTimeInfo(COP     tCIDLib::TCard4&  c4Hour
+                            , COP   tCIDLib::TCard4&  c4Minute
+                            , COP   tCIDLib::TCard4&  c4Second
+                            , COP   tCIDLib::TCard4&  c4Millis) const
 {
     // Get our time into the file time, adjusting for our portable base
     FILETIME    FlTime;
@@ -515,6 +507,10 @@ TKrnlTimeStamp::bAsTimeInfo(tCIDLib::TCard4&    c4Hour
     SYSTEMTIME  SysTime;
     if (!::FileTimeToSystemTime(&FlTime, &SysTime))
     {
+        c4Hour = 0;
+        c4Minute = 0;
+        c4Second = 0;
+        c4Millis = 0;
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
@@ -529,8 +525,7 @@ TKrnlTimeStamp::bAsTimeInfo(tCIDLib::TCard4&    c4Hour
 
 
 // Get the time of week for our current time stamp
-tCIDLib::TBoolean
-TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
+tCIDLib::TBoolean TKrnlTimeStamp::bDayOfWeek(COP tCIDLib::EWeekDays& eToFill) const
 {
     // Get our time into the file time, adjusting for our portable base
     FILETIME    FlTime;
@@ -546,6 +541,7 @@ TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
     ::FileTimeToSystemTime(&FlTime, &SysTime);
     if (SysTime.wDayOfWeek > tCIDLib::c4EnumOrd(tCIDLib::EWeekDays::Max))
     {
+        eToFill = tCIDLib::EWeekDays::Count;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcTm_InvalidDayOfWeek);
         return kCIDLib::False;
     }
@@ -560,15 +556,15 @@ TKrnlTimeStamp::bDayOfWeek(tCIDLib::EWeekDays& eToFill) const
 //  the separate methods might create an inconsistency in some uses.
 //
 tCIDLib::TBoolean
-TKrnlTimeStamp::bExpandDetails( tCIDLib::TCard4&            c4Year
-                                , tCIDLib::EMonths&         eMonth
-                                , tCIDLib::TCard4&          c4Day
-                                , tCIDLib::EWeekDays&       eWeekDay
-                                , tCIDLib::TCard4&          c4Hour
-                                , tCIDLib::TCard4&          c4Minute
-                                , tCIDLib::TCard4&          c4Second
-                                , tCIDLib::TCard4&          c4Millis
-                                , tCIDLib::TEncodedTime&    enctStamp) const
+TKrnlTimeStamp::bExpandDetails( COP     tCIDLib::TCard4&        c4Year
+                                , COP   tCIDLib::EMonths&       eMonth
+                                , COP   tCIDLib::TCard4&        c4Day
+                                , COP   tCIDLib::EWeekDays&     eWeekDay
+                                , COP   tCIDLib::TCard4&        c4Hour
+                                , COP   tCIDLib::TCard4&        c4Minute
+                                , COP   tCIDLib::TCard4&        c4Second
+                                , COP   tCIDLib::TCard4&        c4Millis
+                                , COP   tCIDLib::TEncodedTime&  enctStamp) const
 {
     // Get our time into the file time, adjusting for our portable base
     FILETIME    FlTime;
@@ -583,6 +579,14 @@ TKrnlTimeStamp::bExpandDetails( tCIDLib::TCard4&            c4Year
     SYSTEMTIME  SysTime;
     if (!::FileTimeToSystemTime(&FlTime, &SysTime))
     {
+        c4Year = 0;
+        eMonth = tCIDLib::EMonths::Count;
+        c4Day = 0;
+        eWeekDay = tCIDLib::EWeekDays::Count;
+        c4Hour = 0;
+        c4Minute = 0;
+        c4Second = 0;
+        c4Millis = 0;
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
@@ -610,8 +614,7 @@ TKrnlTimeStamp::bExpandDetails( tCIDLib::TCard4&            c4Year
 //  always 24 hours and then convert back to the local time zone, so that
 //  one is easy enough.
 //
-tCIDLib::TBoolean
-TKrnlTimeStamp::bForwardByDays(const tCIDLib::TCard4 c4Count)
+tCIDLib::TBoolean TKrnlTimeStamp::bForwardByDays(const tCIDLib::TCard4 c4Count)
 {
     // Get our time into the file time, adjusting for our portable base
     FILETIME    FlTime;

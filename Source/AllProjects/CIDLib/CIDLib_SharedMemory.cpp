@@ -44,7 +44,10 @@ RTTIDecls(TSharedMemBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 namespace CIDLib_SharedMemory
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 
@@ -362,6 +365,7 @@ tCIDLib::TVoid TSharedMemBuf::SyncView()
 TSharedMemBuf::TSharedMemBuf() :
 
     TMemBuf()
+    , m_c4Size(0)
 {
 }
 
@@ -371,12 +375,12 @@ TSharedMemBuf::TSharedMemBuf() :
 // ---------------------------------------------------------------------------
 tCIDLib::TCard1* TSharedMemBuf::pc1QueryBuf()
 {
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 const tCIDLib::TCard1* TSharedMemBuf::pc1QueryBuf() const
 {
-    return reinterpret_cast<const tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<const tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 
@@ -386,7 +390,7 @@ TSharedMemBuf::pc1QueryBufInfo( tCIDLib::TCard4&    c4CurSize
 {
     c4CurSize = m_c4Size;
     c4MaxSize = m_ksmbThis.c4MaxSize();
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
 }
 
 const tCIDLib::TCard1*
@@ -395,7 +399,16 @@ TSharedMemBuf::pc1QueryBufInfo(  tCIDLib::TCard4&    c4CurSize
 {
     c4CurSize = m_c4Size;
     c4MaxSize = m_ksmbThis.c4MaxSize();
-    return reinterpret_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+    return static_cast<tCIDLib::TCard1*>(m_ksmbThis.pData());
+}
+
+
+tCIDLib::TVoid
+TSharedMemBuf::QueryBufInfo(tCIDLib::TCard4&    c4CurSize
+                            , tCIDLib::TCard4&  c4MaxSize) const
+{
+    c4CurSize = m_c4Size;
+    c4MaxSize = m_ksmbThis.c4MaxSize();
 }
 
 

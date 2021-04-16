@@ -81,28 +81,8 @@ TDTDNotationDecl::TDTDNotationDecl( const   tCIDLib::TCh* const pszName
 {
 }
 
-TDTDNotationDecl::TDTDNotationDecl(const TDTDNotationDecl& xdeclToCopy) :
-
-    TXMLNotationDecl(xdeclToCopy)
-{
-}
-
 TDTDNotationDecl::~TDTDNotationDecl()
 {
-}
-
-
-// ---------------------------------------------------------------------------
-//  TDTDNotationDecl: Public operators
-// ---------------------------------------------------------------------------
-TDTDNotationDecl&
-TDTDNotationDecl::operator=(const TDTDNotationDecl& xdeclToAssign)
-{
-    if (this == &xdeclToAssign)
-        return *this;
-
-    TParent::operator=(xdeclToAssign);
-    return *this;
 }
 
 

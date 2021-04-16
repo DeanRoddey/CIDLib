@@ -48,6 +48,7 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         );
 
         TCIDNameServerImpl(const TCIDNameServerImpl&) = delete;
+        TCIDNameServerImpl(TCIDNameServerImpl&&) = delete;
 
         ~TCIDNameServerImpl();
 
@@ -56,6 +57,7 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         //  Public operators
         // -------------------------------------------------------------------
         TCIDNameServerImpl& operator=(const TCIDNameServerImpl&) = delete;
+        TCIDNameServerImpl& operator=(TCIDNameServerImpl&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -65,21 +67,21 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         (
             const   TString&                strToCheck
             ,       tCIDLib::TCard8&        c4CurNSCookie
-        );
+        )   final;
 
         tCIDLib::TBoolean bGetObject
         (
             const   TString&                strBinding
             ,       TOrbObjId&              ooidToFill
             ,       tCIDLib::TCard8&        c4CurNSCookie
-        );
+        )   final;
 
         tCIDLib::TBoolean bQueryNameInfo
         (
             const   TString&                strNameToQuery
             ,       TString&                strName
             ,       TString&                strDescr
-        );
+        )   final;
 
         tCIDLib::TBoolean bQueryNameInfo2
         (
@@ -90,7 +92,7 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             ,       TString&                strExtra2
             ,       TString&                strExtra3
             ,       TString&                strExtra4
-        );
+        )   final;
 
         tCIDLib::TBoolean bQueryScopeKeys
         (
@@ -99,27 +101,27 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             ,       tCIDLib::TStrList&      colResults
             , const tCIDLib::TBoolean       bObjectsOnly
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   final;
 
         tCIDLib::TBoolean bRebindObjs
         (
             const   TVector<TNSRebindInfo>& colBindings
             ,       TFundVector<tCIDOrb::ERebindRes>& fcolResults
             ,       tCIDLib::TCard8&        c8CurCookie
-        );
+        )   final;
 
         tCIDLib::TBoolean bRenewLeases
         (
             const   tCIDLib::TStrList&      colPaths
             ,       tCIDLib::TBoolList&     fcolResults
             ,       tCIDLib::TCard8&        c8CurCookie
-        );
+        )   final;
 
         tCIDLib::TBoolean bScopeExists
         (
             const   TString&                strToCheck
             ,       tCIDLib::TCard8&        c4CurNSCookie
-        );
+        )   final;
 
         tCIDLib::TVoid BindObj
         (
@@ -130,7 +132,7 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             , const TString&                strExtra3
             , const TString&                strExtra4
             , const TOrbObjId&              ooidToStore
-        );
+        )   final;
 
         tCIDLib::TVoid BindObj2
         (
@@ -142,64 +144,65 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             , const TString&                strExtra3
             , const TString&                strExtra4
             , const TOrbObjId&              ooidToStore
-        );
+        )   final;
 
         tCIDLib::TVoid BindObj3
         (
             const   TNSRebindInfo&          nsrbiToBind
-        );
+        )   final;
 
         tCIDLib::TCard4 c4EnumObjects
         (
             const   TString&                strScopeToEnum
             ,       TVector<TNameServerInfo>& colResults
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   final;
 
         tCIDLib::TCard4 c4EnumSubScopes
         (
             const   TString&                strScopeToEnum
             ,       tCIDLib::TKVPList&      colResults
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   final;
 
-        tCIDLib::TCard8 c8QueryCookie();
+        tCIDLib::TCard8 c8QueryCookie() final;
 
         tCIDLib::TVoid ClearScope
         (
             const   TString&                strToClear
-        );
+        )   final;
 
         tCIDLib::TVoid CreateScope
         (
             const   TString&                strParentNode
             , const TString&                strNodeName
             , const TString&                strDescription
-        );
+            , const tCIDLib::TBoolean       bThrowIfExists
+        )   final;
 
         tCIDLib::TVoid CreateScopePath
         (
             const   TString&                strScopePath
             , const TString&                strDescription
-        );
+        )   final;
 
         tCIDLib::TVoid CreateScopePath
         (
             const   tCIDLib::TKVPList&      colPathParts
-        );
+        )   final;
 
         tCIDLib::TVoid Dump
         (
                     TString&                strToFill
             , const tCIDOrbUC::EDumpFmts eFormat
-        );
+        )   final;
 
         tCIDLib::TVoid QueryNameInfo
         (
             const   TString&                strNameToQuery
             ,       TString&                strName
             ,       TString&                strDescr
-        );
+        )   final;
 
         tCIDLib::TVoid QueryNameInfo2
         (
@@ -210,25 +213,25 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
             ,       TString&                strExtra2
             ,       TString&                strExtra3
             ,       TString&                strExtra4
-        );
+        )   final;
 
         tCIDLib::TVoid RemoveBinding
         (
             const   TString&                strToRemove
             , const tCIDLib::TBoolean       bThrowIfNot
-        );
+        )   final;
 
         tCIDLib::TVoid RemoveScope
         (
             const   TString&                strToRemove
-        );
+        )   final;
 
         tCIDLib::TVoid UpdateExtraVal
         (
             const   TString&                strBinding
             , const tCIDLib::TCard4         c4Index
             , const TString&                strNewValue
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -244,9 +247,9 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Initialize() override;
+        tCIDLib::TVoid Initialize() final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :
@@ -254,6 +257,8 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
         //  Private class types
         // -------------------------------------------------------------------
         using TNSCache = TBasicTreeCol<TNSNode>;
+        using TImplNode = TBasicTreeCol<TNSNode>::TNode;
+        using TImplNTNode = TBasicTreeCol<TNSNode>::TNodeNT;
 
 
         // -------------------------------------------------------------------
@@ -267,21 +272,21 @@ class TCIDNameServerImpl : public TCIDNameSrvServerBase
 
         tCIDLib::TVoid RecursiveDumpText
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+            const   TImplNTNode* const      pnodeParent
             ,       TTextOutStream&         strmOut
             , const tCIDLib::TCard4         c4Depth
         );
 
         tCIDLib::TVoid RecursiveDumpXML
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+            const   TImplNTNode* const      pnodeParent
             ,       TTextOutStream&         strmOut
             , const tCIDLib::TCard4         c4Depth
         );
 
         tCIDLib::TVoid RecursiveLeaseCheck
         (
-                    TBasicTreeCol<TNSNode>::TNodeNT* const pnodeParent
+                    TImplNTNode* const      pnodeParent
             , const tCIDLib::TEncodedTime   enctNow
         );
 

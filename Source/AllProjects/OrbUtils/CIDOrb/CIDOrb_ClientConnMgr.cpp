@@ -42,22 +42,25 @@ RTTIDecls(TOrbClientConnMgr,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDOrb_ClientConnMgr
 {
-    // -----------------------------------------------------------------------
-    //  The maximum number of worker threads we can have.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxThreads  = 128;
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The maximum number of worker threads we can have.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4MaxThreads  = 128;
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum number of clients connections we'll accept.
-    //
-    //  Since there is some lag between the time that we see that a client
-    //  has dropped and we get it out of the list, we make this a little
-    //  higher than the actual live connections we want to support, to handle
-    //  a pathological scenario where a number of clients drop at once, and
-    //  then reconnect before we get them cleaned up.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4MaxClients  = 256;
+        // -----------------------------------------------------------------------
+        //  The maximum number of clients connections we'll accept.
+        //
+        //  Since there is some lag between the time that we see that a client
+        //  has dropped and we get it out of the list, we make this a little
+        //  higher than the actual live connections we want to support, to handle
+        //  a pathological scenario where a number of clients drop at once, and
+        //  then reconnect before we get them cleaned up.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4MaxClients  = 256;
+    }
 }
 
 
@@ -76,18 +79,8 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
     , m_c4LoopCnt(1)
     , m_c4MaxClients(CIDOrb_ClientConnMgr::c4MaxClients)
     , m_c8NextConnId(0)
-    , m_colClientList
-      (
-        tCIDLib::EAdoptOpts::Adopt
-        , CIDOrb_ClientConnMgr::c4MaxClients
-        , tCIDLib::EMTStates::Unsafe
-      )
-    , m_colThreads
-      (
-        tCIDLib::EAdoptOpts::Adopt
-        , CIDOrb_ClientConnMgr::c4MaxThreads
-        , tCIDLib::EMTStates::Unsafe
-      )
+    , m_colClientList(tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxClients)
+    , m_colThreads(tCIDLib::EAdoptOpts::Adopt, CIDOrb_ClientConnMgr::c4MaxThreads)
     , m_colWorkQ(tCIDLib::EMTStates::Safe)
     , m_ipaOnlyAcceptFrom()
     , m_ippnListenOn(ippnListen)
@@ -134,13 +127,6 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
     //
     TStatsCache::RegisterItem
     (
-        kCIDOrb::pszStat_Srv_ActiveCmds
-        , tCIDLib::EStatItemTypes::Counter
-        , m_sciActiveCmds
-    );
-
-    TStatsCache::RegisterItem
-    (
         kCIDOrb::pszStat_Srv_ClientHWMark
         , tCIDLib::EStatItemTypes::Counter
         , m_sciClientHWMark
@@ -164,13 +150,6 @@ TOrbClientConnMgr::TOrbClientConnMgr(const  tCIDLib::TIPPortNum ippnListen
         kCIDOrb::pszStat_Srv_MaxClients
         , m_sciMaxClients
         , m_c4MaxClients
-    );
-
-    TStatsCache::RegisterItem
-    (
-        kCIDOrb::pszStat_Srv_QueuedCmds
-        , tCIDLib::EStatItemTypes::Counter
-        , m_sciQueuedCmds
     );
 
     TStatsCache::RegisterItem
@@ -222,6 +201,17 @@ TOrbClientConnMgr::~TOrbClientConnMgr()
 //  TOrbClientConnMgr: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
+//
+//  This is for the facility class' monitor thread to periodically ask how many
+//  commands we have queued up so he can update a statistic.
+//
+tCIDLib::TCard4 TOrbClientConnMgr::c4QueuedCmds() const
+{
+    // This guy is thread safe so no need to sync for this
+    return m_colWorkQ.c4ElemCount();
+}
+
+
 // Clear the flag that limits us to the m_ipaOnlyAcceptFrom address
 tCIDLib::TVoid TOrbClientConnMgr::ClearOnlyAcceptFrom()
 {
@@ -243,11 +233,11 @@ tCIDLib::TVoid TOrbClientConnMgr::ClearOnlyAcceptFrom()
 //  is calling us now, it cannot close itself down while it is in here.
 //
 tCIDOrb::EReadRes
-TOrbClientConnMgr::eQueueUpWork(TThread&                thrSpooler
-                                , TServerStreamSocket&  sockThis
-                                , TOrbClientConnImpl&   occiReplyTo
-                                , TMemBuf&              mbufTmp
-                                , TBinMBufInStream&     strmTmp)
+TOrbClientConnMgr::eQueueUpWork(        TThread&                thrSpooler
+                                ,       TServerStreamSocket&    sockThis
+                                , const TOrbClientConnImpl&     occiReplyTo
+                                ,       TMemBuf&                mbufTmp
+                                ,       TBinMBufInStream&       strmTmp)
 {
     tCIDLib::TCard4 c4SeqId;
     TWorkQItemPtr wqipNew;
@@ -289,7 +279,7 @@ TOrbClientConnMgr::eQueueUpWork(TThread&                thrSpooler
             //
             #if CID_DEBUG_ON
             {
-                TMtxLocker mtxlSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
                 if (!poccFindConn(c8RepId))
                 {
                     facCIDOrb().ThrowErr
@@ -307,12 +297,9 @@ TOrbClientConnMgr::eQueueUpWork(TThread&                thrSpooler
 
             //
             //  Ok, we can put the pointer into our work queue. The queue is separately
-            //  thread safe, and doesn't use the main mutex. But, because of that, we
-            //  can't turn around and get the count and use that to set the stats cache
-            //  value directly. We have to trust that we are inc/dec'ing it correctly.
+            //  thread safe, and doesn't use the main mutex.
             //
-            TStatsCache::c8IncCounter(m_sciQueuedCmds);
-            m_colWorkQ.objAdd(wqipNew);
+            m_colWorkQ.objPut(tCIDLib::ForceMove(wqipNew));
         }
 
         catch(TError& errToCatch)
@@ -349,7 +336,7 @@ tCIDLib::TVoid TOrbClientConnMgr::IncDroppedPackets()
 //
 tCIDLib::TVoid TOrbClientConnMgr::OnlyAcceptFrom(const TIPAddress& ipaSource)
 {
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
     m_ipaOnlyAcceptFrom = ipaSource;
     m_bLimitAccess = kCIDLib::True;
 }
@@ -591,7 +578,7 @@ tCIDLib::TVoid TOrbClientConnMgr::Terminate()
         try
         {
             TWorkQItemPtr wqipCur;
-            m_colWorkQ.bGetNext(wqipCur, kCIDLib::False);
+            m_colWorkQ.bGetNextMv(wqipCur, 0, kCIDLib::False);
         }
 
         catch(TError& errToCatch)
@@ -608,7 +595,6 @@ tCIDLib::TVoid TOrbClientConnMgr::Terminate()
             // Probably should log something in debug mode?
         }
     }
-    TStatsCache::SetValue(m_sciQueuedCmds, 0);
 }
 
 
@@ -713,7 +699,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
     //  get close to saturation.
     //
     {
-        TMtxLocker mtxlSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         tCIDLib::TBoolean bChanges = kCIDLib::False;
         tCIDLib::TCard4 c4Index = 0;
@@ -855,7 +841,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
         //  above.) We give this guy the next available connection id.
         //
         {
-            TMtxLocker mtxlSync(&m_mtxSync);
+            TLocker lockrSync(&m_mtxSync);
 
             // Get the next connection id. Don't let it be zero
             m_c8NextConnId++;
@@ -864,10 +850,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
 
             m_colClientList.Add
             (
-                new TOrbClientConnImpl
-                (
-                    janSock.pobjOrphan(), ipepClient, this, m_c8NextConnId
-                )
+                new TOrbClientConnImpl(janSock.pobjOrphan(), ipepClient, this, m_c8NextConnId)
             );
             c4Count = m_colClientList.c4ElemCount();
 
@@ -920,7 +903,7 @@ tCIDLib::TVoid TOrbClientConnMgr::DoChecks()
     //
     if (!(m_c4LoopCnt % 8))
     {
-        TMtxLocker mtxlSync(&m_mtxSync);
+        TLocker lockrSync(&m_mtxSync);
 
         const tCIDLib::TCard4 c4Cmds = m_colWorkQ.c4ElemCount();
         const tCIDLib::TCard4 c4Threads = m_colThreads.c4ElemCount();
@@ -1149,19 +1132,13 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             //  weight and don't allocate anything unless we get something.
             //
             TWorkQItemPtr wqipCur;
-            if (!m_colWorkQ.bGetNext(wqipCur, 1500, kCIDLib::False))
+            if (!m_colWorkQ.bGetNextMv(wqipCur, 1500, kCIDLib::False))
                 continue;
-
-            // Update our stats cache of queued cmds
-            TStatsCache::c8DecCounter(m_sciQueuedCmds);
 
             try
             {
                 // Store the ip end point for the exception handlers below
                 ipepClient = wqipCur->ipepClient();
-
-                // Bump the active commands count
-                TStatsCache::c8IncCounter(m_sciActiveCmds);
 
                 //
                 //  Get the method name out, and then dispatch it. The stream
@@ -1175,26 +1152,18 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
             catch(TError& errToCatch)
             {
                 errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-
-                // And decrement the active cmds count again then rethrow
-                TStatsCache::c8DecCounter(m_sciActiveCmds);
                 throw;
             }
 
             //
             //  Ok, it worked. So we want to queue up the reply on the client
-            //  connection object that is stored in the work queue. At this point
-            //  we are no longer responsible for the work item.
+            //  connection object that is referenced by the the work queue item.
             //
-            //  The connection might have gone away, in which case the counted
-            //  pointer will release the work item back to the pool.
+            //  The connection might have gone away, in which case the work item
+            //  pointer will release the item back to the pool.
             //
-            //  We need to decrement the active commands count as well.
-            //
-            TStatsCache::c8DecCounter(m_sciActiveCmds);
-            TOrbClientConnImpl* poccReply = nullptr;
             {
-                TMtxLocker mtxlSync(&m_mtxSync);
+                TLocker lockrSync(&m_mtxSync);
 
                 // Now let's see if we can find it
                 const tCIDLib::TCard8 c8RepId = wqipCur->c8ConnId();
@@ -1206,6 +1175,10 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
                     //  else we couldn't keep the mutex locked while we
                     //  are in here. It just queues up the item to be
                     //  sent by the connection object's spooler thread.
+                    //  The work item gets moved into the send queue,
+                    //  so it's empty if it gets sent. Otherwise, it'll
+                    //  release the item when the pool item pointer goes
+                    //  out of scope below.
                     //
                     poccReply->SendReply(wqipCur);
                 }
@@ -1214,6 +1187,11 @@ TOrbClientConnMgr::eWorkerThread(TThread& thrThis, tCIDLib::TVoid* pData)
                     TStatsCache::c8IncCounter(m_sciDroppedRetPacks);
                 }
             }
+
+            //
+            //  DO NOT access the work queue item here since will have been
+            //  moved in most cases (if it was queued up for send successfully.)
+            //
         }
 
         catch(TError& errToCatch)

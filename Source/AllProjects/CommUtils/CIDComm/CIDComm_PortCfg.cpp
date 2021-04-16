@@ -42,7 +42,10 @@ RTTIDecls(TCommPortCfg,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDComm_PortCfg
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        const tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

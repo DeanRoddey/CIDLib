@@ -42,7 +42,10 @@ RTTIDecls(TCIDModuleInfo,TObject)
 // ---------------------------------------------------------------------------
 namespace CIDLib_ModuleInfo
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 
@@ -53,7 +56,7 @@ namespace CIDLib_ModuleInfo
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-// Constructors and Destructor
+// TCIDModuleInfo: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TCIDModuleInfo::TCIDModuleInfo() :
 
@@ -89,47 +92,19 @@ TCIDModuleInfo::TCIDModuleInfo( const   TString&            strBaseName
 {
 }
 
-TCIDModuleInfo::TCIDModuleInfo(const TCIDModuleInfo& modiToCopy) :
-
-    m_c4MajVersion(modiToCopy.m_c4MajVersion)
-    , m_c4MinVersion(modiToCopy.m_c4MinVersion)
-    , m_eFlags(modiToCopy.m_eFlags)
-    , m_eModType(modiToCopy.m_eModType)
-    , m_strBaseName(modiToCopy.m_strBaseName)
-{
-}
-
-TCIDModuleInfo::~TCIDModuleInfo()
-{
-}
 
 
 // ---------------------------------------------------------------------------
-//  Public operators
+//  TCIDModuleInfo: Public operators
 // ---------------------------------------------------------------------------
-TCIDModuleInfo& TCIDModuleInfo::operator=(const TCIDModuleInfo& modiToAssign)
-{
-    if (this == &modiToAssign)
-        return *this;
-
-    m_c4MajVersion  = modiToAssign.m_c4MajVersion;
-    m_c4MinVersion  = modiToAssign.m_c4MinVersion;
-    m_eFlags        = modiToAssign.m_eFlags;
-    m_eModType      = modiToAssign.m_eModType;
-    m_strBaseName   = modiToAssign.m_strBaseName;
-
-    return *this;
-}
-
-
 tCIDLib::TBoolean
-TCIDModuleInfo::operator==(const TCIDModuleInfo& modiToCompare) const
+TCIDModuleInfo::operator==(const TCIDModuleInfo& midoSrc) const
 {
-    if ((m_strBaseName  != modiToCompare.m_strBaseName)
-    ||  (m_c4MajVersion != modiToCompare.m_c4MajVersion)
-    ||  (m_c4MinVersion != modiToCompare.m_c4MinVersion)
-    ||  (m_eFlags       != modiToCompare.m_eFlags)
-    ||  (m_eModType     != modiToCompare.m_eModType))
+    if ((m_strBaseName  != midoSrc.m_strBaseName)
+    ||  (m_c4MajVersion != midoSrc.m_c4MajVersion)
+    ||  (m_c4MinVersion != midoSrc.m_c4MinVersion)
+    ||  (m_eFlags       != midoSrc.m_eFlags)
+    ||  (m_eModType     != midoSrc.m_eModType))
     {
         return kCIDLib::False;
     }
@@ -137,42 +112,9 @@ TCIDModuleInfo::operator==(const TCIDModuleInfo& modiToCompare) const
 }
 
 
-tCIDLib::TBoolean
-TCIDModuleInfo::operator!=(const TCIDModuleInfo& modiToCompare) const
-{
-    return !operator==(modiToCompare);
-}
-
-
 // ---------------------------------------------------------------------------
-//  Public, non-virtual methods
+//  TCIDModuleInfo: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TCard4 TCIDModuleInfo::c4MajVersion() const
-{
-    return m_c4MajVersion;
-}
-
-tCIDLib::TCard4 TCIDModuleInfo::c4MinVersion() const
-{
-    return m_c4MinVersion;
-}
-
-tCIDLib::EModFlags TCIDModuleInfo::eFlags() const
-{
-    return m_eFlags;
-}
-
-tCIDLib::EModTypes TCIDModuleInfo::eModType() const
-{
-    return m_eModType;
-}
-
-const TString& TCIDModuleInfo::strBaseName() const
-{
-    return m_strBaseName;
-}
-
-
 tCIDLib::TVoid TCIDModuleInfo::Set( const   TString&            strBaseName
                                     , const tCIDLib::EModTypes  eModType
                                     , const tCIDLib::TCard4     c4MajVersion
@@ -199,14 +141,22 @@ tCIDLib::TVoid TCIDModuleInfo::Set( const   TString&            strBaseName
 
 
 // ---------------------------------------------------------------------------
-//  Protected, inherited methods
+//  TCIDModuleInfo: Protected, inherited methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TCIDModuleInfo::FormatTo(TTextOutStream& strmDest) const
+tCIDLib::TVoid TCIDModuleInfo::FormatTo(CIOP TTextOutStream& strmDest) const
 {
-    // Build up the platform specific name and format it
-    TString strTmp;
-    TModule::BuildRawModName(*this, strTmp);
-    strmDest << strTmp;
+    TString strPortable, strLoadable;
+    TModule::BuildModName
+    (
+        m_strBaseName
+        , m_c4MajVersion
+        , m_c4MinVersion
+        , m_eModType
+        , strPortable
+        , strLoadable
+    );
+
+    strmDest << L"(" << strPortable << L"/" << strLoadable << L")";
 }
 
 

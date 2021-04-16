@@ -111,7 +111,7 @@ TCIDAIBTParser::pbtnodeParse(const TMemBuf& mbufSrc, const tCIDLib::TCard4 c4Byt
         catch(TError& errToCatch)
         {
             errToCatch.AddStackLevel(CID_FILE, CID_LINE);
-            TModule::LogEventObj(errToCatch);
+            TModule::LogEventObj(tCIDLib::ForceMove(errToCatch));
         }
 
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
@@ -173,8 +173,8 @@ tCIDLib::TVoid TCIDAIBTParser::EndTag(const TXMLElemDecl& xdeclElem)
 {
     if (xdeclElem.strFullName() == s_strElem_BTNode)
     {
-        // Pop the node stack now. We are done with this one
-        m_colNodeStack.pobjPop();
+        // Discard the node now. We are done with this one
+        m_colNodeStack.TrashTop();
     }
      else if (xdeclElem.strFullName() == s_strElem_NodeParams)
     {
@@ -265,13 +265,10 @@ TCIDAIBTParser::StartTag(       TXMLParserCore&     xprsSrc
          else if (xdeclElem.strFullName() == s_strElem_NodeParam)
         {
             // Store this new parameter
-            m_colParams.objAdd
+            m_colParams.objPlace
             (
-                TKeyValuePair
-                (
-                    strFindAttr(colAttrList, s_strAttr_Key, kCIDLib::True)
-                    , strFindAttr(colAttrList, s_strAttr_Value, kCIDLib::True)
-                )
+                strFindAttr(colAttrList, s_strAttr_Key, kCIDLib::True)
+                , strFindAttr(colAttrList, s_strAttr_Value, kCIDLib::True)
             );
         }
          else if (xdeclElem.strFullName() == s_strElem_BTNode)

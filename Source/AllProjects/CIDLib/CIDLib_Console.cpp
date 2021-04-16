@@ -78,7 +78,7 @@ TConPager::~TConPager()
 // ---------------------------------------------------------------------------
 tCIDLib::TCard4 TConPager::operator++(int)
 {
-    tCIDLib::EConKeys   eKey;
+    tCIDLib::EConKeys   eKey = tCIDLib::EConKeys::Null;
 
     //
     //  If the current line is at the end of the window then we set the
@@ -216,11 +216,7 @@ TConsoleInImpl::c4ReadBytes(        tCIDLib::TVoid* const   pToFill
 
     tCIDLib::TCard4 c4Len = 0;
 
-    if (!m_kconImpl.bReadLine
-    (
-        reinterpret_cast<tCIDLib::TCh*>(pToFill)
-        , c4MaxChars
-        , c4Len))
+    if (!m_kconImpl.bReadLine(static_cast<tCIDLib::TCh*>(pToFill), c4MaxChars, c4Len))
     {
         facCIDLib().ThrowKrnlErr
         (

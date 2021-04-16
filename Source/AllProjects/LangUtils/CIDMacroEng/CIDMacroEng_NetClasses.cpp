@@ -48,19 +48,22 @@ RTTIDecls(TMEngURLInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_NetClasses
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strDataSrc(L"DataSrc");
-    const TString   strDataSrcClassPath(L"MEng.System.Runtime.DataSrc");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strDataSrc(L"DataSrc");
+        const TString   strDataSrcClassPath(L"MEng.System.Runtime.DataSrc");
 
-    const TString   strHTTPClient(L"HTTPClient");
-    const TString   strHTTPClientClassPath(L"MEng.System.Runtime.HTTPClient");
+        const TString   strHTTPClient(L"HTTPClient");
+        const TString   strHTTPClientClassPath(L"MEng.System.Runtime.HTTPClient");
 
-    const TString   strURL(L"URL");
-    const TString   strURLClassPath(L"MEng.System.Runtime.URL");
-    const TString   strURLProtosClassPath(L"MEng.System.Runtime.URL.URLProtos");
+        const TString   strURL(L"URL");
+        const TString   strURLClassPath(L"MEng.System.Runtime.URL");
+        const TString   strURLProtosClassPath(L"MEng.System.Runtime.URL.URLProtos");
+    }
 }
 
 
@@ -120,7 +123,7 @@ TMEngDataSrcVal::bDbgFormat(        TTextOutStream&     strmTarget
 // Return true if we hae a source and it's connected
 tCIDLib::TBoolean TMEngDataSrcVal::bConnected() const
 {
-    return (m_pcdsSrc && m_pcdsSrc->bConnected());
+    return (m_pcdsSrc && m_pcdsSrc->bIsConnected());
 }
 
 
@@ -306,23 +309,23 @@ TMEngDataSrcInfo::TMEngDataSrcInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DataIsReady(kMacroEng::c2BadId)
-    , m_c2MethId_Close(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetIsConnected(kMacroEng::c2BadId)
-    , m_c2MethId_GetLine(kMacroEng::c2BadId)
-    , m_c2MethId_ReadBytes(kMacroEng::c2BadId)
-    , m_c2MethId_TCPSetup(kMacroEng::c2BadId)
+    , m_c2MethId_DataIsReady(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Close(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetIsConnected(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ReadBytes(kCIDMacroEng::c2BadId)
+    , m_c2MethId_TCPSetup(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Already(kCIDLib::c4MaxCard)
     , m_c4ErrId_Close(kCIDLib::c4MaxCard)
     , m_c4ErrId_NotReady(kCIDLib::c4MaxCard)
     , m_c4ErrId_Read(kCIDLib::c4MaxCard)
     , m_c4ErrId_Setup(kCIDLib::c4MaxCard)
-    , m_c2TypeId_IPEndPoint(kMacroEng::c2BadId)
-    , m_c2TypeId_TextXCoder(kMacroEng::c2BadId)
-    , m_pmeciErrors(0)
-    , m_pmeciLineRes(0)
-    , m_pmeciSockProtos(0)
+    , m_c2TypeId_IPEndPoint(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_TextXCoder(kCIDMacroEng::c2BadId)
+    , m_pmeciErrors(nullptr)
+    , m_pmeciLineRes(nullptr)
+    , m_pmeciSockProtos(nullptr)
 {
     // Force the import of non-intrinsic classes we reference
     bAddClassImport(TMEngStreamSocketInfo::strPath());
@@ -347,11 +350,7 @@ tCIDLib::TVoid TMEngDataSrcInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciErrors = new TMEngEnumInfo
         (
-            meOwner
-            , L"DataSrcErrors"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 5
+            meOwner, L"DataSrcErrors", strClassPath(), L"MEng.Enum", 5
         );
         m_c4ErrId_Already = m_pmeciErrors->c4AddEnumItem(L"Already", TString::strEmpty());
         m_c4ErrId_Close = m_pmeciErrors->c4AddEnumItem(L"Close", TString::strEmpty());
@@ -367,11 +366,7 @@ tCIDLib::TVoid TMEngDataSrcInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciLineRes = new TMEngEnumInfo
         (
-            meOwner
-            , L"LineReadRes"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 4
+            meOwner, L"LineReadRes", strClassPath(), L"MEng.Enum", 4
         );
         m_pmeciLineRes->c4AddEnumItem(L"GotLine", L"Got a line", tCIDLib::ELineRes::GotLine);
         m_pmeciLineRes->c4AddEnumItem(L"EmptyLine", L"Got empty line" , tCIDLib::ELineRes::EmptyLine);
@@ -755,6 +750,7 @@ TMEngHTTPClientVal::bDbgFormat(         TTextOutStream&     strmTarget
                                 , const tCIDLib::ERadices   eRadix
                                 , const TCIDMacroEngine&    meOwner) const
 {
+    CIDAssert(m_phttpcValue != nullptr, L"The HTTP client value object is not set");
     if (eFormat == tCIDMacroEng::EDbgFmts::Long)
     {
         strmTarget << L"Proxy Server: ";
@@ -818,39 +814,40 @@ TMEngHTTPClientInfo::TMEngHTTPClientInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_CreateBasicAuthStr(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_DoSSLGET(kMacroEng::c2BadId)
-    , m_c2MethId_DoSSLPOST(kMacroEng::c2BadId)
-    , m_c2MethId_EscapeBodyText(kMacroEng::c2BadId)
-    , m_c2MethId_ExpandBodyText(kMacroEng::c2BadId)
-    , m_c2MethId_FindHdrLine(kMacroEng::c2BadId)
-    , m_c2MethId_FindTextEncoding(kMacroEng::c2BadId)
-    , m_c2MethId_GetClientMsg(kMacroEng::c2BadId)
-    , m_c2MethId_GetSrvReply(kMacroEng::c2BadId)
-    , m_c2MethId_ParseAuthReq(kMacroEng::c2BadId)
-    , m_c2MethId_ParseMPartMIME(kMacroEng::c2BadId)
-    , m_c2MethId_ParseQParms(kMacroEng::c2BadId)
-    , m_c2MethId_ParseTextEncoding(kMacroEng::c2BadId)
-    , m_c2MethId_SendGET(kMacroEng::c2BadId)
-    , m_c2MethId_SendHEAD(kMacroEng::c2BadId)
-    , m_c2MethId_SendPOST(kMacroEng::c2BadId)
-    , m_c2MethId_SendPOST2(kMacroEng::c2BadId)
-    , m_c2MethId_SendPUT(kMacroEng::c2BadId)
-    , m_c2MethId_SendRUGET(kMacroEng::c2BadId)
-    , m_c2MethId_SendRUHEAD(kMacroEng::c2BadId)
-    , m_c2MethId_SendRUPOST(kMacroEng::c2BadId)
-    , m_c2MethId_SendRUPOST2(kMacroEng::c2BadId)
-    , m_c2MethId_SendRUPUT(kMacroEng::c2BadId)
-    , m_c2MethId_SetAddrType(kMacroEng::c2BadId)
-    , m_c2MethId_SetAutoAuth(kMacroEng::c2BadId)
-    , m_c2MethId_SetProxy(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
-    , m_c2TypeId_KVPair(kMacroEng::c2BadId)
-    , m_c2TypeId_CardList(kMacroEng::c2BadId)
-    , m_c2TypeId_BufList(kMacroEng::c2BadId)
-    , m_c2TypeId_ItemList(kMacroEng::c2BadId)
-    , m_c2TypeId_StrList(kMacroEng::c2BadId)
+    , m_c2MethId_CreateBasicAuthStr(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DoSSLGET(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DoSSLPOST(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EscapeBodyText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ExpandBodyText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindHdrLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FindTextEncoding(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetClientMsg(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetSrvReply(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseAuthReq(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseMPartMIME(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseQParms(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseTextEncoding(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendGET(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendHEAD(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendPOST(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendPOST2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendPUT(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendRUGET(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendRUHEAD(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendRUPOST(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendRUPOST2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SendRUPUT(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetAddrType(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetAuthInfo(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetAutoAuth(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetProxy(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_KVPair(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_CardList(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_BufList(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_ItemList(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_StrList(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Get(kCIDLib::c4MaxCard)
     , m_c4ErrId_Escape(kCIDLib::c4MaxCard)
     , m_c4ErrId_Expand(kCIDLib::c4MaxCard)
@@ -858,11 +855,11 @@ TMEngHTTPClientInfo::TMEngHTTPClientInfo(TCIDMacroEngine& meOwner) :
     , m_c4ErrId_Post(kCIDLib::c4MaxCard)
     , m_c4ErrId_RecvMsg(kCIDLib::c4MaxCard)
     , m_c4ErrId_SetProxy(kCIDLib::c4MaxCard)
-    , m_pmeciAuthTypes(0)
-    , m_pmeciErrors(0)
-    , m_pmeciIPAddrTypes(0)
-    , m_pmeciNetSrc(0)
-    , m_pmeciReadRes(0)
+    , m_pmeciAuthTypes(nullptr)
+    , m_pmeciErrors(nullptr)
+    , m_pmeciIPAddrTypes(nullptr)
+    , m_pmeciNetSrc(nullptr)
+    , m_pmeciReadRes(nullptr)
 {
     // Force the import of non-intrinsic classes we reference
     bAddClassImport(TMEngVectorInfo::strPath());
@@ -891,11 +888,7 @@ tCIDLib::TVoid TMEngHTTPClientInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciErrors = new TMEngEnumInfo
         (
-            meOwner
-            , L"HTTPClientErrors"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 7
+            meOwner, L"HTTPClientErrors", strClassPath(), L"MEng.Enum", 7
         );
         m_c4ErrId_Get = m_pmeciErrors->c4AddEnumItem(L"GetError", TString::strEmpty());
         m_c4ErrId_Escape = m_pmeciErrors->c4AddEnumItem(L"EscapeError", TString::strEmpty());
@@ -915,11 +908,7 @@ tCIDLib::TVoid TMEngHTTPClientInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciAuthTypes = new TMEngEnumInfo
         (
-            meOwner
-            , L"HTTPAuthTypes"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 2
+            meOwner, L"HTTPAuthTypes", strClassPath(), L"MEng.Enum", 2
         );
         m_pmeciAuthTypes->c4AddEnumItem(L"Basic", L"Basic Authentication", tCIDNet::EHTTPAuthTypes::Basic);
         m_pmeciAuthTypes->c4AddEnumItem(L"Digest", L"Digest Authentication", tCIDNet::EHTTPAuthTypes::Digest);
@@ -934,11 +923,7 @@ tCIDLib::TVoid TMEngHTTPClientInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciReadRes = new TMEngEnumInfo
         (
-            meOwner
-            , L"HTTPReadRes"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 11
+            meOwner, L"HTTPReadRes", strClassPath(), L"MEng.Enum", 11
         );
         m_pmeciReadRes->c4AddEnumItem(L"Success", L"Successful read", tCIDNet::ENetPReadRes::Success);
         m_pmeciReadRes->c4AddEnumItem(L"BadFirstLn", TString::strEmpty(), tCIDNet::ENetPReadRes::BadFirstLine);
@@ -1793,7 +1778,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             if (c2MethId == m_c2MethId_DoSSLPOST)
                 c4SendLen = mecvContLen.c4Value();
 
-            tCIDLib::TCard4 c4ResCode;
+            tCIDLib::TCard4 c4ResCode = 0;
             tCIDLib::TKVPList colOutHdrLines;
             tCIDLib::TCard4 c4ContLen = THTTPClient::c4DoSSLPageOp
             (
@@ -2055,7 +2040,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             tCIDNet::EHTTPCodes eCodeType;
             TString strRepType;
             tCIDLib::TKVPList colOutHdrLines;
-            tCIDLib::TCard4 c4ContLen = 0;
+            tCIDLib::TCard4 c4ContLen;
             tCIDLib::TCard4 c4Ret = mecvActual.httpcValue().c4GetSrvReply
             (
                 mecvSrc.cdsValue()
@@ -2160,7 +2145,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 (
                     new TMEngCard4Val
                     (
-                        TString::strEmpty(), tCIDMacroEng::EConstTypes::NonConst, fcolSizes[c4Index]
+                        TString::strEmpty()
+                        , tCIDMacroEng::EConstTypes::NonConst
+                        , fcolSizes[c4Index]
                     )
                 );
             }
@@ -2173,7 +2160,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 (
                     new TMEngStringVal
                     (
-                        TString::strEmpty(), tCIDMacroEng::EConstTypes::NonConst, colTypes[c4Index]
+                        TString::strEmpty()
+                        , tCIDMacroEng::EConstTypes::NonConst
+                        , colTypes[c4Index]
                     )
                 );
             }
@@ -2186,7 +2175,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 (
                     new TMEngStringVal
                     (
-                        TString::strEmpty(), tCIDMacroEng::EConstTypes::NonConst, colDispos[c4Index]
+                        TString::strEmpty()
+                        , tCIDMacroEng::EConstTypes::NonConst
+                        , colDispos[c4Index]
                     )
                 );
             }
@@ -2199,7 +2190,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 (
                     new TMEngStringVal
                     (
-                        TString::strEmpty(), tCIDMacroEng::EConstTypes::NonConst, colEncodings[c4Index]
+                        TString::strEmpty()
+                        , tCIDMacroEng::EConstTypes::NonConst
+                        , colEncodings[c4Index]
                     )
                 );
             }
@@ -2289,8 +2282,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             (
                 mecvActual.httpcValue().bParseTextEncoding
                 (
-                    meOwner.strStackValAt(c4FirstInd)
-                    , mecvToFill.strValue()
+                    meOwner.strStackValAt(c4FirstInd), mecvToFill.strValue()
                 )
             );
         }
@@ -2375,9 +2367,9 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 pcdsToUse = &mecvSrc.cdsValue();
             }
 
-            tCIDNet::EHTTPCodes eCodeType;
+            tCIDNet::EHTTPCodes eCodeType = tCIDNet::EHTTPCodes::Unknown;
             tCIDLib::TKVPList colOutHdrLines;
-            tCIDLib::TCard4 c4Ret;
+            tCIDLib::TCard4 c4Ret = 0;
 
             if ((c2MethId == m_c2MethId_SendGET) || (c2MethId == m_c2MethId_SendRUGET))
             {
@@ -2488,17 +2480,14 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                         mecvInLines.mecvAt(meOwner, c4Index)
                     )
                 );
-                colInHdrLines.objAdd
-                (
-                    TKeyValuePair(mecvCur.strKey(), mecvCur.strValue())
-                );
+                colInHdrLines.objAdd(TKeyValuePair(mecvCur.strKey(), mecvCur.strValue()));
             }
 
             //
             //  If there's an incoming socket, get a pointer to it, else pass in
             //  zero and it will create one for us.
             //
-            TCIDDataSrc* pcdsToUse = 0;
+            TCIDDataSrc* pcdsToUse = nullptr;
             if (c2MethId == m_c2MethId_SendRUHEAD)
             {
                 TMEngDataSrcVal& mecvSrc
@@ -2598,8 +2587,8 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             );
             tCIDLib::TCard4 c4Count = mecvInLines.c4ElemCount();
 
-            // Use +1 for max in case of zer count
-            tCIDLib::TKVPList colInHdrLines(c4Count);
+            // Use + 1 for max in case of zero count
+            tCIDLib::TKVPList colInHdrLines(c4Count + 1);
             for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
             {
                 // Get the element and cast to its real type
@@ -2627,7 +2616,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             //  If there's an incoming socket, get a pointer to it, else pass in
             //  zero and it will create one for us.
             //
-            TCIDDataSrc* pcdsToUse = 0;
+            TCIDDataSrc* pcdsToUse = nullptr;
             if (c2MethId == m_c2MethId_SendRUPOST)
             {
                 TMEngDataSrcVal& mecvSrc
@@ -2638,7 +2627,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
                 pcdsToUse = &mecvSrc.cdsValue();
             }
 
-            tCIDNet::EHTTPCodes eCodeType;
+            tCIDNet::EHTTPCodes eCodeType = tCIDNet::EHTTPCodes::Unknown;
             tCIDLib::TKVPList colOutHdrLines;
             tCIDLib::TCard4 c4ContLen = 0;
             tCIDLib::TCard4 c4Ret = mecvActual.httpcValue().c4SendPost
@@ -2757,7 +2746,7 @@ TMEngHTTPClientInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             //  If there's an incoming socket, get a pointer to it, else pass in
             //  zero and it will create one for us.
             //
-            TCIDDataSrc* pcdsToUse = 0;
+            TCIDDataSrc* pcdsToUse = nullptr;
             if (c2MethId == m_c2MethId_SendRUPOST2)
             {
                 TMEngDataSrcVal& mecvSrc
@@ -3061,45 +3050,46 @@ TMEngURLInfo::TMEngURLInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Formattable"
     )
-    , m_c2MethId_BuildURL(kMacroEng::c2BadId)
-    , m_c2MethId_Clear(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_Encode(kMacroEng::c2BadId)
-    , m_c2MethId_Equal(kMacroEng::c2BadId)
-    , m_c2MethId_Expand(kMacroEng::c2BadId)
-    , m_c2MethId_GetEncoded(kMacroEng::c2BadId)
-    , m_c2MethId_GetEncodedParts(kMacroEng::c2BadId)
-    , m_c2MethId_GetFragment(kMacroEng::c2BadId)
-    , m_c2MethId_GetFullText(kMacroEng::c2BadId)
-    , m_c2MethId_GetHost(kMacroEng::c2BadId)
-    , m_c2MethId_GetIPEndPoint(kMacroEng::c2BadId)
-    , m_c2MethId_GetParams(kMacroEng::c2BadId)
-    , m_c2MethId_GetPassword(kMacroEng::c2BadId)
-    , m_c2MethId_GetPath(kMacroEng::c2BadId)
-    , m_c2MethId_GetPort(kMacroEng::c2BadId)
-    , m_c2MethId_GetProto(kMacroEng::c2BadId)
-    , m_c2MethId_GetQParms(kMacroEng::c2BadId)
-    , m_c2MethId_GetQParmsFmt(kMacroEng::c2BadId)
-    , m_c2MethId_GetResource(kMacroEng::c2BadId)
-    , m_c2MethId_GetUserName(kMacroEng::c2BadId)
-    , m_c2MethId_Set(kMacroEng::c2BadId)
-    , m_c2MethId_Set2(kMacroEng::c2BadId)
-    , m_c2MethId_Set3(kMacroEng::c2BadId)
-    , m_c2MethId_Set4(kMacroEng::c2BadId)
-    , m_c2TypeId_Comps(kMacroEng::c2BadId)
-    , m_c2TypeId_Errors(kMacroEng::c2BadId)
-    , m_c2TypeId_ItemList(kMacroEng::c2BadId)
-    , m_c2TypeId_IPEP(kMacroEng::c2BadId)
-    , m_c2TypeId_KVPair(kMacroEng::c2BadId)
-    , m_c2TypeId_Protos(kMacroEng::c2BadId)
+    , m_c2MethId_BuildURL(kCIDMacroEng::c2BadId)
+    , m_c2MethId_BuildURL2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Clear(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Encode(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Equal(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Expand(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetEncoded(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetEncodedParts(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFragment(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetFullText(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetHost(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetIPEndPoint(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetParams(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetPassword(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetPath(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetPort(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetProto(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetQParms(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetQParmsFmt(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetResource(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetUserName(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set3(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set4(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Comps(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Errors(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_ItemList(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_IPEP(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_KVPair(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_Protos(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Encoding(kCIDLib::c4MaxCard)
-    , m_c4ErrId_NoIPEP(kMacroEng::c2BadId)
+    , m_c4ErrId_NoIPEP(kCIDMacroEng::c2BadId)
     , m_c4ErrId_Query(kCIDLib::c4MaxCard)
     , m_c4ErrId_Set(kCIDLib::c4MaxCard)
-    , m_pmeciIPAddrTypes(0)
-    , m_pmeciComps(0)
-    , m_pmeciErrors(0)
-    , m_pmeciProtos(0)
+    , m_pmeciIPAddrTypes(nullptr)
+    , m_pmeciComps(nullptr)
+    , m_pmeciErrors(nullptr)
+    , m_pmeciProtos(nullptr)
 {
     // Add imports for any non-intrinsic classes we use in our signatures
     bAddClassImport(TMEngBaseInfoInfo::strPath());
@@ -3121,11 +3111,7 @@ tCIDLib::TVoid TMEngURLInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciComps = new TMEngEnumInfo
         (
-            meOwner
-            , L"URLComps"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 3
+            meOwner, L"URLComps", strClassPath(), L"MEng.Enum", 3
         );
         m_pmeciComps->c4AddEnumItem(L"Path", L"Path", TURL::EExpTypes::Path);
         m_pmeciComps->c4AddEnumItem(L"Query", L"Query", TURL::EExpTypes::Query);
@@ -3143,11 +3129,7 @@ tCIDLib::TVoid TMEngURLInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciErrors = new TMEngEnumInfo
         (
-            meOwner
-            , L"URLErrors"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 4
+            meOwner, L"URLErrors", strClassPath(), L"MEng.Enum", 4
         );
         m_c4ErrId_Encoding = m_pmeciErrors->c4AddEnumItem(L"EncodingError", TString::strEmpty());
         m_c4ErrId_NoIPEP  = m_pmeciErrors->c4AddEnumItem(L"NoIPEP", TString::strEmpty());
@@ -3162,11 +3144,7 @@ tCIDLib::TVoid TMEngURLInfo::Init(TCIDMacroEngine& meOwner)
     {
         m_pmeciProtos = new TMEngEnumInfo
         (
-            meOwner
-            , L"URLProtos"
-            , strClassPath()
-            , L"MEng.Enum"
-            , 10
+            meOwner, L"URLProtos", strClassPath(), L"MEng.Enum", 10
         );
         m_pmeciProtos->c4AddEnumItem(L"None", L"None", tCIDSock::EProtos::None);
         m_pmeciProtos->c4AddEnumItem(L"File", L"file", tCIDSock::EProtos::File);
@@ -3928,10 +3906,7 @@ TMEngURLInfo::bInvokeMethod(        TCIDMacroEngine&    meOwner
         try
         {
             // Get the output list and clear it
-            TMEngVectorVal& mecvQPs
-            (
-                meOwner.mecvStackAtAs<TMEngVectorVal>(c4FirstInd)
-            );
+            TMEngVectorVal& mecvQPs(meOwner.mecvStackAtAs<TMEngVectorVal>(c4FirstInd));
             mecvQPs.RemoveAll();
 
             // Loop through the query parms list from the incoming URL

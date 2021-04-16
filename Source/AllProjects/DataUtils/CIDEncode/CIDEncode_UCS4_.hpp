@@ -39,15 +39,13 @@ class CIDENCODEEXP TUCS4Converter : public TTextConverter
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        ~TUCS4Converter();
+        ~TUCS4Converter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EBaseTextFmts eBaseFmt() const;
-
-        tCIDLib::TVoid Reset();
+        tCIDLib::EBaseTextFmts eBaseFmt() const override;
 
 
         // -------------------------------------------------------------------
@@ -65,15 +63,10 @@ class CIDENCODEEXP TUCS4Converter : public TTextConverter
             const   tCIDLib::EEndianModes   eMode
         );
 
-        TUCS4Converter
-        (
-            const   TUCS4Converter&         tcvtToCopy
-        );
-
-        TUCS4Converter& operator=
-        (
-            const   TUCS4Converter&         tcvtToAssign
-        );
+        TUCS4Converter(const TUCS4Converter&) = default;
+        TUCS4Converter(TUCS4Converter&&) = default;
+        TUCS4Converter& operator=(const TUCS4Converter&) = default;
+        TUCS4Converter& operator=(TUCS4Converter&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -87,7 +80,7 @@ class CIDENCODEEXP TUCS4Converter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -97,16 +90,10 @@ class CIDENCODEEXP TUCS4Converter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TUCS4Converter,TTextConverter)
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -119,6 +106,11 @@ class CIDENCODEEXP TUCS4Converter : public TTextConverter
         // -------------------------------------------------------------------
         tCIDLib::TBoolean       m_bSwapped;
         tCIDLib::EEndianModes   m_eMode;
+
+        // -------------------------------------------------------------------
+        //  Magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TUCS4Converter,TTextConverter)
 };
 
 
@@ -134,21 +126,17 @@ class CIDENCODEEXP TUCS4BEConverter : public TUCS4Converter
         // -------------------------------------------------------------------
         TUCS4BEConverter();
 
-        TUCS4BEConverter
-        (
-            const   TUCS4BEConverter&       tcvtToCopy
-        );
+        TUCS4BEConverter(const TUCS4BEConverter&) = default;
+        TUCS4BEConverter(TUCS4BEConverter&&) = default;
 
-        ~TUCS4BEConverter();
+        ~TUCS4BEConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUCS4BEConverter& operator=
-        (
-            const   TUCS4BEConverter&       tcvtToAssign
-        );
+        TUCS4BEConverter& operator=(const TUCS4BEConverter&) = default;
+        TUCS4BEConverter& operator=(TUCS4BEConverter&&) = default;
 
 
     private :
@@ -173,21 +161,17 @@ class CIDENCODEEXP TUCS4LEConverter : public TUCS4Converter
         // -------------------------------------------------------------------
         TUCS4LEConverter();
 
-        TUCS4LEConverter
-        (
-            const   TUCS4LEConverter&       tcvtToCopy
-        );
+        TUCS4LEConverter(const TUCS4LEConverter&) = default;
+        TUCS4LEConverter(TUCS4LEConverter&&) = default;
 
-        ~TUCS4LEConverter();
+        ~TUCS4LEConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TUCS4LEConverter& operator=
-        (
-            const   TUCS4LEConverter&       tcvtToAssign
-        );
+        TUCS4LEConverter& operator=(const TUCS4LEConverter&) = default;
+        TUCS4LEConverter& operator=(TUCS4LEConverter&&) = default;
 
 
     private :

@@ -131,7 +131,7 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
         BulkTest(tCIDLib::TCard4& c4BufSz_mbufOut, THeapBuf& mbufOut)
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < c4BufSz_mbufOut; c4Index++)
-                mbufOut[c4Index] = tCIDLib::TCard1(mbufOut[c4Index]) ^ 0xFF;
+                mbufOut.PutCard1(tCIDLib::TCard1(mbufOut[c4Index]) ^ 0xFF, c4Index);
 
             //
             //  We just leave the input count alone, since we return the same
@@ -391,7 +391,7 @@ TTest_ORBLoopback::eRunTest(TTextStringOutStream&   strmOut
     tCIDLib::TBoolean bInitCalled = kCIDLib::False;
     tCIDLib::TBoolean bTermCalled = kCIDLib::False;
     TLoopbackImpl* porbsTest = new TLoopbackImpl(&bInitCalled, &bTermCalled);
-    facCIDOrb().RegisterObject(porbsTest);
+    facCIDOrb().RegisterObject(porbsTest, tCIDLib::EAdoptOpts::Adopt);
 
     // At this point the init method should have been called
     if (!bInitCalled)
@@ -700,7 +700,7 @@ TTest_ORBLoopback::eRunTest(TTextStringOutStream&   strmOut
 
         THeapBuf mbufTmp(c4Bytes);
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Bytes; c4Index++)
-            mbufTmp[c4Index] = tCIDLib::TCard1(c4Index);
+            mbufTmp.PutCard1(tCIDLib::TCard1(c4Index), c4Index);
 
         //
         //  Send it to the other side and then get the reply, which should

@@ -51,27 +51,23 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
         // -------------------------------------------------------------------
         TNativeWCConverter();
 
-        TNativeWCConverter
-        (
-            const   TNativeWCConverter&     tcvtToCopy
-        );
+        TNativeWCConverter(const TNativeWCConverter&) = default;
+        TNativeWCConverter(TNativeWCConverter&&) = default;
 
-        ~TNativeWCConverter();
+        ~TNativeWCConverter() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TNativeWCConverter& operator=
-        (
-            const   TNativeWCConverter&     tcvtToAssign
-        );
+        TNativeWCConverter& operator=(const TNativeWCConverter&) = default;
+        TNativeWCConverter& operator=(TNativeWCConverter&&) = default;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EBaseTextFmts eBaseFmt() const override;
+        tCIDLib::EBaseTextFmts eBaseFmt() const final;
 
 
     protected :
@@ -86,7 +82,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxChars
             ,       tCIDLib::TCard4&        c4OutChars
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
         tCIDLib::TCard4 c4BlockTo
         (
@@ -96,7 +92,7 @@ class CIDLIBEXP TNativeWCConverter : public TTextConverter
             , const tCIDLib::TCard4         c4MaxBytes
             ,       tCIDLib::TCard4&        c4OutBytes
             ,       tCIDLib::TBoolean&      bStop
-        );
+        )   final;
 
 
     private :

@@ -20,6 +20,9 @@
 //  scopes we need nested enums, nested fundamental types, aliases, data members,
 //  and methods.
 //
+//  We also define a namespace derivative here as well, since it just uses some
+//  of the same  bits and pieces that the classes use.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -63,7 +66,8 @@ class TAliases
 
 
 // ---------------------------------------------------------------------------
-//  A constant definition. Mostly for a class but we might use it elsewhere.
+//  A constant definition. Mostly for a class but also used in namespaces,
+//  and maybe some other places eventually.
 // ---------------------------------------------------------------------------
 struct TConstDef
 {
@@ -76,13 +80,43 @@ struct TConstDef
 
 
 // ---------------------------------------------------------------------------
-//  For enums we just give the name and description. If individual values must
-//  be called out, it can be done in the descriptive text.
+//  For enums we get the name and description, and then a list of values and their
+//  names and descriptions.
 // ---------------------------------------------------------------------------
-struct TEnumDef
+struct TEnumVal
 {
     THelpNode   m_hnDesc;
     TString     m_strName;
+};
+
+struct TEnumDef
+{
+    TVector<TEnumVal>   m_colVals;
+    THelpNode           m_hnDesc;
+    TString             m_strName;
+};
+
+class TEnums
+{
+    public :
+        tCIDLib::TBoolean bIsEmpty() const
+        {
+            return m_colList.bIsEmpty();
+        }
+
+        tCIDLib::TVoid Parse
+        (
+            const   TXMLTreeElement&        xtnodeSrc
+        );
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+            , const tCIDDocComp::EVisTypes  eVisType
+        )   const;
+
+    private :
+        TVector<TEnumDef>   m_colList;
 };
 
 
@@ -139,6 +173,7 @@ struct TMethodParam
         , const tCIDLib::TCard4         c4Index
     )   const;
 
+    tCIDLib::TBoolean       m_bRetain = kCIDLib::False;
     tCIDDocComp::EParmPB    m_ePassBy = tCIDDocComp::EParmPB::Count;
     tCIDDocComp::EParmDirs  m_eDir = tCIDDocComp::EParmDirs::Count;
     TString                 m_strDefVal;
@@ -162,6 +197,7 @@ class TMethodVar
             , const TString&                strRetType
             , const tCIDDocComp::EParmPB    eRetBy
             , const tCIDDocComp::EMethAttrs eGrpAttrs
+            , const TString&                strTmplParms
         );
         tCIDLib::TVoid OutputContent
         (
@@ -174,6 +210,7 @@ class TMethodVar
         tCIDDocComp::EMethAttrs m_eAttrs = tCIDDocComp::EMethAttrs::None;
         tCIDDocComp::EParmPB    m_eRetBy = tCIDDocComp::EParmPB::None;
         TString                 m_strRetType;
+        TString                 m_strTmplParms;
 };
 
 
@@ -203,7 +240,10 @@ class TMethod
         THelpNode               m_hnDescr;
         TString                 m_strName;
         TString                 m_strRetType;
+        TString                 m_strTmplParms;
 };
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -244,6 +284,11 @@ class  TMethodGrp
             , const tCIDDocComp::ESpecMeths eMeth
             , const tCIDLib::TBoolean       bDefault
         )   const;
+
+        tCIDLib::TVoid ParseGetSet
+        (
+            const   TXMLTreeElement&        xtnodeMeth
+        );
 
         tCIDLib::TVoid ParseSpecMethods
         (
@@ -288,6 +333,7 @@ class TMemberGrp
 
         tCIDDocComp::EVisTypes  m_eVisType;
         TAliases                m_memgAliases;
+        TEnums                  m_memgEnums;
         TMembers                m_memgMembers;
         TMethodGrp              m_methgCtors;
         TMethodGrp              m_methgNVirtMethods;
@@ -361,8 +407,14 @@ class TCppClassPage : public TBasePage
         // -------------------------------------------------------------------
         tCIDLib::TVoid LoadMixinMethods();
 
+
         // -------------------------------------------------------------------
         //  Private data members
+        //
+        //  m_colTmplParams
+        //      If it's a template, we get template parameters. It's a key/value
+        //      list. Mostly it's just values, but some template parms can have
+        //      default values. If this is empty, it's not a template.
         //
         //  m_eFlags
         //      These indicate various optional things that the class may or may
@@ -381,6 +433,7 @@ class TCppClassPage : public TBasePage
         //      parent.
         // -------------------------------------------------------------------
         tCIDDocComp::EClsFlags      m_eFlags = tCIDDocComp::EClsFlags::None;
+        tCIDLib::TKVPList           m_colTmplParams;
         TMemberGrp                  m_memgPublic;
         TMemberGrp                  m_memgProtected;
         TMemberGrp                  m_memgPrivate;
@@ -394,4 +447,75 @@ class TCppClassPage : public TBasePage
         static TMethod              s_methFormatTo;
         static TMethod              s_methStreamFrom;
         static TMethod              s_methStreamTo;
+};
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TNamespacePage
+//  PREFIX: pg
+// ---------------------------------------------------------------------------
+class TNamespacePage : public TBasePage
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and destructor
+        // -------------------------------------------------------------------
+        TNamespacePage() = delete;
+
+        TNamespacePage
+        (
+            const   TString&                strExtTopic
+            , const TString&                strParSrcDir
+            , const TString&                strParTopic
+            , const TString&                strFileName
+        );
+
+        ~TNamespacePage() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TString& strName() const
+        {
+            return m_strName;
+        }
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid Parse
+        (
+                    TTopic&                 topicParent
+            , const TXMLTreeElement&        xtnodeRoot
+        )   override;
+
+        tCIDLib::TVoid OutputContent
+        (
+                    TTextOutStream&         strmTar
+        )   const override;
+
+
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_colMethods
+        //      If we have any methods.
+        //
+        //  m_hnDesc
+        //      The overall namespace description
+        //
+        //  m_memgAliases
+        //  m_memgEnums
+        //      Any aliases and enums.
+        //
+        //  m_strName
+        //      The namespace's name.
+        // -------------------------------------------------------------------
+        TVector<TMethod>    m_colMethods;
+        THelpNode           m_hnDesc;
+        TAliases            m_memgAliases;
+        TEnums              m_memgEnums;
+        TString             m_strName;
 };

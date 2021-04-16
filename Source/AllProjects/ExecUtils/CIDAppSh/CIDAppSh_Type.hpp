@@ -77,13 +77,15 @@ namespace tCIDAppSh
         , Min           = L0
         , Max           = L9
     };
+
+
+    // ---------------------------------------------------------------------------
+    //  Do standard macros for some enums
+    // ---------------------------------------------------------------------------
+    StdEnumTricks(tCIDAppSh::EAppLevels)
+
 }
 
-
-// ---------------------------------------------------------------------------
-//  Do standard macros for some enums
-// ---------------------------------------------------------------------------
-StdEnumTricks(tCIDAppSh::EAppLevels)
 
 #pragma CIDLIB_POPPACK
 

@@ -38,20 +38,3 @@
 //  Include any needed internal headers
 // ---------------------------------------------------------------------------
 #include    "CIDRegX_MessageIds.hpp"
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDRegX_
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facility constants namespace
-// ---------------------------------------------------------------------------
-namespace kCIDRegX_
-{
-}

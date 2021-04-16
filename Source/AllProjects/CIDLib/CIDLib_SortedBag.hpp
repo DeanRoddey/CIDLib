@@ -39,13 +39,15 @@
 //   CLASS: TSortedBag
 //  PREFIX: bag
 // ---------------------------------------------------------------------------
-template <typename TElem> class TSortedBag : public TBag<TElem>
+template <typename TElem> class TSortedBag : public TBasicDLinkedCol<TElem>
 {
     public :
         // -------------------------------------------------------------------
         //  Public types
         // -------------------------------------------------------------------
+        using TMyElemType = TElem;
         using TMyType = TSortedBag<TElem>;
+        using TParType = TBasicDLinkedCol<TElem>;
         using TCompFunc = tCIDLib::ESortComps (*)(const TElem&, const TElem&);
 
 
@@ -56,7 +58,8 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
                     , const tCIDLib::ESortDirs  eDir = tCIDLib::ESortDirs::Ascending
                     , const tCIDLib::EMTStates  eMTSafe = tCIDLib::EMTStates::Unsafe) :
 
-            TBag<TElem>(eMTSafe)
+            TParType(eMTSafe)
+            , m_c4UserData(0)
             , m_eDir(eDir)
             , m_pfnComp(pfnComp)
         {
@@ -64,15 +67,25 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
 
         TSortedBag(const TMyType& colSrc) :
 
-            TBag<TElem>(colSrc)
+            TParType(colSrc)
+            , m_c4UserData(colSrc.m_c4UserData)
             , m_eDir(colSrc.m_eDir)
             , m_pfnComp(colSrc.m_pfnComp)
         {
         }
 
-        ~TSortedBag()
+        // Do a basic setup and call the move operator
+        TSortedBag(TMyType&& colSrc) :
+
+            TParType(colSrc)
+            , m_c4UserData(0)
+            , m_eDir(tCIDLib::ESortDirs::Ascending)
+            , m_pfnComp(colSrc.m_pfnComp)
         {
+            *this = tCIDLib::ForceMove(colSrc);
         }
+
+        ~TSortedBag() = default;
 
 
         // -------------------------------------------------------------------
@@ -82,9 +95,30 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
         {
             if (&colSrc != this)
             {
-                TParent::operator=(colSrc);
+                TParType::operator=(colSrc);
+                m_c4UserData = colSrc.m_c4UserData;
                 m_eDir = colSrc.m_eDir;
                 m_pfnComp = colSrc.m_pfnComp;
+            }
+            return *this;
+        }
+
+        TMyType& operator=(TMyType&& colSrc)
+        {
+            if (&colSrc != this)
+            {
+                // Lock both while we do this
+                TLocker lockrSrc(&colSrc);
+                TLocker lockrThis(this);
+
+                TParType::operator=(tCIDLib::ForceMove(colSrc));
+                tCIDLib::Swap(m_c4UserData, colSrc.m_c4UserData);
+                tCIDLib::Swap(m_eDir, colSrc.m_eDir);
+                tCIDLib::Swap(m_pfnComp, colSrc.m_pfnComp);
+
+                // Publish reload events for both
+                this->PublishReloaded();
+                colSrc.PublishReloaded();
             }
             return *this;
         }
@@ -96,51 +130,21 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
         TElem& objAdd(const TElem& objNew) override
         {
             // Lock the collection
-            TMtxLocker lockCol(this->pmtxLock());
+            TLocker lockrCol(this);
 
             // Optimize if the bag is empty
             if (this->bIsEmpty())
                 return this->objAddAtTop(objNew);
 
-            //
-            //  Find the position to put the new element at. We just iterate
-            //  the nodes until we find one that is greater than (or less
-            //  than if descending) the new object. We then insert the new
-            //  element before it.
-            //
-            //  Note that we the comp func returns true if the first is less,
-            //  so false means greater than or equal, so we not the return
-            //  and arrange the two compared elements so that we won't compare
-            //  the new element against a bunch of elements in the list that
-            //  are equal.
-            //
-            typename TBasicDLinkedCol<TElem>::TCursor cursAdd(this);
-            while (cursAdd)
-            {
-                if (m_eDir == tCIDLib::ESortDirs::Ascending)
-                {
-                    // As soon as the bag element is >= the new
-                    if (m_pfnComp(*cursAdd, objNew) != tCIDLib::ESortComps::FirstLess)
-                        break;
-                }
-                 else
-                {
-                    // As soon as the new is >= a bag element
-                    if (m_pfnComp(objNew, *cursAdd) != tCIDLib::ESortComps::FirstLess)
-                        break;
-                }
-                ++cursAdd;
-            }
-
             // If the cursor is invalid, it will go at the end
-            TElem& objRet = this->objInsertAfter(objNew, cursAdd);
+            typename TParType::TCursor cursAt = cursFindInsert(objNew);
+            TElem& objRet = this->objInsertAfter(objNew, cursAt);
 
             // Invalidate any cursors
             this->c4IncSerialNum();
 
             return objRet;
         }
-
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -156,8 +160,92 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
             return m_eDir;
         }
 
+        template <typename T = TElem> T& objAddMove(T&& objNew)
+        {
+            // Lock the collection
+            TLocker lockrCol(this);
+
+            // Optimize if the bag is empty
+            if (this->bIsEmpty())
+                return this->objAddAtTop(objNew);
+
+            // If the cursor is invalid, it will go at the end
+            typename TParType::TCursor cursAt = cursFindInsert(objNew);
+            TElem& objRet = this->objInsertAfter(tCIDLib::ForceMove(objNew), cursAt);
+
+            // Invalidate any cursors
+            this->c4IncSerialNum();
+
+            return objRet;
+        }
+
+        //
+        //  In this case, this is only a convenience, no improvement in performance
+        //  since we have to create the object first in order to find out where to
+        //  put it. Only when we are empty can we just forward the arguments and
+        //  add it directly.
+        //
+        template <typename... TArgs> TElem& objPlace(TArgs&&... Args)
+        {
+            // Lock the collection
+            TLocker lockrCol(this);
+
+            // Optimize if the bag is empty
+            if (this->bIsEmpty())
+                return this->objPlaceAtTop(tCIDLib::Forward<TArgs>(Args)...);
+
+            // If the cursor is invalid, it will go at the end
+            TElem objNew(tCIDLib::Forward<TArgs>(Args)...);
+            typename TParType::TCursor cursAt(cursFindInsert(objNew));
+            TElem& objRet = this->objInsertAfter(objNew, cursAt);
+
+            // Invalidate any cursors
+            this->c4IncSerialNum();
+
+            return objRet;
+        }
+
 
     private  :
+        // -------------------------------------------------------------------
+        //  Find the insertion point for a new object
+        // -------------------------------------------------------------------
+        TBasicDLinkedCol<TElem>::TCursor cursFindInsert(const TElem& objNew)
+        {
+            typename TBasicDLinkedCol<TElem>::TCursor cursRet(this);
+
+            //
+            //  Find the position to put the new element at. We just iterate
+            //  the nodes until we find one that is greater than (or less
+            //  than if descending) the new object. We then insert the new
+            //  element before it.
+            //
+            //  Note that we the comp func returns true if the first is less,
+            //  so false means greater than or equal, so we not the return
+            //  and arrange the two compared elements so that we won't compare
+            //  the new element against a bunch of elements in the list that
+            //  are equal.
+            //
+            while (cursRet)
+            {
+                if (m_eDir == tCIDLib::ESortDirs::Ascending)
+                {
+                    // As soon as the bag element is >= the new
+                    if (m_pfnComp(*cursRet, objNew) != tCIDLib::ESortComps::FirstLess)
+                        break;
+                }
+                 else
+                {
+                    // As soon as the new is >= a bag element
+                    if (m_pfnComp(objNew, *cursRet) != tCIDLib::ESortComps::FirstLess)
+                        break;
+                }
+                ++cursRet;
+            }
+            return cursRet;
+        }
+
+
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -180,7 +268,7 @@ template <typename TElem> class TSortedBag : public TBag<TElem>
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         DefPolyDup(TMyType)
-        TemplateRTTIDefs(TMyType,TBag<TElem>)
+        TemplateRTTIDefs(TSortedBag<TElem>, TBasicDLinkedCol<TElem>)
 };
 
 #pragma CIDLIB_POPPACK

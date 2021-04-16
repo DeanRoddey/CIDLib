@@ -41,6 +41,7 @@ class TCfgSerialPortDlg : public TDlgBox
         TCfgSerialPortDlg();
 
         TCfgSerialPortDlg(const TCfgSerialPortDlg&) = delete;
+        TCfgSerialPortDlg(TCfgSerialPortDlg&&) = delete;
 
         ~TCfgSerialPortDlg();
 
@@ -49,6 +50,7 @@ class TCfgSerialPortDlg : public TDlgBox
         //  Public operators
         // -------------------------------------------------------------------
         TCfgSerialPortDlg& operator=(const TCfgSerialPortDlg&) = delete;
+        TCfgSerialPortDlg& operator=(TCfgSerialPortDlg&&) = delete;
 
 
         // -------------------------------------------------------------------

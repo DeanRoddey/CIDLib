@@ -47,30 +47,27 @@ RTTIDecls(TSocketListener,TObject)
 // ---------------------------------------------------------------------------
 //  TSocketListener: Constructors and Destructor
 // ---------------------------------------------------------------------------
+
+// They have to call Initialize() later in this case, to set the protocol
 TSocketListener::TSocketListener(const  tCIDLib::TIPPortNum ippnToUse
                                 , const tCIDLib::TCard4     c4MaxWaiting) :
 
-    m_c4Count(0)
+    m_apksockList()
+    , m_c4Count(0)
     , m_c4MaxWaiting(c4MaxWaiting)
     , m_ippnListenOn(ippnToUse)
 {
-    // Zero the socket list
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < 2; c4Index++)
-        m_apksockList[c4Index] = nullptr;
 }
 
 TSocketListener::TSocketListener(const  tCIDLib::TIPPortNum     ippnToUse
                                 , const tCIDSock::ESockProtos   eProtocol
                                 , const tCIDLib::TCard4         c4MaxWaiting) :
 
-    m_c4Count(0)
+    m_apksockList()
+    , m_c4Count(0)
     , m_c4MaxWaiting(c4MaxWaiting)
     , m_ippnListenOn(ippnToUse)
 {
-    // Zero the socket list
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < 2; c4Index++)
-        m_apksockList[c4Index] = nullptr;
-
     Initialize(eProtocol);
 }
 
@@ -114,9 +111,9 @@ tCIDLib::TCard4 TSocketListener::c4MaxWaiting() const
 tCIDLib::TVoid TSocketListener::Cleanup()
 {
     //
-    //  For all of the listening sockets we have, go through and close them.
-    //  If they aren't open, this won't do anything, so it's safe to just
-    //  call close on all fo them.
+    //  For all of the listening sockets we have, go through and close them
+    //  and delete them. If they aren't open, this won't do anything, so it's
+    //  safe to just call close on all of them.
     //
     for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
     {
@@ -132,8 +129,11 @@ tCIDLib::TVoid TSocketListener::Cleanup()
                 , tCIDLib::EErrClasses::Internal
             );
         }
+        delete m_apksockList[c4Index];
         m_apksockList[c4Index] = nullptr;
     }
+
+    // And this marks us as unitialized again
     m_c4Count = 0;
 }
 
@@ -159,14 +159,14 @@ TSocketListener::psockListenFor(const   tCIDLib::TEncodedTime   enctWait
 {
     // If we have no listening interfaces, then null now
     if (!m_c4Count)
-        return 0;
+        return nullptr;
 
     //
     //  Do a multi select on all of the sockets in our list to see if any
     //  of them have been signaled.
     //
-    tCIDSock::EMSelFlags aeFlags[kCIDSock::c4MaxSelect];
-    tCIDLib::TCard4 c4Count;
+    tCIDSock::EMSelFlags aeFlags[kCIDSock::c4MaxSelect] = {tCIDSock::EMSelFlags::None};
+    tCIDLib::TCard4 c4Count = 0;
 
     // Wait for up to half a second at a time
     tCIDLib::TEncodedTime   enctCur = TKrnlTimeStamp::enctNow();
@@ -205,7 +205,7 @@ TSocketListener::psockListenFor(const   tCIDLib::TEncodedTime   enctWait
                     , tCIDLib::EErrClasses::AppStatus
                 );
             }
-            return 0;
+            return nullptr;
         }
 
         // If we got any hits, then break out
@@ -325,7 +325,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         );
     }
 
-    CIDAssert(m_c4Count <= 2, L"Got more than 2 listening interfaces");
+    CIDAssert(c4TryCnt <= 2, L"Got more than 2 listening interfaces");
 
     // Loop through the ones we got and try to set them up
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TryCnt; c4Index++)
@@ -333,9 +333,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         TKrnlSocket* pksockCur = new TKrnlSocket;
         bRes = pksockCur->bCreate
         (
-            tCIDSock::ESocketTypes::Stream
-            , eProtocol
-            , akipaUse[c4Index].eType()
+            tCIDSock::ESocketTypes::Stream, eProtocol, akipaUse[c4Index].eType()
         );
 
         // Try to bind it if we created it
@@ -350,6 +348,7 @@ tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol
         // If it worked, keep it, else destroy it
         if (bRes)
         {
+            #pragma warning(suppress : 6386) // We make sure above that we won't overflow
             m_apksockList[m_c4Count++] = pksockCur;
 
             //

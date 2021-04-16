@@ -1381,21 +1381,35 @@ TAttrEditWnd::eCustomDraw(          TGraphDrawDev&      gdevTar
                 TArea areaLast;
                 QueryRowArea(c4Count - 1, areaLast);
 
-                TPoint pntTop(areaName.i4Right(), areaName.i4Y());
-                TPoint pntBottom(pntTop.i4X(), areaLast.i4Bottom());
+                //
+                //  Because we are drawing lines here and not areas, we need to adjust
+                //  for the exclusive nature of the bottom/right points.
+                //
+                TPoint pntTop(areaName.i4Right() - 1, areaName.i4Y());
+                TPoint pntBottom(pntTop.i4X(), areaLast.i4Bottom() - 1);
                 gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
 
-                pntTop.i4X(areaVal.i4Right());
+                pntTop.i4X(areaVal.i4Right() - 1);
                 pntBottom.i4X(pntTop.i4X());
                 gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
             }
         }
          else if ((c4Row != kCIDLib::c4MaxCard) && (c4Column == kCIDLib::c4MaxCard))
         {
-            // It's post row, so we draw a line under our row
+            //
+            //  It's post row, so we draw a line under our row. Because we are drawing
+            //  a line here, we have to adjust for the exclusive nature of the bottom
+            //  and right sides of the area points.
+            //
             TArea areaRow;
             QueryRowArea(c4Row, areaRow);
-            gdevTar.DrawLine(areaRow.pntLL(), areaRow.pntLR(), facCIDGraphDev().rgbPaleGrey);
+            areaRow.AdjustSize(-1, -1);
+            gdevTar.DrawLine
+            (
+                areaRow.pntLL()
+                , areaRow.pntLR()
+                , facCIDGraphDev().rgbPaleGrey
+            );
         }
     }
      else

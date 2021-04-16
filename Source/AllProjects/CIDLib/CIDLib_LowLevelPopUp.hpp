@@ -36,7 +36,7 @@ namespace TPopUp
         , const tCIDLib::TCh* const     pszTitle1
         , const tCIDLib::TCh* const     pszTitle2
         , const tCIDLib::TCh* const     pszMsg
-        , const tCIDLib::TCh* const     pszMsg2 = 0
+        , const tCIDLib::TCh* const     pszMsg2 = nullptr
     );
 
     CIDLIBEXP tCIDLib::TVoid PopUpMsg

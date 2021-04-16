@@ -43,7 +43,27 @@ class TStructMem : public TObject
             const   TXMLTreeElement&        xtnodeType
         );
 
-        ~TStructMem();
+        TStructMem(const TStructMem&) = default;
+
+        TStructMem(TStructMem&& tinfoSrc) :
+
+            TStructMem()
+        {
+            *this = tCIDLib::ForceMove(tinfoSrc);
+        }
+
+        ~TStructMem() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStructMem& operator=(const TStructMem&) = default;
+
+        TStructMem& operator=
+        (
+                    TStructMem&&            tinfoSrc
+        );
 
 
         // -------------------------------------------------------------------
@@ -109,7 +129,17 @@ class TStructInfo : public TObject
             const   TXMLTreeElement&        xtnodeType
         );
 
+        TStructInfo(const TStructInfo&) = delete;
+        TStructInfo(TStructInfo&&) = delete;
+
         ~TStructInfo();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TStructInfo& operator=( TStructInfo&) = delete;
+        TStructInfo& operator=(TStructInfo&&) = delete;
 
 
         // -------------------------------------------------------------------

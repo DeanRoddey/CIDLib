@@ -189,6 +189,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , pmethToAdopt->strName()
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     // Make sure that they both have the same id, which should be the case
@@ -206,6 +209,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , TCardinal(pmethToAdopt->c2Id())
             , TCardinal(pmethiTarget->c2Id())
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     //
@@ -224,6 +230,9 @@ TMEngClassInfo::AddMethodImpl(TMEngMethodImpl* const pmethToAdopt)
             , pmethToAdopt->strName()
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return;
     }
 
     // Add it to the method implementation list
@@ -318,7 +327,7 @@ tCIDLib::TVoid TMEngClassInfo::BaseClassInit(TCIDMacroEngine& meOwner)
 {
     // Store the parent class id and inherit members and methods
     if (m_strParentClassPath == kCIDMacroEng_::pszNoParentClass)
-        m_c2ParentClassId = kMacroEng::c2BadId;
+        m_c2ParentClassId = kCIDMacroEng::c2BadId;
     else
         m_c2ParentClassId = meOwner.c2FindClassId(m_strParentClassPath);
 
@@ -328,7 +337,7 @@ tCIDLib::TVoid TMEngClassInfo::BaseClassInit(TCIDMacroEngine& meOwner)
     //  all his methods and members, and this way our method and members ids
     //  start at the correct place when we add them at our level
     //
-    if (m_c2ParentClassId != kMacroEng::c2BadId)
+    if (m_c2ParentClassId != kCIDMacroEng::c2BadId)
     {
         //
         //  The index of the first member and method of our own will be the
@@ -432,7 +441,7 @@ TMEngClassInfo::c2AddMethodInfo(const TMEngMethodInfo& methiToAdd)
     //
     if (methiNew.bIsCtor() && !methiNew.c4ParmCount())
     {
-        if ((m_c2DefCtorId != kMacroEng::c2BadId)
+        if ((m_c2DefCtorId != kCIDMacroEng::c2BadId)
         &&  (m_c2DefCtorId >= m_c2FirstMethodId))
         {
             facCIDMacroEng().ThrowErr
@@ -461,9 +470,9 @@ TMEngClassInfo::c2FindMember(const  TString&            strToFind
 {
     const TMEngMemberInfo* pmemiRet = m_colMembers.pobjFindByKey(strToFind);
     if (!pmemiRet)
-        return kMacroEng::c2BadId;
+        return kCIDMacroEng::c2BadId;
     if (bThisClassOnly && (pmemiRet->c2Id() < m_c2FirstMemberId))
-        return kMacroEng::c2BadId;
+        return kCIDMacroEng::c2BadId;
     return pmemiRet->c2Id();
 }
 
@@ -472,7 +481,7 @@ tCIDLib::TCard2 TMEngClassInfo::c2FindMethod(const TString& strToFind) const
 {
     const TMEngMethodInfo* pmethiRet = m_colMethods.pobjFindByKey(strToFind);
     if (!pmethiRet)
-        return kMacroEng::c2BadId;
+        return kCIDMacroEng::c2BadId;
     return pmethiRet->c2Id();
 }
 
@@ -492,7 +501,7 @@ tCIDLib::TCard2 TMEngClassInfo::c2FirstMethodId() const
 tCIDLib::TCard2 TMEngClassInfo::c2Id() const
 {
     #if CID_DEBUG_ON
-    if (m_c2Id == kMacroEng::c2BadId)
+    if (m_c2Id == kCIDMacroEng::c2BadId)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -525,6 +534,9 @@ tCIDLib::TCard2 TMEngClassInfo::c2MethodId(const TString& strToFind) const
             , strToFind
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return 0;
     }
     return pmethiRet->c2Id();
 }
@@ -545,6 +557,9 @@ tCIDLib::TCard2 TMEngClassInfo::c2MemberId(const TString& strToFind) const
             , strToFind
             , m_strClassPath
         );
+
+        // Won't happen but makes analyzer happy
+        return 0;
     }
     return pmemiRet->c2Id();
 }
@@ -697,13 +712,13 @@ TMEngClassInfo::Invoke(         TCIDMacroEngine&        meOwner
     //  the instance value. We then work down the inheritance chain till we
     //  find someone who handles it, or we fail.
     //
-    tCIDLib::TCard2 c2ClassId;
+    tCIDLib::TCard2 c2ClassId = kCIDMacroEng::c2BadId;
 
     if (eDispatch == tCIDMacroEng::EDispatch::Mono)
         c2ClassId = m_c2Id;
     else
         c2ClassId = mecvInstance.c2ClassId();
-    while (c2ClassId != kMacroEng::c2BadId)
+    while (c2ClassId != kCIDMacroEng::c2BadId)
     {
         TMEngClassInfo& meciCur = meOwner.meciFind(c2ClassId);
         const TMEngMethodInfo& methiTarget = meciCur.methiFind(c2MethodId);
@@ -715,7 +730,7 @@ TMEngClassInfo::Invoke(         TCIDMacroEngine&        meOwner
     }
 
     // If we didn't find it, that's a problem
-    if (c2ClassId == kMacroEng::c2BadId)
+    if (c2ClassId == kCIDMacroEng::c2BadId)
     {
         facCIDMacroEng().ThrowErr
         (
@@ -754,7 +769,7 @@ TMEngClassInfo::pmelvFind(  const   TString&            strName
     while (kCIDLib::True)
     {
         // If we are at MEng.Object, then we are done
-        if (pmeciCur->c2ParentClassId() == kMacroEng::c2BadId)
+        if (pmeciCur->c2ParentClassId() == kCIDMacroEng::c2BadId)
             break;
 
         // Else, move up the hierarchy
@@ -796,7 +811,7 @@ TMEngClassInfo::pmemiFind(  const   TString&            strName
 const TMEngMethodImpl* TMEngClassInfo::pmethDefCtor() const
 {
     // The default ctor id is stored specially
-    if (m_c2DefCtorId == kMacroEng::c2BadId)
+    if (m_c2DefCtorId == kCIDMacroEng::c2BadId)
         return nullptr;
 
     // Looks like we have one, so get the info object
@@ -820,7 +835,7 @@ const TMEngMethodImpl* TMEngClassInfo::pmethDefCtor() const
 const TMEngMethodInfo* TMEngClassInfo::pmethiDefCtor() const
 {
     // The default ctor id is stored specially
-    if (m_c2DefCtorId == kMacroEng::c2BadId)
+    if (m_c2DefCtorId == kCIDMacroEng::c2BadId)
         return nullptr;
 
     // Looks like we have one, so return the info object
@@ -915,10 +930,10 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
                                 , const tCIDMacroEng::EClassExt    eExtend
                                 , const TString&                strParentClassPath) :
     m_bCopyable(bCopyable)
-    , m_c2DefCtorId(kMacroEng::c2BadId)
+    , m_c2DefCtorId(kCIDMacroEng::c2BadId)
     , m_c2FirstMemberId(0)
     , m_c2FirstMethodId(0)
-    , m_c2Id(kMacroEng::c2BadId)
+    , m_c2Id(kCIDMacroEng::c2BadId)
     , m_c2NextMemberId(0)
     , m_c2NextMethodId(0)
     , m_c2ParentClassId(0)
@@ -951,10 +966,10 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
                                 , const tCIDMacroEng::EClassExt eExtend
                                 , const tCIDLib::TCh* const     pszParentClassPath) :
     m_bCopyable(bCopyable)
-    , m_c2DefCtorId(kMacroEng::c2BadId)
+    , m_c2DefCtorId(kCIDMacroEng::c2BadId)
     , m_c2FirstMemberId(0)
     , m_c2FirstMethodId(0)
-    , m_c2Id(kMacroEng::c2BadId)
+    , m_c2Id(kCIDMacroEng::c2BadId)
     , m_c2NextMemberId(0)
     , m_c2NextMethodId(0)
     , m_c2ParentClassId(0)

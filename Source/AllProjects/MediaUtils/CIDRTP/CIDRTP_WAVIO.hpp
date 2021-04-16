@@ -50,6 +50,7 @@ class CIDRTPEXP TFileWaveIO : public TCIDRTPIOSrc
         );
 
         TFileWaveIO(const TFileWaveIO&) = delete;
+        TFileWaveIO(TFileWaveIO&&) = delete;
 
         ~TFileWaveIO();
 
@@ -58,6 +59,7 @@ class CIDRTPEXP TFileWaveIO : public TCIDRTPIOSrc
         //  Public operators
         // -------------------------------------------------------------------
         TFileWaveIO& operator=(const TFileWaveIO&);
+        TFileWaveIO& operator=(TFileWaveIO&&);
 
 
         // -------------------------------------------------------------------
@@ -68,19 +70,19 @@ class CIDRTPEXP TFileWaveIO : public TCIDRTPIOSrc
         tCIDLib::TCard4 c4ReadSamples
         (
                     TMemBuf&                mbufToFill
-            ,       tCIDLib::TCard4&        c4AtSample
-            ,       tCIDLib::TCard4&        c4AtMillisec
+            , COP   tCIDLib::TCard4&        c4AtSample
+            , COP   tCIDLib::TCard4&        c4AtMillisec
         )   override;
 
         tCIDLib::TVoid Initialize
         (
-                    tCIDLib::TCard1&        c1PayloadType
-            ,       tCIDLib::TCard4&        c4PayloadMSs
-            ,       tCIDLib::TCard4&        c4PayloadBytes
-            ,       tCIDLib::TCard4&        c4PayloadSamples
-            ,       tCIDLib::TCard4&        c4SampleBytes
-            ,       tCIDLib::TCard4&        c4TotalMSs
-            ,       tCIDLib::TCard4&        c4TotalBytes
+            COP     tCIDLib::TCard1&        c1PayloadType
+            , COP   tCIDLib::TCard4&        c4PayloadMSs
+            , COP   tCIDLib::TCard4&        c4PayloadBytes
+            , COP   tCIDLib::TCard4&        c4PayloadSamples
+            , COP   tCIDLib::TCard4&        c4SampleBytes
+            , COP   tCIDLib::TCard4&        c4TotalMSs
+            , COP   tCIDLib::TCard4&        c4TotalBytes
         )   override;
 
         tCIDLib::TVoid Terminate();

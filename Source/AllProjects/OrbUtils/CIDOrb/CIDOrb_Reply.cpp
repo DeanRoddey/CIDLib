@@ -40,7 +40,10 @@ RTTIDecls(TOrbReply, TObject)
 
 namespace CIDOrb_Reply
 {
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+    namespace
+    {
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

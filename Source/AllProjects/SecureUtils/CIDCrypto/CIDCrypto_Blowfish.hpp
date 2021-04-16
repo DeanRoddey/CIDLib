@@ -63,6 +63,7 @@ class CIDCRYPTEXP TBlowfishEncrypter : public TBlockEncrypter
         );
 
         TBlowfishEncrypter(const TBlowfishEncrypter&) = delete;
+        TBlowfishEncrypter(TBlowfishEncrypter&&) = delete;
 
         ~TBlowfishEncrypter();
 
@@ -71,6 +72,7 @@ class CIDCRYPTEXP TBlowfishEncrypter : public TBlockEncrypter
         //  Public operators
         // -------------------------------------------------------------------
         TBlowfishEncrypter& operator=(const TBlowfishEncrypter&) = delete;
+        TBlowfishEncrypter& operator=(TBlowfishEncrypter&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -93,15 +95,15 @@ class CIDCRYPTEXP TBlowfishEncrypter : public TBlockEncrypter
         (
             const   tCIDLib::TCard1* const  pc1Cypher
             ,       tCIDLib::TCard1* const  pc1Plain
-        )   override;
+        )   final;
 
         tCIDLib::TVoid EncryptImpl
         (
             const   tCIDLib::TCard1* const  pc1Plain
             ,       tCIDLib::TCard1* const  pc1CypherBuf
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid ResetImpl() override;
+        tCIDLib::TVoid ResetImpl() final;
 
 
     private :
@@ -126,14 +128,14 @@ class CIDCRYPTEXP TBlowfishEncrypter : public TBlockEncrypter
 
         tCIDLib::TVoid DecryptBlock
         (
-                    tCIDLib::TCard4&        c4Left
-            ,       tCIDLib::TCard4&        c4Right
+            CIOP     tCIDLib::TCard4&       c4Left
+            , CIOP   tCIDLib::TCard4&
         );
 
         tCIDLib::TVoid EncryptBlock
         (
-                    tCIDLib::TCard4&        c4Left
-            ,       tCIDLib::TCard4&        c4Right
+            CIOP     tCIDLib::TCard4&       c4Left
+            , CIOP   tCIDLib::TCard4&       c4Right
         );
 
 

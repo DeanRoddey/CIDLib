@@ -43,18 +43,21 @@ RTTIDecls(TCIDDAEWaveEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 namespace CIDDAE_WaveEncoder
 {
-    // -----------------------------------------------------------------------
-    //  The names we return for our codec and format
-    // -----------------------------------------------------------------------
-    const TString strCodecName(L"DefaultWAV");
-    const TString strFormatName(L"44Khz, 2Ch, 16Bit, PCM");
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  The names we return for our codec and format
+        // -----------------------------------------------------------------------
+        const TString strCodecName(L"DefaultWAV");
+        const TString strFormatName(L"44Khz, 2Ch, 16Bit, PCM");
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum amount of data we'll decode in a single chunk decode
-    //  call.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxReadChunkSz = 16 * 1024;
+        // -----------------------------------------------------------------------
+        //  The maximum amount of data we'll decode in a single chunk decode
+        //  call.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxReadChunkSz = 16 * 1024;
+    }
 }
 
 
@@ -196,8 +199,8 @@ tCIDLib::TVoid TCIDDAEWaveDec::StartDecodeImpl(const TString& strSrcFile)
     m_c4DataBytes = 0;
 
     // Search forward for the data chunk. We only support one data chunk
-    tCIDLib::TCard4 c4ID;
-    tCIDLib::TCard4 c4Sz;
+    tCIDLib::TCard4 c4ID = 0;
+    tCIDLib::TCard4 c4Sz = 0;
     while (kCIDLib::True)
     {
         // Get the chunk id and size

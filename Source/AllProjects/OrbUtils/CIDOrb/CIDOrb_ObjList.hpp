@@ -21,7 +21,6 @@
 //  quite right for what we want to do, and we need maximum performance in
 //  this case.
 //
-//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -46,6 +45,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         TOrbSObjList();
 
         TOrbSObjList(const TOrbSObjList&) = delete;
+        TOrbSObjList(TOrbSObjList&&) = delete;
 
         ~TOrbSObjList();
 
@@ -54,6 +54,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TOrbSObjList& operator=(const TOrbSObjList&) = delete;
+        TOrbSObjList& operator=(TOrbSObjList&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -62,6 +63,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         tCIDLib::TVoid Add
         (
                     TOrbServerBase* const   porbsToAdd
+            , const tCIDLib::EAdoptOpts     eAdopt
         );
 
         tCIDLib::TBoolean bNext();
@@ -70,28 +72,29 @@ class CIDORBEXP TOrbSObjList : public TObject
 
         tCIDLib::TBoolean bRemove
         (
-                    TOrbServerBase* const   porbsToRemove
+            const   TOrbServerBase* const   porbsToRemove
         );
 
-        tCIDLib::TCard4 c4ElemCount() const;
+        [[nodiscard]] tCIDLib::TCard4 c4ElemCount() const;
 
         const TOrbServerBase& objCur() const;
 
         TOrbServerBase& objCur();
 
-        TOrbServerBase* porbsFind
+        [[nodiscard]] TOrbServerBase* porbsFind
         (
             const   TOrbId&                 oidToFind
         );
 
-        const TOrbServerBase* porbsFind
+        [[nodiscard]] const TOrbServerBase* porbsFind
         (
             const   TOrbId&                 oidToFind
         )   const;
 
         TOrbServerBase* porbsOrphan
         (
-                    TOrbServerBase* const   porbsToOrphan
+            const   TOrbServerBase* const   porbsToOrphan
+            ,       tCIDLib::EAdoptOpts&    eAdopt
         );
 
         tCIDLib::TVoid RemoveAll();
@@ -103,6 +106,7 @@ class CIDORBEXP TOrbSObjList : public TObject
         // -------------------------------------------------------------------
         struct TBucketItem
         {
+            tCIDLib::EAdoptOpts eAdopt;
             TOrbServerBase*     porbsThis;
             TBucketItem*        pbiNext;
         };

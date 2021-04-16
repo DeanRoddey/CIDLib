@@ -46,7 +46,7 @@ TMutexHandle::TMutexHandle() :
 
     m_phmtxiThis(nullptr)
 {
-    m_phmtxiThis = (TMutexHandleImpl*)::_aligned_malloc(sizeof(TMutexHandleImpl), 32);
+    m_phmtxiThis = new TMutexHandleImpl;
     m_phmtxiThis->hMutex = 0;
 }
 
@@ -54,13 +54,13 @@ TMutexHandle::TMutexHandle(const TMutexHandle& hmtxToCopy) :
 
     m_phmtxiThis(nullptr)
 {
-    m_phmtxiThis = (TMutexHandleImpl*)::_aligned_malloc(sizeof(TMutexHandleImpl), 32);
+    m_phmtxiThis = new TMutexHandleImpl;
     m_phmtxiThis->hMutex = hmtxToCopy.m_phmtxiThis->hMutex;
 }
 
 TMutexHandle::~TMutexHandle()
 {
-    ::_aligned_free(m_phmtxiThis);
+    delete m_phmtxiThis;
     m_phmtxiThis = nullptr;
 }
 
@@ -189,7 +189,7 @@ tCIDLib::TBoolean TKrnlMutex::bClose()
     }
 
     if (m_hmtxThis.m_phmtxiThis)
-        TKrnlWin32::AtomicHandleSet(m_hmtxThis.m_phmtxiThis->hMutex, 0);
+        m_hmtxThis.m_phmtxiThis->hMutex = 0;
     return kCIDLib::True;
 }
 
@@ -216,15 +216,15 @@ TKrnlMutex::bCreate(const tCIDLib::ELockStates eInitState)
         return bCreateNamed(eInitState, kCIDLib::True, bDummy);
     }
 
-    HANDLE hTmp = ::CreateMutex(0, eInitState == tCIDLib::ELockStates::Locked, 0);
-    if (!hTmp)
+    m_hmtxThis.m_phmtxiThis->hMutex = ::CreateMutex
+    (
+        0, eInitState == tCIDLib::ELockStates::Locked, 0
+    );
+    if (!m_hmtxThis.m_phmtxiThis->hMutex)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hmtxThis.m_phmtxiThis->hMutex, hTmp);
     return kCIDLib::True;
 }
 
@@ -251,23 +251,21 @@ tCIDLib::TBoolean TKrnlMutex::bDuplicate(const TKrnlMutex& kmtxToDup)
         m_pszName = TRawStr::pszReplicate(kmtxToDup.m_pszName);
 
     // Duplicate the handle
-    HANDLE hTmp;
-    if (!::DuplicateHandle
+    const BOOL bRes = ::DuplicateHandle
     (
         kmtxToDup.m_hmtxThis.m_phmtxiThis->hMutex
         , TKrnlProcess::hprocThis().hprociThis().hProcess
         , TKrnlProcess::hprocThis().hprociThis().hProcess
-        , &hTmp
+        , &m_hmtxThis.m_phmtxiThis->hMutex
         , 0
         , 0
-        , DUPLICATE_SAME_ACCESS))
+        , DUPLICATE_SAME_ACCESS
+    );
+    if (bRes == FALSE)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // It went ok, so store the new handle
-    TKrnlWin32::AtomicHandleSet(m_hmtxThis.m_phmtxiThis->hMutex, hTmp);
     return kCIDLib::True;
 }
 
@@ -309,15 +307,12 @@ tCIDLib::TBoolean TKrnlMutex::bOpen()
         return kCIDLib::False;
     }
 
-    HANDLE hTmp = ::OpenMutex(MUTEX_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
-    if (!hTmp)
+    m_hmtxThis.m_phmtxiThis->hMutex = ::OpenMutex(MUTEX_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
+    if (!m_hmtxThis.m_phmtxiThis->hMutex)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
     }
-
-    // We survived, so store the handle
-    TKrnlWin32::AtomicHandleSet(m_hmtxThis.m_phmtxiThis->hMutex, hTmp);
     return kCIDLib::True;
 }
 
@@ -425,13 +420,13 @@ TKrnlMutex::bCreateNamed(const  tCIDLib::ELockStates    eState
     //  the incoming initial lock state.
     //
     BOOL bInitOwner(eState == tCIDLib::ELockStates::Locked ? TRUE : FALSE);
-    HANDLE hTmp = ::CreateMutex(&SAttrs, bInitOwner, m_pszName);
+    m_hmtxThis.m_phmtxiThis->hMutex = ::CreateMutex(&SAttrs, bInitOwner, m_pszName);
 
     // Either way now, we can clean up the descriptor
     ::LocalDiscard(pSDesc);
 
     // If it failed, then we give up now
-    if (!hTmp)
+    if (!m_hmtxThis.m_phmtxiThis->hMutex)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -449,14 +444,11 @@ TKrnlMutex::bCreateNamed(const  tCIDLib::ELockStates    eState
     //
     if (!bCreated && bFailIfExists)
     {
-        ::CloseHandle(hTmp);
+        ::CloseHandle(m_hmtxThis.m_phmtxiThis->hMutex);
+        m_hmtxThis.m_phmtxiThis->hMutex = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyExists);
         return kCIDLib::False;
     }
-
-    // It worked, so store the platform specific handle info
-    TKrnlWin32::AtomicHandleSet(m_hmtxThis.m_phmtxiThis->hMutex, hTmp);
     return kCIDLib::True;
 }
-
 

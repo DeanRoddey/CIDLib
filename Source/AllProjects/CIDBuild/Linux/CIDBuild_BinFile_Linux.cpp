@@ -29,127 +29,166 @@
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "../CIDBuild.hpp"
+#include    <sys/stat.h>
+#include    <fcntl.h>
+#include    <unistd.h>
 
 
 
 // ---------------------------------------------------------------------------
 //  TBinFile: Public implementation methods
 // ---------------------------------------------------------------------------
-tCIDBuild::TUInt TBinFile::uiCurPos() const
+tCIDLib::TCard4 TBinFile::c4CurPos() const
 {
     // Do a seek relative to the current position
-    off_t Offset = ::lseek(__hflThis, 0, SEEK_CUR);
+    off_t Offset = ::lseek(m_hflThis, 0, SEEK_CUR);
 
     // See if it there was an error or just a position over 32 bits
     if (Offset == -1)
     {
-        stdOut  << NStr("Warning: Could not query current position in file: ")
-                << __strFileName << kCIDBuild::EndLn;
+        stdOut  << L"Warning: Could not query current position in file: "
+                << m_strFileName << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::SeekError;
     }
 
-    return Offset;
+    return tCIDLib::TCard4(Offset);
 }
 
 
-tCIDBuild::TUInt TBinFile::uiSize() const
+tCIDLib::TCard4 TBinFile::c4SeekToEnd()
+{
+    // Do a seek relative to the current position
+    off_t Offset = ::lseek(m_hflThis, 0, SEEK_END);
+
+    // See if it there was an error or just a position over 32 bits
+    if (Offset == -1)
+    {
+        stdOut  << L"Warning: Could not query current position in file: "
+                << m_strFileName << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::SeekError;
+    }
+
+    return tCIDLib::TCard4(Offset);
+}
+
+
+tCIDLib::TCard4 TBinFile::c4Size() const
 {
     struct stat StatBuf;
-    if (::fstat(__hflThis, &StatBuf))
+    if (::fstat(m_hflThis, &StatBuf))
     {
-        stdOut  << NStr("Warning: Could not query size of file: ")
-                << __strFileName << kCIDBuild::EndLn;
+        stdOut  << L"Warning: Could not query size of file: "
+                << m_strFileName << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::QueryError;
     }
     return StatBuf.st_size;
 }
 
 
-// ---------------------------------------------------------------------------
-//  TBinFile: Private implementation methods
-// ---------------------------------------------------------------------------
-tCIDBuild::TVoid TBinFile::__Close()
+tCIDLib::TVoid TBinFile::Close()
 {
-    if (::close(__hflThis))
+    if (::close(m_hflThis))
     {
-        stdOut  << NStr("Warning: Could not close file: ")
-                << __strFileName << kCIDBuild::EndLn;
-    }
+        stdOut  << L"Warning: Could not close file: "
+                << m_strFileName << kCIDBuild::EndLn;
+    }    
 }
 
 
-tCIDBuild::TVoid TBinFile::__Open(  const   tCIDBuild::EAccessModes eAccess
-                                    , const tCIDBuild::EOpenActions eAction)
+tCIDLib::TVoid TBinFile::Open(  const   TBldStr&                strName
+                                , const tCIDLib::EAccessModes   eAccess
+                                , const tCIDLib::ECreateActs    eAction)
 {
-    tCIDBuild::TInt iFlags = 0;
-    if (eAction == tCIDBuild::EOpenAction_Truncate)
+    m_strFileName = strName;
+
+    tCIDLib::TSInt iFlags = 0;
+    if (eAction == tCIDLib::ECreateActs::TruncateExisting)
         iFlags = O_TRUNC;
-    else if (eAction == tCIDBuild::EOpenAction_FailIfExists)
+    else if (eAction == tCIDLib::ECreateActs::CreateIfNew)
         iFlags = O_CREAT | O_EXCL;
-    else if (eAction == tCIDBuild::EOpenAction_OpenExisting)
+    else if (eAction == tCIDLib::ECreateActs::OpenIfExists)
         iFlags = O_APPEND;
-    else if (eAction == tCIDBuild::EOpenAction_CreateAlways)
+    else if (eAction == tCIDLib::ECreateActs::CreateAlways)
         iFlags = O_CREAT | O_TRUNC;
-    else if (eAction == tCIDBuild::EOpenAction_OpenAlways)
+    else if (eAction == tCIDLib::ECreateActs::OpenOrCreate)
         iFlags = O_CREAT | O_APPEND;
 
     mode_t Mode = S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP;
-    if (eAccess == tCIDBuild::EAccess_Read)
+    if (eAccess == tCIDLib::EAccessModes::Read)
         iFlags |= O_RDONLY;
-    else if (eAccess == tCIDBuild::EAccess_Write)
+    else if (eAccess == tCIDLib::EAccessModes::Write)
         iFlags |= O_WRONLY;
-    else if (eAccess == tCIDBuild::EAccess_ReadWrite)
+    else if (eAccess == tCIDLib::EAccessModes::ReadWrite)
         iFlags |= O_RDWR;
 
-    tCIDBuild::TNatCh* pszName = TRawStr::pszTranscode(__strFileName.pszBuffer());
-    TArrayJanitor<tCIDBuild::TNatCh> janName(pszName);
+    tCIDBuild::TSCh* pszName = TRawStr::pszTranscode(m_strFileName.pszBuffer());
+    TArrayJanitor<tCIDBuild::TSCh> janName(pszName);
 
-    tCIDBuild::TInt iNew = ::open(pszName, iFlags, Mode);
+    tCIDLib::TSInt iNew = ::open(pszName, iFlags, Mode);
 
     if (iNew == -1)
     {
-        stdOut  << NStr("Warning: Could not open file: ")
-                << __strFileName << kCIDBuild::EndLn;
+        stdOut  << L"Warning: Could not open file: "
+                << m_strFileName << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::OpenError;
     }
 
-    __hflThis = iNew;
+    m_hflThis = iNew;    
 }
 
 
-tCIDBuild::TVoid TBinFile::__Open(const tCIDBuild::EStdFiles eStdFile)
+tCIDLib::TVoid TBinFile::Open(const tCIDLib::EStdFiles eStdFile)
 {
-    if (eStdFile == tCIDBuild::EStdFiles::In)
-        __hflThis = 0;
-    else if (eStdFile == tCIDBuild::EStdFiles::Out)
-        __hflThis = 1;
-    else if (eStdFile == tCIDBuild::EStdFiles::Err)
-        __hflThis = 2;
+    if (eStdFile == tCIDLib::EStdFiles::StdIn)
+        m_hflThis = 0;
+    else if (eStdFile == tCIDLib::EStdFiles::StdOut)
+        m_hflThis = 1;
+    else if (eStdFile == tCIDLib::EStdFiles::StdErr)
+        m_hflThis = 2;
 }
 
 
-tCIDBuild::TUInt
-TBinFile::__uiReadBytes(        tCIDBuild::TVoid* const pToFill
-                        , const tCIDBuild::TUInt        uiMax)
+tCIDLib::TVoid TBinFile::SeekTo(const tCIDLib::TCard4 c4To)
 {
-    ssize_t SizeRead = ::read(__hflThis, pToFill, uiMax);
+    // Do a seek relative to the current position
+    off_t Offset = ::lseek(m_hflThis, c4To, SEEK_SET);
+
+    // See if it there was an error or just a position over 32 bits
+    if (Offset == -1)
+    {
+        stdOut  << L"Warning: Could not set to position in file: "
+                << m_strFileName << kCIDBuild::EndLn;
+        throw tCIDBuild::EErrors::SeekError;
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+//  TBinFile: Private implementation methods
+// ---------------------------------------------------------------------------
+
+tCIDLib::TCard4
+TBinFile::c4ReadBytes(          tCIDLib::TVoid* const   pToFill
+                        , const tCIDLib::TCard4         c4Max)
+{
+    ssize_t SizeRead = ::read(m_hflThis, pToFill, c4Max);
     if (SizeRead == -1)
     {
-        stdOut << NStr("Error reading file: ") << __strFileName << kCIDBuild::EndLn;
+        stdOut << L"Error reading file: " << m_strFileName << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::ReadError;
     }
     return SizeRead;
 }
 
 
-tCIDBuild::TUInt
-TBinFile::__uiWriteBytes(   const   tCIDBuild::TVoid* const pToWrite
-                            , const tCIDBuild::TUInt        uiToWrite)
+tCIDLib::TCard4
+TBinFile::c4WriteBytes( const   tCIDLib::TVoid* const   pToWrite
+                        , const tCIDLib::TCard4         c4ToWrite)
 {
-    ssize_t SizeRead = ::write(__hflThis, pToWrite, uiToWrite);
+    ssize_t SizeRead = ::write(m_hflThis, pToWrite, c4ToWrite);
     if (SizeRead == -1)
     {
-        stdOut << NStr("Error writing file: ") << __strFileName << kCIDBuild::EndLn;
+        stdOut << L"Error writing file: " << m_strFileName << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::ReadError;
     }
     return SizeRead;

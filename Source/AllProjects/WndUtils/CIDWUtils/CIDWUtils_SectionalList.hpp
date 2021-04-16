@@ -58,6 +58,7 @@ class CIDWUTILSEXP TSectionalList : public TMultiColListBox
         TSectionalList();
 
         TSectionalList(const TSectionalList&) = delete;
+        TSectionalList(TSectionalList&&) = delete;
 
         ~TSectionalList();
 
@@ -66,6 +67,7 @@ class CIDWUTILSEXP TSectionalList : public TMultiColListBox
         //  Public operators
         // -------------------------------------------------------------------
         TSectionalList& operator=(const TSectionalList&) = delete;
+        TSectionalList& operator=(TSectionalList&&) = delete;
 
 
         // -------------------------------------------------------------------

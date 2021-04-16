@@ -130,7 +130,7 @@ TTest_SHA1_1::eRunTest( TTextStringOutStream&   strmOut
         }
 
         // Modify a byte and do another, making sure they are not different
-        mbufMsg[1]++;
+        mbufMsg.PutCard1(mbufMsg[1] + 1, 1);
         TSHA1Hash mhashTest3;
 
         mdigTest.StartNew();

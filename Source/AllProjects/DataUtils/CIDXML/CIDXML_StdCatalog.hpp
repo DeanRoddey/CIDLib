@@ -73,7 +73,8 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
                     tCIDXML::TEntitySrcRef& esrToParse
         );
 
-        TXMLStdCatalog(const TXMLStdCatalog&) = delete;
+        TXMLStdCatalog(const TXMLStdCatalog&) = default;
+        TXMLStdCatalog(TXMLStdCatalog&&) = default;
 
         ~TXMLStdCatalog();
 
@@ -81,7 +82,8 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TXMLStdCatalog& operator=(const TXMLStdCatalog&) = delete;
+        TXMLStdCatalog& operator=(const TXMLStdCatalog&) = default;
+        TXMLStdCatalog& operator=(TXMLStdCatalog&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -90,32 +92,32 @@ class CIDXMLEXP TXMLStdCatalog : public TXMLCatalog
         tCIDLib::TVoid AddMapping
         (
             const   TXMLEntitySrc* const    pxsrcToAdopt
-        );
+        )   final;
 
         tCIDLib::TVoid AddMapping
         (
                     tCIDXML::TEntitySrcRef& esrToAdd
-        );
+        )   final;
 
         tCIDLib::TBoolean bPublicMappingExists
         (
             const   TString&                strPublicId
-        )   const;
+        )   const final;
 
-        tCIDLib::TCard4 c4MapCount() const;
+        tCIDLib::TCard4 c4MapCount() const final;
 
         tCIDXML::TEntitySrcRef esrMapId
         (
             const   TString&                strPublicId
             , const TString&                strSystemId
-        )   const;
+        )   const final;
 
-        tCIDLib::TVoid RemoveAll();
+        tCIDLib::TVoid RemoveAll() final;
 
         tCIDLib::TVoid RemoveMapping
         (
             const   TString&                strId
-        );
+        )   final;
 
 
     private :

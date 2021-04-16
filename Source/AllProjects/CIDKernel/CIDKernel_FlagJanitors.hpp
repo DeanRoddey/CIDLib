@@ -20,13 +20,10 @@
 //  to set it back upon exit of the scope. There is also one for enums which
 //  is a template.
 //
-//  These are public classes that are exposed directly to the outside world,
-//  since they cannot have any errors and don't use any kernel specific types.
-//  They cannot be standard CIDLib classes, since they exist here in the
-//  kernel, but they don't need to be since they are very small and simple
-//  and don't need the RTTI overhead anyway.
-//
-//  This stuff is all platform independent.
+//  And we have another templated one that is a sort of magic one that takes
+//  a lambda expression, which it will call when it destructs. The lambda can
+//  do whatever you want, including having captures of data it can operate
+//  on.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -53,13 +50,18 @@ class KRNLEXPORT TBoolJanitor
         TBoolJanitor(       tCIDLib::TBoolean* const pbToRestore
                     , const tCIDLib::TBoolean        bNewValue) :
 
-            m_bOldValue(*pbToRestore)
+            m_bOldValue(kCIDLib::False)
             , m_pbToSanitize(pbToRestore)
         {
-            *m_pbToSanitize = bNewValue;
+            if (m_pbToSanitize)
+            {
+                m_bOldValue = *m_pbToSanitize;
+                *m_pbToSanitize = bNewValue;
+            }
         }
 
         TBoolJanitor(const TBoolJanitor&) = delete;
+        TBoolJanitor(TBoolJanitor&&) = delete;
 
         ~TBoolJanitor()
         {
@@ -72,7 +74,8 @@ class KRNLEXPORT TBoolJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TBoolJanitor& operator=(const TBoolJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt)  = delete;
+        TBoolJanitor& operator=(TBoolJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t)  = delete;
 
 
         // -------------------------------------------------------------------
@@ -115,13 +118,18 @@ class KRNLEXPORT TCardJanitor
         TCardJanitor(       tCIDLib::TCard4* const  pc4ToRestore
                     , const tCIDLib::TCard4         c4NewValue) :
 
-            m_c4OldValue(*pc4ToRestore)
+            m_c4OldValue(0)
             , m_pc4ToSanitize(pc4ToRestore)
         {
-            *m_pc4ToSanitize = c4NewValue;
+            if (m_pc4ToSanitize)
+            {
+                m_c4OldValue = *m_pc4ToSanitize;
+                *m_pc4ToSanitize = c4NewValue;
+            }
         }
 
         TCardJanitor(const TCardJanitor&) = delete;
+        TCardJanitor(TCardJanitor&&) = delete;
 
         ~TCardJanitor()
         {
@@ -134,7 +142,8 @@ class KRNLEXPORT TCardJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TCardJanitor& operator=(const TCardJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TCardJanitor& operator=(TCardJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -177,13 +186,18 @@ class KRNLEXPORT TIntJanitor
         TIntJanitor(        tCIDLib::TInt4* const   pi4ToRestore
                     , const tCIDLib::TInt4          i4NewValue) :
 
-            m_i4OldValue(*pi4ToRestore)
+            m_i4OldValue(0)
             , m_pi4ToSanitize(pi4ToRestore)
         {
-            *m_pi4ToSanitize = i4NewValue;
+            if (m_pi4ToSanitize)
+            {
+                m_i4OldValue = *m_pi4ToSanitize;
+                *m_pi4ToSanitize = i4NewValue;
+            }
         }
 
         TIntJanitor(const TIntJanitor&) = delete;
+        TIntJanitor(TIntJanitor&&) = delete;
 
         ~TIntJanitor()
         {
@@ -196,7 +210,8 @@ class KRNLEXPORT TIntJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TIntJanitor& operator=(const TIntJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TIntJanitor& operator=(TIntJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -206,8 +221,6 @@ class KRNLEXPORT TIntJanitor
         {
             m_pi4ToSanitize = nullptr;
         }
-
-
 
     private :
         // -------------------------------------------------------------------
@@ -226,6 +239,69 @@ class KRNLEXPORT TIntJanitor
 
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TLambdaJan
+// PREFIX: jan
+// ---------------------------------------------------------------------------
+template <typename CB> class TLambdaJan
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TLambdaJan() = delete;
+
+        TLambdaJan(CB pfnCallback) :
+
+            m_bOrphaned(kCIDLib::False)
+            , m_pfnCallback(pfnCallback)
+        { }
+
+        TLambdaJan(const TLambdaJan&) = delete;
+        TLambdaJan(TLambdaJan&&) = delete;
+
+        ~TLambdaJan()
+        {
+            // If we still have the callback, invoke it
+            if (!m_bOrphaned)
+            {
+                //
+                //  We can't force these to be no-except, we just have to suppress
+                //  this and if they cause an exception it's going to be fatal.
+                //
+                CIDLib_Suppress(26447)
+                m_pfnCallback();
+            }
+        }
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TLambdaJan& operator=(const TLambdaJan&) = delete;
+        TLambdaJan& operator=(TLambdaJan&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean bIsOrphaned() const
+        {
+            return m_bOrphaned;
+        }
+
+        tCIDLib::TVoid Orphan()
+        {
+            m_bOrphaned = kCIDLib::True;
+        }
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bOrphaned;
+        CB                  m_pfnCallback;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -235,7 +311,7 @@ class KRNLEXPORT TIntJanitor
 //  This one will set a pointer on a scoped basis and then put back the original
 //  value. The parameter must in include the constness of the pointer.
 // ---------------------------------------------------------------------------
-template <class T> class TPtrJanitor
+template <typename T> class TPtrJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -252,6 +328,7 @@ template <class T> class TPtrJanitor
         }
 
         TPtrJanitor(const TPtrJanitor&) = delete;
+        TPtrJanitor(TPtrJanitor&&) = delete;
 
         ~TPtrJanitor()
         {
@@ -264,7 +341,8 @@ template <class T> class TPtrJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TPtrJanitor& operator=(const TPtrJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TPtrJanitor& operator=(TPtrJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------
@@ -307,7 +385,7 @@ template <class T> class TPtrJanitor
 //  for things like pointers to things that we want to set on a scoped basis
 //  or enumvalues that need to be set on a scoped basis, that kind of thing.
 // ---------------------------------------------------------------------------
-template <class T> class TGFJanitor
+template <typename T> class TGFJanitor
 {
     public  :
         // -------------------------------------------------------------------
@@ -317,13 +395,18 @@ template <class T> class TGFJanitor
 
         TGFJanitor(T* const ptToRestore, const T tNewValue) :
 
-            m_tOldValue(*ptToRestore)
+            m_tOldValue()
             , m_ptToSanitize(ptToRestore)
         {
-            *m_ptToSanitize = tNewValue;
+            if (m_ptToSanitize)
+            {
+                m_tOldValue = *m_ptToSanitize;
+                *m_ptToSanitize = tNewValue;
+            }
         }
 
         TGFJanitor(const TGFJanitor&) = delete;
+        TGFJanitor(TGFJanitor&&) = delete;
 
         ~TGFJanitor()
         {
@@ -336,7 +419,8 @@ template <class T> class TGFJanitor
         //  Public operators
         // -------------------------------------------------------------------
         TGFJanitor& operator=(const TGFJanitor&) = delete;
-        tCIDLib::TVoid* operator new(const tCIDLib::TUInt) = delete;
+        TGFJanitor& operator=(TGFJanitor&&) = delete;
+        tCIDLib::TVoid* operator new(const size_t) = delete;
 
 
         // -------------------------------------------------------------------

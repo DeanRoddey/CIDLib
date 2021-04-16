@@ -64,13 +64,6 @@ TSHA1Hash::TSHA1Hash(const TMemBuf& mbufBytes) :
 {
 }
 
-TSHA1Hash::TSHA1Hash(TSHA1Hash&& mhashSrc) :
-
-    TSHA1Hash()
-{
-    *this = tCIDLib::ForceMove(mhashSrc);
-}
-
 TSHA1Hash::~TSHA1Hash()
 {
 }
@@ -79,13 +72,6 @@ TSHA1Hash::~TSHA1Hash()
 // ---------------------------------------------------------------------------
 //  TSHA1Hash: Public operators
 // ---------------------------------------------------------------------------
-TSHA1Hash& TSHA1Hash::operator=(TSHA1Hash&& mhashSrc)
-{
-    if (this != &mhashSrc)
-        TParent::operator=(tCIDLib::ForceMove(mhashSrc));
-    return *this;
-}
-
 
 tCIDLib::TBoolean TSHA1Hash::operator==(const TSHA1Hash& mhashSrc) const
 {
@@ -124,7 +110,7 @@ TSHA1Hash::FormatToStr(TString& strToFill, const tCIDLib::TBoolean bAppend) cons
 
     const tCIDLib::TCard4* pc4Cur
     (
-        reinterpret_cast<const tCIDLib::TCard4*>(pc1Buffer())
+        reinterpret_cast<const tCIDLib::TCard4*>(pc1Hash())
     );
 
     TString strVal;

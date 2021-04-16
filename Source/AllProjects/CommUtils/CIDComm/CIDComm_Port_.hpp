@@ -69,61 +69,61 @@ class TCommPort : public TCommPortBase
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsOpen() const override;
+        tCIDLib::TBoolean bIsOpen() const final;
 
-        tCIDLib::TBoolean bQueryCTSOn() const override;
+        tCIDLib::TBoolean bQueryCTSOn() const final;
 
-        tCIDLib::TBoolean bQueryDSROn() const override;
+        tCIDLib::TBoolean bQueryDSROn() const final;
 
         tCIDLib::TCard4 c4ReadRawBufMS
         (
                     tCIDLib::TVoid* const   pToFill
             , const tCIDLib::TCard4         c4MaxBytes
             , const tCIDLib::TCard4         c4Wait
-        ) override;
+        ) final;
 
         tCIDLib::TCard4 c4ReadRawBuf
         (
                     tCIDLib::TVoid* const   pToFill
             , const tCIDLib::TCard4         c4MaxBytes
             , const tCIDLib::TEncodedTime   enctWait
-        ) override;
+        ) final;
 
         tCIDLib::TCard4 c4WriteRawBufMS
         (
             const   tCIDLib::TVoid* const   pToWrite
             , const tCIDLib::TCard4         c4BytesToWrite
             , const tCIDLib::TCard4         c4Wait
-        ) override;
+        ) final;
 
-        tCIDLib::TVoid Close() override;
+        tCIDLib::TVoid Close() final;
 
         tCIDLib::TVoid Cycle
         (
             const   tCIDComm::EOpenFlags    eFlags = tCIDComm::EOpenFlags::None
             , const tCIDLib::TCard4         c4ReadBufSz = 0
             , const tCIDLib::TCard4         c4WriteBufSz = 0
-        ) override;
+        ) final;
 
-        tCIDComm::EFlags eFlags() const override;
+        tCIDComm::EFlags eFlags() const final;
 
-        tCIDLib::TVoid FlushWriteBuffer() override;
+        tCIDLib::TVoid FlushWriteBuffer() final;
 
         tCIDLib::TVoid Open
         (
             const   tCIDComm::EOpenFlags    eFlags = tCIDComm::EOpenFlags::None
             , const tCIDLib::TCard4         c4ReadBufSz = 0
             , const tCIDLib::TCard4         c4WriteBufSz = 0
-        ) override;
+        ) final;
 
-        tCIDLib::TVoid PurgeReadData() override;
+        tCIDLib::TVoid PurgeReadData() final;
 
-        tCIDLib::TVoid PurgeWriteData() override;
+        tCIDLib::TVoid PurgeWriteData() final;
 
         tCIDLib::TVoid QueryCfg
         (
                     TCommPortCfg&           cpcfgToFill
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid QueryLineStates
         (
@@ -131,66 +131,66 @@ class TCommPort : public TCommPortBase
             ,       tCIDLib::TBoolean&      bDSROn
             ,       tCIDLib::TBoolean&      bRingOn
             ,       tCIDLib::TBoolean&      bRLSDOn
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid QueryXChars
         (
                     tCIDLib::TSCh&          schOn
             ,       tCIDLib::TSCh&          schOff
-        )   const override;
+        )   const final;
 
-        tCIDLib::TVoid Reset() override;
+        tCIDLib::TVoid Reset() final;
 
         tCIDLib::TVoid SetBaudRate
         (
             const   tCIDLib::TCard4         c4ToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetBreak
         (
             const   tCIDLib::TBoolean       bState
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetDataBits
         (
             const   tCIDComm::EDataBits     eToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetDTR
         (
             const   tCIDComm::EPortDTR      eToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetParity
         (
             const   tCIDComm::EParities     eToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetRTS
         (
             const   tCIDComm::EPortRTS      eToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetStopBits
         (
             const   tCIDComm::EStopBits     eToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetCfg
         (
             const   TCommPortCfg&           cpcfgToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetEOFChar
         (
             const   tCIDLib::TSCh           schToSet
-        ) override;
+        ) final;
 
         tCIDLib::TVoid SetFlags
         (
             const   tCIDComm::EFlags        eToSet
             , const tCIDComm::EFlags        eMask
-        ) override;
+        ) final;
 
 
         // -------------------------------------------------------------------

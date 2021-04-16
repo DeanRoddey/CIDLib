@@ -68,9 +68,9 @@ TMEngSysInfoInfo::TMEngSysInfoInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_GetCPUCount(kMacroEng::c2BadId)
-    , m_c2MethId_GetNodeName(kMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetCPUCount(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNodeName(kCIDMacroEng::c2BadId)
 {
 }
 

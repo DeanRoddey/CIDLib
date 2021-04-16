@@ -62,8 +62,8 @@ namespace CIDKernel_Signals
     //      installed.
     // -----------------------------------------------------------------------
     tCIDLib::TCard4  c4CurId = 1;
-    TKrnlCritSec*    pkcrsLock;
-    TListNode*       pnodeTail = 0;
+    TKrnlCritSec*    pkcrsLock = nullptr;
+    TListNode*       pnodeTail = nullptr;
 }
 
 
@@ -117,8 +117,6 @@ MSignalHandler::MSignalHandler(const MSignalHandler&)
 tCIDLib::TVoid MSignalHandler::operator=(const MSignalHandler&)
 {
 }
-
-
 
 
 // ---------------------------------------------------------------------------

@@ -100,7 +100,7 @@ class CIDSOCKEXP TSocketListener : public TObject
 
         tCIDLib::TIPPortNum ippnListenOn() const;
 
-        TServerStreamSocket* psockListenFor
+        [[nodiscard]] TServerStreamSocket* psockListenFor
         (
             const   tCIDLib::TEncodedTime   enctWait
             ,       TIPEndPoint&            ipepClient = TIPEndPoint::Nul_TIPEndPoint()
@@ -120,6 +120,16 @@ class CIDSOCKEXP TSocketListener : public TObject
 
 
     private :
+        // -------------------------------------------------------------------
+        //  Private class constants
+        //
+        //  c4ListenCnt
+        //      The max number of listening sockets we create (one for all IPV4
+        //      and one for all IPV6 worst case, if both are available.)
+        // -------------------------------------------------------------------
+        static constexpr tCIDLib::TCard4 c4ListenCnt = 2;
+
+
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -142,7 +152,7 @@ class CIDSOCKEXP TSocketListener : public TObject
         //      purposes. If it is zero, then it is updated during init to the actual
         //      port that got used.
         // -------------------------------------------------------------------
-        TKrnlSocket*            m_apksockList[2];
+        TKrnlSocket*            m_apksockList[c4ListenCnt];
         tCIDLib::TCard4         m_c4Count;
         tCIDLib::TCard4         m_c4MaxWaiting;
         tCIDLib::TIPPortNum     m_ippnListenOn;

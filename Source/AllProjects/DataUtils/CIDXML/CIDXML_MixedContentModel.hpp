@@ -49,7 +49,17 @@ class CIDXMLEXP TXMLMixedCM : public TXMLContentModel
             , const tCIDLib::TCard4         c4Count
         );
 
+        TXMLMixedCM(const TXMLMixedCM&) = delete;
+        TXMLMixedCM(TXMLMixedCM&&) = delete;
+
         ~TXMLMixedCM();
+
+
+        // -------------------------------------------------------------------
+        //  Public constructors
+        // -------------------------------------------------------------------
+        TXMLMixedCM& operator=(const TXMLMixedCM&) = delete;
+        TXMLMixedCM& operator=(TXMLMixedCM&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -60,13 +70,13 @@ class CIDXMLEXP TXMLMixedCM : public TXMLContentModel
             const   tCIDLib::TCard4* const  pc4MixedIds
             , const tCIDLib::TCard4         c4MixedCount
             ,       tCIDLib::TCard4&        c4FailedAt
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
             , const TXMLValidator&          xvalPool
-        )   const;
+        )   const final;
 
 
     protected :
@@ -77,13 +87,6 @@ class CIDXMLEXP TXMLMixedCM : public TXMLContentModel
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented constructors and operators
-        // -------------------------------------------------------------------
-        TXMLMixedCM(const TXMLMixedCM&);
-        tCIDLib::TVoid operator=(const TXMLMixedCM&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //
@@ -96,12 +99,6 @@ class CIDXMLEXP TXMLMixedCM : public TXMLContentModel
         // -------------------------------------------------------------------
         tCIDLib::TCard4     m_c4Count;
         tCIDLib::TCard4*    m_pc4ChildIds;
-
-
-        // -------------------------------------------------------------------
-        //  Magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TXMLMixedCM,TXMLContentModel)
 };
 
 #pragma CIDLIB_POPPACK

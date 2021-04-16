@@ -7,12 +7,11 @@
 //
 // COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
 //
-//  This file is part of a demonstration program of the CIDLib C++
-//  Frameworks. Its contents are distributed 'as is', to provide guidance on
-//  the use of the CIDLib system. However, these demos are not intended to
-//  represent a full fledged applications. Any direct use of demo code in
-//  user applications is at the user's discretion, and no warranties are
-//  implied as to its correctness or applicability.
+//  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
+//  the author (Dean Roddey.) It is licensed under the MIT Open Source
+//  license:
+//
+//  https://opensource.org/licenses/MIT
 //
 // DESCRIPTION:
 //
@@ -69,12 +68,12 @@ static tCIDLib::TVoid TestSetBasics(TTextOutStream& strmOut)
     THashMapOfTArea colTest(c4HashModulus, TStringKeyOps());
 
     // Add in one element, then try to add it again. It should be rejected
-    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
+    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
 
     bCaughtIt = kCIDLib::False;
     try
     {
-        colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
+        colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
     }
 
     catch(const TError& errToCatch)
@@ -136,9 +135,9 @@ static tCIDLib::TVoid TestSetStreaming(TTextOutStream& strmOut)
     THashMapOfTArea colTest(17, TStringKeyOps());
 
     // Put some values into it
-    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3, 4)));
-    colTest.objAdd(TTestPair(L"Test2", TArea(2, 3, 4, 5)));
-    colTest.objAdd(TTestPair(L"Test3", TArea(3, 4, 5, 6)));
+    colTest.objAdd(TTestPair(L"Test1", TArea(1, 2, 3UL, 4UL)));
+    colTest.objAdd(TTestPair(L"Test2", TArea(2, 3, 4UL, 5UL)));
+    colTest.objAdd(TTestPair(L"Test3", TArea(3, 4, 5UL, 6UL)));
 
     //
     //  Create a memory based output stream, and an input stream linked

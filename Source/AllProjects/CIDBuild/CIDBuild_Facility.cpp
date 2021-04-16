@@ -54,6 +54,7 @@ TFacCIDBuild::TFacCIDBuild() :
     , m_bVerbose(kCIDLib::False)
     , m_eAction(tCIDBuild::EActions::Build)
     , m_eBldMode(tCIDBuild::EBldModes::Develop)
+    , m_eCodeAnalysis(tCIDBuild::EAnalysisLevels::None)
     , m_eHdrDumpMode(tCIDBuild::EHdrDmpModes::None)
     , m_c4CPUCount(1)
     , m_c4MajVer(0)
@@ -816,6 +817,7 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
     //  Run through the environment and look for the following environment
     //  variables (and what they set):
     //
+    //  CIDLIB_SRCDIR       m_strCIDLibSrcDir
     //  CID_BUILDMODE       m_eBldMode
     //  CID_RESDIR          m_strOutDir
     //  CID_SRCTREE         m_strRootDir
@@ -853,22 +855,22 @@ tCIDLib::TVoid TFacCIDBuild::CheckEnv()
     if (TUtils::bGetEnvVar(L"CID_SRCTREE", m_strRootDir))
     {
         // Make sure it ends with a slash
-        if (m_strRootDir.chLast() != L'\\')
-            m_strRootDir.Append(L"\\");
+        if (m_strRootDir.chLast() != kCIDBuild::chPathSep)
+            m_strRootDir.Append(kCIDBuild::chPathSep);
     }
 
     if (TUtils::bGetEnvVar(L"CIDLIB_SRCDIR", m_strCIDLibSrcDir))
     {
         // Make sure it ends with a slash
-        if (m_strCIDLibSrcDir.chLast() != L'\\')
-            m_strCIDLibSrcDir.Append(L"\\");
+        if (m_strCIDLibSrcDir.chLast() != kCIDBuild::chPathSep)
+            m_strCIDLibSrcDir.Append(kCIDBuild::chPathSep);
     }
 
     if (TUtils::bGetEnvVar(L"CID_RESDIR", m_strOutDir))
     {
         // Make sure it ends with a slash
-        if (m_strOutDir.chLast() != L'\\')
-            m_strOutDir.Append(L"\\");
+        if (m_strOutDir.chLast() != kCIDBuild::chPathSep)
+            m_strOutDir.Append(kCIDBuild::chPathSep);
     }
 
     // Create full string versions of the xxx_Platform.hpp file values
@@ -900,8 +902,7 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                         << kCIDBuild::EndLn;
                 throw tCIDBuild::EErrors::BadParams;
             }
-
-            if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
+             else if (!TRawStr::iCompIStr(pszCurParm, L"Force"))
             {
                 m_bForce = kCIDLib::True;
             }
@@ -963,8 +964,8 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                 //  space for a trailing slash in case it does not have one.
                 //
                 m_strRootDir = &pszCurParm[8];
-                if (m_strRootDir.chLast() != L'\\')
-                    m_strRootDir.Append(L"\\");
+                if (m_strRootDir.chLast() != kCIDBuild::chPathSep)
+                    m_strRootDir.Append(kCIDBuild::chPathSep);
             }
              else if (!TRawStr::iCompIStr(pszCurParm, L"Single"))
             {
@@ -998,47 +999,60 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
             }
              else if (!TRawStr::iCompIStrN(pszCurParm, L"Action=", 7))
             {
-                if (!TRawStr::iCompIStr(&pszCurParm[7], L"Build"))
+                const tCIDLib::TCh* const pszActVal = &pszCurParm[7];
+                if (!TRawStr::iCompIStr(pszActVal, L"Analyze"))
+                {
+                    // It's a build but with the code analysis level set
+                    m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level1;
+                    m_eAction = tCIDBuild::EActions::Build;
+                }
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Analyze2"))
+                {
+                    // It's a build but with the code analysis level set
+                    m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level2;
+                    m_eAction = tCIDBuild::EActions::Build;
+                }
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Build"))
                 {
                     m_eAction = tCIDBuild::EActions::Build;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"Debug"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Debug"))
                 {
                     m_eAction = tCIDBuild::EActions::Debug;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeDeps"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeDeps"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeDeps;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"ShowProjDeps"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"ShowProjDeps"))
                 {
                     m_eAction = tCIDBuild::EActions::ShowProjDeps;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"ShowProjSettings"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"ShowProjSettings"))
                 {
                     m_eAction = tCIDBuild::EActions::ShowProjSettings;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"CopyHeaders"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"CopyHeaders"))
                 {
                     m_eAction = tCIDBuild::EActions::CopyHeaders;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeRes"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeRes"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeRes;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeBinRel"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeBinRel"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeBinRelease;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"MakeDevRel"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"MakeDevRel"))
                 {
                     m_eAction = tCIDBuild::EActions::MakeDevRelease;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"IDLGen"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"IDLGen"))
                 {
                     m_eAction = tCIDBuild::EActions::IDLGen;
                 }
-                 else if (!TRawStr::iCompIStr(&pszCurParm[7], L"Bootstrap"))
+                 else if (!TRawStr::iCompIStr(pszActVal, L"Bootstrap"))
                 {
                     m_eAction = tCIDBuild::EActions::Bootstrap;
                 }
@@ -1122,13 +1136,13 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
 
     // Build up the standard include path
     m_strIncludeDir = m_strOutDir;
-    m_strIncludeDir.Append(L"Include", L"\\");
+    m_strIncludeDir.Append(L"Include", kCIDBuild::pszPathSep);
 
     m_strPPIncludeDir = m_strIncludeDir;
     m_strPPIncludeDir.Append(kCIDBuild::pszPlatformDir);
 
     m_strPrivIncludeDir = m_strOutDir;
-    m_strPrivIncludeDir.Append(L"PrivInclude", L"\\");
+    m_strPrivIncludeDir.Append(L"PrivInclude", kCIDBuild::pszPathSep);
 
     m_strPPPrivIncludeDir = m_strPrivIncludeDir;
     m_strPPPrivIncludeDir.Append(kCIDBuild::pszPlatformDir);
@@ -1159,8 +1173,8 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
         }
 
         // Make sure it ends in a path separator
-        if (m_strTarget.chLast() != L'\\')
-            m_strTarget.Append(L"\\");
+        if (m_strTarget.chLast() != kCIDBuild::chPathSep)
+            m_strTarget.Append(kCIDBuild::chPathSep);
 
         if (m_eBldMode == tCIDBuild::EBldModes::Develop)
             stdOut << L"WARNING: This action should use the Production build" << kCIDBuild::EndLn;
@@ -1255,6 +1269,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowParms()
                 << L"    Verbose: " << (m_bVerbose ? L"Yes" : L"No") << L"\n"
                 << L"   Low Prio: " << (m_bLowPrio ? L"Yes" : L"No") << L"\n"
                 << L"   Max Warn: " << (m_bMaxWarn ? L"Yes" : L"No") << L"\n"
+                << L"    Analyze: " << tCIDLib::TCard4(m_eCodeAnalysis) << L"\n"
                 << L"    No Logo: " << (m_bSupressLogo ? L"Yes" : L"No") << L"\n";
 
         stdOut << L"     Target: ";
@@ -1303,7 +1318,7 @@ tCIDLib::TVoid TFacCIDBuild::ShowUsage()
             << L"    Actions:\n"
             << L"        Build, MakeDeps, ShowProjDeps, CopyHeaders, MakeRes\n"
             << L"        ShowProjSettings, MakeBinRel, MakeDevRel, IDLGen,\n"
-            << L"        Debug\n"
+            << L"        Debug, Analyze, Analyze2\n"
             << L"\n"
             << L"      *  Means a required option\n"
             << L"      () Means the default if not provided\n\n"

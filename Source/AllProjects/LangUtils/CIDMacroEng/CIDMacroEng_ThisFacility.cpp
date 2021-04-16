@@ -42,38 +42,41 @@ RTTIDecls(TFacCIDMacroEng,TFacility)
 // ---------------------------------------------------------------------------
 namespace kCIDMacroEng_ThisFacility
 {
-    // -----------------------------------------------------------------------
-    //  A simple default class that is inserted when a new class is created.
-    //  There is a replacement token that is used to put in the actual new
-    //  class path. So it creates an initial valid and compilable class.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCh* pszDefClassText =
-    (
-        L"Class=[NonFinal]\n"
-        L"    ClassPath %(1);\n"
-        L"    ParentClass MEng.Object;\n"
-        L"EndClass;\n"
-        L"\n"
-        L"Imports=\n"
-        L"EndImports;\n"
-        L"\n"
-        L"Members=\n"
-        L"EndMembers;\n"
-        L"\n"
-        L"\n"
-        L"Methods=[Public,Final]\n"
-        L"\n"
-        L"    Constructor()\n"
-        L"    Begin\n"
-        L"    EndConstructor;\n"
-        L"\n"
-        L"    Method Start() Returns Int4\n"
-        L"    Begin\n"
-        L"        Return 0;\n"
-        L"    EndMethod;\n"
-        L"\n"
-        L"EndMethods;\n"
-    );
+    namespace
+    {
+        // -----------------------------------------------------------------------
+        //  A simple default class that is inserted when a new class is created.
+        //  There is a replacement token that is used to put in the actual new
+        //  class path. So it creates an initial valid and compilable class.
+        // -----------------------------------------------------------------------
+        constexpr const tCIDLib::TCh* pszDefClassText =
+        (
+            L"Class=[NonFinal]\n"
+            L"    ClassPath %(1);\n"
+            L"    ParentClass MEng.Object;\n"
+            L"EndClass;\n"
+            L"\n"
+            L"Imports=\n"
+            L"EndImports;\n"
+            L"\n"
+            L"Members=\n"
+            L"EndMembers;\n"
+            L"\n"
+            L"\n"
+            L"Methods=[Public,Final]\n"
+            L"\n"
+            L"    Constructor()\n"
+            L"    Begin\n"
+            L"    EndConstructor;\n"
+            L"\n"
+            L"    Method Start() Returns Int4\n"
+            L"    Begin\n"
+            L"        Return 0;\n"
+            L"    EndMethod;\n"
+            L"\n"
+            L"EndMethods;\n"
+        );
+    }
 }
 
 
@@ -253,7 +256,7 @@ TFacCIDMacroEng::TFacCIDMacroEng() :
     TFacility
     (
         L"CIDMacroEng"
-        , tCIDLib::EModTypes::Dll
+        , tCIDLib::EModTypes::SharedLib
         , kCIDLib::c4MajVersion
         , kCIDLib::c4MinVersion
         , kCIDLib::c4Revision
@@ -298,7 +301,7 @@ TFacCIDMacroEng::AddClassLoader(        MMEngExtClassLoader* const  pmeclToAdd
                                 , const tCIDLib::EEnds              eEnd)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     // Add the new loader where indicated
     if (eEnd == tCIDLib::EEnds::First)
@@ -458,7 +461,7 @@ TMEngClassInfo* TFacCIDMacroEng
                             , const TString&            strClassPathToLoad)
 {
     // Lock the list while we do this
-    TMtxLocker mtxlSync(&m_mtxSync);
+    TLocker lockrSync(&m_mtxSync);
 
     //
     //  Loop through the installed class loaders till we get a hit or run

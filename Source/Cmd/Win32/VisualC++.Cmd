@@ -24,15 +24,12 @@ REM automatically
 REM
 REM The ones from the environment are:
 REM
-REM     CID_SPEECHPLATDIR   - The higher level speech platform SDK
 REM     CID_PLATFORMSSDK    - The windows SDK top level path
 REM     CID_VSSTUDIOPATH    - The top level Visual studio path
-REM     CID_WMFSDKDIR       - The Window Media Format SDK path
 REM     CID_PLATSDKVER      - The version of the Platform SDK we are using
 REM     CID_VSTOOLSVER      - The version of the Visual Studio tools we are using
 REM
 REM     - Only used in CQC currently
-REM     CID_QTSDK           - The Quick Time SDK directory
 REM     CID_LIBVLCPATH      - The main VLC executable path itself
 REM
 REM The ones that we set up ourself are:
@@ -42,7 +39,7 @@ REM     SDK Tweaks      - A couple files we need not mornally available
 REM     Scintilla       - We have a custom build of Scintilla
 REM
 REM     - Only used in CQC currently
-REM     LIBVLC SDK      - To the sdk directory in our CID_Dev area
+REM     LIBVLC SDK      - To the sdk directory in the Depends directory
 REM
 
 IF "%1"=="" GOTO BAD_PARMS
@@ -64,13 +61,11 @@ SET LIB=%CID_PLATFORMSDK%\lib\%CID_PLATSDKVER%\ucrt\x86;%LIB%;
 SET LIB=%LIB%;%CID_PLATFORMSDK%\lib\%CID_PLATSDKVER%\um\x86;
 SET LIB=%LIB%;%CID_VSTUDIOPATH%\VC\Tools\MSVC\%CID_VSTOOLSVER%\lib\x86;
 
-SET INCLUDE=%INCLUDE%;%CID_WMFSDKDIR%\Include;%WMPSDKDIR%\Include;%ITUNESSDK%
-SET LIB=%LIB%;%CID_WMFSDKDIR%\Lib;%CID_SPEECHPLATDIR%\Lib
+SET INCLUDE=%INCLUDE%;%ITUNESSDK%
 
 REM Make sure these are up front
-SET INCLUDE=%CID_SPEECHPLATDIR%\Include;%KINECTSDK20_DIR%\inc;%INCLUDE%
-SET LIB=%CID_SPEECHPLATDIR%\Lib;%KINECTSDK20_DIR%\Lib\x86;%LIB%
-SET PATH=%CID_SPEECHPLATDIR%\Tools;%PATH%
+SET INCLUDE=%KINECTSDK20_DIR%\inc;%INCLUDE%
+SET LIB=%KINECTSDK20_DIR%\Lib\x86;%LIB%
 
 REM Add ATL/MFC stuff if required
 SET INCLUDE=%INCLUDE%;%CID_VSTUDIOPATH%\VC\Tools\MSVC\%CID_VSTOOLSVER%\atlmfc\include;
@@ -79,6 +74,7 @@ SET LIB=%LIB%;%CID_VSTUDIOPATH%\VC\Tools\MSVC\%CID_VSTOOLSVER%\atlmfc\lib\x86;
 REM Add a tweak directory where we put stuff we have to modify or pull down separately
 SET INCLUDE=%CID_DEPENDS%\SDKTweaks;%INCLUDE%
 SET LIB=%CID_DEPENDS%\SDKTweaks;%LIB%
+
 
 REM ---------------------------------------------------------------------------
 REM Add to the path the appropriate runtime library path
@@ -106,9 +102,17 @@ SET LIB=%LIB%;%CID_DEPENDS%\SDKS\LibVLC\Lib;
 REM ---------------------------------------------------------------------------
 REM  Add the iTunes SDK
 REM ---------------------------------------------------------------------------
-SET PATH=%PATH%;%CID_QTSDK%;
 SET INCLUDE=%INCLUDE%;%CID_DEPENDS%\SDKS\iTunes;
 GOTO EXIT
+
+
+REM ---------------------------------------------------------------------------
+REM  Needed for the code analysis stuff (AFTER the include path is set.)
+REM ---------------------------------------------------------------------------
+SET esp.extensions=CppCoreCheck.dll
+SET esp.annotationbuildlevel=ignore
+set caexcludepath=%INCLUDE%
+
 
 
 REM Come here if bad parameters

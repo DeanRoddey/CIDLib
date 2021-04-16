@@ -361,6 +361,49 @@ TTest_GraphData::eRunTest(  TTextStringOutStream&   strmOut
             strmOut << TFWCurLn << L"The serial number was not adjusted correctly\n\n";
         }
     }
+
+    // Test copy and move
+    {
+        TGraphData grdatOrg(8);
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 7; c4Index++)
+            grdatOrg.PushNewSample(tCIDLib::TFloat4(c4Index + 1));
+
+        TGraphData grdatCopy(grdatOrg);
+        TGraphData grdatMove(tCIDLib::ForceMove(grdatOrg));
+
+        // The copy and the move of the original should have the same samples
+        if (grdatCopy.c4SamplesAvail() != 7)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Copied graph data has wrong sample count\n\n";
+        }
+
+        if (grdatMove.c4SamplesAvail() != 7)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Moved graph data has wrong sample count\n\n";
+        }
+
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 7; c4Index++)
+        {
+            if (grdatCopy.f4SampleAt(c4Index) != tCIDLib::TFloat4(c4Index + 1))
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"Copied graph data had wrong sample at offset " << c4Index << L"\n\n";
+                break;
+            }
+        }
+
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < 7; c4Index++)
+        {
+            if (grdatMove.f4SampleAt(c4Index) != tCIDLib::TFloat4(c4Index + 1))
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"MOved graph data had wrong sample at offset " << c4Index << L"\n\n";
+                break;
+            }
+        }
+    }
     return eRes;
 }
 

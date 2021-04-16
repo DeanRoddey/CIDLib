@@ -99,7 +99,7 @@ TCIDObjStoreImpl::c4CreateSeqData(          TVector<TOSSeqData>& colToFill
         }
         #endif
 
-        colToFill.objAdd(TOSSeqData(fliCur, c4Index));
+        colToFill.objPlace(fliCur, c4Index);
         c4FreeItems++;
     }
 

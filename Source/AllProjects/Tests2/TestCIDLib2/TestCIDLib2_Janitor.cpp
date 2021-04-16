@@ -36,6 +36,7 @@
 //  Magic macros
 // ---------------------------------------------------------------------------
 RTTIDecls(TTest_FlagJanitor,TTestFWTest)
+RTTIDecls(TTest_LambdaJan,TTestFWTest)
 
 
 
@@ -136,6 +137,72 @@ TTest_FlagJanitor::eRunTest(TTextStringOutStream&   strmOut
         {
             strmOut << TFWCurLn
                     << L"Const pointer janitor did not restore old value\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+
+    return eRes;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_LambdaJan1
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_LambdaJan1: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_LambdaJan::TTest_LambdaJan() :
+
+    TTestFWTest
+    (
+        L"Lambda Janitors", L"Tests of the lambda janitor class", 0
+    )
+{
+}
+
+TTest_LambdaJan::~TTest_LambdaJan()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_LambdaJan: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_LambdaJan::eRunTest(TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    TString strTestVal(L"Initial Value");
+
+    // This should leave the test value cleared
+    {
+        {
+            TLambdaJan janClearStr([&strTestVal]() -> void { strTestVal.Clear();});
+        }
+        if (!strTestVal.bIsEmpty())
+        {
+            strmOut << TFWCurLn
+                    << L"Lambda janitor did not clear the string\n";
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+
+    // Test orphaning, which should leave the value unchanged
+    strTestVal = L"Not orphaned";
+    {
+        {
+            TLambdaJan janClearStr([&strTestVal](){ strTestVal.Clear();});
+            janClearStr.Orphan();
+        }
+        if (strTestVal != L"Not orphaned")
+        {
+            strmOut << TFWCurLn
+                    << L"Orphaned lambda janitor still cleared the string\n";
             eRes = tTestFWLib::ETestRes::Failed;
         }
     }

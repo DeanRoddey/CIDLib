@@ -33,9 +33,7 @@
 // ---------------------------------------------------------------------------
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
-//#include  <winsock2.h>
 #include    <Iphlpapi.h>
-#include    <ws2tcpip.h>
 #include    <netfw.h>
 
 
@@ -56,109 +54,112 @@ struct TErrorMap
 
 namespace CIDKernel_IP_WIN32
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  aXlatErrors
-    //      An array of mappings from socket errors to CIDLib kernel errors.
-    //      We map a good bit of them to general errors, and some are mapped
-    //      to error codes added just for TCP/IP support.
-    //
-    //  c4ErrCount
-    //      The number of elements in the aXlatErrors array.
-    //
-    //  c2MinVersion
-    //      The minimium version of the WinSock subsystem that we require.
-    // -----------------------------------------------------------------------
-    const TErrorMap amapErrors[] =
+    namespace
     {
-            { WSAEINTR          , kKrnlErrs::errcGen_Interrupted }
-        ,   { WSAEBADF          , kKrnlErrs::errcData_InvalidHandle }
-        ,   { WSAEACCES         , kKrnlErrs::errcAcc_InvalidAccess }
-        ,   { WSAEFAULT         , kKrnlErrs::errcGen_GeneralFault }
-        ,   { WSAEINVAL         , kKrnlErrs::errcData_InvalidValue }
-        ,   { WSAEMFILE         , kKrnlErrs::errcFl_TooManyOpenFiles }
-        ,   { WSAEWOULDBLOCK    , kKrnlErrs::errcGen_WouldBlock }
-        ,   { WSAEINPROGRESS    , kKrnlErrs::errcGen_InProgress }
-        ,   { WSAEALREADY       , kKrnlErrs::errcGen_Already }
-        ,   { WSAENOTSOCK       , kKrnlErrs::errcNet_NotASocket }
-        ,   { WSAEDESTADDRREQ   , kKrnlErrs::errcNet_DestAdrRequired }
-        ,   { WSAEMSGSIZE       , kKrnlErrs::errcNet_MsgSize }
-        ,   { WSAEPROTOTYPE     , kKrnlErrs::errcNet_ProtoType }
-        ,   { WSAENOPROTOOPT    , kKrnlErrs::errcNet_NoProtoOpts }
-        ,   { WSAEPROTONOSUPPORT, kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAESOCKTNOSUPPORT, kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEOPNOTSUPP     , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEPFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEAFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
-        ,   { WSAEADDRINUSE     , kKrnlErrs::errcGen_Busy }
-        ,   { WSAEADDRNOTAVAIL  , kKrnlErrs::errcGen_NotAvailable }
-        ,   { WSAENETDOWN       , kKrnlErrs::errcNet_NetworkDown }
-        ,   { WSAENETUNREACH    , kKrnlErrs::errcNet_NetworkUnreachable }
-        ,   { WSAENETRESET      , kKrnlErrs::errcNet_NetworkReset }
-        ,   { WSAECONNABORTED   , kKrnlErrs::errcNet_ConnAborted }
-        ,   { WSAECONNRESET     , kKrnlErrs::errcNet_ConnReset }
-        ,   { WSAENOBUFS        , kKrnlErrs::errcNet_NoBuffers }
-        ,   { WSAEISCONN        , kKrnlErrs::errcGen_AlreadyConnected }
-        ,   { WSAENOTCONN       , kKrnlErrs::errcGen_NotConnected }
-        ,   { WSAESHUTDOWN      , kKrnlErrs::errcNet_Shutdown }
-        ,   { WSAETOOMANYREFS   , kKrnlErrs::errcGen_TooMany }
-        ,   { WSAETIMEDOUT      , kKrnlErrs::errcGen_Timeout }
-        ,   { WSAECONNREFUSED   , kKrnlErrs::errcNet_ConnRefused }
-        ,   { WSAELOOP          , kKrnlErrs::errcNet_Loop }
-        ,   { WSAENAMETOOLONG   , kKrnlErrs::errcData_NameTooLong }
-        ,   { WSAEHOSTDOWN      , kKrnlErrs::errcNet_HostDown }
-        ,   { WSAEHOSTUNREACH   , kKrnlErrs::errcNet_HostUnreachable }
-        ,   { WSAENOTEMPTY      , kKrnlErrs::errcGen_NotEmpty }
-        ,   { WSAEPROCLIM       , kKrnlErrs::errcProc_ProcessLimit }
-        ,   { WSAEUSERS         , kKrnlErrs::errcNet_Users }
-        ,   { WSAEDQUOT         , kKrnlErrs::errcNet_Quota }
-        ,   { WSAESTALE         , kKrnlErrs::errcNet_Stale }
-        ,   { WSAEREMOTE        , kKrnlErrs::errcNet_Remote }
-        ,   { WSAEDISCON        , kKrnlErrs::errcNet_Disconnect }
-        ,   { WSANOTINITIALISED , kKrnlErrs::errcGen_NotInitialized }
-    };
-    const tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
-    const tCIDLib::TCard2 c2MinVersion = 0x0202;
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  aXlatErrors
+        //      An array of mappings from socket errors to CIDLib kernel errors.
+        //      We map a good bit of them to general errors, and some are mapped
+        //      to error codes added just for TCP/IP support.
+        //
+        //  c4ErrCount
+        //      The number of elements in the aXlatErrors array.
+        //
+        //  c2MinVersion
+        //      The minimium version of the WinSock subsystem that we require.
+        // -----------------------------------------------------------------------
+        constexpr TErrorMap amapErrors[] =
+        {
+                { WSAEINTR          , kKrnlErrs::errcGen_Interrupted }
+            ,   { WSAEBADF          , kKrnlErrs::errcData_InvalidHandle }
+            ,   { WSAEACCES         , kKrnlErrs::errcAcc_InvalidAccess }
+            ,   { WSAEFAULT         , kKrnlErrs::errcGen_GeneralFault }
+            ,   { WSAEINVAL         , kKrnlErrs::errcData_InvalidValue }
+            ,   { WSAEMFILE         , kKrnlErrs::errcFl_TooManyOpenFiles }
+            ,   { WSAEWOULDBLOCK    , kKrnlErrs::errcGen_WouldBlock }
+            ,   { WSAEINPROGRESS    , kKrnlErrs::errcGen_InProgress }
+            ,   { WSAEALREADY       , kKrnlErrs::errcGen_Already }
+            ,   { WSAENOTSOCK       , kKrnlErrs::errcNet_NotASocket }
+            ,   { WSAEDESTADDRREQ   , kKrnlErrs::errcNet_DestAdrRequired }
+            ,   { WSAEMSGSIZE       , kKrnlErrs::errcNet_MsgSize }
+            ,   { WSAEPROTOTYPE     , kKrnlErrs::errcNet_ProtoType }
+            ,   { WSAENOPROTOOPT    , kKrnlErrs::errcNet_NoProtoOpts }
+            ,   { WSAEPROTONOSUPPORT, kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAESOCKTNOSUPPORT, kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEOPNOTSUPP     , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEPFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEAFNOSUPPORT   , kKrnlErrs::errcGen_NotSupported }
+            ,   { WSAEADDRINUSE     , kKrnlErrs::errcGen_Busy }
+            ,   { WSAEADDRNOTAVAIL  , kKrnlErrs::errcGen_NotAvailable }
+            ,   { WSAENETDOWN       , kKrnlErrs::errcNet_NetworkDown }
+            ,   { WSAENETUNREACH    , kKrnlErrs::errcNet_NetworkUnreachable }
+            ,   { WSAENETRESET      , kKrnlErrs::errcNet_NetworkReset }
+            ,   { WSAECONNABORTED   , kKrnlErrs::errcNet_ConnAborted }
+            ,   { WSAECONNRESET     , kKrnlErrs::errcNet_ConnReset }
+            ,   { WSAENOBUFS        , kKrnlErrs::errcNet_NoBuffers }
+            ,   { WSAEISCONN        , kKrnlErrs::errcGen_AlreadyConnected }
+            ,   { WSAENOTCONN       , kKrnlErrs::errcGen_NotConnected }
+            ,   { WSAESHUTDOWN      , kKrnlErrs::errcNet_Shutdown }
+            ,   { WSAETOOMANYREFS   , kKrnlErrs::errcGen_TooMany }
+            ,   { WSAETIMEDOUT      , kKrnlErrs::errcGen_Timeout }
+            ,   { WSAECONNREFUSED   , kKrnlErrs::errcNet_ConnRefused }
+            ,   { WSAELOOP          , kKrnlErrs::errcNet_Loop }
+            ,   { WSAENAMETOOLONG   , kKrnlErrs::errcData_NameTooLong }
+            ,   { WSAEHOSTDOWN      , kKrnlErrs::errcNet_HostDown }
+            ,   { WSAEHOSTUNREACH   , kKrnlErrs::errcNet_HostUnreachable }
+            ,   { WSAENOTEMPTY      , kKrnlErrs::errcGen_NotEmpty }
+            ,   { WSAEPROCLIM       , kKrnlErrs::errcProc_ProcessLimit }
+            ,   { WSAEUSERS         , kKrnlErrs::errcNet_Users }
+            ,   { WSAEDQUOT         , kKrnlErrs::errcNet_Quota }
+            ,   { WSAESTALE         , kKrnlErrs::errcNet_Stale }
+            ,   { WSAEREMOTE        , kKrnlErrs::errcNet_Remote }
+            ,   { WSAEDISCON        , kKrnlErrs::errcNet_Disconnect }
+            ,   { WSANOTINITIALISED , kKrnlErrs::errcGen_NotInitialized }
+        };
+        constexpr tCIDLib::TCard4 c4ErrCount = tCIDLib::c4ArrayElems(amapErrors);
+        constexpr tCIDLib::TCard2 c2MinVersion = 0x0202;
 
 
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  c2Version
-    //      This is the version of the host TCP/IP support that we are using.
-    //      It is saved here during init and used by the TCP/IP version
-    //      support method of TKrnlSysInfo that we implement here.
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard2     c2Version = 0;
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  c2Version
+        //      This is the version of the host TCP/IP support that we are using.
+        //      It is saved here during init and used by the TCP/IP version
+        //      support method of TKrnlSysInfo that we implement here.
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard2     c2Version = 0;
 
 
-    // -----------------------------------------------------------------------
-    //  We fault in info about whether IPV4 and 6 are installed. And a flag that
-    //  let's the user allow us to auto-decide what interface to use when doing
-    //  name to address translation (when the caller doesn't indicate a specific
-    //  one.) This is set via the environment variable CID_AUTOIPINTF being
-    //  set.
-    // -----------------------------------------------------------------------
-    tCIDLib::TBoolean   bIPProtoAvailLoaded = kCIDLib::False;
-    tCIDLib::TBoolean   bIPV4Avail    = kCIDLib::False;
-    tCIDLib::TBoolean   bIPV6Avail    = kCIDLib::False;
-    tCIDLib::TBoolean   bAutoIPIntf   = kCIDLib::False;
+        // -----------------------------------------------------------------------
+        //  We fault in info about whether IPV4 and 6 are installed. And a flag that
+        //  let's the user allow us to auto-decide what interface to use when doing
+        //  name to address translation (when the caller doesn't indicate a specific
+        //  one.) This is set via the environment variable CID_AUTOIPINTF being
+        //  set.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomProtoLoaded;
+        tCIDLib::TBoolean   bIPV4Avail    = kCIDLib::False;
+        tCIDLib::TBoolean   bIPV6Avail    = kCIDLib::False;
+        tCIDLib::TBoolean   bAutoIPIntf   = kCIDLib::False;
 
 
-    // -----------------------------------------------------------------------
-    //  We support an environment variable that lets the user do some things to
-    //  help with name resolution issues that have cropped up in some versions of
-    //  Windows. The values create a bitmap, with the lower two indicating case
-    //  and the 3rd indicating whether to add a trailing period
-    //
-    //      0 = Default, do nothing
-    //      1 = Force it all lower case     (=Lower)
-    //      2 = Force it all upper case     (=Upper)
-    //      5 = Lower plus trailing period  (=LowerPeriod)
-    //      6 = Lower plus trailing period  (=UpperPeriod)
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4     c4DNSNameStyle = 0;
+        // -----------------------------------------------------------------------
+        //  We support an environment variable that lets the user do some things to
+        //  help with name resolution issues that have cropped up in some versions of
+        //  Windows. The values create a bitmap, with the lower two indicating case
+        //  and the 3rd indicating whether to add a trailing period
+        //
+        //      0 = Default, do nothing
+        //      1 = Force it all lower case     (=Lower)
+        //      2 = Force it all upper case     (=Upper)
+        //      5 = Lower plus trailing period  (=LowerPeriod)
+        //      6 = Lower plus trailing period  (=UpperPeriod)
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard4     c4DNSNameStyle = 0;
+    }
 }
 
 
@@ -248,49 +249,52 @@ CvtAdapterInfo(TKrnlIP::TAdaptorInfo& kadpFill, IP_ADAPTER_ADDRESSES& Adapter)
 //
 static tCIDLib::TVoid LoadIPVAvailInfo()
 {
-    TBaseLock lockInit;
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
+    if (!CIDKernel_IP_WIN32::atomProtoLoaded)
     {
-        // Assume neither till proven otherwise
-        CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::False;
-        CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::False;
-
-        TKrnlLList<TKrnlIP::TAdaptorInfo> kllstAdapters;
-        if (TKrnlIP::bQueryAdaptorList(kllstAdapters))
+        TBaseLock lockInit;
+        if (!CIDKernel_IP_WIN32::atomProtoLoaded)
         {
-            //
-            //  Query the adapters in the system. Loop through them and for any that
-            //  we care about, check to see if they are enabled for either family.
-            //
-            //  We ignore tunneling interfaces and non-dedicated connections.
-            //
-            if (kllstAdapters.bResetCursor())
+            // Assume neither till proven otherwise
+            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::False;
+            CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::False;
+
+            TKrnlLList<TKrnlIP::TAdaptorInfo> kllstAdapters;
+            if (TKrnlIP::bQueryAdaptorList(kllstAdapters))
             {
-                TKrnlIP::TAdaptorInfo* pkaiCur = nullptr;
-                while (kllstAdapters.bNext(pkaiCur))
+                //
+                //  Query the adapters in the system. Loop through them and for any that
+                //  we care about, check to see if they are enabled for either family.
+                //
+                //  We ignore tunneling interfaces and non-dedicated connections.
+                //
+                if (kllstAdapters.bResetCursor())
                 {
-                    if (pkaiCur->bTunnel || !pkaiCur->bDedicated)
-                        continue;
+                    TKrnlIP::TAdaptorInfo* pkaiCur = nullptr;
+                    while (kllstAdapters.bNext(pkaiCur))
+                    {
+                        if (pkaiCur->bTunnel || !pkaiCur->bDedicated)
+                            continue;
 
-                    if (pkaiCur->bIPV4Enabled)
-                        CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
+                        if (pkaiCur->bIPV4Enabled)
+                            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
 
-                    if (pkaiCur->bIPV6Enabled)
-                        CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::True;
+                        if (pkaiCur->bIPV6Enabled)
+                            CIDKernel_IP_WIN32::bIPV6Avail = kCIDLib::True;
+                    }
                 }
             }
-        }
-         else
-        {
-            // Not much we can do, assume V4
-            CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
-        }
+            else
+            {
+                // Not much we can do, assume V4
+                CIDKernel_IP_WIN32::bIPV4Avail = kCIDLib::True;
+            }
 
-        // See if we should enable the auto-IP interface option
-        if (TKrnlEnvironment::pszFind(L"CID_AUTOIPINTF"))
-            CIDKernel_IP_WIN32::bAutoIPIntf = kCIDLib::True;
+            // See if we should enable the auto-IP interface option
+            if (TKrnlEnvironment::pszFind(L"CID_AUTOIPINTF"))
+                CIDKernel_IP_WIN32::bAutoIPIntf = kCIDLib::True;
 
-        CIDKernel_IP_WIN32::bIPProtoAvailLoaded = kCIDLib::True;
+            CIDKernel_IP_WIN32::atomProtoLoaded.Set();
+        }
     }
 }
 
@@ -342,203 +346,6 @@ TCIDKrnlModule::bInitTermIP(const tCIDLib::EInitTerm eState)
 
 
 // ---------------------------------------------------------------------------
-//  Some platform specific methods of TKrnlIPAddr
-// ---------------------------------------------------------------------------
-
-//
-//  Set from a platform specific socket address. The passed value is assumed
-//  on this platform to be a SOCKADDR (or one of it's family specific variants.)
-//
-//  We are getting in incoming address here, so we flip the port to little
-//  endian mode if that's the local order.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bFromSockAddr( const   tCIDLib::TVoid* const   pAddr
-                            , const tCIDLib::TCard4         c4Len
-                            ,       tCIDLib::TIPPortNum&    ippnToFill)
-{
-    // Cast it to the generic socket address class to look at the family
-    const SOCKADDR* pSockAddr = (const SOCKADDR*)pAddr;
-
-    tCIDLib::TBoolean bRet = kCIDLib::False;
-    if (pSockAddr->sa_family == AF_INET)
-    {
-        // It's V4
-        if (c4Len < sizeof(sockaddr_in))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-        const sockaddr_in* p4Addr = reinterpret_cast<const sockaddr_in*>(pSockAddr);
-
-        // If we are little endian, swap the port number bytes
-        #if defined(CIDLIB_LITTLEENDIAN)
-        ippnToFill = tCIDLib::TIPPortNum(TRawBits::c2SwapBytes(p4Addr->sin_port));
-        #else
-        ippnToFill = p4Addr->sin_port;
-        #endif
-
-        bRet = bSet
-        (
-            (tCIDLib::TCard1*)&p4Addr->sin_addr, 4, tCIDSock::EAddrTypes::IPV4, 0, 0
-        );
-    }
-     else if (pSockAddr->sa_family == AF_INET6)
-    {
-        // It's V6
-        if (c4Len < sizeof(sockaddr_in6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-        const sockaddr_in6* p6Addr = reinterpret_cast<const sockaddr_in6*>(pSockAddr);
-
-        // If we are little endian, we have to flip some stuff
-        tCIDLib::TCard4 c4ScopeId;
-        tCIDLib::TCard4 c4FlowInfo;
-        #if defined(CIDLIB_LITTLEENDIAN)
-        ippnToFill = tCIDLib::TIPPortNum(TRawBits::c2SwapBytes(p6Addr->sin6_port));
-        c4ScopeId = TRawBits::c4SwapBytes(p6Addr->sin6_scope_id);
-        c4FlowInfo = TRawBits::c4SwapBytes(p6Addr->sin6_flowinfo);
-        #else
-        ippnToFill = p6Addr->sin6_port;
-        c4ScopeId = p6Addr->sin6_scope_id;
-        c4FlowInfo = p6Addr->sin6_flowinfo;
-        #endif
-
-        // And store the address info, passing in the native order values!
-        bRet = bSet
-        (
-            (tCIDLib::TCard1*)&p6Addr->sin6_addr
-            , kCIDSock::c4MaxIPAddrBytes
-            , tCIDSock::EAddrTypes::IPV6
-            , c4ScopeId
-            , c4FlowInfo
-        );
-    }
-     else
-    {
-        // Unknown, so reset it
-        Reset();
-    }
-    return bRet;
-}
-
-
-//
-//  Copies out our address info when the caller only wants the in_addr stuff,
-//  not the whole sockaddr_in stuff.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bToInAddr( tCIDLib::TVoid* const   pAddr
-                        , tCIDLib::TCard4&      c4SzInOut) const
-{
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
-
-    if (m_eType == tCIDSock::EAddrTypes::IPV4)
-    {
-        if (c4SzInOut < sizeof(in_addr))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        c4SzInOut = sizeof(in_addr);
-        TRawMem::CopyMemBuf(pAddr, m_ac1Data, 4);
-    }
-     else if (m_eType == tCIDSock::EAddrTypes::IPV6)
-    {
-        if (c4SzInOut < sizeof(in_addr6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        c4SzInOut = sizeof(in_addr6);
-        TRawMem::CopyMemBuf(pAddr, m_ac1Data, 16);
-    }
-     else
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_UnknownAddrType);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-//
-//  Set up a socket address in the passed data buffer. We get the size coming
-//  in so we can be sure it's large enough. And we set the actual size of the
-//  structure we put into it as the output.
-//
-//  We are creating an address for outgoing here, so we flip the port to
-//  network order if that's not the native endian order.
-//
-tCIDLib::TBoolean
-TKrnlIPAddr::bToSockAddr(       tCIDLib::TVoid* const  pAddr
-                        ,       tCIDLib::TCard4&       c4SzInOut
-                        , const tCIDLib::TIPPortNum    ippnPort) const
-{
-    TRawMem::SetMemBuf(pAddr, tCIDLib::TCard1(0), c4SzInOut);
-
-    if (m_eType == tCIDSock::EAddrTypes::IPV4)
-    {
-        if (c4SzInOut < sizeof(sockaddr_in))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        sockaddr_in* pRealAddr = (sockaddr_in*)pAddr;
-        c4SzInOut = sizeof(sockaddr_in);
-        pRealAddr->sin_family = AF_INET;
-
-        // If we are little endian, swap the port number, else take it as is
-        pRealAddr->sin_port = tCIDLib::TCard2(ippnPort);
-        #if defined(CIDLIB_LITTLEENDIAN)
-        pRealAddr->sin_port = TRawBits::c2SwapBytes(pRealAddr->sin_port);
-        #endif
-
-        TRawMem::CopyMemBuf(&pRealAddr->sin_addr, m_ac1Data, 4);
-    }
-     else if (m_eType == tCIDSock::EAddrTypes::IPV6)
-    {
-        if (c4SzInOut < sizeof(sockaddr_in6))
-        {
-            TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_BadAddrSize);
-            return kCIDLib::False;
-        }
-
-        sockaddr_in6* pRealAddr = (sockaddr_in6*)pAddr;
-        c4SzInOut = sizeof(sockaddr_in6);
-        pRealAddr->sin6_family = AF_INET6;
-
-        // Handle endian specific stuff
-        #if defined(CIDLIB_LITTLEENDIAN)
-        pRealAddr->sin6_port = TRawBits::c2SwapBytes(tCIDLib::TCard2(ippnPort));
-        pRealAddr->sin6_scope_id = TRawBits::c4SwapBytes(m_c4ScopeId);
-        pRealAddr->sin6_flowinfo = TRawBits::c4SwapBytes(m_c4FlowInfo);
-        #else
-        pRealAddr->sin6_port = tCIDLib::TCard2(ippnPort);
-        pRealAddr->sin6_scope_id = m_c4ScopeId;
-        pRealAddr->sin6_flowinfo = m_c4FlowInfo;
-        #endif
-
-        TRawMem::CopyMemBuf(&pRealAddr->sin6_addr, m_ac1Data, 16);
-    }
-     else
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcIP_UnknownAddrType);
-        return kCIDLib::False;
-    }
-    return kCIDLib::True;
-}
-
-
-
-
-
-// ---------------------------------------------------------------------------
 //  TKrnlTCPIP: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean
@@ -563,7 +370,7 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
             , NULL
             , CLSCTX_INPROC_SERVER
             , __uuidof(INetFwMgr)
-            , (void**)&pMgr
+            , tCIDLib::pToVoidPP(&pMgr)
         );
         if (FAILED(hRes))
             throw kKrnlErrs::errcFW_CantInit;
@@ -634,7 +441,7 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
                 , NULL
                 , CLSCTX_INPROC_SERVER
                 , __uuidof(INetFwAuthorizedApplication)
-                , (void**)&pApp
+                , tCIDLib::pToVoidPP(&pApp)
             );
             if (FAILED(hRes))
                 throw kKrnlErrs::errcFW_CantCreateApp;
@@ -690,17 +497,13 @@ TKrnlIP::bAddToFirewall(const   tCIDLib::TCh* const pszAppPath
 //
 tCIDLib::TBoolean TKrnlIP::bIPV4Avail()
 {
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
-        LoadIPVAvailInfo();
-
+    LoadIPVAvailInfo();
     return CIDKernel_IP_WIN32::bIPV4Avail;
 }
 
 tCIDLib::TBoolean TKrnlIP::bIPV6Avail()
 {
-    if (!CIDKernel_IP_WIN32::bIPProtoAvailLoaded)
-        LoadIPVAvailInfo();
-
+    LoadIPVAvailInfo();
     return CIDKernel_IP_WIN32::bIPV6Avail;
 }
 
@@ -742,7 +545,7 @@ TKrnlIP::bQueryAdaptorInfo( const   tCIDLib::TCh* const pszName
         return kCIDLib::True;
 
     // Loop through them and try to find the indicated name
-    TAdaptorInfo* pCur;
+    TAdaptorInfo* pCur = nullptr;
     while (llstAdaptors.bNext(pCur))
     {
         if (TRawStr::bCompareStr(pCur->szName, pszName))
@@ -764,7 +567,7 @@ TKrnlIP::bQueryAdaptorList(TKrnlLList<TAdaptorInfo>& llstToFill)
     //  Allocate a buffer. They recommend 15K or larger to make it unlikely
     //  that a reallocation is needed. We go over twice that.
     //
-    ULONG uBufSz = 1024 * 32;
+    ULONG uBufSz = kCIDLib::c4Sz_32K;
     tCIDLib::TCard1* pc1Buf = new tCIDLib::TCard1[uBufSz];
     TArrayJanitor<tCIDLib::TCard1> janBuf(pc1Buf);
     IP_ADAPTER_ADDRESSES* pAdapters = (IP_ADAPTER_ADDRESSES*)pc1Buf;
@@ -822,7 +625,7 @@ TKrnlIP::bQueryDefLocalAddr(        TKrnlIPAddr&            kipaToFill
     else if (eType == tCIDSock::EAddrTypes::IPV6)
         Filter.ai_family = AF_INET6;
 
-    if (::GetAddrInfo(kCIDLib::pszEmptyZStr, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(kCIDLib::pszEmptyZStr, nullptr, &Filter, &pInfo))
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
         TKrnlError::SetLastKrnlError(c4XlatError(c4LastErr), c4LastErr);
@@ -884,7 +687,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
         llstToFill.RemoveAll();
 
     // First get non-loopbacks
-    if (::GetAddrInfo(pszName, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(pszName, nullptr, &Filter, &pInfo))
     {
         // If that failed, then give up
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
@@ -917,7 +720,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
     //
     if (bIncludeLoopback && !TRawStr::bCompareStrI(pszName, L"localhost") && *pszName)
     {
-        if (::GetAddrInfo(L"localhost", 0, &Filter, &pInfo))
+        if (::GetAddrInfo(L"localhost", nullptr, &Filter, &pInfo))
         {
             // If that failed, then give up
             TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);
@@ -954,7 +757,7 @@ TKrnlIP::bQueryHostAddrs(   const   tCIDLib::TCh* const         pszHostName
 //
 tCIDLib::TBoolean TKrnlIP::bQueryLocalName(TKrnlString& kstrToFill)
 {
-    const tCIDLib::TCard4 c4NameBufMax = 1024;
+    constexpr tCIDLib::TCard4 c4NameBufMax = kCIDLib::c4Sz_1K;
     tCIDLib::TCh szName[c4NameBufMax + 2];
     tCIDLib::TCard4 c4ActualSz = c4NameBufMax;
     if (!::GetComputerNameEx(ComputerNameDnsHostname, szName, &c4ActualSz))
@@ -1053,7 +856,7 @@ TKrnlIP::bTextFromIPAddr(const  TKrnlIPAddr&    kipaToConvert
         return kCIDLib::False;
 
     // Try the conversion
-    const tCIDLib::TCard4 c4Len = 1024;
+    constexpr tCIDLib::TCard4 c4Len = kCIDLib::c4Sz_1K;
     tCIDLib::TCh achBuf[c4Len + 1];
 
     tCIDLib::TCard4 c4InLen = c4Len;
@@ -1148,7 +951,7 @@ TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString
     // If not explicitly intended to be IPV6 and not null or empty, try 4
     if (pszIPAddrString && *pszIPAddrString && (eType != tCIDSock::EAddrTypes::IPV6))
     {
-        TRawMem::SetMemBuf(&AddrStore, sizeof(AddrStore), tCIDLib::TCard1(0));
+        TRawMem::SetMemBuf(&AddrStore, sizeof(AddrStore), kCIDLib::c1MinCard);
         pAddr->sa_family = AF_INET;
 
         iAddrSz = sizeof(AddrStore);
@@ -1195,7 +998,7 @@ TKrnlIP::eIPAFromText(  const   tCIDLib::TCh* const     pszIPAddrString
         Filter.ai_family = AF_INET;
     else if (eRealType == tCIDSock::EAddrTypes::IPV6)
         Filter.ai_family = AF_INET6;
-    if (::GetAddrInfo(pszIPAddrString, 0, &Filter, &pInfo))
+    if (::GetAddrInfo(pszIPAddrString, nullptr, &Filter, &pInfo))
     {
         // If that failed too, then give up
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcNet_InvalidAddrString);

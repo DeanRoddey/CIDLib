@@ -10,6 +10,7 @@
     <SubTopicMap>
         <SubTopicLink SubDir="BigPicture" Title="Big Picture"/>
         <SubTopicLink SubDir="Reference" Title="Reference Material"/>
+        <SubTopicLink SubDir="Samples" Title="Sample Programs"/>
     </SubTopicMap>
 
 </CIDTopic>

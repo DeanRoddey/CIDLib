@@ -26,7 +26,7 @@
 //  classes.
 //
 //  We don't support copy/assign. We don't know how to copy the elements, so the derived
-//  class has to do it.
+//  class has to do it. WE can support moves.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -50,6 +50,7 @@ class CIDLIBEXP TDLstNode : public TObject
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TDLstNode(const TDLstNode&) = delete;
+        TDLstNode(TDLstNode&&) = delete;
 
         ~TDLstNode();
 
@@ -57,7 +58,8 @@ class CIDLIBEXP TDLstNode : public TObject
         // -------------------------------------------------------------------
         //  Public opreators
         // -------------------------------------------------------------------
-        const TDLstNode& operator=(const TDLstNode&) = delete;
+        TDLstNode& operator=(const TDLstNode&) = delete;
+        TDLstNode& operator=(TDLstNode&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -131,6 +133,13 @@ class CIDLIBEXP TDLinkedList : public TObject
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TDLinkedList& operator=(const TDLinkedList&) = delete;
+
+        TDLinkedList& operator=
+        (
+                    TDLinkedList&&          llstSrc
+        );
+
         tCIDLib::TBoolean operator==
         (
             const   TDLinkedList&            llstSrc
@@ -140,13 +149,6 @@ class CIDLIBEXP TDLinkedList : public TObject
         (
             const   TDLinkedList&            llstSrc
         )   const;
-
-        TDLinkedList& operator=(const TDLinkedList&) = delete;
-
-        TDLinkedList& operator=
-        (
-                    TDLinkedList&&          llstSrc
-        );
 
 
         // -------------------------------------------------------------------

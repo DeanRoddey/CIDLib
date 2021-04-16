@@ -60,16 +60,16 @@ tCIDLib::TVoid TKrnlPopup::Show(const   tCIDLib::TCh* const pszFileName
     TRawStr::pszConvert(TKrnlSysInfo::pszProcessName(), szBuf1, c4MaxBufChars(szBuf1));
     ::fprintf(stderr, " Application: %s\n", szBuf1);
 
-    const tCIDLib::TCh* pszTmp = TRawStr::pszFindLastChar(pszFileName, kCIDLib::chPathSeparator);
+    const tCIDLib::TCh* pszTmp = TRawStr::pszFindLastChar(pszFileName, kCIDLib::chPathSep);
     if (!pszTmp)
         TRawStr::pszConvert(pszFileName, szBuf1, c4MaxBufChars(szBuf1));
     else
         TRawStr::pszConvert(pszTmp + 1, szBuf1, c4MaxBufChars(szBuf1));
 
-    ::fprintf(stderr, " Module/Line: %s.%u\n", szBuf1, c4LineNum);
+    ::fprintf(stderr, " Module/Line: %s.%lu\n", szBuf1, c4LineNum);
     ::fprintf(stderr, "CIDLib Error: %lu\n", errcId);
     ::fprintf(stderr, "Kernel Error: %lu\n", errcKrnlId);
-    ::fprintf(stderr, "  Host Error: %lu\n", errcHostId);
+    ::fprintf(stderr, "  Host Error: %d\n", errcHostId);
 
     TRawStr::pszConvert(pszMsg, szBuf1, c4MaxBufChars(szBuf1));
     TRawStr::pszConvert(pszMsg2, szBuf2, c4MaxBufChars(szBuf2));

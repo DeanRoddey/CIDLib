@@ -76,13 +76,13 @@ class CIDMACROENGEXP TMEngJSONAnchorVal : public TMEngClassVal
             , const tCIDMacroEng::EDbgFmts     eFormat
             , const tCIDLib::ERadices       eRadix
             , const TCIDMacroEngine&        meOwner
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid CopyFrom
         (
             const   TMEngClassVal&          mecvToCopy
             ,       TCIDMacroEngine&        meOwner
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -185,14 +185,14 @@ class CIDMACROENGEXP TMEngJSONAnchorInfo : public TMEngClassInfo
         tCIDLib::TVoid Init
         (
                     TCIDMacroEngine&        meOwner
-        )   override;
+        )   final;
 
         TMEngClassVal* pmecvMakeStorage
         (
             const   TString&                strName
             ,       TCIDMacroEngine&        meOwner
             , const tCIDMacroEng::EConstTypes  eConst
-        )   const override;
+        )   const final;
 
 
     protected :
@@ -204,7 +204,7 @@ class CIDMACROENGEXP TMEngJSONAnchorInfo : public TMEngClassInfo
                     TCIDMacroEngine&        meOwner
             , const TMEngMethodInfo&        methiTarget
             ,       TMEngClassVal&          mecvInstance
-        )   override;
+        )   final;
 
 
     private :
@@ -275,7 +275,7 @@ class CIDMACROENGEXP TMEngJSONParserVal : public TMEngClassVal
             , const tCIDMacroEng::EDbgFmts     eFormat
             , const tCIDLib::ERadices       eRadix
             , const TCIDMacroEngine&        meOwner
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -403,14 +403,14 @@ class CIDMACROENGEXP TMEngJSONParserInfo : public TMEngClassInfo
         tCIDLib::TVoid Init
         (
                     TCIDMacroEngine&        meOwner
-        )   override;
+        )   final;
 
         TMEngClassVal* pmecvMakeStorage
         (
             const   TString&                strName
             ,       TCIDMacroEngine&        meOwner
             , const tCIDMacroEng::EConstTypes  eConst
-        )   const override;
+        )   const final;
 
 
     protected :
@@ -422,7 +422,7 @@ class CIDMACROENGEXP TMEngJSONParserInfo : public TMEngClassInfo
                     TCIDMacroEngine&        meOwner
             , const TMEngMethodInfo&        methiTarget
             ,       TMEngClassVal&          mecvInstance
-        )   override;
+        )   final;
 
 
     private :

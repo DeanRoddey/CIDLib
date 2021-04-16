@@ -43,7 +43,17 @@ class CIDMETAEXTREXP TCIDMetaExtrWMA : public TCIDMetaExtractor
         // -------------------------------------------------------------------
         TCIDMetaExtrWMA();
 
+        TCIDMetaExtrWMA(const TCIDMetaExtrWMA&) = delete;
+        TCIDMetaExtrWMA(TCIDMetaExtrWMA&&) = delete;
+
         ~TCIDMetaExtrWMA();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDMetaExtrWMA& operator=(const TCIDMetaExtrWMA&) = delete;
+        TCIDMetaExtrWMA& operator=(TCIDMetaExtrWMA&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -66,21 +76,21 @@ class CIDMETAEXTREXP TCIDMetaExtrWMA : public TCIDMetaExtractor
             , const tCIDLib::TBoolean       bWantArt
             ,       TMemBuf&                mbufArt
             ,       tCIDLib::TCard4&        c4ArtSize
-        );
+        )   final;
 
         tCIDLib::TBoolean bExtractImage
         (
             const   TString&                strFilePath
             ,       TMemBuf&                mbufArt
             ,       tCIDLib::TCard4&        c4ArtSize
-        );
+        )   final;
 
         tCIDLib::TBoolean bProbe
         (
             const   TString&                strFilePath
-        );
+        )   final;
 
-        const TString& strTypeName() const;
+        const TString& strTypeName() const final;
 
 
         // -------------------------------------------------------------------

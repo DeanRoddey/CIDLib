@@ -49,6 +49,7 @@ class CIDLIBEXP TFacCIDLib : public TFacility
         TFacCIDLib();
 
         TFacCIDLib(const TFacCIDLib&) = delete;
+        TFacCIDLib(TFacCIDLib&&) = delete;
 
         ~TFacCIDLib();
 
@@ -57,6 +58,7 @@ class CIDLIBEXP TFacCIDLib : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDLib& operator=(const TFacCIDLib&) = delete;
+        TFacCIDLib& operator=(TFacCIDLib&&) = delete;
 
 
         // -------------------------------------------------------------------

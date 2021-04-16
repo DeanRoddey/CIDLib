@@ -60,6 +60,7 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         );
 
         TCfgServerClient(const TCfgServerClient&) = delete;
+        TCfgServerClient(TCfgServerClient&&) = delete;
 
         ~TCfgServerClient();
 
@@ -68,6 +69,7 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         //  Pubic operators
         // -------------------------------------------------------------------
         TCfgServerClient& operator=(const TCfgServerClient&) = delete;
+        TCfgServerClient& operator=(TCfgServerClient&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -88,7 +90,7 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         tCIDLib::TBoolean bAddOrUpdate
         (
             const   TString&                strKey
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const MStreamable&            strmblToAdd
             , const tCIDLib::TCard4         c4Reserve
         );
@@ -122,14 +124,14 @@ class CIDORBUCEXP TCfgServerClient : public TObject
         (
             const   TString&                strKey
             ,       MStreamable&            strmblToFill
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
         );
 
         tCIDLib::ELoadRes eReadObject
         (
             const   TString&                strKey
             ,       MStreamable&            strmblToFill
-            ,       tCIDLib::TCard4&        c4Version
+            , CIOP  tCIDLib::TCard4&        c4Version
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
         );
 

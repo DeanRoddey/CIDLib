@@ -405,27 +405,6 @@ namespace tCIDLib
     };
 
 
-    // -----------------------------------------------------------------------
-    //  The CPU types that we might find outselves running on, for reporting
-    //  back in system information.
-    // -----------------------------------------------------------------------
-    enum class ECPUTypes
-    {
-        Unknown
-        , Alpha
-        , Alpha64
-        , Arm
-        , Intel32
-        , Intel64
-        , MIPS
-        , PPC
-        , SPARC
-
-        , Count
-        , Min           = Unknown
-        , Max           = SPARC
-    };
-
 
     // -----------------------------------------------------------------------
     //  These are flags used when creating or opening files or other
@@ -1178,11 +1157,11 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     enum class EModTypes
     {
-        Dll
+        SharedLib
         , Exe
 
         , Count
-        , Min               = Dll
+        , Min               = SharedLib
         , Max               = Exe
     };
 
@@ -1550,7 +1529,7 @@ namespace tCIDLib
     // -----------------------------------------------------------------------
     //  A basic read/write access bitmapped enum
     // -----------------------------------------------------------------------
-    enum class ERWAccess
+    enum class ERWAccess : tCIDLib::TCard4
     {
         None            = 0x0
         , Read          = 0x01
@@ -1913,7 +1892,7 @@ namespace tCIDLib
     //  Note that Replace is ignored when converting outwards and is treated
     //  like Throw. It's only used when internalizing text.
     // -----------------------------------------------------------------------
-    enum class ETCvtActions
+    enum class ETCvtActs
     {
         Throw
         , StopThenThrow
@@ -2308,7 +2287,9 @@ namespace tCIDLib
 namespace tCIDComm
 {
     // -----------------------------------------------------------------------
-    //  The data bits supported by comm ports
+    //  The data bits supported by comm ports. BE SURE to update the text mapping
+    //  table in CIDComm_Types if you change this, since we can't use the IDL
+    //  compiler for these enums.
     // -----------------------------------------------------------------------
     enum class EDataBits
     {
@@ -2523,7 +2504,9 @@ namespace tCIDSock
 
     // -----------------------------------------------------------------------
     //  The available socket protocols. Keep this in sync with the translation
-    //  methods in the CIDSock facility class.
+    //  methods in the CIDSock facility class, and in the platform implementations
+    //  of sockets, which will have mapping tables to the local ids for these
+    //  things probably. And the CML class that wraps this type as well.
     // -----------------------------------------------------------------------
     enum class ESockProtos
     {
@@ -2535,10 +2518,11 @@ namespace tCIDSock
         , UDP
         , IDP
         , RawIP
+        , ICMP6
 
         , Count
         , Min           = IP
-        , Max           = RawIP
+        , Max           = ICMP6
     };
 
 
@@ -2579,10 +2563,11 @@ namespace tCIDSock
     {
         Stream
         , Datagram
+        , Raw
 
         , Count
         , Min           = Stream
-        , Max           = Datagram
+        , Max           = Raw
     };
 
 

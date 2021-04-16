@@ -303,9 +303,6 @@ class CIDCTRLSEXP TGUIFacility : public TFacility
         //      The coordinates of the virtual screen (combination of the areas of all
         //      of the monitors.)
         //
-        //  s_bMetricsLoaded
-        //      Used to fault in some system metrics and font info.
-        //
         //  s_c4DefFontHeight
         //      The EM height of our default font.
         //
@@ -337,7 +334,6 @@ class CIDCTRLSEXP TGUIFacility : public TFacility
         // -------------------------------------------------------------------
         static TArea                s_areaPrimaryMon;
         static TArea                s_areaVirtualScr;
-        static tCIDLib::TBoolean    s_bMetricsLoaded;
         static tCIDLib::TCard4      s_c4DefFontHeight;
         static tCIDLib::TCard4      s_c4HorzDlgUnits;
         static tCIDLib::TCard4      s_c4VertDlgUnits;

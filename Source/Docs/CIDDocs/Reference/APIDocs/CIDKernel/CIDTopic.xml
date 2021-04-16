@@ -5,6 +5,8 @@
 
     <PageMap>
         <PageLink FileName="Overview" Title="Overview"/>
+
+        <PageLink FileName="TKrnlMutex"  PageType="CppClass"/>
     </PageMap>
 
     <SubTopicMap>

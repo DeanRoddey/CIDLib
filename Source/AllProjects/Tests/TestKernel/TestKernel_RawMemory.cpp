@@ -198,9 +198,13 @@ static tCIDLib::TVoid TestAtomics()
     //
 
     // Test the basic exchange method
-    CID_CACHEALIGN tCIDLib::TCard4 c4Val1 = 10;
-    CID_CACHEALIGN tCIDLib::TCard4 c4Val2 = 20;
-    CID_CACHEALIGN tCIDLib::TCard4 c4Val3 = 30;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4 c4Val1 = 10;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4 c4Val2 = 20;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4 c4Val3 = 30;
+
+    // Make sure the alignment worked
+    if (tCIDLib::TCard8(&c4Val1) % kCIDLib::c4CacheAlign)
+        strmOut << CUR_LN << L"Alignment keyword did not work\n";
 
     // This should return the old first value of 10
     if (TRawMem::c4Exchange(c4Val1, c4Val2) != 10)
@@ -244,9 +248,9 @@ static tCIDLib::TVoid TestAtomics()
     c4Val2 = 20;
     c4Val3 = 30;
 
-    CID_CACHEALIGN tCIDLib::TCard4* pc4Val1 = &c4Val1;
-    CID_CACHEALIGN tCIDLib::TCard4* pc4Val2 = &c4Val2;
-    CID_CACHEALIGN tCIDLib::TCard4* pc4Val3 = &c4Val3;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4* pc4Val1 = &c4Val1;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4* pc4Val2 = &c4Val2;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4* pc4Val3 = &c4Val3;
 
     if (TRawMem::pExchangePtr<tCIDLib::TCard4>(&pc4Val1, pc4Val2) != &c4Val1)
         strmOut << CUR_LN << L"pExchangePtr did not return old value\n";

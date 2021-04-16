@@ -39,20 +39,9 @@
 //  Bring in underlying headers that only have to be visible internally
 // ---------------------------------------------------------------------------
 #include    "CIDSock.hpp"
-
 #include    "CIDXML.hpp"
-
 #include    "CIDNet.hpp"
 
-
-
-// ---------------------------------------------------------------------------
-//  This is the intra-facilities types namespace. It contains non-class types
-//  for use within the facility.
-// ---------------------------------------------------------------------------
-namespace tCIDUPnP_
-{
-}
 
 
 // ---------------------------------------------------------------------------

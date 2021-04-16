@@ -45,8 +45,11 @@ RTTIDecls(TMEngStringTokVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 namespace CIDMacroEng_StringTokClass
 {
-    const TString   strClassPath(L"MEng.System.Runtime.StringTokenizer");
-    const TString   strName(L"StringTokenizer");
+    namespace
+    {
+        const TString   strClassPath(L"MEng.System.Runtime.StringTokenizer");
+        const TString   strName(L"StringTokenizer");
+    }
 }
 
 
@@ -152,23 +155,23 @@ TMEngStringTokInfo::TMEngStringTokInfo(TCIDMacroEngine& meOwner) :
         , tCIDMacroEng::EClassExt::Final
         , L"MEng.Object"
     )
-    , m_c2MethId_BuildQuotedCommaList(kMacroEng::c2BadId)
-    , m_c2MethId_BuildQuotedCommaList2(kMacroEng::c2BadId)
-    , m_c2MethId_DefCtor(kMacroEng::c2BadId)
-    , m_c2MethId_EatNextToken(kMacroEng::c2BadId)
-    , m_c2MethId_FormatQuotedList(kMacroEng::c2BadId)
-    , m_c2MethId_GetNextToken(kMacroEng::c2BadId)
-    , m_c2MethId_GetRestOfLine(kMacroEng::c2BadId)
-    , m_c2MethId_MoreTokens(kMacroEng::c2BadId)
-    , m_c2MethId_PeekRestOfLine(kMacroEng::c2BadId)
-    , m_c2MethId_ParseCmdLine(kMacroEng::c2BadId)
-    , m_c2MethId_ParseCSVLine(kMacroEng::c2BadId)
-    , m_c2MethId_ParseQuotedCommaList(kMacroEng::c2BadId)
-    , m_c2MethId_Reset(kMacroEng::c2BadId)
-    , m_c2MethId_Set(kMacroEng::c2BadId)
-    , m_c2MethId_SetWhitespace(kMacroEng::c2BadId)
-    , m_c2MethId_Tokenize(kMacroEng::c2BadId)
-    , m_c2TypeId_StrVec(kMacroEng::c2BadId)
+    , m_c2MethId_BuildQuotedCommaList(kCIDMacroEng::c2BadId)
+    , m_c2MethId_BuildQuotedCommaList2(kCIDMacroEng::c2BadId)
+    , m_c2MethId_DefCtor(kCIDMacroEng::c2BadId)
+    , m_c2MethId_EatNextToken(kCIDMacroEng::c2BadId)
+    , m_c2MethId_FormatQuotedList(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetNextToken(kCIDMacroEng::c2BadId)
+    , m_c2MethId_GetRestOfLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_MoreTokens(kCIDMacroEng::c2BadId)
+    , m_c2MethId_PeekRestOfLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseCmdLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseCSVLine(kCIDMacroEng::c2BadId)
+    , m_c2MethId_ParseQuotedCommaList(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Reset(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Set(kCIDMacroEng::c2BadId)
+    , m_c2MethId_SetWhitespace(kCIDMacroEng::c2BadId)
+    , m_c2MethId_Tokenize(kCIDMacroEng::c2BadId)
+    , m_c2TypeId_StrVec(kCIDMacroEng::c2BadId)
     , m_c4ErrBadCmdLine(kCIDLib::c4MaxCard)
     , m_c4ErrBuild(kCIDLib::c4MaxCard)
     , m_c4ErrParse(kCIDLib::c4MaxCard)

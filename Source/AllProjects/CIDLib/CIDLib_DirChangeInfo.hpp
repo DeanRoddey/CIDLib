@@ -48,6 +48,7 @@ class CIDLIBEXP TDirChangeInfo : public TObject
         );
 
         TDirChangeInfo(const TDirChangeInfo&) = default;
+        TDirChangeInfo(TDirChangeInfo&&) = default;
 
         ~TDirChangeInfo() = default;
 
@@ -56,6 +57,7 @@ class CIDLIBEXP TDirChangeInfo : public TObject
         //  Public operator
         // -------------------------------------------------------------------
         TDirChangeInfo& operator=(const TDirChangeInfo&) = default;
+        TDirChangeInfo& operator=(TDirChangeInfo&&) = default;
 
 
         // -------------------------------------------------------------------
