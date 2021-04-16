@@ -36,6 +36,7 @@
 //  always correctly ignore errors here, so force it to.
 // ---------------------------------------------------------------------------
 #pragma warning(push)
+#include    <CodeAnalysis\Warnings.h>
 #pragma warning(disable : ALL_CODE_ANALYSIS_WARNINGS)
 #include    <windows.h>
 #include    <Commctrl.h>
