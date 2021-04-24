@@ -3278,7 +3278,7 @@ tCIDLib::TVoid TTime::StreamFrom(TBinInStream& strmToReadFrom)
      else
     {
         delete m_pstrDefFormat;
-        m_pstrDefFormat = 0;
+        m_pstrDefFormat = nullptr;
     }
 }
 

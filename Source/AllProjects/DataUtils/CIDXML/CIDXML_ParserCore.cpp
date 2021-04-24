@@ -235,7 +235,7 @@ TXMLParserCore::ParseRootEntity(        tCIDXML::TEntitySrcRef& esrRoot
         //  Push it. This one cannot fail because its impossible for the first
         //  entity to be recursive.
         //
-        m_xemThis.bPushEntity(pxesRoot, 0, *this);
+        m_xemThis.bPushEntity(pxesRoot, nullptr, *this);
 
         //
         //  If the entity was empty, then lets call the end document event now
@@ -1317,7 +1317,7 @@ TXMLParserCore::bParseStartTag(const tCIDLib::TCard4 c4SpoolerId)
     //  content of this element.
     //
     if (bEmpty && tCIDLib::bAllBitsOn(m_eOptions, tCIDXML::EParseOpts::Validate))
-        m_pxvalValidator->bValidateContent(*pxdeclElem, 0, 0);
+        m_pxvalValidator->bValidateContent(*pxdeclElem, nullptr, 0);
 
     //
     //  If this is an empty tag, return the end of content status. We
@@ -1503,7 +1503,7 @@ tCIDLib::TVoid TXMLParserCore::ParsePreContent()
         );
 
         // Push it on the entity stack and ask the validator to parse it
-        if (m_xemThis.bPushEntity(pxesExtSS, 0, *this))
+        if (m_xemThis.bPushEntity(pxesExtSS, nullptr, *this))
             m_pxvalValidator->ParseDefExtSS(m_strDefRootElem);
     }
 }

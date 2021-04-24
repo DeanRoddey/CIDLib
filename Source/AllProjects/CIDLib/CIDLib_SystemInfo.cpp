@@ -427,9 +427,9 @@ tCIDLib::TBoolean TSysInfo::bQueryLatLong(  tCIDLib::TFloat8&   f8Lat
     if (TKrnlEnvironment::bFind(L"CID_FAUXLOCINFO", szTmp, c4MaxBufChars(szTmp)))
     {
         // Break it into two floating point numbers
-        tCIDLib::TCh* pszCtx = 0;
+        tCIDLib::TCh* pszCtx = nullptr;
         const tCIDLib::TCh* pszLat = TRawStr::pszStrTokenize(szTmp, L" ", &pszCtx);
-        const tCIDLib::TCh* pszLong = TRawStr::pszStrTokenize(0, L" ", &pszCtx);
+        const tCIDLib::TCh* pszLong = TRawStr::pszStrTokenize(nullptr, L" ", &pszCtx);
 
         if (pszLat && pszLong)
         {
@@ -810,6 +810,7 @@ tCIDLib::TVoid TSysInfo::SetNSAddr( const   TString&            strDNSAddr
 
 
 
+
 // ---------------------------------------------------------------------------
 //  TSysInfo: Hidden Constructors and Destructor
 // ---------------------------------------------------------------------------
@@ -860,7 +861,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
                     CID_FILE
                     , CID_LINE
                     , L"CIDLib System Info Subsystem"
-                    , 0
+                    , nullptr
                     , kCIDErrs::errcSysI_GetCmdLineParm
                     , 0
                     , 0
@@ -951,7 +952,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
                 CID_FILE
                 , CID_LINE
                 , L"CIDLib System Info Subsystem"
-                , 0
+                , nullptr
                 , kCIDErrs::errcSysI_QueryUserName
                 , 0
                 , 0
@@ -991,7 +992,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
                 CID_FILE
                 , CID_LINE
                 , L"CIDLib System Info Subsystem"
-                , 0
+                , nullptr
                 , kCIDErrs::errcSysI_QueryUserName
                 , 0
                 , 0

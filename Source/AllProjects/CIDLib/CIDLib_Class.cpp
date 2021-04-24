@@ -91,21 +91,21 @@ TClass::TClass() :
 
     m_c4BufChars(64)
     , m_hshName(0)
-    , m_pszClassName(0)
+    , m_pszClassName(nullptr)
 {
     //
     //  Allocate a reasonable sized string that will hold a likely class
     //  name without reallocation.
     //
     m_pszClassName = new tCIDLib::TCh[65];
-    m_pszClassName[0] = 0;
+    m_pszClassName[0] = kCIDLib::chNull;
 }
 
 TClass::TClass(const TClass& clsSrc) :
 
     m_c4BufChars(clsSrc.m_c4BufChars)
     , m_hshName(clsSrc.m_hshName)
-    , m_pszClassName(0)
+    , m_pszClassName(nullptr)
 {
     m_pszClassName = TRawStr::pszReplicate(clsSrc.m_pszClassName);
 }
@@ -114,7 +114,7 @@ TClass::TClass(const TString& strClassName) :
 
     m_c4BufChars(0)
     , m_hshName(0)
-    , m_pszClassName(0)
+    , m_pszClassName(nullptr)
 {
     // Replicate the name and store its hash
     m_pszClassName = strClassName.pszDupBuffer();
@@ -139,7 +139,7 @@ TClass::TClass(const tCIDLib::TCh* const pszClassName) :
 
     m_c4BufChars(0)
     , m_hshName(0)
-    , m_pszClassName(0)
+    , m_pszClassName(nullptr)
 {
     if (!pszClassName)
     {
@@ -287,7 +287,7 @@ TClass& TClass::operator=(const TClass& clsSrc)
     if (m_c4BufChars < c4NewChars)
     {
         delete [] m_pszClassName;
-        m_pszClassName = 0;
+        m_pszClassName = nullptr;
         m_pszClassName = new tCIDLib::TCh[c4NewChars + 1];
 
         // Store the new buffer size
@@ -436,9 +436,9 @@ tCIDLib::TVoid TClass::StreamFrom(TBinInStream& strmToReadFrom)
     if (c4Buf != m_c4BufChars)
     {
         delete [] m_pszClassName;
-        m_pszClassName = 0;
+        m_pszClassName = nullptr;
         m_pszClassName = new tCIDLib::TCh[c4Buf + 1];
-        m_pszClassName[0] = 0;
+        m_pszClassName[0] = kCIDLib::chNull;
 
         // Store the new buffer size
         m_c4BufChars = c4Buf;
@@ -450,18 +450,13 @@ tCIDLib::TVoid TClass::StreamFrom(TBinInStream& strmToReadFrom)
     //  wide char format.
     //
     strmToReadFrom.ReadArray(m_pszClassName, c4Len);
-    m_pszClassName[c4Len] = 0;
+    m_pszClassName[c4Len] = kCIDLib::chNull;
 
     //
     //  Hash it and compare with the hash we read in. If not the same then
     //  are are not reading in the right place.
     //
-    tCIDLib::THashVal hshTmp = TRawStr::hshHashStr
-    (
-        m_pszClassName
-        , kCIDLib::c4ClassModulus
-    );
-
+    tCIDLib::THashVal hshTmp = TRawStr::hshHashStr(m_pszClassName, kCIDLib::c4ClassModulus);
     if (!hshTmp)
     {
         facCIDLib().ThrowErr

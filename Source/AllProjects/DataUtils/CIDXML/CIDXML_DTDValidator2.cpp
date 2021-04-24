@@ -700,7 +700,7 @@ tCIDLib::TVoid TDTDValidator::ParseDOCType(const tCIDLib::TBoolean bDTOnly)
     //  Don't do this if only doing the doctype eating type pass, since all
     //  of this info should already be in the validator.
     //
-    TDTDElemDecl* pxdeclRoot = 0;
+    TDTDElemDecl* pxdeclRoot = nullptr;
     if (!bDTOnly)
     {
         pxdeclRoot = new TDTDElemDecl(strRoot);
@@ -945,7 +945,7 @@ tCIDLib::TVoid TDTDValidator::ParseDOCType(const tCIDLib::TBoolean bDTOnly)
         );
 
         // Push it on the entity stack
-        if (xemOwner().bPushEntity(pxesExtSS, 0, xprsOwner()))
+        if (xemOwner().bPushEntity(pxesExtSS, nullptr, xprsOwner()))
         {
             // If we have a DTD handler, then send a start event
             if (m_pmxevDTD && xprsOwner().bInfoWanted(tCIDXML::EParseFlags::Topology))
@@ -1168,7 +1168,7 @@ tCIDLib::TVoid TDTDValidator::ParseEntity()
     //  so, then this is a redundant declaration and we'll use a dummy object
     //  to parse into.
     //
-    TDTDEntityDecl* pxdeclTarget = 0;
+    TDTDEntityDecl* pxdeclTarget = nullptr;
     if (bIsPE)
         pxdeclTarget = m_pxnipPEs->pobjByName(strName);
     else
@@ -1248,10 +1248,7 @@ tCIDLib::TVoid TDTDValidator::ParseEntity()
         pxdeclTarget->strPublicId(strPublic);
 
         // We can have optional white space or a PE ref here
-        const tCIDLib::TBoolean bGotSpace = bHandleWSOrPERef
-        (
-            tCIDXML::EPERefOpts::InMarkup
-        );
+        const tCIDLib::TBoolean bGotSpace = bHandleWSOrPERef(tCIDXML::EPERefOpts::InMarkup);
 
         //
         //  We could end here, so check for the closing angle. If so, go

@@ -54,7 +54,7 @@ TTextInSockStream::TTextInSockStream(const  tCIDLib::TEncodedTime enctMaxWait
                                     , const tCIDLib::EAdoptOpts   eAdopt
                                     ,       TTextConverter* const ptcvtToAdopt) :
     TTextInStream(ptcvtToAdopt)
-    , m_pstrmiIn(0)
+    , m_pstrmiIn(nullptr)
 {
     // Create a binary input sock stream object
     m_pstrmiIn = new TBinInSockStream(enctMaxWait, psockToAdopt, eAdopt);
@@ -66,7 +66,7 @@ TTextInSockStream::TTextInSockStream(const  tCIDLib::TEncodedTime enctMaxWait
                                     ,       TTextConverter* const ptcvtToAdopt) :
 
     TTextInStream(ptcvtToAdopt)
-    , m_pstrmiIn(0)
+    , m_pstrmiIn(nullptr)
 {
     // Create an input socket synced to the passed output stream
     m_pstrmiIn = new TBinInSockStream(enctMaxWait, *strmToSyncTo.m_pstrmiOut);
@@ -116,7 +116,7 @@ TTextOutSockStream(         TStreamSocket* const    psockToAdopt
                     ,       TTextConverter* const   ptcvtToAdopt) :
 
     TTextOutStream(ptcvtToAdopt)
-    , m_pstrmiOut(0)
+    , m_pstrmiOut(nullptr)
 {
     // Create a sock stream object and store it on our member for later use
     m_pstrmiOut = new TBinOutSockStream(psockToAdopt, eAdopt);
@@ -126,8 +126,7 @@ TTextOutSockStream(         TStreamSocket* const    psockToAdopt
 }
 
 TTextOutSockStream::
-TTextOutSockStream(         TBinOutSockStream* const    pstrmToAdopt
-                    ,       TTextConverter* const       ptcvtToAdopt) :
+TTextOutSockStream(TBinOutSockStream* const pstrmToAdopt, TTextConverter* const ptcvtToAdopt) :
 
     TTextOutStream(ptcvtToAdopt)
     , m_pstrmiOut(pstrmToAdopt)

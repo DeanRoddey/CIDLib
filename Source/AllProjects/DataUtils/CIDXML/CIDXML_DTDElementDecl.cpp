@@ -37,7 +37,7 @@
 // ---------------------------------------------------------------------------
 TDTDAttrDefCursor::TDTDAttrDefCursor(const TDTDElemDecl& xdeclToCursor) :
 
-    m_pxnipcThis(0)
+    m_pxnipcThis(nullptr)
 {
     //
     //  If the passed element ever got an attribute list created, then create
@@ -49,7 +49,7 @@ TDTDAttrDefCursor::TDTDAttrDefCursor(const TDTDElemDecl& xdeclToCursor) :
 
 TDTDAttrDefCursor::TDTDAttrDefCursor(const TDTDAttrDefCursor& adcToCopy) :
 
-    m_pxnipcThis(0)
+    m_pxnipcThis(nullptr)
 {
     // If the source got set up, then create a copy, else stick with null
     if (adcToCopy.m_pxnipcThis)
@@ -80,7 +80,7 @@ TDTDAttrDefCursor::operator=(const TDTDAttrDefCursor& adcToAssign)
         {
             // We have one and they don't, so get rid of ours
             delete m_pxnipcThis;
-            m_pxnipcThis = 0;
+            m_pxnipcThis = nullptr;
         }
          else if (adcToAssign.m_pxnipcThis)
         {
@@ -145,9 +145,9 @@ TDTDElemDecl::TDTDElemDecl( const   TString&                strName
                             , const tCIDXML::EElemModels    eModel) :
     m_eModel(eModel)
     , m_eTextType(tCIDXML::EElemTextTypes::Any)
-    , m_padcThis(0)
-    , m_pxcmThis(0)
-    , m_pxnipAttrList(0)
+    , m_padcThis(nullptr)
+    , m_pxcmThis(nullptr)
+    , m_pxnipAttrList(nullptr)
     , m_strName(strName)
 {
 }
@@ -348,7 +348,7 @@ TXMLAttrDef* TDTDElemDecl::pxadFindAttrDef(const TString& strName)
 {
     // If no list has been created yet, then we don't have any
     if (!m_pxnipAttrList)
-        return 0;
+        return nullptr;
 
     // Else look it up, returning zero if not found
     return m_pxnipAttrList->pobjByName(strName);
@@ -358,7 +358,7 @@ const TXMLAttrDef* TDTDElemDecl::pxadFindAttrDef(const TString& strName) const
 {
     // If no list has been created yet, then we don't have any
     if (!m_pxnipAttrList)
-        return 0;
+        return nullptr;
 
     // Else look it up, returning zero if not found
     return m_pxnipAttrList->pobjByName(strName);
@@ -369,7 +369,7 @@ TXMLAttrDef*
 TDTDElemDecl::pxadFindAttrDef(  const   TString&            strName
                                 ,       tCIDLib::TBoolean&  bAdded)
 {
-    TDTDAttrDef* pxadRet = 0;
+    TDTDAttrDef* pxadRet = nullptr;
 
     // If we have a pool already, see if it's in there
     if (m_pxnipAttrList)

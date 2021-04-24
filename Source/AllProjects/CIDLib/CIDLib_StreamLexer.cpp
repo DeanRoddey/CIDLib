@@ -72,8 +72,8 @@ TStreamLexer::TStreamLexer(         TTextInStream* const    pstrmToReadFrom
     , m_c4TokenIndex(0)
     , m_eAdopt(eAdopt)
     , m_i4StackIndex(-1)
-    , m_pac4Tokens(0)
-    , m_pchCharStack(0)
+    , m_pac4Tokens(nullptr)
+    , m_pchCharStack(nullptr)
     , m_pstrmSrc(pstrmToReadFrom)
 {
     //

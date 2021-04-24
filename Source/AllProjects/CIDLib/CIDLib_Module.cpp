@@ -617,7 +617,7 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
         //  The next two are optional so we don't fail if they are not
         //  there. But the format string can be malformed.
         //
-        pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
+        pszTmp = TRawStr::pszStrTokenize(nullptr, L";", &pszCtx);
         if (pszTmp)
         {
             if (pszTmp[0])
@@ -629,7 +629,7 @@ tCIDLib::TVoid TLogSpoolThread::SetDefaultLogger()
             }
 
             // And check for a mutex name
-            pszTmp = TRawStr::pszStrTokenize(0, L";", &pszCtx);
+            pszTmp = TRawStr::pszStrTokenize(nullptr, L";", &pszCtx);
             if (pszTmp)
                 TRawStr::CopyStr(szMutexName, pszTmp, c4MaxBufSz);
         }

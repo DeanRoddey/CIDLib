@@ -48,7 +48,7 @@ RTTIDecls(TTextQOutStream,TTextOutStream)
 // ---------------------------------------------------------------------------
 TQOutStreamImpl::TQOutStreamImpl(const  tCIDLib::TCard4     c4MaxLines
                                 , const tCIDLib::EReadModes eMode) :
-    m_apstrLines(0)
+    m_apstrLines(nullptr)
     , m_c4MaxLines(c4MaxLines)
     , m_c4BaseIndex(0)
     , m_c4MsgIndex(0)
@@ -72,7 +72,7 @@ TQOutStreamImpl::TQOutStreamImpl(const  tCIDLib::TCard4     c4MaxLines
     // Allocate the buffer and initialize the pointers
     m_apstrLines = new TString*[c4MaxLines];
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4MaxLines; c4Index++)
-        m_apstrLines[c4Index] = 0;
+        m_apstrLines[c4Index] = nullptr;
 }
 
 TQOutStreamImpl::~TQOutStreamImpl()
@@ -347,7 +347,7 @@ tCIDLib::TVoid TQOutStreamImpl::AddNewLine(const TString& strToAdd)
     //  Remember the 0th element. If we are full, we'll rotate the bottom
     //  one out, and can just reuse it at the end as the new string.
     //
-    TString* pstrNew = 0;
+    TString* pstrNew = nullptr;
     pstrNew = m_apstrLines[0];
 
     //
@@ -396,7 +396,7 @@ TTextQOutStream::TTextQOutStream(const  tCIDLib::TCard4     c4MaxLines
                                 , const tCIDLib::EReadModes eMode) :
 
     TTextOutStream(new TNativeWCConverter)
-    , m_pstrmiQ(0)
+    , m_pstrmiQ(nullptr)
 {
     //
     //  Create a stream input implementation object. We save a copy for our

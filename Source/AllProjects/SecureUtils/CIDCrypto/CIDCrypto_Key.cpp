@@ -523,7 +523,7 @@ tCIDLib::TVoid TCryptoKey::StreamFrom(TBinInStream& strmToReadFrom)
     if (c4TmpBytes != m_c4Bytes)
     {
         delete [] m_pc1Buffer;
-        m_pc1Buffer = 0;
+        m_pc1Buffer = nullptr;
         m_pc1Buffer = new tCIDLib::TCard1[c4TmpBytes];
         m_c4Bytes = c4TmpBytes;
     }

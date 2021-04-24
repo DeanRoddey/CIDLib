@@ -406,7 +406,7 @@ TCIDObjStoreImpl::UpdateItemData(       TOSStoreItem&   osiToUpdate
             if (&m_colFreeList[c4Index] == pfliRemove)
             {
                 m_colFreeList.RemoveAt(c4Index);
-                pfliRemove = 0;
+                pfliRemove = nullptr;
                 break;
             }
         }
@@ -1083,9 +1083,9 @@ TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
 
 tCIDLib::TBoolean
 TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData
-                                ,       TMemBuf&        mbufKey
-                                ,       TStoreItemHdr&  hdrToFill)
+                                , COP   TMemBuf&        mbufData
+                                , COP   TMemBuf&        mbufKey
+                                , COP   TStoreItemHdr&  hdrToFill)
 {
     // Assume good until proven otherwise
     tCIDLib::TBoolean bRet = kCIDLib::True;
@@ -1225,8 +1225,8 @@ TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
 
 tCIDLib::TBoolean
 TCIDObjStoreImpl::bLoadItemData(const   TOSStoreItem&   osiToLoad
-                                ,       TMemBuf&        mbufData
-                                ,       TStoreItemHdr&  hdrToFill)
+                                , COP   TMemBuf&        mbufData
+                                , COP   TStoreItemHdr&  hdrToFill)
 {
     tCIDLib::TBoolean bRet = kCIDLib::True;
 
@@ -1417,7 +1417,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::BuildIndex()
     //  there is there. If it's good, we'll add the appropriate item to
     //  the appropriate list.
     //
-    tCIDLib::TCard4         c4MagicVal;
+    tCIDLib::TCard4         c4MagicVal = 0;
     TStoreItemHdr           hdrItem{};
     TStoreItemFreeHdr       hdrFree{};
     THeapBuf                mbufData(8192);
@@ -1686,7 +1686,7 @@ tCIDLib::TVoid TCIDObjStoreImpl::Compact(const tCIDLib::TCard4 c4Needed)
         if (cursItems.bIsValid())
         {
             THeapBuf mbufKey(1024);
-            TStoreItemHdr hdrCur;
+            TStoreItemHdr hdrCur{};
 
             for (; cursItems; ++cursItems)
             {

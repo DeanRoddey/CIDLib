@@ -258,7 +258,7 @@ TXMLEntSpooler::TXMLEntSpooler( const   TString&                strSystemId
     , m_c4RawBufInd(0)
     , m_c4SpoolerId(0)
     , m_eType(eType)
-    , m_ptcvtDecode(0)
+    , m_ptcvtDecode(nullptr)
     , m_pstrmSrc(pstrmToAdopt)
     , m_strEncoding(strEncoding)
     , m_strSystemId(strSystemId)

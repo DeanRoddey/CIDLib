@@ -477,7 +477,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         tCIDLib::TVoid CheckCallerIsSelf
         (
             const   tCIDLib::TCard4         c4Line
-            , const tCIDLib::TCh* const     pszAuxText = 0
+            , const tCIDLib::TCh* const     pszAuxText = nullptr
         )   const;
 
         tCIDLib::TVoid ShutdownProcessing();

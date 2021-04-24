@@ -453,7 +453,7 @@ static TStatsCacheNode* pscnFind(const  tCIDLib::TCh* const pszKey
     //  not find it.
     //
     if (c4At >= CIDLib_StatsCache::c4CacheUsed)
-        return 0;
+        return nullptr;
     return CIDLib_StatsCache::apscnCache[c4At];
 }
 
@@ -473,7 +473,7 @@ pscnFind(const  tCIDLib::TCh* const pszKey
     c4At = 0;
 
     // First check the item. If set up, then we are done
-    TStatsCacheNode* pscnRet = 0;
+    TStatsCacheNode* pscnRet = nullptr;
     if (sciToUse.bHasValidData(pscnRet, c4At))
         return pscnRet;
 
@@ -768,7 +768,7 @@ TStatsCache::bCheckFlag(const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -793,7 +793,7 @@ tCIDLib::TBoolean TStatsCache::bCheckFlag(const tCIDLib::TCh* const pszKey)
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -906,7 +906,7 @@ TStatsCache::bSetFlag(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -933,7 +933,7 @@ TStatsCache::bSetFlag(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -977,7 +977,7 @@ TStatsCache::bSetIfHigher(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -1230,7 +1230,7 @@ TStatsCache::c8CheckValue(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -1255,7 +1255,7 @@ tCIDLib::TCard8 TStatsCache::c8CheckValue(const tCIDLib::TCh* const pszKey)
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -1283,7 +1283,7 @@ tCIDLib::TCard8
 TStatsCache::c8DecCounter(  const   tCIDLib::TCh* const pszKey
                             , CIOP  TStatsCacheItem&    sciToUse)
 {
-    CIDAssert((pszKey != 0) && (*pszKey != 0), L"Empty/null stats cache key");
+    CIDAssert((pszKey != nullptr) && (*pszKey != kCIDLib::chNull), L"Empty/null stats cache key");
 
     TSyncJanitor janLock;
 
@@ -1322,7 +1322,7 @@ TStatsCache::c8IncCounter(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 
@@ -1388,7 +1388,7 @@ TStatsCache::SetValue(  const   tCIDLib::TCh* const pszKey
 {
     CIDAssert
     (
-        (pszKey != 0) && (*pszKey == kCIDLib::chForwardSlash)
+        (pszKey != nullptr) && (*pszKey == kCIDLib::chForwardSlash)
         , L"Empty/null stats cache key"
     );
 

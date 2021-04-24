@@ -67,7 +67,7 @@ template class TXMLNameIDPoolCursor<TDTDNotationDecl>;
 template <class TElem>
 TXMLNameIDPool<TElem>::TXMLNameIDPool(TKeyExtract pfnKeyExtract) :
 
-    m_apobjById(0)
+    m_apobjById(nullptr)
     , m_c4IdCount(64)
     , m_c4IdIndex(0)
     , m_c4IterBucket(c4Modulus)
@@ -195,7 +195,7 @@ tCIDLib::TCard4 TXMLNameIDPool<TElem>::c4AddNew(TElem* const pobjToAdd)
     if (m_aBuckets[hshKey])
         m_aBuckets[hshKey] = new TBucketElem(pobjToAdd, m_aBuckets[hshKey]);
     else
-        m_aBuckets[hshKey] = new TBucketElem(pobjToAdd, 0);
+        m_aBuckets[hshKey] = new TBucketElem(pobjToAdd, nullptr);
 
     // Bump the sequence id to invalidate cursors
     m_c4SeqId++;

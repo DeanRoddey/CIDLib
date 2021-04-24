@@ -1289,7 +1289,7 @@ TFileSys::ReplaceFile(  const   TString&    strToReplace
 {
     if (!TKrnlFileSys::bReplaceFile(strToReplace.pszBuffer()
                                     , strNewFile.pszBuffer()
-                                    , 0))
+                                    , nullptr))
     {
         facCIDLib().ThrowKrnlErr
         (

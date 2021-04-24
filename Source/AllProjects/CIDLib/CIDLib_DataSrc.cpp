@@ -252,7 +252,7 @@ TCIDDataSrc::eGetLine(TString& strToFill, const tCIDLib::TEncodedTime enctEnd)
 
     // If we never set the return to anything else, then assume a timeout
     tCIDLib::ELineRes eRet = tCIDLib::ELineRes::Timeout;
-    TThread* pthrCaller = 0;
+    TThread* pthrCaller = nullptr;
     try
     {
         tCIDLib::TEncodedTime enctCur = TTime::enctNow();

@@ -594,13 +594,13 @@ TSocket::bWaitForSendReady(const tCIDLib::TEncodedTime enctWait) const
     {
         tCIDLib::TEncodedTime enctCur = TKrnlTimeStamp::enctNow();
         tCIDLib::TEncodedTime enctCurWait = 0;
-        tCIDLib::TEncodedTime enctEnd;
+        tCIDLib::TEncodedTime enctEnd = 0;
         if (enctWait == kCIDLib::enctMaxWait)
             enctEnd = kCIDLib::enctMaxWait;
         else
             enctEnd = enctCur + enctWait;
 
-        TThread* pthrCaller = 0;
+        TThread* pthrCaller = nullptr;
         while (enctCur < enctEnd)
         {
             // Wait for up to half a second this time around
@@ -681,7 +681,7 @@ TSocket::bWaitForDataReady(const tCIDLib::TEncodedTime enctWait) const
         else
             enctEnd = enctCur + enctWait;
 
-        TThread* pthrCaller = 0;
+        TThread* pthrCaller = nullptr;
         while (enctCur < enctEnd)
         {
             // Wait for a while

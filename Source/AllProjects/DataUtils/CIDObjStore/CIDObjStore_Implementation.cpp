@@ -223,7 +223,7 @@ TCIDObjStoreImpl::bAddOrUpdate( const   TString&            strKey
         TOSStoreItem* posiFound = m_colStoreList.pobjFindByKey(strKey);
 
         // If we didn't find it, then add, else update
-        bNew = (posiFound == 0);
+        bNew = (posiFound == nullptr);
         if (bNew)
         {
             AddObject(strKey, mbufKey, c4KeySize, mbufData, c4DataSize, c4Reserve);
@@ -749,11 +749,11 @@ tCIDLib::TEncodedTime TCIDObjStoreImpl::enctLastBackup() const
 
 tCIDLib::ELoadRes
 TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 ,       TMemBuf&            mbufData
-                                ,       tCIDLib::TCard4&    c4DataSize
+                                , COP   tCIDLib::TCard4&    c4DataSize
                                 ,       TMemBuf&            mbufKey
-                                ,       tCIDLib::TCard4&    c4KeySize
+                                , COP   tCIDLib::TCard4&    c4KeySize
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     c4DataSize = 0;
@@ -810,11 +810,13 @@ TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
 
 tCIDLib::ELoadRes
 TCIDObjStoreImpl::eReadObject(  const   TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 ,       TMemBuf&            mbufData
-                                ,       tCIDLib::TCard4&    c4DataSize
+                                , COP   tCIDLib::TCard4&    c4DataSize
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
+    c4DataSize = 0;
+
     // Find the item with this key, throw if not found
     TOSStoreItem* posiCur = m_colStoreList.pobjFindByKey(strKey);
     if (!posiCur)

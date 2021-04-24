@@ -603,7 +603,7 @@ class TVector : public TCollection<TElem>
                 for (; c4Index < m_c4CurAlloc; c4Index++)
                 {
                     CIDLib_Suppress(6386)  // We range checked above
-                    m_apElems[c4Index] = 0;
+                    m_apElems[c4Index] = nullptr;
                 }
 
                 this->c4IncSerialNum();
@@ -828,7 +828,7 @@ class TVector : public TCollection<TElem>
             //  our stuff straight, and it's now the caller's issue.
             //
             TJanitor<TMyElemType> janRemove(m_apElems[c4Index]);
-            m_apElems[c4Index] = 0;
+            m_apElems[c4Index] = nullptr;
 
             //
             //  Now bump down the count of elements and compact the list if
@@ -844,7 +844,7 @@ class TVector : public TCollection<TElem>
                 }
 
                 // Zero the last one, since it's not used anymore
-                m_apElems[m_c4CurCount] = 0;
+                m_apElems[m_c4CurCount] = nullptr;
             }
 
             // And invalidate cursors
@@ -872,7 +872,7 @@ class TVector : public TCollection<TElem>
             //  slot.
             //
             TJanitor<TMyElemType> janRemove(m_apElems[m_c4CurCount]);
-            m_apElems[m_c4CurCount] = 0;
+            m_apElems[m_c4CurCount] = nullptr;
 
             // Now invalidate cursors and return true
             this->c4IncSerialNum();
@@ -1626,7 +1626,7 @@ class TVector : public TCollection<TElem>
             {
                 CIDLib_Suppress(6386)  // We range checked above
                 m_apElems[c4Index] = colSrc.m_apElems[c4Index];
-                colSrc.m_apElems[c4Index] = 0;
+                colSrc.m_apElems[c4Index] = nullptr;
             }
 
             // Invalidate cursors on both

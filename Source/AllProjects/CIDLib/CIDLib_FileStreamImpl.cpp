@@ -192,7 +192,7 @@ TFileOutStreamImpl::TFileOutStreamImpl(         TBinaryFile* const  pflToUse
     m_eAdopted(eAdopt)
     , m_pflData(pflToUse)
 {
-    CIDAssert(m_pflData != 0, L"The adopted binary stream cannot be null");
+    CIDAssert(m_pflData != nullptr, L"The adopted binary stream cannot be null");
 }
 
 TFileOutStreamImpl::~TFileOutStreamImpl()

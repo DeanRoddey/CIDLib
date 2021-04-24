@@ -71,7 +71,7 @@ TBinFileInStream(const  TString&                strFileName
                 , const tCIDLib::EFileFlags     eFlags
                 , const tCIDLib::EAccessModes   eAccess) :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
     Open(strFileName, eAction, ePerms, eFlags, eAccess);
 }
@@ -100,7 +100,7 @@ tCIDLib::TVoid TBinFileInStream::Close()
     if (m_pstrmiFile)
     {
         m_pstrmiFile->Close();
-        m_pstrmiFile = 0;
+        m_pstrmiFile = nullptr;
 
         // Ask our parent to clean up the implementation object
         DeleteImplObject();
@@ -130,8 +130,8 @@ TBinFileInStream::Open( const   TString&                strFileName
     }
 
     // Init these guys so we can clean up in case of error
-    TBinaryFile*        pflToUse    = 0;
-    TFileInStreamImpl*  pstrmiToUse = 0;
+    TBinaryFile*        pflToUse    = nullptr;
+    TFileInStreamImpl*  pstrmiToUse = nullptr;
     try
     {
         // Construct the binary file object
@@ -153,12 +153,12 @@ TBinFileInStream::Open( const   TString&                strFileName
         if (pstrmiToUse)
         {
             delete pstrmiToUse;
-            pstrmiToUse = 0;
+            pstrmiToUse = nullptr;
         }
          else
         {
             delete pflToUse;
-            pflToUse = 0;
+            pflToUse = nullptr;
         }
         throw;
     }
@@ -201,8 +201,8 @@ tCIDLib::TVoid TBinFileInStream::Open(const tCIDLib::EStdFiles eFile)
     }
 
     // Init these guys so we can clean up in case of error
-    TBinaryFile*        pflToUse    = 0;
-    TFileInStreamImpl*  pstrmiToUse = 0;
+    TBinaryFile*        pflToUse    = nullptr;
+    TFileInStreamImpl*  pstrmiToUse = nullptr;
 
     try
     {
@@ -223,12 +223,12 @@ tCIDLib::TVoid TBinFileInStream::Open(const tCIDLib::EStdFiles eFile)
         if (pstrmiToUse)
         {
             delete pstrmiToUse;
-            pstrmiToUse = 0;
+            pstrmiToUse = nullptr;
         }
          else
         {
             delete pflToUse;
-            pflToUse = 0;
+            pflToUse = nullptr;
         }
         throw;
     }
@@ -259,7 +259,7 @@ const TString& TBinFileInStream::strFileName() const
 // ---------------------------------------------------------------------------
 TBinFileOutStream::TBinFileOutStream() :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
 }
 
@@ -270,14 +270,14 @@ TBinFileOutStream(  const   TString&                strFileName
                     , const tCIDLib::EFileFlags     eFlags
                     , const tCIDLib::EAccessModes   eAccess) :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
     Open(strFileName, eAction, ePerms, eFlags, eAccess);
 }
 
 TBinFileOutStream::TBinFileOutStream(const tCIDLib::EStdFiles eFile) :
 
-    m_pstrmiFile(0)
+    m_pstrmiFile(nullptr)
 {
     Open(eFile);
 }
@@ -310,7 +310,7 @@ tCIDLib::TVoid TBinFileOutStream::Close()
     if (m_pstrmiFile)
     {
         m_pstrmiFile->Close();
-        m_pstrmiFile = 0;
+        m_pstrmiFile = nullptr;
         DeleteImplObject();
     }
 }
@@ -338,8 +338,8 @@ TBinFileOutStream::Open(const   TString&                strFileName
     }
 
     // Init these guys so we can clean up in case of error
-    TBinaryFile*        pflToUse    = 0;
-    TFileOutStreamImpl* pstrmiToUse = 0;
+    TBinaryFile*        pflToUse    = nullptr;
+    TFileOutStreamImpl* pstrmiToUse = nullptr;
 
     try
     {
@@ -362,12 +362,12 @@ TBinFileOutStream::Open(const   TString&                strFileName
         if (pstrmiToUse)
         {
             delete pstrmiToUse;
-            pstrmiToUse = 0;
+            pstrmiToUse = nullptr;
         }
          else
         {
             delete pflToUse;
-            pflToUse = 0;
+            pflToUse = nullptr;
         }
         throw;
     }

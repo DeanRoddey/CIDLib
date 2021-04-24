@@ -142,7 +142,7 @@ tCIDLib::TVoid TXMLStdCatalog::AddMapping(tCIDXML::TEntitySrcRef& esrToSet)
 tCIDLib::TBoolean
 TXMLStdCatalog::bPublicMappingExists(const TString& strPublicId) const
 {
-    return (m_colIdMap.pobjFindByKey(strPublicId) != 0);
+    return (m_colIdMap.pobjFindByKey(strPublicId) != nullptr);
 }
 
 
@@ -163,7 +163,7 @@ TXMLStdCatalog::esrMapId(const TString& strPublicId, const TString&) const
     //
     const tCIDXML::TEntitySrcRef* esrFound = m_colIdMap.pobjFindByKey(strPublicId);
     if (!esrFound)
-        return tCIDXML::TEntitySrcRef(0);
+        return tCIDXML::TEntitySrcRef(nullptr);
 
     //
     //  Return a copy, which gives them their own counted ref to the entity

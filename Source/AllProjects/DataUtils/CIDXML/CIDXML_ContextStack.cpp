@@ -50,7 +50,7 @@ TXMLContextStack::TXMLContextStack() :
     m_c4LevelTop(0)
     , m_c4LevelMax(32)
     , m_eTextType(tCIDXML::EElemTextTypes::Any)
-    , m_pLevels(0)
+    , m_pLevels(nullptr)
 {
     // Do the initial allocation of the level stack array
     m_pLevels = new TLevel[m_c4LevelMax];
@@ -176,7 +176,7 @@ tCIDLib::TBoolean TXMLContextStack::bPopLevel()
     //  (i.e. the current allocation sizes.)
     //
     m_c4LevelTop--;
-    m_pLevels[m_c4LevelTop].pxdeclLevel = 0;
+    m_pLevels[m_c4LevelTop].pxdeclLevel = nullptr;
     m_pLevels[m_c4LevelTop].c4SpoolerId = 0;
     m_pLevels[m_c4LevelTop].c4ChildCount = 0;
     m_pLevels[m_c4LevelTop].c4MapCount = 0;
@@ -352,14 +352,14 @@ tCIDLib::TVoid TXMLContextStack::CleanUp()
         if (CurLev.pc4ChildIds)
         {
             delete [] CurLev.pc4ChildIds;
-            CurLev.pc4ChildIds = 0;
+            CurLev.pc4ChildIds = nullptr;
             CurLev.c4ChildCount = 0;
         }
 
         if (CurLev.pMapItems)
         {
             delete [] CurLev.pMapItems;
-            CurLev.pMapItems = 0;
+            CurLev.pMapItems = nullptr;
             CurLev.c4MapCount = 0;
         }
     }

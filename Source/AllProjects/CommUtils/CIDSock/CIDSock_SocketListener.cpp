@@ -170,8 +170,8 @@ TSocketListener::psockListenFor(const   tCIDLib::TEncodedTime   enctWait
 
     // Wait for up to half a second at a time
     tCIDLib::TEncodedTime   enctCur = TKrnlTimeStamp::enctNow();
-    tCIDLib::TEncodedTime   enctCurWait;
-    tCIDLib::TEncodedTime   enctEnd;
+    tCIDLib::TEncodedTime   enctCurWait = 0;
+    tCIDLib::TEncodedTime   enctEnd = 0;
 
     if (enctWait == kCIDLib::enctMaxWait)
         enctEnd = kCIDLib::enctMaxWait;
@@ -226,7 +226,7 @@ TSocketListener::psockListenFor(const   tCIDLib::TEncodedTime   enctWait
     if (c4Count)
     {
         TKrnlIPAddr         kipaClient;
-        tCIDLib::TIPPortNum ippnClient;
+        tCIDLib::TIPPortNum ippnClient = 0;
 
         for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Count; c4Index++)
         {
@@ -288,7 +288,7 @@ TSocketListener::Initialize(const   tCIDSock::ESockProtos   eProtocol
 
 tCIDLib::TVoid TSocketListener::Initialize(const tCIDSock::ESockProtos eProtocol)
 {
-    tCIDLib::TBoolean bRes;
+    tCIDLib::TBoolean bRes = kCIDLib::False;
 
     // We can't already be initialized
     if (m_c4Count)

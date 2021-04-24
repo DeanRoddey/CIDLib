@@ -1883,7 +1883,7 @@ TString::bCompareNI(const   tCIDLib::TCh* const     pszSrc
 //
 tCIDLib::TBoolean TString::bContainsChar(const tCIDLib::TCh chToFind) const noexcept
 {
-    return TRawStr::pszFindChar(pszBuffer(), chToFind) != 0;
+    return TRawStr::pszFindChar(pszBuffer(), chToFind) != nullptr;
 }
 
 

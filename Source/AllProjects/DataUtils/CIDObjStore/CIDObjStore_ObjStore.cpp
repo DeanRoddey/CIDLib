@@ -54,7 +54,7 @@ TCIDObjStore::TCIDObjStore(const tCIDObjStore::EFlags eFlags) :
     , m_eFlags(eFlags)
     , m_mbufRead(8192, 0x10000, 8192)
     , m_mbufReadKey(1024, 0x10000)
-    , m_postCache(0)
+    , m_postCache(nullptr)
     , m_strmKey(8192, 0x10000)
     , m_strmOut(8192, 0x10000)
 {
@@ -71,7 +71,7 @@ TCIDObjStore::~TCIDObjStore()
         if (m_bReady)
             m_postCache->Close();
         delete m_postCache;
-        m_postCache = 0;
+        m_postCache = nullptr;
     }
 }
 
@@ -522,7 +522,7 @@ tCIDLib::TVoid TCIDObjStore::DeleteScope(const TString& strScopeName)
 //
 tCIDLib::ELoadRes
 TCIDObjStore::eReadObject(  const   TString&            strKey
-                            ,       tCIDLib::TCard4&    c4Version
+                            , CIOP  tCIDLib::TCard4&    c4Version
                             ,       MStreamable&        strmblToFill
                             , const tCIDLib::TBoolean   bThrowIfNot)
 {
@@ -639,7 +639,7 @@ tCIDLib::TVoid TCIDObjStore::ValidateStore()
     TLocker lockrStore(&m_mtxSync);
 
     // Delegate to the cache object
-    m_postCache->ValidateStore(0);
+    m_postCache->ValidateStore(nullptr);
 }
 
 tCIDLib::TVoid TCIDObjStore::ValidateStore(TTextOutStream& strmTar)

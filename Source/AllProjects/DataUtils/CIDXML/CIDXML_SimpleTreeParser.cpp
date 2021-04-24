@@ -436,7 +436,7 @@ TXMLTreeParser::c4FindPath( const   TString&            strPath
     // Else, there are more, so let's start searching
     TXMLTreeElement* pxtnodePar = pxtnodeCur;
     TString strExt;
-    tCIDLib::TCard4 c4FndAt;
+    tCIDLib::TCard4 c4FndAt = 0;
     while(kCIDLib::True)
     {
         //
@@ -483,7 +483,7 @@ TXMLTreeParser::c4FindPath( const   TString&            strPath
         //
         if (!pxtnodeCur)
         {
-            pxtnodeTar = 0;
+            pxtnodeTar = nullptr;
             fcolIndices.RemoveAll();
             break;
         }
@@ -535,7 +535,7 @@ TXMLTreeParser::InstallCatalog(         TXMLCatalog* const  pxcatToSet
     {
         if (m_eAdoptCat == tCIDLib::EAdoptOpts::Adopt)
             delete m_pxcatMappings;
-        m_pxcatMappings = 0;
+        m_pxcatMappings = nullptr;
     }
 
     m_pxcatMappings = pxcatToSet;
@@ -688,7 +688,7 @@ TXMLTreeParser::DocCharacters(  const   TString&            strChars
     //  we have to append the new text to that existing child. Else we
     //  have to allocate a new one.
     //
-    TXMLTreeText* pxtnodeText = 0;
+    TXMLTreeText* pxtnodeText = nullptr;
     if (m_pxtnodeCur)
         pxtnodeText = m_pxtnodeCur->pxtnodeLastIsText();
 
@@ -767,7 +767,7 @@ tCIDLib::TVoid TXMLTreeParser::EndTag(const TXMLElemDecl&)
     if (!m_pcolElemStack->bIsEmpty())
         m_pxtnodeCur = m_pcolElemStack->pobjPop();
      else
-        m_pxtnodeCur = 0;
+        m_pxtnodeCur = nullptr;
 }
 
 
@@ -775,7 +775,7 @@ tCIDLib::TVoid TXMLTreeParser::ResetDocument()
 {
     // Clear out the document for the next round, and zero the current element
     m_pxtdocThis->Reset();
-    m_pxtnodeCur = 0;
+    m_pxtnodeCur = nullptr;
 }
 
 
@@ -796,7 +796,7 @@ TXMLTreeParser::StartTag(       TXMLParserCore&     xprsSrc
     //  pooled one. Else we want to get one from the pool or add one
     //  to the pool.
     //
-    TXMLTreeElement* pxtnodeNew = 0;
+    TXMLTreeElement* pxtnodeNew = nullptr;
     if (m_pxtnodeCur)
     {
         // It's a nested one so deal with pooling

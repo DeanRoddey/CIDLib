@@ -116,7 +116,7 @@ tCIDLib::TBoolean TXMLTreeAttr::bExplicit() const
 
 tCIDLib::TBoolean TXMLTreeAttr::bValueAs() const
 {
-    tCIDLib::TBoolean bRet;
+    tCIDLib::TBoolean bRet = kCIDLib::False;
     if (m_strValue.bCompareI(L"true") || m_strValue.bCompareI(L"yes"))
     {
         bRet = kCIDLib::True;
@@ -1194,7 +1194,7 @@ TXMLTreeElement::xtnodeNthElement(  const   tCIDLib::TCard4     c4Index
 {
     c4At = 0;
     tCIDLib::TCard4 c4InstCnt = 0;
-    TXMLTreeElement* pxtnodeRet = 0;
+    TXMLTreeElement* pxtnodeRet = nullptr;
     if (m_pcolChildren)
     {
         const tCIDLib::TCard4 c4Count = m_pcolChildren->c4ElemCount();
@@ -1247,8 +1247,8 @@ TXMLTreeElement::TXMLTreeElement(const  TXMLElemDecl&       xdeclSrc
 
     TXMLTreeNode(tCIDXML::ENodeTypes::Element)
     , m_eTextType(xdeclSrc.eTextType())
-    , m_pcolAttrs(0)
-    , m_pcolChildren(0)
+    , m_pcolAttrs(nullptr)
+    , m_pcolChildren(nullptr)
     , m_strQName
       (
         (xdeclSrc.strFullName().c4Length() < 64)
@@ -1738,7 +1738,7 @@ const TXMLTreeElement& TXMLTreeDocument::xtnodeRoot() const
     //  Search the list of children for the one that is an element type. If
     //  we don't find one, then its not set yet.
     //
-    TXMLTreeNode* pxtnodeRoot = 0;
+    TXMLTreeNode* pxtnodeRoot = nullptr;
     const tCIDLib::TCard4 c4ChildCount = m_pcolChildren->c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCount; c4Index++)
     {
@@ -1771,7 +1771,7 @@ TXMLTreeElement& TXMLTreeDocument::xtnodeRoot()
     //  Search the list of children for the one that is an element type. If
     //  we don't find one, then its not set yet.
     //
-    TXMLTreeNode* pxtnodeRoot = 0;
+    TXMLTreeNode* pxtnodeRoot = nullptr;
     const tCIDLib::TCard4 c4ChildCount = m_pcolChildren->c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCount; c4Index++)
     {

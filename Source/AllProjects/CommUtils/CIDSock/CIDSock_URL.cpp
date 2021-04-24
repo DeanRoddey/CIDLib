@@ -695,18 +695,14 @@ tCIDLib::TVoid TURL::ExpandTo(  const   tCIDLib::TCh* const     pszSrc
     //  didn't provide a transcoder, we have to gen one up.
     //
     TTextConverter* ptcvtActual = ptcvtToUse;
-    TUTF8Converter* ptcvtDefault = 0;
+    TUTF8Converter* ptcvtDefault = nullptr;
     if (!ptcvtActual)
     {
         ptcvtDefault = new TUTF8Converter;
         ptcvtActual = ptcvtDefault;
     }
     TJanitor<TUTF8Converter> janDefault(ptcvtDefault);
-
-    ptcvtActual->c4ConvertFrom
-    (
-        mbufToUse.pc1Data(), c4BufInd, strToFill, eAppend
-    );
+    ptcvtActual->c4ConvertFrom(mbufToUse.pc1Data(), c4BufInd, strToFill, eAppend);
 }
 
 tCIDLib::TVoid TURL::ExpandTo(  const   TString&                strSrc
@@ -1152,7 +1148,7 @@ TURL::pstrmFromURL(         TBinInStream*&          pstrmToFill
     //  We optimize for a file protocol on the local host by just creating
     //  a regular binary file input stream.
     //
-    TBinOutStream* pstrmRet = 0;
+    TBinOutStream* pstrmRet = nullptr;
     if ((m_eProto == tCIDSock::EProtos::File)
     &&  ((m_strHost.bCompareI(L"localhost")) || m_strHost.bIsEmpty()))
     {
@@ -2039,7 +2035,7 @@ TURL::Parse(const   tCIDLib::TCh* const     pszURLText
 {
     TString strTmp;
     TString strQuery;
-    tCIDLib::TCh* pszTmp = 0;
+    tCIDLib::TCh* pszTmp = nullptr;
 
     // Get a copy of the text we can mangle
     tCIDLib::TCh* pszPText = TRawStr::pszReplicate(pszURLText);
@@ -2048,7 +2044,7 @@ TURL::Parse(const   tCIDLib::TCh* const     pszURLText
     // We use start/end pointers to eat into the text from either end
     tCIDLib::TCh* pszStart = pszPText;
     tCIDLib::TCh* pszEnd = pszPText + TRawStr::c4StrLen(pszPText);
-    CIDAssert(*pszEnd == 0, L"The URL end pointer doesn't point to the null");
+    CIDAssert(*pszEnd == kCIDLib::chNull, L"The URL end pointer doesn't point to the null");
 
     // Just in case, we run the two inwards past any whitespace
     while (pszEnd > pszStart)

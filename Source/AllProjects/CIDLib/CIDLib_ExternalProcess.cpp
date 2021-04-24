@@ -560,7 +560,7 @@ TExternalProcess::Start(const   TString&                strPath
         //  Ok, lets start up this puppy. We just call our kernel object
         //  and pass along this info we've set up.
         //
-        const tCIDLib::TCh* pszInitPath = 0;
+        const tCIDLib::TCh* pszInitPath = nullptr;
         if (!strInitPath.bIsEmpty())
             pszInitPath = strInitPath.pszBuffer();
         if (!m_kextpThis.bStart(strPath.pszBuffer()

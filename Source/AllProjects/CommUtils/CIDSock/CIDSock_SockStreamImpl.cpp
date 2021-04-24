@@ -161,6 +161,7 @@ TSockInStreamImpl::SkipForwardBy(const tCIDLib::TCard4 c4SkipBy)
     //  required to skip the indicated number of bytes.
     //
     const tCIDLib::TCard4 c4BufSize = 1024;
+    CIDLib_Suppress(26494) // Don't need to init, we are reading into it below
     tCIDLib::TCard1 ac1Buf[c4BufSize];
     tCIDLib::TCard4 c4CountDown = c4SkipBy;
 

@@ -83,7 +83,7 @@ TBaseTreeNode::TBaseTreeNode(const  tCIDLib::ETreeNodes eType
                             , const TString&            strDescription) :
     m_eType(eType)
     , m_strName(strName)
-    , m_pstrDescription(0)
+    , m_pstrDescription(nullptr)
 {
     // If its not the nul string, then store it
     if (!TString::bIsNullObject(strDescription))

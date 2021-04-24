@@ -486,7 +486,7 @@ TInConsole::TInConsole( const   tCIDLib::TBoolean   bInsertMode
                         , const tCIDLib::TCard4     c4MaxRecall) :
 
     TTextInStream(new TNativeWCConverter)
-    , m_pstrmiCon(0)
+    , m_pstrmiCon(nullptr)
 {
     // Create a stream input implementation object
     m_pstrmiCon = new TConsoleInImpl(bInsertMode, c4MaxRecall);
@@ -548,7 +548,7 @@ tCIDLib::TVoid TInConsole::WaitKey()
 {
     // Just call the impl, indicating max wait time, and eat the result
     tCIDLib::EConKeys eKeyType;
-    m_pstrmiCon->chReadChar(eKeyType, kCIDLib::c4MaxWait, 0, 0);
+    m_pstrmiCon->chReadChar(eKeyType, kCIDLib::c4MaxWait, nullptr, nullptr);
 }
 
 
@@ -564,7 +564,7 @@ tCIDLib::TVoid TInConsole::WaitKey()
 TOutConsole::TOutConsole() :
 
     TTextOutStream(new TNativeWCConverter)
-    , m_pstrmiCon(0)
+    , m_pstrmiCon(nullptr)
 {
     //
     //  Create a stream input implementation object. We save a copy for our

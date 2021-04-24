@@ -200,7 +200,7 @@ tCIDLib::TVoid TAudio::SetWAVForCue(const   tCIDLib::EAudioCues eCue
     //
     tCIDLib::TBoolean bRes = kCIDLib::False;
     if (TString::bIsNullObject(strFileForCue))
-        bRes = TKrnlAudio::bSetWAVForCue(eCue, 0);
+        bRes = TKrnlAudio::bSetWAVForCue(eCue, nullptr);
     else
         bRes = TKrnlAudio::bSetWAVForCue(eCue, strFileForCue.pszBuffer());
 

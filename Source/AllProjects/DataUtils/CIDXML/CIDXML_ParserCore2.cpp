@@ -310,7 +310,7 @@ TXMLParserCore::bExpandCharRef(tCIDLib::TCh& chToFill, tCIDLib::TCh& chSecond)
     //  see from here to there must be legal digits in the radix we got.
     //
     tCIDLib::TCard4 c4Accum = 0;
-    tCIDLib::TCard4 c4CurDigit;
+    tCIDLib::TCard4 c4CurDigit = 0;
     while (kCIDLib::True)
     {
         const tCIDLib::TCh chNext = m_xemThis.chGetNext();
@@ -444,7 +444,7 @@ TXMLParserCore::bParseAttrValue(const  TXMLAttrDef& xadCur
     //  and surrogate pair checking.
     //
     tCIDLib::TBoolean   bEscaped = kCIDLib::False;
-    tCIDLib::TCh        chNext;
+    tCIDLib::TCh        chNext = kCIDLib::chNull;
     tCIDLib::TCh        chSecond = kCIDLib::chNull;
     while (kCIDLib::True)
     {
@@ -793,7 +793,7 @@ TXMLParserCore::eExpandEntityRef(const  tCIDLib::TBoolean   bExtOk
     //  If the entity is an internal entity, then we create one type of
     //  spooler, else we create one for an external entity.
     //
-    TXMLEntSpooler* pxesEntity;
+    TXMLEntSpooler* pxesEntity = nullptr;
     if (pxdeclEntity->bIsInternal())
     {
         pxesEntity = m_xemThis.pxesMakeNewFromInt

@@ -1206,7 +1206,7 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
             {
                 xprsOwner().PostXMLError(kXMLErrs::errcXMLE_BadChildModel);
                 delete pxcsnRet;
-                return 0;
+                return nullptr;
             }
         }
          else
@@ -1220,7 +1220,7 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
             {
                 xprsOwner().PostXMLError(kXMLErrs::errcXMLE_ExpectedElementName);
                 delete pxcsnRet;
-                return 0;
+                return nullptr;
             }
 
             //
@@ -1313,7 +1313,7 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
         {
             xprsOwner().PostXMLError(kXMLErrs::errcXMLE_BadChildModel);
             delete pxcsnRet;
-            return 0;
+            return nullptr;
         }
 
         if (eType == tCIDXML::ECMNodeTypes::Unknown)
@@ -1333,7 +1333,7 @@ TXMLCMSpecNode* TDTDValidator::pxcsnParseCMLevel()
             {
                 xprsOwner().PostXMLError(kXMLErrs::errcXMLE_MixedContentTypes);
                 delete pxcsnRet;
-                return 0;
+                return nullptr;
             }
 
             //

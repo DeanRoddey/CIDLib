@@ -101,10 +101,12 @@ TStreamSocket::~TStreamSocket()
     //  or no more data comes back, or we timeout.
     //
     const tCIDLib::TCard4 c4BufSize = 256;
-    tCIDLib::TCard4 c4Read;
-    tCIDLib::TCard1 ac1Junk[c4BufSize];
-    tCIDLib::TCard4 c4Count;
+    tCIDLib::TCard4 c4Read = 0;
+    tCIDLib::TCard4 c4Count = 0;
     tCIDLib::TEncodedTime enctEnd = TTime::enctNowPlusSecs(4);
+
+    CIDLib_Suppress(26494) // Don't need to initialize, we are reading into it below
+    tCIDLib::TCard1 ac1Junk[c4BufSize];
     while (ksockThis.bDataReady(c4Count))
     {
         if (!ksockThis.bReceive(ac1Junk, c4BufSize, c4Read))
@@ -324,9 +326,9 @@ TStreamSocket::c4ReceiveRawTO(          tCIDLib::TVoid* const   pToFill
     //  always allocate the caller's buffer to the max to receive size,
     //  which would be inefficient.
     //
-    tCIDLib::TBoolean   bMoreData;
+    tCIDLib::TBoolean   bMoreData = kCIDLib::False;
     tCIDLib::TCard4     c4SoFar = 0;
-    tCIDLib::TCard4     c4ThisTime;
+    tCIDLib::TCard4     c4ThisTime = 0;
 
     //
     //  We need a pointer to the output buffer that we can index, so get
@@ -336,8 +338,8 @@ TStreamSocket::c4ReceiveRawTO(          tCIDLib::TVoid* const   pToFill
 
     // Loop until we run out of time or we get enough bytes
     tCIDLib::TEncodedTime enctCur = TTime::enctNow();
-    tCIDLib::TEncodedTime enctCurWait;
-    tCIDLib::TEncodedTime enctEnd;
+    tCIDLib::TEncodedTime enctCurWait = 0;
+    tCIDLib::TEncodedTime enctEnd = 0;
     if (enctWait == kCIDLib::enctMaxWait)
         enctEnd = kCIDLib::enctMaxWait;
     else
@@ -633,9 +635,10 @@ tCIDLib::TCard4 TStreamSocket::c4Shutdown(TMemBuf& mbufToFill)
     //
     const tCIDLib::TCard4   c4BufSize = mbufToFill.c4MaxSize();
     const tCIDLib::TCard4   c4TmpBufSize = 2048;
+    CIDLib_Suppress(26494) // Don't need to initialize, we are reading into it below
     tCIDLib::TCard1         ac1Tmp[c4TmpBufSize];
     tCIDLib::TCard4         c4Bytes = 0;
-    tCIDLib::TCard4         c4BytesAvail;
+    tCIDLib::TCard4         c4BytesAvail = 0;
     tCIDLib::TEncodedTime   enctEnd = TTime::enctNowPlusSecs(2);
 
     if (ksockThis.bDataReady(c4BytesAvail))

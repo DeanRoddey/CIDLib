@@ -55,8 +55,8 @@ TXMLValidator::~TXMLValidator()
 // ---------------------------------------------------------------------------
 TXMLValidator::TXMLValidator(TXMLParserCore* const pxprsOwner) :
 
-    m_pxbmOwner(0)
-    , m_pxemOwner(0)
+    m_pxbmOwner(nullptr)
+    , m_pxemOwner(nullptr)
     , m_pxprsOwner(pxprsOwner)
 {
     // Get out our convenience pointers

@@ -63,7 +63,7 @@ TProcess::bCheckSingleInstanceInfo( const   TResourceName&          rsnToUse
     const TString strName = rsnToUse.strFullName(tCIDLib::ENamedRscTypes::Memory);
     return TKrnlProcess::bCheckSingleInstanceInfo
     (
-        strName.pszBuffer(), bFound, pextpTarget ? &pextpTarget->kextpThis() : 0
+        strName.pszBuffer(), bFound, pextpTarget ? &pextpTarget->kextpThis() : nullptr
     );
 }
 

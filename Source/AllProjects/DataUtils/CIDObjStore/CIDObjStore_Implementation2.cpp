@@ -48,8 +48,8 @@
 //
 tCIDLib::TCard4
 TCIDObjStoreImpl::c4CreateSeqData(          TVector<TOSSeqData>& colToFill
-                                    ,       tCIDLib::TCard4&     c4IndexItems
-                                    ,       tCIDLib::TCard4&     c4FreeItems
+                                    , COP   tCIDLib::TCard4&     c4IndexItems
+                                    , COP   tCIDLib::TCard4&     c4FreeItems
                                     , const tCIDLib::TCard4      c4TargetOfs)
 {
     // Clear the vector out first and init the counter parms
@@ -137,9 +137,12 @@ TCIDObjStoreImpl::c4CreateSeqData(          TVector<TOSSeqData>& colToFill
 //
 tCIDLib::TCard4
 TCIDObjStoreImpl::c4FindFreeSpace(  const   tCIDLib::TCard4     c4Needed
-                                    ,       tCIDLib::TCard4&    c4ActualSz
-                                    ,       tCIDLib::TCard4&    c4Offset)
+                                    , COP   tCIDLib::TCard4&    c4ActualSz
+                                    , COP   tCIDLib::TCard4&    c4Offset)
 {
+    c4ActualSz = 0;
+    c4Offset = 0;
+
     //
     //  Make one run through the list and see if we can find that we can
     //  take outright. While looking, we'll keep up with the smallest one

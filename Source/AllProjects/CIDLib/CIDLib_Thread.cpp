@@ -317,7 +317,7 @@ static tCIDLib::TBoolean bRemoveName(const TString& strName)
             {
                 // We found it so dec the count and clear the entry
                 CIDLib_Thread::c4ThreadCount--;
-                pthriCur->pthrThis = 0;
+                pthriCur->pthrThis = nullptr;
                 pthriCur->tidThread = kCIDLib::tidInvalid;
 
                 // Decrement the stats counter
@@ -382,7 +382,7 @@ static TThread* pthrFindName(const TString& strName)
         }
         pthriCur++;
     }
-    return 0;
+    return nullptr;
 }
 
 
@@ -1659,7 +1659,7 @@ tCIDLib::TVoid TThread::Start(          tCIDLib::TVoid* const   pData
     //  can be a mess to diagnose.
     //
     #if CID_DEBUG_ON
-    if (this == 0)
+    if (this == nullptr)
     {
         facCIDLib().ThrowErr
         (
@@ -2163,8 +2163,8 @@ TThread::TThread() :
     , m_c4ListInd(CIDLib_Thread::c4MaxThreads)
     , m_c4StackSz(0)
     , m_kthrThis()
-    , m_ptfuncToRun(0)
-    , m_pfnOnExit(0)
+    , m_ptfuncToRun(nullptr)
+    , m_pfnOnExit(nullptr)
     , m_tidSyncReq(kCIDLib::tidInvalid)
     , m_strName(kCIDLib::pszPrimaryThrdName)
 {

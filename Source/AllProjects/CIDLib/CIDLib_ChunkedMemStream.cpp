@@ -1211,7 +1211,7 @@ tCIDLib::TVoid TChunkedBinInStream::SetEndIndex(const tCIDLib::TCard4 c4NewIndex
 // ---------------------------------------------------------------------------
 TChunkedBinOutStream::TChunkedBinOutStream(const tCIDLib::TCard4 c4MaxSize) :
 
-    m_pstrmiOut(0)
+    m_pstrmiOut(nullptr)
 {
     // Make sure max size is not zero. If so, bump it up to at least one byte
     tCIDLib::TCard4 c4RealSz = c4MaxSize;
@@ -1340,7 +1340,7 @@ TChunkedTextOutStream(  const   tCIDLib::TCard4         c4MaxSize
                         ,       TTextConverter* const   ptcvtToAdopt) :
 
     TTextOutStream(ptcvtToAdopt)
-    , m_pstrmOut(0)
+    , m_pstrmOut(nullptr)
 {
     // Create a chunked binary stream and give it to our parent
     m_pstrmOut = new TChunkedBinOutStream(c4MaxSize);
