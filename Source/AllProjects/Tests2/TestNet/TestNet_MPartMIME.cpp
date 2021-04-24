@@ -110,7 +110,7 @@ TTest_MPMIMEDecode1::eRunTest(  TTextStringOutStream&   strmOut
     (
         mbufTest
         , c4SrcBytes
-        , TStrCat(L"multipart/mixed; boundary=", strBoundary)
+        , TString::strConcat(L"multipart/mixed; boundary=", strBoundary)
         , colParts
         , fcolSizes
         , colContTypes

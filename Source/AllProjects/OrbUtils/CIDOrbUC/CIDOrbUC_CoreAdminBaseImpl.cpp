@@ -108,7 +108,7 @@ TCIDCoreAdminBaseImpl::SetModLogLevel(  const   TString&    strModName
                                         , const TString&    strLevel)
 {
     // Check the level for validity
-    TString strTmp(TStrCat(L"ESev_", strLevel));
+    TString strTmp(TString::strConcat(L"ESev_", strLevel));
     const tCIDLib::ESeverities eSev = tCIDLib::eXlatESeverities(strTmp);
 
     // It wasn't a valid level

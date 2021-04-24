@@ -159,19 +159,6 @@ static tCIDLib::TVoid TestConstructors(TTextOutStream& strmOut)
     if (strTest3 != L"This is test string 3")
         strmOut << CUR_LN << L"Msg file string 3 was not correct" << kCIDLib::EndLn;
 
-    //
-    //  Test the constructor that supports the concatenation operator. It
-    //  takes two raw strings and creates a string that holds the two
-    //  strings concatenated together.
-    //
-    TString strConcat(TStrCat(L"This is ", L"a test string"));
-    CheckStrInvariants(strConcat)
-    if (strConcat != L"This is a test string")
-    {
-        strmOut << CUR_LN << L"Concatenation constructor gave incorrect value"
-                << kCIDLib::EndLn;
-    }
-
     // Test the constructor from a formattable object
     TString strFormatted(TArea(10,10,100,100));
     CheckStrInvariants(strFormatted)

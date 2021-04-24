@@ -722,7 +722,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
 
                     tCIDLib::TCard4 c4Ret = upnpsContDir.c4BrowseTracks
                     (
-                        TStrCat(L"SQ:", astrCmd[1])
+                        TString::strConcat(L"SQ:", astrCmd[1])
                         , c4StartInd
                         , astrCmd[3].c4Val()
                         , c4Total
@@ -842,7 +842,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
              else if (strCmd.bCompareI(L"DeletePL"))
             {
                 if (bCheckParmCnt(c4InpVals, 1))
-                    upnpsContDir.DeleteObject(TStrCat(L"SQ:", astrCmd[1]));
+                    upnpsContDir.DeleteObject(TString::strConcat(L"SQ:", astrCmd[1]));
             }
              else if (strCmd.bCompareI(L"Exit"))
             {
@@ -1021,7 +1021,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 {
                     upnpsAVTrans.SetAVTransportURI
                     (
-                        TStrCat(L"x-rincon:", astrCmd[1]), TString::strEmpty()
+                        TString::strConcat(L"x-rincon:", astrCmd[1]), TString::strEmpty()
                     );
                 }
             }
@@ -1078,7 +1078,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                     tCIDLib::TCard4 c4QdAt, c4NewCnt;
                     upnpsAVTrans.AddURIToQueue
                     (
-                        TStrCat(L"file:///jffs/settings/savedqueues.rsq#", astrCmd[1])
+                        TString::strConcat(L"file:///jffs/settings/savedqueues.rsq#", astrCmd[1])
                         , TString::strEmpty()
                         , c4QdAt
                         , c4NewCnt
@@ -1155,7 +1155,7 @@ tCIDLib::EExitCodes eMainThreadFunc(TThread& thrThis, tCIDLib::TVoid*)
                 {
                     upnpsAVTrans.StartAutoplay
                     (
-                        TStrCat(L"file:///jffs/settings/savedqueues.rsq#", astrCmd[1])
+                        TString::strConcat(L"file:///jffs/settings/savedqueues.rsq#", astrCmd[1])
                         , kCIDLib::True
                         , kCIDLib::False
                         , astrCmd[2].c4Val()

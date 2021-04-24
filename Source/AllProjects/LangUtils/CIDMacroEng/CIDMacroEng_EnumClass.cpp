@@ -880,18 +880,12 @@ tCIDLib::TCard4 TMEngEnumInfo::c4ValueCount() const
 
 TString TMEngEnumInfo::strFullName(const TMEngEnumVal& mecvValue) const
 {
-    return TString
-    (
-        TStrCat(strClassPath(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName)
-    );
+    return TString::strConcat(strClassPath(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName);
 }
 
 TString TMEngEnumInfo::strFullName(const tCIDLib::TCard4 c4Ordinal) const
 {
-    return TString
-    (
-        TStrCat(strClassPath(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName)
-    );
+    return TString::strConcat(strClassPath(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName);
 }
 
 
@@ -908,15 +902,12 @@ const TString& TMEngEnumInfo::strItemName(const tCIDLib::TCard4 c4Ordinal) const
 
 TString TMEngEnumInfo::strPartialName(const TMEngEnumVal& mecvValue) const
 {
-    return TString
-    (
-        TStrCat(strName(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName)
-    );
+    return TString::strConcat(strName(), kCIDLib::chPeriod, m_colItems[mecvValue.c4Ordinal()].m_strName);
 }
 
 TString TMEngEnumInfo::strPartialName(const tCIDLib::TCard4 c4Ordinal) const
 {
-    return TString(TStrCat(strName(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName));
+    return TString::strConcat(strName(), kCIDLib::chPeriod, m_colItems[c4Ordinal].m_strName);
 }
 
 

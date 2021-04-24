@@ -640,7 +640,7 @@ TCGenEnumInfo::FormatEnumDef(       TTextOutStream& strmTar
     //  old style name prefix for old style ones, so do this to avoid a lot of
     //  redundancy below.
     //
-    const TString strTypePref(TStrCat(m_strTypeName, kCIDLib::chUnderscore));
+    const TString strTypePref = TString::strConcat(m_strTypeName, kCIDLib::chUnderscore);
 
     // Generate the opening of the enum definition
     strmTar << TTextOutStream::Spaces(c4Indent) << L"enum class "

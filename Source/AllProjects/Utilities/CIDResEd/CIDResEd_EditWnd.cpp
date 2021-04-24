@@ -1475,7 +1475,7 @@ tCIDCtrls::EEvResponses TResEdEditor::eAttrEditHandler(TAttrEditInfo& wnotInfo)
         TErrBox msgbErr
         (
             L"Resource Editor"
-            , TStrCat(L"Unknown attr event source:", wnotInfo.strSrcName())
+            , TString::strConcat(L"Unknown attr event source:", wnotInfo.strSrcName())
         );
         msgbErr.ShowIt(*this);
     }

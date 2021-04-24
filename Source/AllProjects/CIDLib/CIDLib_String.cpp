@@ -64,243 +64,6 @@ namespace CIDLib_String
 
 
 
-// ---------------------------------------------------------------------------
-//  CLASS: TStrCat
-// PREFIX: scat
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TStrCat: Constructors and Destructor.
-// ---------------------------------------------------------------------------
-
-//
-//  To be efficient, we don't call CatStr, because it has to run all the way up to
-//  the end each time. So we take the hit here and do memory moves. That willl make
-//  this fairly fundamental thing vastly more efficient.
-//
-//  We have some special ones that combine strings and characters, which is also
-//  pretty common.
-//
-//  * Remember the buffers that TString stores are always 1 larger than the current
-//  character size, to leave room for a null, so make sure of that. He is going to
-//  assume this.
-//
-TStrCat::TStrCat(const TString& str1, const TString& str2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + c4Len2;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-TStrCat::TStrCat(const  TString& str1, const TString& str2, const TString& str3) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf
-    (
-        &m_pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes
-    );
-
-    m_c4Len = c4Len1 + c4Len2 + c4Len3;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const  TString&    str1
-                , const TString&    str2
-                , const TString&    str3
-                , const TString&    str4) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
-    const tCIDLib::TCard4 c4Len4 = str4.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + c4Len4 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf
-    (
-        &m_pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes
-    );
-    TRawMem::CopyMemBuf
-    (
-        &m_pszBuf[c4Len1 + c4Len2 + c4Len3], str4.pszBuffer(), c4Len4 * kCIDLib::c4CharBytes
-    );
-
-
-    m_c4Len = c4Len1 + c4Len2 + c4Len3 + c4Len4;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const TString& str1, const tCIDLib::TCh chSep) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + 2];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + 1;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const  TString&        str1
-                , const tCIDLib::TCh    chSep
-                , const TString&        str2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf
-    (
-        &m_pszBuf[c4Len1 + 1], str2.pszBuffer(), c4Len2 *  kCIDLib::c4CharBytes
-    );
-
-    m_c4Len = c4Len1 + + c4Len2 + 1;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const TString& str1, const tCIDLib::TCh* const psz2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + c4Len2;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const tCIDLib::TCh* const psz1, const TString& str2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, psz1, c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + c4Len2;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const tCIDLib::TCh* const psz1, const tCIDLib::TCh* const psz2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(m_pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + c4Len2;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-
-TStrCat::TStrCat(const  tCIDLib::TCh* const psz1
-                , const tCIDLib::TCh        chSep
-                , const tCIDLib::TCh* const psz2) :
-
-    m_pszBuf(nullptr)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    m_pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
-
-    TRawMem::CopyMemBuf(m_pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&m_pszBuf[c4Len1 + 1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    m_c4Len = c4Len1 + c4Len2 + 1;
-    m_pszBuf[m_c4Len] = kCIDLib::chNull;
-}
-
-TStrCat::TStrCat(TStrCat&& scatSrc) :
-
-    m_c4Len(0)
-    , m_pszBuf(nullptr)
-{
-    *this = tCIDLib::ForceMove(scatSrc);
-}
-
-// If by chance we never got to give it away, delete it
-TStrCat::~TStrCat()
-{
-    delete [] m_pszBuf;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TStrCat: Public operators
-// ---------------------------------------------------------------------------
-TStrCat& TStrCat::operator=(TStrCat&& scatSrc)
-{
-    if (&scatSrc != this)
-    {
-        tCIDLib::Swap(m_c4Len, scatSrc.m_c4Len);
-        tCIDLib::Swap(m_pszBuf, scatSrc.m_pszBuf);
-    }
-    return *this;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TStrCat: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-
-// The string calls this to steal our buffer
-tCIDLib::TCh* TStrCat::pszStealBuf(tCIDLib::TCard4& c4Len) const
-{
-    tCIDLib::TCh* pszRet = m_pszBuf;
-    m_pszBuf = nullptr;
-    c4Len = m_c4Len;
-    m_c4Len = 0;
-    return pszRet;
-}
-
-
-
-
-
 
 // ---------------------------------------------------------------------------
 //   CLASS: TString
@@ -308,7 +71,7 @@ tCIDLib::TCh* TStrCat::pszStealBuf(tCIDLib::TCard4& c4Len) const
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TString: Public, static data
+//  TString: Public, static methods
 // ---------------------------------------------------------------------------
 
 //
@@ -793,17 +556,160 @@ tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
 }
 
 
+TString TString::strConcat(const TString& str1, const TString& str2)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+TString TString::strConcat(const  TString& str1, const TString& str2, const TString& str3)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
+    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + c4Len3;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat( const   TString&    str1
+                            , const TString&    str2
+                            , const TString&    str3
+                            , const TString&    str4)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
+    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
+    const tCIDLib::TCard4 c4Len4 = str4.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + c4Len4 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2 + c4Len3], str4.pszBuffer(), c4Len4 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + c4Len3 + c4Len4;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat(const TString& str1, const tCIDLib::TCh chSep)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + 2];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + 1;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat( const   TString&        str1
+                            , const tCIDLib::TCh    chSep
+                            , const TString&        str2)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + 1], str2.pszBuffer(), c4Len2 *  kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + 1;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat(const TString& str1, const tCIDLib::TCh* const psz2)
+{
+    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
+    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat(const tCIDLib::TCh* const psz1, const TString& str2)
+{
+    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
+    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 *  kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat(const tCIDLib::TCh* const psz1, const tCIDLib::TCh* const psz2)
+{
+    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
+    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
+
+    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
+TString TString::strConcat( const   tCIDLib::TCh* const psz1
+                            , const tCIDLib::TCh        chSep
+                            , const tCIDLib::TCh* const psz2)
+{
+    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
+    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
+    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
+
+    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + 1], psz2, c4Len2 * kCIDLib::c4CharBytes);
+
+    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + 1;
+    pszBuf[c4FullLen] = kCIDLib::chNull;
+    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
+}
+
+
 const TString& TString::strEmpty()
 {
     static TString strEmpty;
     return strEmpty;
 }
 
-
-
-// ---------------------------------------------------------------------------
-//  TString: Public, static methods
-// ---------------------------------------------------------------------------
 TString& TString::Nul_TString()
 {
     static TString strNull;
@@ -1021,36 +927,6 @@ TString::TString(const tCIDLib::TSCh* const pszInit) :
         Set(kCIDLib::pszNullStr);
     else
         SetFromShort(pszInit);
-}
-
-
-//
-//  We steal his buffer and adopt it. Deal with the possibility that we get a
-//  used one (already nulled.) We will allocate the buffer one larger for the
-//  null as we need it.
-//
-TString::TString(const TStrCat& scatSrc) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
-{
-    tCIDLib::TCard4 c4SrcLen;
-    m_pszBuffer = scatSrc.pszStealBuf(c4SrcLen);
-
-    // If we get a used one, then set up an empty string
-    if (!m_pszBuffer)
-    {
-        m_c4CurEnd = 0;
-        m_c4BufChars = 1;
-        m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-        *m_pszBuffer = kCIDLib::chNull;
-    }
-     else
-    {
-        m_c4BufChars = c4SrcLen;
-        m_c4CurEnd = c4SrcLen;
-    }
 }
 
 TString::TString(const TString& strSrc) :

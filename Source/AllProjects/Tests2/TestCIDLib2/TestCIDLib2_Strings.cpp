@@ -859,7 +859,7 @@ TTest_StringCat::TTest_StringCat() :
 
     TTestFWTest
     (
-        L"String Cat", L"Tests concatenator helper class", 2
+        L"String Cat", L"Tests concatenation helper", 2
     )
 {
 }
@@ -886,63 +886,63 @@ TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
     const tCIDLib::TCh* const pszSrc1(L"abc");
     const tCIDLib::TCh* const pszSrc2(L"def");
 
-    const TString strTest1(TStrCat(strSrc1, strSrc2));
+    const TString strTest1(TString::strConcat(strSrc1, strSrc2));
     if (strTest1 != L"ABCDEF")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"2 String cat helper failed\n";
     }
 
-    const TString strTest2(TStrCat(strSrc1, strSrc2, strSrc3));
+    const TString strTest2(TString::strConcat(strSrc1, strSrc2, strSrc3));
     if (strTest2 != L"ABCDEFGHI")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"3 String cat helper failed\n";
     }
 
-    const TString strTest3(TStrCat(strSrc1, strSrc2, strSrc3, strSrc4));
+    const TString strTest3(TString::strConcat(strSrc1, strSrc2, strSrc3, strSrc4));
     if (strTest3 != L"ABCDEFGHIJKL")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"4 String cat helper failed\n";
     }
 
-    const TString strTest4(TStrCat(strSrc1, kCIDLib::chDollarSign));
+    const TString strTest4(TString::strConcat(strSrc1, kCIDLib::chDollarSign));
     if (strTest4 != L"ABC$")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"String/TCh cat helper failed\n";
     }
 
-    const TString strTest5(TStrCat(strSrc1, kCIDLib::chPeriod, strSrc2));
+    const TString strTest5(TString::strConcat(strSrc1, kCIDLib::chPeriod, strSrc2));
     if (strTest5 != L"ABC.DEF")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TString/TCh/TString cat helper failed\n";
     }
 
-    const TString strTest6(TStrCat(strSrc1, pszSrc2));
+    const TString strTest6(TString::strConcat(strSrc1, pszSrc2));
     if (strTest6 != L"ABCdef")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"String/TCh* cat helper failed\n";
     }
 
-    const TString strTest7(TStrCat(pszSrc1, strSrc2));
+    const TString strTest7(TString::strConcat(pszSrc1, strSrc2));
     if (strTest7 != L"abcDEF")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TCh*/String cat helper failed\n";
     }
 
-    const TString strTest8(TStrCat(pszSrc1, pszSrc2));
+    const TString strTest8(TString::strConcat(pszSrc1, pszSrc2));
     if (strTest8 != L"abcdef")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TCh*/TCh* cat helper failed\n";
     }
 
-    const TString strTest9(TStrCat(pszSrc1, kCIDLib::chAmpersand, pszSrc2));
+    const TString strTest9(TString::strConcat(pszSrc1, kCIDLib::chAmpersand, pszSrc2));
     if (strTest9 != L"abc&def")
     {
         eRes = tTestFWLib::ETestRes::Failed;
@@ -950,23 +950,22 @@ TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
     }
 
 
-
     // Should handle nulls
-    const TString strTest15(TStrCat(nullptr, strSrc1));
+    const TString strTest15(TString::strConcat(nullptr, strSrc1));
     if (strTest15 != L"ABC")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"null/TString cat helper failed\n";
     }
 
-    const TString strTest16(TStrCat(strSrc2, nullptr));
+    const TString strTest16(TString::strConcat(strSrc2, nullptr));
     if (strTest16 != L"DEF")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TString/null cat helper failed\n";
     }
 
-    const TString strTest17(TStrCat(nullptr, nullptr));
+    const TString strTest17(TString::strConcat(nullptr, nullptr));
     if (!strTest17.bIsEmpty())
     {
         eRes = tTestFWLib::ETestRes::Failed;
@@ -975,21 +974,21 @@ TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
 
 
     // Should handle empty strings
-    const TString strTest20(TStrCat(L"", pszSrc1));
+    const TString strTest20(TString::strConcat(L"", pszSrc1));
     if (strTest20 != L"abc")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Empty/TCh* cat helper failed\n";
     }
 
-    const TString strTest21(TStrCat(pszSrc2, L""));
+    const TString strTest21(TString::strConcat(pszSrc2, L""));
     if (strTest21 != L"def")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TCh*/Empty cat helper failed\n";
     }
 
-    const TString strTest22(TStrCat(TString::strEmpty(), TString::strEmpty()));
+    const TString strTest22(TString::strConcat(TString::strEmpty(), TString::strEmpty()));
     if (!strTest22.bIsEmpty())
     {
         eRes = tTestFWLib::ETestRes::Failed;

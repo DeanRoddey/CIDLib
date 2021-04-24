@@ -67,123 +67,6 @@ class   TString;
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 
-// ---------------------------------------------------------------------------
-//  CLASS: TStrCat
-// PREFIX: scat
-//
-//  Exists purely to be passed to the ctor of a string, in order to concatenate
-//  multiple string together. We build up the raw string buffer, and the string
-//  object steals it, leaving us with a null.
-//
-//  This is necessary because multiple strings conflicts with the token replacement
-//  scheme (because TString implements MFormattable which all of the token
-//  replacement parametres are.)
-// ---------------------------------------------------------------------------
-class CIDLIBEXP TStrCat
-{
-    public :
-        // -------------------------------------------------------------------
-        //  Constructors and Destructor.
-        // -------------------------------------------------------------------
-        TStrCat() = delete;
-
-        TStrCat(const TStrCat&) = delete;
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const TString&                str2
-        );
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const TString&                str2
-            , const TString&                str3
-        );
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const TString&                str2
-            , const TString&                str3
-            , const TString&                str4
-        );
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh            chSep
-        );
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh            chSep
-            , const TString&                str2
-        );
-
-        TStrCat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const TString&                str2
-        );
-
-        TStrCat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh* const     psz2
-        );
-
-        TStrCat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const tCIDLib::TCh* const     psz2
-        );
-
-        TStrCat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const tCIDLib::TCh            chSep
-            , const tCIDLib::TCh* const     psz2
-        );
-
-        TStrCat
-        (
-                    TStrCat&&               scatSrc
-        );
-
-        ~TStrCat();
-
-
-        // -------------------------------------------------------------------
-        //  Public operators
-        // -------------------------------------------------------------------
-        TStrCat& operator=(const TStrCat&) = delete;
-
-        TStrCat& operator=
-        (
-                    TStrCat&&               scatSrc
-        );
-
-
-        // -------------------------------------------------------------------
-        //  Public, non-virtual methods
-        // -------------------------------------------------------------------
-        [[nodiscard]] tCIDLib::TCh* pszStealBuf
-        (
-                    tCIDLib::TCard4&        c4Len
-        )   const;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Private data members
-        // -------------------------------------------------------------------
-        mutable tCIDLib::TCard4 m_c4Len;
-        mutable tCIDLib::TCh*   m_pszBuf;
-};
-
 
 // ---------------------------------------------------------------------------
 //  CLASS: TString
@@ -295,6 +178,65 @@ class CIDLIBEXP TString :
 
         static const TString& strEmpty();
 
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const TString&                str2
+        );
+
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const TString&                str2
+            , const TString&                str3
+        );
+
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const TString&                str2
+            , const TString&                str3
+            , const TString&                str4
+        );
+
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const tCIDLib::TCh            chSep
+        );
+
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const tCIDLib::TCh            chSep
+            , const TString&                str2
+        );
+
+        static TString strConcat
+        (
+            const   tCIDLib::TCh* const     psz1
+            , const TString&                str2
+        );
+
+        static TString strConcat
+        (
+            const   TString&                str1
+            , const tCIDLib::TCh* const     psz2
+        );
+
+        static TString strConcat
+        (
+            const   tCIDLib::TCh* const     psz1
+            , const tCIDLib::TCh* const     psz2
+        );
+
+        static TString strConcat
+        (
+            const   tCIDLib::TCh* const     psz1
+            , const tCIDLib::TCh            chSep
+            , const tCIDLib::TCh* const     psz2
+        );
+
 
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
@@ -381,11 +323,6 @@ class CIDLIBEXP TString :
 
         TString
         (
-            const   TStrCat&                scatSrc
-        );
-
-        TString
-        (
             const   TString&                strSrc
         );
 
@@ -398,6 +335,7 @@ class CIDLIBEXP TString :
         (
             const   TKrnlString&            kstrSrc
         );
+
         TString
         (
                     TKrnlString&&           kstrSrc
@@ -1459,6 +1397,24 @@ class CIDLIBEXP TString :
         (
             const   tCIDLib::TCh            chToXlat
         );
+
+
+        // -------------------------------------------------------------------
+        //  Private constructor, for use by the strConcat static methods. We add a
+        //  bogus parameter to make sure it doesn't clash with any public ones. The
+        //  buffer is adopted and is allocated to the indicated length, and will
+        //  be null terminated.
+        // -------------------------------------------------------------------
+        enum EBogusCtorParm { x };
+        TString(        tCIDLib::TCh* const     pszToAdopt
+                , const tCIDLib::TCard4         c4BufLen
+                , const EBogusCtorParm          eBogus) :
+
+            m_c4BufChars(c4BufLen)
+            , m_c4CurEnd(c4BufLen)
+            , m_pszBuffer(pszToAdopt)
+        {
+        }
 
 
         // -------------------------------------------------------------------

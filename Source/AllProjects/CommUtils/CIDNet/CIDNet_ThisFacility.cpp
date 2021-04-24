@@ -186,8 +186,8 @@ TFacCIDNet::ParseMultiPartMIME( const   TMemBuf&            mbufSrc
     }
 
     // Build up the start/end versions of the boundary
-    const TString strBStart(TStrCat(L"--", strBoundary));
-    const TString strBEnd(TStrCat(strBStart, L"--"));
+    const TString strBStart = TString::strConcat(L"--", strBoundary);
+    const TString strBEnd = TString::strConcat(strBStart, L"--");
 
     //
     //  Create a simple binary version of the start and end boundary strings. We'll

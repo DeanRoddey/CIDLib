@@ -1046,7 +1046,7 @@ TAttrEditWnd::bVisEdit(         TAttrData&      adatEdit
         //  Just pop up a little multi-line editor based dialog to let them
         //  edit the text.
         //
-        TString strTitle(TStrCat(L"Edit Attribute: ", adatEdit.strName()));
+        TString strTitle = TString::strConcat(L"Edit Attribute: ", adatEdit.strName());
         TString strNew;
         if (facCIDWUtils().bEditText(*this, strTitle, adatEdit.strValue(), strNew, kCIDLib::True))
             adatEdit.SetString(strNew);
@@ -1119,7 +1119,7 @@ TAttrEditWnd::bVisEdit(         TAttrData&      adatEdit
         }
          else
         {
-            TString strTitle(TStrCat(L"Edit Attribute: ", adatEdit.strName()));
+            TString strTitle = TString::strConcat(L"Edit Attribute: ", adatEdit.strName());
             TString strNew;
 
             // Call the appropriate editor based on single or multi-line limit
@@ -1146,7 +1146,7 @@ TAttrEditWnd::bVisEdit(         TAttrData&      adatEdit
         //  We provide a dialog box that lets them set the time via a set of combo
         //  boxes where they set hours, minutes, and seconds.
         //
-        TString strTitle(TStrCat(L"Edit Attribute: ", adatEdit.strName()));
+        TString strTitle = TString::strConcat(L"Edit Attribute: ", adatEdit.strName());
         tCIDLib::TEncodedTime enctEdit = adatEdit.enctVal();
         if (facCIDWUtils().bEditTime(*this, strTitle, enctEdit))
             adatEdit.SetTime(enctEdit);
@@ -1912,7 +1912,7 @@ tCIDLib::TVoid TAttrEditWnd::EditValue(const tCIDLib::TCard4 c4Item)
         TErrBox msgbErr
         (
             L"Attribute Editor"
-            , TStrCat
+            , TString::strConcat
               (
                 L"No editor is available for data type: "
                 , tCIDMData::strXlatEAttrTypes(adatTar.eType())
@@ -1995,7 +1995,7 @@ tCIDLib::TVoid TAttrEditWnd::VisEdit(const tCIDLib::TCard4 c4Item)
         TErrBox msgbErr
         (
             L"Attribute Editor"
-            , TStrCat
+            , TString::strConcat
               (
                 L"No visual editor is available for data type: "
                 , tCIDMData::strXlatEAttrTypes(adatTar.eType())

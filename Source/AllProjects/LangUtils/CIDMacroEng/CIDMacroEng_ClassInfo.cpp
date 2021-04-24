@@ -953,7 +953,7 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
     , m_colMethodImpls(tCIDLib::EAdoptOpts::Adopt, 16)
     , m_eExtend(eExtend)
     , m_strBasePath(strBasePath)
-    , m_strClassPath(TStrCat(strBasePath, kCIDLib::chPeriod, strName))
+    , m_strClassPath(TString::strConcat(strBasePath, kCIDLib::chPeriod, strName))
     , m_strName(strName)
     , m_strParentClassPath(strParentClassPath)
 {
@@ -986,7 +986,7 @@ TMEngClassInfo::TMEngClassInfo( const   TString&                strName
     , m_colMethodImpls(tCIDLib::EAdoptOpts::Adopt, 16)
     , m_eExtend(eExtend)
     , m_strBasePath(strBasePath)
-    , m_strClassPath(TStrCat(strBasePath, kCIDLib::chPeriod, strName))
+    , m_strClassPath(TString::strConcat(strBasePath, kCIDLib::chPeriod, strName))
     , m_strName(strName)
     , m_strParentClassPath(pszParentClassPath)
 {
