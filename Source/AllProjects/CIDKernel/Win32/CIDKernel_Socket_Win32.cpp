@@ -858,7 +858,7 @@ tCIDLib::TBoolean TKrnlSocket::bAccept( TKrnlIPAddr&            kipaClient
 tCIDLib::TBoolean TKrnlSocket::bAssociateReadEvent(TKrnlEvent& kevToSignal)
 {
     if (::WSAEventSelect(m_hsockThis.m_phsockiThis->hSock
-                        , kevToSignal.hevThis().m_pheviThis->hEvent
+                        , *tCIDLib::pReCastPtr<HANDLE>(kevToSignal.pHandle())
                         , FD_READ | FD_CLOSE))
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
@@ -959,7 +959,7 @@ TKrnlSocket::bBindForRemote(const   TKrnlIPAddr&        kipaTarAddr
 tCIDLib::TBoolean TKrnlSocket::bClearReadEvent(TKrnlEvent& kevToClear)
 {
     if (::WSAEventSelect(m_hsockThis.m_phsockiThis->hSock
-                        , kevToClear.hevThis().m_pheviThis->hEvent
+                        , *tCIDLib::pReCastPtr<HANDLE>(kevToClear.pHandle())
                         , 0))
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();
@@ -1169,7 +1169,7 @@ TKrnlSocket::bEnumEvents(TKrnlEvent& kevReset, tCIDSock::ESockEvs& eToFill)
 {
     WSANETWORKEVENTS Events;
     if (::WSAEnumNetworkEvents( m_hsockThis.m_phsockiThis->hSock
-                                , kevReset.hevThis().m_pheviThis->hEvent
+                                , *tCIDLib::pReCastPtr<HANDLE>(kevReset.pHandle())
                                 , &Events))
     {
         tCIDLib::TCard4 c4LastErr = ::WSAGetLastError();

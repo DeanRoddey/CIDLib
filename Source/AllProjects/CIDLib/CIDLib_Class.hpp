@@ -227,7 +227,7 @@ class CIDLIBEXP TClass :
 
         TString strClassName() const;
 
-        const tCIDLib::TCh* pszClassName() const;
+        const tCIDLib::TCh* pszClassName() const noexcept;
 
 
     protected   :

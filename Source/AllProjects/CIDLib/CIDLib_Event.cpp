@@ -114,7 +114,7 @@ TEvent::TEvent( const   tCIDLib::EEventStates   eInitState
 
 TEvent::TEvent( const   TResourceName&          rsnToUse
                 , const tCIDLib::EEventStates   eInitState
-                , const tCIDLib::ECreateActs eAction
+                , const tCIDLib::ECreateActs    eAction
                 , const tCIDLib::TBoolean       bManual) :
 
     m_bNamed(kCIDLib::True)
@@ -128,7 +128,7 @@ TEvent::TEvent( const   TResourceName&          rsnToUse
 TEvent::TEvent( const   TResourceName&          rsnToUse
                 ,       tCIDLib::TBoolean&      bCreated
                 , const tCIDLib::EEventStates   eInitState
-                , const tCIDLib::ECreateActs eAction
+                , const tCIDLib::ECreateActs    eAction
                 , const tCIDLib::TBoolean       bManual) :
 
     m_bNamed(kCIDLib::True)

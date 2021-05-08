@@ -33,7 +33,7 @@ ERRORS=
 
     ; Regular expression errors
     errcRegEx_NoPattern         2900    The regular expression has not been set yet
-    errcRegEx_EmptyPattern      2901    The new regular expression is empty
+    errcRegEx_MustReset         2901    The regular expression engine must be reset before you can reuse it
     errcRegEx_NoStatesYet       2902    There are no states in the NFA to update
     errcRegEx_StateOverflow     2903    Overflowed the NFA state arrays. Max States=%(1)
     errcRegEx_UnexpectedEOP     2904    Unexpected end of regular expression pattern
@@ -49,7 +49,6 @@ ERRORS=
     errcRegEx_ExpectedExpr      2914    Expected "|<expr>" at offset %(1) of RegEx pattern
     errcRegEx_ZeroMaxElems      2915    Cannot set the NFA maximum states to zero
     errcRegEx_NoMatcher         2916    There is no matcher object associated with an epsilon state
-    errcRegEx_MustReset         2917    The regular expression engine must be reset before you can reuse it
 
 END ERRORS
 

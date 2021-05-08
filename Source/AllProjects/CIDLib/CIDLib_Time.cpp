@@ -763,7 +763,7 @@ const TString& TTime::strTimeZoneName()
             tCIDLib::TInt4 i4TZOfs = 0;
             tCIDLib::TZStr64 szTZName = L"";
             if (!TKrnlTimeStamp::bTZOffset(i4TZOfs)
-            ||  !TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName)))
+            ||  !TKrnlTimeStamp::bTZName(szTZName, tCIDLib::c4MaxBufChars(szTZName)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -789,7 +789,7 @@ const TString& TTime::strTimeZoneName()
         if (i4NewOfs != CIDLib_Time::atomLastTZ.i4Value())
         {
             tCIDLib::TZStr64 szTZName;
-            if (!TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName)))
+            if (!TKrnlTimeStamp::bTZName(szTZName, tCIDLib::c4MaxBufChars(szTZName)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -2305,7 +2305,7 @@ TTime::FormatToStr(         TString&                strToWriteTo
             {
                 // The local time zone designation
                 tCIDLib::TZStr64 szTZName;
-                TKrnlTimeStamp::bTZName(szTZName, c4MaxBufChars(szTZName));
+                TKrnlTimeStamp::bTZName(szTZName, tCIDLib::c4MaxBufChars(szTZName));
                 strBuild.eReplaceToken(szTZName, kCIDLib::chLatin_T);
                 break;
             }

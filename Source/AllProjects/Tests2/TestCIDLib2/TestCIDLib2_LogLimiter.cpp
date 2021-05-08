@@ -69,7 +69,7 @@ TTest_LogLimiter::eRunTest(  TTextStringOutStream&   strmOut
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-    // Get an object and set the threshold to 1 seconds so that we can do this quickly
+    // Get an object and set the threshold to 2 seconds so that we can do this quickly
     TLogLimiter loglimTest(1);
 
     // Create some error objects to test with
@@ -78,7 +78,7 @@ TTest_LogLimiter::eRunTest(  TTextStringOutStream&   strmOut
         L"MyFacility"
         , L"SomeFile"
         , 1
-        , 1000
+        , 2000
         , L"Some error"
         , L"Some aux text"
         , tCIDLib::ESeverities::Failed

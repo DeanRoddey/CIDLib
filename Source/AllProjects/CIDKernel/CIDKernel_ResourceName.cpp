@@ -43,106 +43,116 @@
 // ---------------------------------------------------------------------------
 //  TKrnlRscName: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TKrnlRscName::TKrnlRscName() :
-
-    m_pidOfName(kCIDLib::pidInvalid)
-    , m_pszCompany(0)
-    , m_pszSubsystem(0)
-    , m_pszResource(0)
-{
-    m_pszCompany = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
-    m_pszSubsystem = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
-    m_pszResource = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
-}
-
 TKrnlRscName::TKrnlRscName( const   tCIDLib::TCh* const pszCompany
                             , const tCIDLib::TCh* const pszSubsystem
                             , const tCIDLib::TCh* const pszResource
                             , const tCIDLib::TProcessId pidOfName) :
     m_pidOfName(pidOfName)
-    , m_pszCompany(0)
-    , m_pszSubsystem(0)
-    , m_pszResource(0)
 {
     m_pszCompany = TRawStr::pszReplicate(pszCompany);
     m_pszSubsystem = TRawStr::pszReplicate(pszSubsystem);
     m_pszResource = TRawStr::pszReplicate(pszResource);
 }
 
-TKrnlRscName::TKrnlRscName(const TKrnlRscName& krscnToCopy) :
+TKrnlRscName::TKrnlRscName(const TKrnlRscName& krscnSrc) :
 
-    m_pidOfName(krscnToCopy.m_pidOfName)
-    , m_pszCompany(0)
-    , m_pszSubsystem(0)
-    , m_pszResource(0)
+    m_pidOfName(krscnSrc.m_pidOfName)
 {
-    m_pszCompany = TRawStr::pszReplicate(krscnToCopy.m_pszCompany);
-    m_pszSubsystem = TRawStr::pszReplicate(krscnToCopy.m_pszSubsystem);
-    m_pszResource = TRawStr::pszReplicate(krscnToCopy.m_pszResource);
+    if (krscnSrc.m_pszCompany != nullptr)
+        m_pszCompany = TRawStr::pszReplicate(krscnSrc.m_pszCompany);
+    if (krscnSrc.m_pszSubsystem != nullptr)
+        m_pszSubsystem = TRawStr::pszReplicate(krscnSrc.m_pszSubsystem);
+    if (krscnSrc.m_pszResource != nullptr)
+        m_pszResource = TRawStr::pszReplicate(krscnSrc.m_pszResource);
 }
+
+TKrnlRscName::TKrnlRscName(TKrnlRscName&& krscnSrc) :
+
+    m_pidOfName(kCIDLib::pidInvalid)
+{
+    *this = tCIDLib::ForceMove(krscnSrc);
+}
+
 
 TKrnlRscName::~TKrnlRscName()
 {
     delete [] m_pszCompany;
-    m_pszCompany = 0;
+    m_pszCompany = nullptr;
     delete [] m_pszSubsystem;
-    m_pszCompany = 0;
+    m_pszCompany = nullptr;
     delete [] m_pszResource;
-    m_pszResource = 0;
+    m_pszResource = nullptr;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TKrnlRscName: Public operators
 // ---------------------------------------------------------------------------
-TKrnlRscName& TKrnlRscName::operator=(const TKrnlRscName& krscnToAssign)
+TKrnlRscName& TKrnlRscName::operator=(const TKrnlRscName& krscnSrc)
 {
-    if (this == &krscnToAssign)
+    if (this == &krscnSrc)
         return *this;
 
-    m_pidOfName = krscnToAssign.m_pidOfName;
+    m_pidOfName = krscnSrc.m_pidOfName;
 
     // Clean up our current strings
     delete [] m_pszCompany;
-    m_pszCompany = 0;
+    m_pszCompany = nullptr;
     delete [] m_pszSubsystem;
-    m_pszSubsystem = 0;
+    m_pszSubsystem = nullptr;
     delete [] m_pszResource;
-    m_pszResource = 0;
+    m_pszResource = nullptr;
 
     // Now replicate the source strings
-    m_pszCompany = TRawStr::pszReplicate(krscnToAssign.m_pszCompany);
-    m_pszSubsystem = TRawStr::pszReplicate(krscnToAssign.m_pszSubsystem);
-    m_pszResource = TRawStr::pszReplicate(krscnToAssign.m_pszResource);
+    if (krscnSrc.m_pszCompany != nullptr)
+        m_pszCompany = TRawStr::pszReplicate(krscnSrc.m_pszCompany);
+    if (krscnSrc.m_pszSubsystem != nullptr)
+        m_pszSubsystem = TRawStr::pszReplicate(krscnSrc.m_pszSubsystem);
+    if (krscnSrc.m_pszResource != nullptr)
+        m_pszResource = TRawStr::pszReplicate(krscnSrc.m_pszResource);
 
     return *this;
 }
 
-tCIDLib::TBoolean
-TKrnlRscName::operator==(const TKrnlRscName& krscnToCompare) const
+TKrnlRscName& TKrnlRscName::operator=(TKrnlRscName&& krscnSrc)
 {
-    if (this == &krscnToCompare)
+    if (this != &krscnSrc)
+    {
+        tCIDLib::Swap(m_pidOfName, krscnSrc.m_pidOfName);
+        tCIDLib::Swap(m_pszCompany, krscnSrc.m_pszCompany);
+        tCIDLib::Swap(m_pszSubsystem, krscnSrc.m_pszSubsystem);
+        tCIDLib::Swap(m_pszResource, krscnSrc.m_pszResource);
+    }
+    return *this;
+}
+
+
+tCIDLib::TBoolean TKrnlRscName::operator==(const TKrnlRscName& krscnSrc) const
+{
+    if (this == &krscnSrc)
         return kCIDLib::True;
 
     // Compare the PID first since its fast
-    if (m_pidOfName != krscnToCompare.m_pidOfName)
+    if (m_pidOfName != krscnSrc.m_pidOfName)
         return kCIDLib::False;
 
-    // Then compare in the order that they are most likely to differe
-    if (!TRawStr::bCompareStr(m_pszResource, krscnToCompare.m_pszResource))
+    //
+    //  Then compare in the order that they are most likely to differ. We use the safe
+    //  compare since either side could be null.
+    //
+    if (!TRawStr::bCompareStrSafe(m_pszResource, krscnSrc.m_pszResource))
         return kCIDLib::False;
 
-    if (!TRawStr::bCompareStr(m_pszSubsystem, krscnToCompare.m_pszSubsystem))
+    if (!TRawStr::bCompareStrSafe(m_pszSubsystem, krscnSrc.m_pszSubsystem))
         return kCIDLib::False;
 
-    if (!TRawStr::bCompareStr(m_pszCompany, krscnToCompare.m_pszCompany))
+    if (!TRawStr::bCompareStrSafe(m_pszCompany, krscnSrc.m_pszCompany))
         return kCIDLib::False;
 
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean
-TKrnlRscName::operator!=(const TKrnlRscName& krsnToCompare) const
+tCIDLib::TBoolean TKrnlRscName::operator!=(const TKrnlRscName& krsnToCompare) const
 {
     return !operator==(krsnToCompare);
 }
@@ -153,6 +163,9 @@ TKrnlRscName::operator!=(const TKrnlRscName& krsnToCompare) const
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TKrnlRscName::bIsValid() const
 {
+    if (!m_pszResource || !m_pszSubsystem || !m_pszCompany)
+        return kCIDLib::False;
+
     // If any substring is empty, its not valid
     if (!m_pszCompany[0] || !m_pszSubsystem[0] || !m_pszResource[0])
         return kCIDLib::False;
@@ -166,16 +179,19 @@ tCIDLib::TProcessId TKrnlRscName::pidOfName() const
 
 const tCIDLib::TCh* TKrnlRscName::pszCompanyName() const
 {
+    FaultInStrs();
     return m_pszCompany;
 }
 
 const tCIDLib::TCh* TKrnlRscName::pszSubsystemName() const
 {
+    FaultInStrs();
     return m_pszSubsystem;
 }
 
 const tCIDLib::TCh* TKrnlRscName::pszResourceName() const
 {
+    FaultInStrs();
     return m_pszResource;
 }
 
@@ -188,11 +204,11 @@ TKrnlRscName::SetName(  const   tCIDLib::TCh* const     pszCompany
 {
     // Free the existing strings
     delete [] m_pszCompany;
-    m_pszCompany = 0;
+    m_pszCompany = nullptr;
     delete [] m_pszSubsystem;
-    m_pszSubsystem = 0;
+    m_pszSubsystem = nullptr;
     delete [] m_pszResource;
-    m_pszResource = 0;
+    m_pszResource = nullptr;
 
     // Now replicate the source strings
     m_pszCompany = TRawStr::pszReplicate(pszCompany);
@@ -202,3 +218,18 @@ TKrnlRscName::SetName(  const   tCIDLib::TCh* const     pszCompany
     m_pidOfName = pidToFormat;
 }
 
+
+// ---------------------------------------------------------------------------
+//  TKrnlRscName: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TKrnlRscName::FaultInStrs() const
+{
+    if (m_pszCompany == nullptr)
+        m_pszCompany = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
+
+    if (m_pszSubsystem == nullptr)
+        m_pszSubsystem = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
+
+    if (m_pszResource == nullptr)
+        m_pszResource = TRawStr::pszReplicate(kCIDLib::pszEmptyZStr);
+}

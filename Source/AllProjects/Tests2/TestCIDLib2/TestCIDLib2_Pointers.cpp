@@ -383,6 +383,9 @@ TTest_MemberPtr1::eRunTest(  TTextStringOutStream&   strmOut
         return tTestFWLib::ETestRes::Failed;
     }
 
+    // This should cause a static assert. No polymorphism allowed for this one
+    // TMemberPtr<TString> mbptrTest = tCIDLib::mbptrMakeNew<TPathStr>(L"Test");
+
     return tTestFWLib::ETestRes::Success;
 }
 

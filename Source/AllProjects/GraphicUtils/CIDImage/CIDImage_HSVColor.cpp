@@ -48,7 +48,7 @@ RTTIDecls(THSVClr,TObject)
 // ---------------------------------------------------------------------------
 //  THSVClr: Public, static methods
 // ---------------------------------------------------------------------------
-THSVClr& THSVClr::Nul_THSVClr()
+THSVClr& THSVClr::Nul_THSVClr() noexcept
 {
     static THSVClr hsvNull;
     return hsvNull;

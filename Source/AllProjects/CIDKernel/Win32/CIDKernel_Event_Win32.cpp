@@ -35,108 +35,12 @@
 
 
 // ---------------------------------------------------------------------------
-//   CLASS: TEventHandle
-//  PREFIX: hev
+//  Define our implementation of the event data
 // ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TEventHandle: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TEventHandle::TEventHandle() :
-
-    m_pheviThis(nullptr)
+struct TKrnlEvent::TEventData
 {
-    m_pheviThis = new TEventHandleImpl;
-    m_pheviThis->hEvent = 0;
-}
-
-TEventHandle::TEventHandle(const TEventHandle& hevSrc) :
-
-    m_pheviThis(nullptr)
-{
-    m_pheviThis = new TEventHandleImpl;
-    m_pheviThis->hEvent = hevSrc.m_pheviThis->hEvent;
-}
-
-TEventHandle::TEventHandle(TEventHandle&& hevSrc) :
-
-    TEventHandle()
-{
-    *this = tCIDLib::ForceMove(hevSrc);
-}
-
-TEventHandle::~TEventHandle()
-{
-    delete m_pheviThis;
-    m_pheviThis = nullptr;
-}
-
-
-// -------------------------------------------------------------------
-//  Public operators
-// -------------------------------------------------------------------
-TEventHandle& TEventHandle::operator=(const TEventHandle& hevSrc)
-{
-    if (this != &hevSrc)
-        m_pheviThis->hEvent = hevSrc.m_pheviThis->hEvent;
-    return *this;
-}
-
-TEventHandle& TEventHandle::operator=(TEventHandle&& hevSrc)
-{
-    if (this != &hevSrc)
-        tCIDLib::Swap(m_pheviThis, hevSrc.m_pheviThis);
-    return *this;
-}
-
-
-tCIDLib::TBoolean
-TEventHandle::operator==(const TEventHandle& hevToCompare) const
-{
-    return (m_pheviThis->hEvent == hevToCompare.m_pheviThis->hEvent);
-}
-
-tCIDLib::TBoolean
-TEventHandle::operator!=(const TEventHandle& hevToCompare) const
-{
-    return !operator==(hevToCompare);
-}
-
-
-// -------------------------------------------------------------------
-//  Public, non-virtual methods
-// -------------------------------------------------------------------
-tCIDLib::TBoolean TEventHandle::bIsValid() const
-{
-    return ((m_pheviThis != nullptr) && (m_pheviThis->hEvent != 0));
-}
-
-
-tCIDLib::TVoid TEventHandle::Clear()
-{
-    m_pheviThis->hEvent = 0;
-}
-
-
-tCIDLib::TVoid
-TEventHandle::FormatToStr(          tCIDLib::TCh* const pszToFill
-                            , const tCIDLib::TCard4     c4MaxChars) const
-{
-    TRawStr::bFormatVal
-    (
-        tCIDLib::TCard4(m_pheviThis->hEvent)
-        , pszToFill
-        , c4MaxChars
-        , tCIDLib::ERadices::Hex
-    );
-}
-
-
-const TEventHandleImpl& TEventHandle::heviThis() const
-{
-    return *m_pheviThis;
-}
-
+    HANDLE      m_hEvent;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -158,8 +62,8 @@ TKrnlEvent::bWaitMultiple(          TKrnlEvent&         kevOne
 
     // Set up the array of handles
     HANDLE aHandles[2];
-    aHandles[0] = kevOne.m_hevThis.m_pheviThis->hEvent;
-    aHandles[1] = kevTwo.m_hevThis.m_pheviThis->hEvent;
+    aHandles[0] = kevOne.m_pData->m_hEvent;
+    aHandles[1] = kevTwo.m_pData->m_hEvent;
 
     const tCIDLib::EWaitRes eRes = TKrnlWin32::eWaitHandles
     (
@@ -174,13 +78,15 @@ TKrnlEvent::bWaitMultiple(          TKrnlEvent&         kevOne
 // ---------------------------------------------------------------------------
 TKrnlEvent::TKrnlEvent() :
 
-    m_pszName(nullptr)
+    m_pData(new TEventData{0})
+    , m_pszName(nullptr)
 {
 }
 
 TKrnlEvent::TKrnlEvent(const tCIDLib::TCh* const pszName) :
 
-    m_pszName(nullptr)
+    m_pData(new TEventData{0})
+    , m_pszName(nullptr)
 {
     if (pszName)
         m_pszName = TRawStr::pszReplicate(pszName);
@@ -217,6 +123,9 @@ TKrnlEvent::~TKrnlEvent()
         );
         #endif
     }
+
+    delete m_pData;
+    m_pData->m_hEvent = nullptr;
 }
 
 
@@ -229,7 +138,7 @@ TKrnlEvent& TKrnlEvent::operator=(TKrnlEvent&& kevSrc)
     if (this != &kevSrc)
     {
         tCIDLib::Swap(m_pszName, kevSrc.m_pszName);
-        m_hevThis = tCIDLib::ForceMove(kevSrc.m_hevThis);
+        tCIDLib::Swap(m_pData, kevSrc.m_pData);
     }
     return *this;
 }
@@ -241,14 +150,13 @@ tCIDLib::TBoolean TKrnlEvent::bClose()
 {
     if (bIsValid())
     {
-        if (!::CloseHandle(m_hevThis.m_pheviThis->hEvent))
+        if (!::CloseHandle(m_pData->m_hEvent))
         {
             TKrnlError::SetLastHostError(::GetLastError());
             return kCIDLib::False;
         }
     }
-    if (m_hevThis.m_pheviThis)
-        m_hevThis.m_pheviThis->hEvent = 0;
+    m_pData->m_hEvent = 0;
     return kCIDLib::True;
 }
 
@@ -269,17 +177,10 @@ TKrnlEvent::bCreate(const   tCIDLib::EEventStates   eInitState
         return bCreateNamed(eInitState, kCIDLib::True, bManual, bDummy);
     }
 
-    // Make sure we've not been destructed already!
-    if (!m_hevThis.m_pheviThis)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotInitialized);
-        return kCIDLib::False;
-    }
-
     DWORD ManFlag = (bManual == kCIDLib::True);
     DWORD InitFlag = (eInitState == tCIDLib::EEventStates::Triggered);
-    m_hevThis.m_pheviThis->hEvent = ::CreateEvent(0, ManFlag, InitFlag, 0);
-    if (!m_hevThis.m_pheviThis->hEvent)
+    m_pData->m_hEvent = ::CreateEvent(0, ManFlag, InitFlag, 0);
+    if (!m_pData->m_hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -290,13 +191,6 @@ TKrnlEvent::bCreate(const   tCIDLib::EEventStates   eInitState
 
 tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
 {
-    // Make sure we've not been destructed already!
-    if (!m_hevThis.m_pheviThis)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotInitialized);
-        return kCIDLib::False;
-    }
-
     // Close this event if open
     if (!bClose())
         return kCIDLib::False;
@@ -312,10 +206,10 @@ tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
     // Duplicate the handle
     const BOOL bRes = ::DuplicateHandle
     (
-        kevToDup.m_hevThis.m_pheviThis->hEvent
+        kevToDup.m_pData->m_hEvent
         , GetCurrentProcess()
         , GetCurrentProcess()
-        , &m_hevThis.m_pheviThis->hEvent
+        , &m_pData->m_hEvent
         , 0
         , 0
         , DUPLICATE_SAME_ACCESS
@@ -327,6 +221,12 @@ tCIDLib::TBoolean TKrnlEvent::bDuplicate(const TKrnlEvent& kevToDup)
         return kCIDLib::False;
     }
     return kCIDLib::True;
+}
+
+
+tCIDLib::TBoolean TKrnlEvent::bIsValid() const noexcept
+{
+    return m_pData->m_hEvent != 0;
 }
 
 
@@ -344,15 +244,8 @@ tCIDLib::TBoolean TKrnlEvent::bOpen()
         return kCIDLib::False;
     }
 
-    // Make sure we've not been destructed already!
-    if (!m_hevThis.m_pheviThis)
-    {
-        TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_NotInitialized);
-        return kCIDLib::False;
-    }
-
-    m_hevThis.m_pheviThis->hEvent = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
-    if (!m_hevThis.m_pheviThis->hEvent)
+    m_pData->m_hEvent = ::OpenEvent(EVENT_ALL_ACCESS | SYNCHRONIZE, 0, m_pszName);
+    if (!m_pData->m_hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -390,7 +283,7 @@ tCIDLib::TBoolean TKrnlEvent::bPulse()
         return kCIDLib::False;
     }
 
-    if (!::PulseEvent(m_hevThis.m_pheviThis->hEvent))
+    if (!::PulseEvent(m_pData->m_hEvent))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -407,7 +300,7 @@ tCIDLib::TBoolean TKrnlEvent::bReset()
         return kCIDLib::False;
     }
 
-    if (!::ResetEvent(m_hevThis.m_pheviThis->hEvent))
+    if (!::ResetEvent(m_pData->m_hEvent))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -440,7 +333,7 @@ tCIDLib::TBoolean TKrnlEvent::bTrigger()
         return kCIDLib::False;
     }
 
-    if (!::SetEvent(m_hevThis.m_pheviThis->hEvent))
+    if (!::SetEvent(m_pData->m_hEvent))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -457,11 +350,18 @@ tCIDLib::TBoolean TKrnlEvent::bWaitFor(const tCIDLib::TCard4 c4Wait)
         return kCIDLib::False;
     }
 
-    const tCIDLib::EWaitRes eRes = TKrnlWin32::eWaitHandle
-    (
-        m_hevThis.m_pheviThis->hEvent, c4Wait
-    );
+    const tCIDLib::EWaitRes eRes = TKrnlWin32::eWaitHandle(m_pData->m_hEvent, c4Wait);
     return (eRes == tCIDLib::EWaitRes::Success);
+}
+
+
+//
+//  Provide access to our handle, which must be done generically. It should only be
+//  accessed by other platform code that knows what it is.
+//
+tCIDLib::TVoid* TKrnlEvent::pHandle() const
+{
+    return &m_pData->m_hEvent;
 }
 
 
@@ -516,13 +416,13 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates   eState
 
     DWORD ManFlag = (bManual == kCIDLib::True);
     DWORD InitFlag = (eState == tCIDLib::EEventStates::Triggered);
-    m_hevThis.m_pheviThis->hEvent = ::CreateEvent(&SAttrs, ManFlag, InitFlag, m_pszName);
+    m_pData->m_hEvent = ::CreateEvent(&SAttrs, ManFlag, InitFlag, m_pszName);
 
     // Either way now, we can clean up the descriptor
     ::LocalDiscard(pSDesc);
 
     // If it failed, then give up
-    if (!m_hevThis.m_pheviThis->hEvent)
+    if (!m_pData->m_hEvent)
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;
@@ -540,8 +440,8 @@ TKrnlEvent::bCreateNamed(const  tCIDLib::EEventStates   eState
     //
     if (!bCreated && bFailIfExists)
     {
-        ::CloseHandle(m_hevThis.m_pheviThis->hEvent);
-        m_hevThis.m_pheviThis->hEvent = 0;
+        ::CloseHandle(m_pData->m_hEvent);
+        m_pData->m_hEvent = 0;
         TKrnlError::SetLastKrnlError(kKrnlErrs::errcGen_AlreadyExists);
         return kCIDLib::False;
     }

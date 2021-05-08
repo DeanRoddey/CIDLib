@@ -55,12 +55,12 @@ class CIDLIBEXP TResourceName :
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TResourceName();
+        TResourceName() noexcept;
 
         TResourceName
         (
             const   TKrnlRscName&           krsnToUse
-        );
+        )   noexcept;
 
         TResourceName
         (
@@ -68,39 +68,38 @@ class CIDLIBEXP TResourceName :
             , const TString&                strSubsystem
             , const TString&                strResource
             , const tCIDLib::TProcessId     pidOfName = kCIDLib::pidInvalid
-        );
+        )   noexcept;
 
-        TResourceName
-        (
-            const   TResourceName&          rsnToCopy
-        );
+        TResourceName(const TResourceName&) = default;
+        TResourceName(TResourceName&&) = default;
 
-        ~TResourceName();
+        ~TResourceName() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
+        TResourceName& operator=(const TResourceName&) = default;
+        TResourceName& operator=(TResourceName&&) = default;
+
         tCIDLib::TBoolean operator==
         (
-            const   TResourceName&          rsnToCompare
-        )   const;
+            const   TResourceName&          rsnSrc
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
-            const   TResourceName&          rsnToCompare
-        )   const;
-
-        TResourceName& operator=
-        (
-            const   TResourceName&          rsnToAssign
-        );
+            const   TResourceName&          rsnSrc
+        )   const noexcept;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsValid() const;
+        tCIDLib::TBoolean bIsValid() const noexcept
+        {
+            return m_krsnThis.bIsValid();
+        }
 
         tCIDLib::TVoid QueryNameParts
         (
@@ -109,7 +108,10 @@ class CIDLIBEXP TResourceName :
             ,       TString&                strResource
         )   const;
 
-        tCIDLib::TProcessId pidOfName() const;
+        tCIDLib::TProcessId pidOfName() const
+        {
+            return m_krsnThis.pidOfName();
+        }
 
         tCIDLib::TVoid SetName
         (
@@ -137,7 +139,7 @@ class CIDLIBEXP TResourceName :
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        ) override;
+        )   override;
 
         tCIDLib::TVoid StreamTo
         (

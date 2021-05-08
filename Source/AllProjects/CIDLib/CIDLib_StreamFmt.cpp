@@ -49,7 +49,7 @@ AdvRTTIDecls(TStreamFmt,TObject)
 // ---------------------------------------------------------------------------
 //  TStreamFmt: Public, static methods
 // ---------------------------------------------------------------------------
-TStreamFmt& TStreamFmt::Nul_TStreamFmt()
+TStreamFmt& TStreamFmt::Nul_TStreamFmt() noexcept
 {
     static TStreamFmt strmfNull;
     return strmfNull;

@@ -44,7 +44,7 @@
 // ---------------------------------------------------------------------------
 //  MStreamable: Public, static methods
 // ---------------------------------------------------------------------------
-MStreamable& MStreamable::Nul_MStreamable()
+MStreamable& MStreamable::Nul_MStreamable() noexcept
 {
     // This isn't a concrete class so we just use a point object which implements it
     static TPoint mstrmblNull;

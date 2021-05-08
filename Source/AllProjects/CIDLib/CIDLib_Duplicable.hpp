@@ -96,7 +96,7 @@ class CIDLIBEXP MDuplicable
         //  Hidden constructors and operators, so that including classes can still
         //  have default copy/assignment
         // -------------------------------------------------------------------
-        MDuplicable() = default;
+        constexpr MDuplicable() noexcept {};
         MDuplicable(const MDuplicable&) = default;
         MDuplicable(MDuplicable&&) = default;
         MDuplicable& operator=(const MDuplicable&) = default;

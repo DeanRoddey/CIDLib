@@ -15,8 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This file implements the TString class, which (suprise) implements a wrapper
-//  for an array of (wide) characters strings. The string is maintained null
+//  This file implements the TString class, which (surprise) implements a wrapper
+//  for an array of (wide) characters. The string is maintained null
 //  terminated at least any time you look at the raw buffer, so that it can be
 //  passed to system APIs, but the length is also  maintained at all times. So
 //  appends or other ops that require access to the end of the string are very fast.
@@ -30,10 +30,10 @@
 //  We take the complexity hit here to provide for greater performance, in that we
 //  allow our buffer to be null. This is both so that default ctor'd strings that
 //  never get actually used don't allocate anything. And so that we can move
-//  strings without having to pay the cost to allocate a buffer that in most case
-//  will just get discarded. This makes the common scenario where we create some
-//  string contents locally and return it much cheaper since we can just move the
-//  contents to the caller.
+//  strings without having to pay the cost to allocate a buffer that will just get
+//  discarded. This makes the common scenario where we create some string contents
+//  locally and return it much cheaper since we can just move the contents to the
+//  caller without any extra cost.
 //
 //  So we almost never directly access the buffer member, we call methods that will
 //  get the buffer for const or non-const access and the same at a specific index
@@ -66,8 +66,6 @@ class   TString;
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
-
-
 // ---------------------------------------------------------------------------
 //  CLASS: TString
 // PREFIX: str
@@ -95,12 +93,12 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         //  Public, static methods
         // -------------------------------------------------------------------
-        [[nodiscard]] static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bComp(const TString& str1, const TString& str2) noexcept
         {
             return str1.bCompare(str2);
         }
 
-        [[nodiscard]] static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::TBoolean bCompI(const TString& str1, const TString& str2)  noexcept
         {
             return str1.bCompareI(str2);
         }
@@ -129,12 +127,12 @@ class CIDLIBEXP TString :
             return c1Ret;
         }
 
-        [[nodiscard]] static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eComp(const TString& str1, const TString& str2) noexcept
         {
             return str1.eCompare(str2);
         }
 
-        [[nodiscard]] static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2)
+        [[nodiscard]] static tCIDLib::ESortComps eCompI(const TString& str1, const TString& str2) noexcept
         {
             return str1.eCompareI(str2);
         }
@@ -176,72 +174,130 @@ class CIDLIBEXP TString :
             , COP   tCIDLib::TCard4&        c4TokenCnt
         );
 
-        static const TString& strEmpty();
+        static const TString& strEmpty() noexcept;
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const TString&                str2
-        );
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const TString&                str2
-            , const TString&                str3
-        );
+        //
+        //  These templates allow for arbitrary concatenation of lists of TString objects,
+        //  raw strings, and single characters.
+        //
+        //  ConcatSz calculates the bytes required
+        //  ConcatAccum accumulates the content in a string
+        //  strConcat uses the above to create a string with the needed capacity, then
+        //  load it up with values, and then just returns the string. The compiler should
+        //  do a move of the return of the final string.
+        //
+        //  At the bottom of this file, some very common variations are pre-instantiated
+        //  to avoid this goop being spit out in a lot of places.
+        //
+        //  * To avoid craziness we have separate variations for raw arrays, which need to
+        //    match size. String literals aren't decayed. And of course it saves time since
+        //    the size is compile time, we don't have to do a c4StrLen() on it.
+        //
+        template<typename T, tCIDLib::TCard4 c4Size> static tCIDLib::TCard4 c4ConcatSz(T(&tVal)[c4Size])
+        {
+            return c4Size;
+        }
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const TString&                str2
-            , const TString&                str3
-            , const TString&                str4
-        );
+        template<typename T> static tCIDLib::TCard4 c4ConcatSz(T&& tVal)
+        {
+            tCIDLib::TCard4 c4Ret = 0;
+            using TBase = tCIDLib::tRemoveCR<T>;
+            if constexpr (tCIDLib::bIsSameType<TBase, tCIDLib::TCh>)
+            {
+                c4Ret = 1;
+            }
+            else if constexpr ((tCIDLib::bIsSameType<TBase, const tCIDLib::TCh*>)
+                              || (tCIDLib::bIsSameType<TBase, tCIDLib::TCh*>))
+            {
+                if (tVal != nullptr)
+                    c4Ret = TRawStr::c4StrLen(tVal);
+            }
+            else if constexpr (tCIDLib::bIsSameType<TBase, TString>)
+            {
+                c4Ret = tVal.c4Length();
+            }
+            else
+            {
+                static_assert(tCIDLib::FalseDependType<T>::bState);
+            }
+            return c4Ret;
+        }
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh            chSep
-        );
+        template<typename T, typename... TArgs>
+        static tCIDLib::TVoid ConcatSz(tCIDLib::TCard4& c4Accum, T&& tFirst)
+        {
+            c4Accum += c4ConcatSz(tCIDLib::Forward<T>(tFirst));
+        }
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh            chSep
-            , const TString&                str2
-        );
+        template<typename T, typename... TArgs>
+        static tCIDLib::TVoid ConcatSz(tCIDLib::TCard4& c4Accum, T&& tFirst, TArgs&&... tArgs)
+        {
+            c4Accum += c4ConcatSz(tCIDLib::Forward<T>(tFirst));
+            ConcatSz(c4Accum, tCIDLib::Forward<TArgs>(tArgs)...);
+        }
 
-        static TString strConcat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const TString&                str2
-        );
+        // Does the actual accumulation of the parameters into a string object
+        template<typename T, tCIDLib::TCard4 c4Size>
+        static tCIDLib::TVoid ConcatAppend(TString& strTar, T(&tVal)[c4Size])
+        {
+            strTar.Append(tVal);
+        }
 
-        static TString strConcat
-        (
-            const   TString&                str1
-            , const tCIDLib::TCh* const     psz2
-        );
+        template<typename T> tCIDLib::TVoid static ConcatAppend(TString& strTar, T&& tVal)
+        {
+            using TBase = tCIDLib::tRemoveCR<T>;
+            if constexpr (tCIDLib::bIsSameType<TBase, tCIDLib::TCh>)
+            {
+                strTar.Append(tVal);
+            }
+            else if constexpr ((tCIDLib::bIsSameType<TBase, const tCIDLib::TCh*>)
+                              || (tCIDLib::bIsSameType<TBase, tCIDLib::TCh*>))
+            {
+                if (tVal != nullptr)
+                    strTar.Append(tVal);
+            }
+            else if constexpr (tCIDLib::bIsSameType<TBase, TString>)
+            {
+                strTar.Append(tVal);
+            }
+            else
+            {
+                static_assert(tCIDLib::FalseDependType<T>::bState);
+            }
+        }
 
-        static TString strConcat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const tCIDLib::TCh* const     psz2
-        );
+        template<typename T, typename... TArgs>
+        static tCIDLib::TVoid ConcatAccum(TString& strTar, T&& tFirst)
+        {
+            ConcatAppend(strTar, tCIDLib::Forward<T>(tFirst));
+        }
 
-        static TString strConcat
-        (
-            const   tCIDLib::TCh* const     psz1
-            , const tCIDLib::TCh            chSep
-            , const tCIDLib::TCh* const     psz2
-        );
+        template<typename T, typename... TArgs>
+        static tCIDLib::TVoid ConcatAccum(TString& strTar, T&& tFirst, TArgs&&... tArgs)
+        {
+            ConcatAppend(strTar, tFirst);
+            ConcatAccum(strTar, tCIDLib::Forward<TArgs>(tArgs)...);
+        }
+
+        template<typename... TArgs> static TString strConcat(TArgs&&... tArgs)
+        {
+            // Calculate the size required
+            tCIDLib::TCard4 c4Sz = 0;
+            ConcatSz(c4Sz, tCIDLib::Forward<TArgs>(tArgs)...);
+
+            // Allocate a string and accumulate
+            TString strRet(c4Sz);
+            ConcatAccum(strRet, tCIDLib::Forward<TArgs>(tArgs)...);
+
+            return strRet;
+        }
 
 
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
         // -------------------------------------------------------------------
-        TString();
+        TString() = default;
 
         explicit TString
         (
@@ -370,22 +426,22 @@ class CIDLIBEXP TString :
         tCIDLib::TBoolean operator==
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator==
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TVoid operator+=(const TString& strSrc)
         {
@@ -405,42 +461,42 @@ class CIDLIBEXP TString :
         tCIDLib::TBoolean operator<
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<=
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>=
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<=
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>=
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TCh operator[]
         (
@@ -450,12 +506,12 @@ class CIDLIBEXP TString :
         tCIDLib::TBoolean operator==
         (
             const   tCIDLib::TSCh* const    pszSrc
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   tCIDLib::TSCh* const    pszSrc
-        )   const;
+        )   const noexcept;
 
 
         // -------------------------------------------------------------------
@@ -611,46 +667,46 @@ class CIDLIBEXP TString :
         [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompare
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   TString&                strSrc
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareI
         (
             const   tCIDLib::TCh* const     pszSrc
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   TString&                strSrc
             , const tCIDLib::TCard4         c4Count
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareN
         (
             const   tCIDLib::TCh* const     pszSrc
             , const tCIDLib::TCard4         c4Count
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareNI
         (
             const   TString&                strSrc
             , const tCIDLib::TCard4         c4Count
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bCompareNI
         (
             const   tCIDLib::TCh* const     pszSrc
             , const tCIDLib::TCard4         c4Count
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bContainsChar
         (
@@ -711,11 +767,11 @@ class CIDLIBEXP TString :
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
         )   const;
 
-        [[nodiscard]] tCIDLib::TBoolean bIsAlpha() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsAlpha() const noexcept;
 
-        [[nodiscard]] tCIDLib::TBoolean bIsAlphaNum() const;
+        [[nodiscard]] tCIDLib::TBoolean bIsAlphaNum() const noexcept;
 
-        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const
+        [[nodiscard]] tCIDLib::TBoolean bIsEmpty() const noexcept
         {
             return(m_c4CurEnd == 0);
         }
@@ -875,9 +931,15 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh            chToken
         )   const;
 
-        [[nodiscard]] tCIDLib::TCard4 c4BufChars() const;
+        [[nodiscard]] tCIDLib::TCard4 c4BufChars() const noexcept
+        {
+            return m_c4BufChars;
+        }
 
-        [[nodiscard]] tCIDLib::TCard4 c4Length() const;
+        [[nodiscard]] tCIDLib::TCard4 c4Length() const noexcept
+        {
+            return m_c4CurEnd;
+        }
 
         tCIDLib::TCard4 c4Val
         (
@@ -896,7 +958,7 @@ class CIDLIBEXP TString :
 
         [[nodiscard]] tCIDLib::TCh chFirst() const;
 
-        [[nodiscard]] tCIDLib::TCh chLast() const;
+        [[nodiscard]] tCIDLib::TCh chLast() const noexcept;
 
         tCIDLib::TVoid CapAt
         (
@@ -1400,24 +1462,6 @@ class CIDLIBEXP TString :
 
 
         // -------------------------------------------------------------------
-        //  Private constructor, for use by the strConcat static methods. We add a
-        //  bogus parameter to make sure it doesn't clash with any public ones. The
-        //  buffer is adopted and is allocated to the indicated length, and will
-        //  be null terminated.
-        // -------------------------------------------------------------------
-        enum EBogusCtorParm { x };
-        TString(        tCIDLib::TCh* const     pszToAdopt
-                , const tCIDLib::TCard4         c4BufLen
-                , const EBogusCtorParm          eBogus) :
-
-            m_c4BufChars(c4BufLen)
-            , m_c4CurEnd(c4BufLen)
-            , m_pszBuffer(pszToAdopt)
-        {
-        }
-
-
-        // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
         [[nodiscard]] tCIDLib::TBoolean bCheckPrefix
@@ -1606,9 +1650,9 @@ class CIDLIBEXP TString :
         //  m_pszBuffer
         //      This is the buffer for this string.
         // -------------------------------------------------------------------
-        mutable tCIDLib::TCard4 m_c4BufChars;
-        mutable tCIDLib::TCard4 m_c4CurEnd;
-        mutable tCIDLib::TCh*   m_pszBuffer;
+        mutable tCIDLib::TCard4 m_c4BufChars = 0;
+        mutable tCIDLib::TCard4 m_c4CurEnd = 0;
+        mutable tCIDLib::TCh*   m_pszBuffer = nullptr;
 
 
         // -------------------------------------------------------------------
@@ -1623,6 +1667,23 @@ class CIDLIBEXP TString :
 #pragma CIDLIB_POPPACK
 
 
+// Pre-instantiate some really common variations on the concatenation method
+extern template TString TString::strConcat(const TString&, const TString&);
+extern template TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh*&);
+extern template TString TString::strConcat(const TString&, const tCIDLib::TCh*&);
+extern template TString TString::strConcat(const tCIDLib::TCh*&, const TString&);
+
+extern template TString TString::strConcat(const TString&, const TString&, const TString&);
+extern template TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh*&, const tCIDLib::TCh*&);
+
+extern template TString TString::strConcat(const TString&, const tCIDLib::TCh&, const TString&);
+extern template TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh&, const tCIDLib::TCh*&);
+extern template TString TString::strConcat(const TString&, const tCIDLib::TCh&, const tCIDLib::TCh*&);
+extern template TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh&, const TString&);
+
+extern template TString TString::strConcat(const tCIDLib::TCh&, const tCIDLib::TCh*&);
+extern template TString TString::strConcat(const tCIDLib::TCh&, const TString&);
+
 
 // ---------------------------------------------------------------------------
 //  Global operators
@@ -1631,5 +1692,5 @@ inline TString operator+(const TString& str1, const TString& str2)
 {
     TString strRet(str1, str2.c4Length());
     strRet.Append(str2);
-    return tCIDLib::ForceMove(strRet);
+    return strRet;
 }

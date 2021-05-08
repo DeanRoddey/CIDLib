@@ -1275,7 +1275,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
     (
         szRaw, 512, f8Val, c4Precision + 2, &iDec, &iSign
     );
-    pszConvert(szRaw, szTmp, c4MaxBufChars(szTmp));
+    pszConvert(szRaw, szTmp, tCIDLib::c4MaxBufChars(szTmp));
 
     // Get the length of the string
     c4Len = c4StrLen(szTmp);
@@ -1759,6 +1759,16 @@ tCIDLib::ESortComps
 TRawStr::eCompareStr(   const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2) noexcept
 {
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     const tCIDLib::TCh* pszCur1 = pszStr1;
     const tCIDLib::TCh* pszCur2 = pszStr2;
     tCIDLib::TSInt iRes = 0;
@@ -1787,6 +1797,17 @@ TRawStr::eCompareStrN(  const   tCIDLib::TCh* const pszStr1
     //
     if (!c4Count)
         return tCIDLib::ESortComps::Equal;
+
+    // Deal with possible nulls
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
 
     const tCIDLib::TCh* pszCur1 = pszStr1;
     const tCIDLib::TCh* pszCur2 = pszStr2;
@@ -1818,6 +1839,16 @@ tCIDLib::ESortComps
 TRawStr::eCompareStrI(  const   tCIDLib::TCh* const pszStr1
                         , const tCIDLib::TCh* const pszStr2) noexcept
 {
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     const tCIDLib::TCh* pszCur1 = pszStr1;
     const tCIDLib::TCh* pszCur2 = pszStr2;
     tCIDLib::TSInt iRes = 0;
@@ -1847,6 +1878,17 @@ TRawStr::eCompareStrNI( const   tCIDLib::TCh* const pszStr1
     //
     if (!c4Count)
         return tCIDLib::ESortComps::Equal;
+
+    // Deal with possible nulls
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
 
     const tCIDLib::TCh* pszCur1 = pszStr1;
     const tCIDLib::TCh* pszCur2 = pszStr2;
@@ -1908,6 +1950,16 @@ TRawStr::eCompareStrN(  const   tCIDLib::TSCh* const    pszStr1
                         , const tCIDLib::TSCh* const    pszStr2
                         , const tCIDLib::TCard4         c4Count) noexcept
 {
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     return eXlatSortRes(CIDSStrOp_CompareN(pszStr1, pszStr2, c4Count));
 }
 
@@ -1916,6 +1968,16 @@ tCIDLib::ESortComps
 TRawStr::eCompareStrI(  const   tCIDLib::TSCh* const pszStr1
                         , const tCIDLib::TSCh* const pszStr2) noexcept
 {
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     return eXlatSortRes(CIDSStrOp_CompareI(pszStr1, pszStr2));
 }
 
@@ -1925,6 +1987,16 @@ TRawStr::eCompareStrNI( const   tCIDLib::TSCh* const    pszStr1
                         , const tCIDLib::TSCh* const    pszStr2
                         , const tCIDLib::TCard4         c4Count) noexcept
 {
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     return eXlatSortRes(CIDSStrOp_CompareNI(pszStr1, pszStr2, c4Count));
 }
 

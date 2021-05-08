@@ -75,7 +75,7 @@ static tCIDGraphDev::TBrushHandle hbrCreateNewBrush(const LOGBRUSH& Brush)
 // ---------------------------------------------------------------------------
 //  TGUIBrush: Public, static methods
 // ---------------------------------------------------------------------------
-TGUIBrush& TGUIBrush::Nul_TGUIBrush()
+TGUIBrush& TGUIBrush::Nul_TGUIBrush() noexcept
 {
     static TSolidBrush gbrNull(TRGBClr(0, 0, 0));
     return gbrNull;

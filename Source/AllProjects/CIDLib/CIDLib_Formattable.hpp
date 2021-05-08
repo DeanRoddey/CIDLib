@@ -71,7 +71,7 @@ class CIDLIBEXP MFormattable
         //  Hidden but available so that our derived classes can have default
         //  generated copy and assignment.
         // -------------------------------------------------------------------
-        MFormattable() = default;
+        constexpr MFormattable() noexcept {}
         MFormattable(const MFormattable&) = default;
         MFormattable(MFormattable&&) = default;
         MFormattable& operator=(const MFormattable&) = default;

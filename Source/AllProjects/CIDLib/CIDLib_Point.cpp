@@ -53,7 +53,7 @@ const TPoint TPoint::pntOrigin(0, 0);
 // ---------------------------------------------------------------------------
 //  TPoint: Public, static methods
 // ---------------------------------------------------------------------------
-TPoint& TPoint::Nul_TPoint()
+TPoint& TPoint::Nul_TPoint() noexcept
 {
     static TPoint pntNull;
     return pntNull;
@@ -61,46 +61,26 @@ TPoint& TPoint::Nul_TPoint()
 
 
 // ---------------------------------------------------------------------------
-//  TPoint: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TPoint::TPoint(const tCIDLib::THostPoint& ptSrc) noexcept :
-
-    m_i4X(ptSrc.i4X)
-    , m_i4Y(ptSrc.i4Y)
-{
-}
-
-TPoint::TPoint(const tCIDLib::TRawPoint& ptSrc) noexcept :
-
-    m_i4X(ptSrc.i4X)
-    , m_i4Y(ptSrc.i4Y)
-{
-}
-
-
-
-
-// ---------------------------------------------------------------------------
 //  TPoint: Public operators
 // ---------------------------------------------------------------------------
-TPoint::operator const tCIDLib::THostPoint*() const
+TPoint::operator const tCIDLib::THostPoint*() const noexcept
 {
     return (const tCIDLib::THostPoint*)&m_i4X;
 }
 
-TPoint::operator tCIDLib::THostPoint*()
+TPoint::operator tCIDLib::THostPoint*() noexcept
 {
     return (tCIDLib::THostPoint*)&m_i4X;
 }
 
-TPoint& TPoint::operator=(const tCIDLib::THostPoint& ptSrc)
+TPoint& TPoint::operator=(const tCIDLib::THostPoint& ptSrc) noexcept
 {
     m_i4X = ptSrc.i4X;
     m_i4Y = ptSrc.i4Y;
     return *this;
 }
 
-TPoint& TPoint::operator=(const tCIDLib::TRawPoint& ptSrc)
+TPoint& TPoint::operator=(const tCIDLib::TRawPoint& ptSrc) noexcept
 {
     m_i4X = ptSrc.i4X;
     m_i4Y = ptSrc.i4Y;
@@ -108,24 +88,24 @@ TPoint& TPoint::operator=(const tCIDLib::TRawPoint& ptSrc)
 }
 
 
-tCIDLib::TVoid TPoint::operator+=(const TPoint& pntToAdd)
+tCIDLib::TVoid TPoint::operator+=(const TPoint& pntToAdd) noexcept
 {
     m_i4X += pntToAdd.m_i4X;
     m_i4Y += pntToAdd.m_i4Y;
 }
 
-tCIDLib::TVoid TPoint::operator-=(const TPoint& pntToSub)
+tCIDLib::TVoid TPoint::operator-=(const TPoint& pntToSub) noexcept
 {
     m_i4X -= pntToSub.m_i4X;
     m_i4Y -= pntToSub.m_i4Y;
 }
 
-TPoint operator+(const TPoint& pnt1, const TPoint& pnt2)
+TPoint operator+(const TPoint& pnt1, const TPoint& pnt2) noexcept
 {
     return TPoint(pnt1.m_i4X + pnt2.m_i4X, pnt1.m_i4Y + pnt2.m_i4Y);
 }
 
-TPoint operator-(const TPoint& pnt1, const TPoint& pnt2)
+TPoint operator-(const TPoint& pnt1, const TPoint& pnt2) noexcept
 {
     return TPoint(pnt1.m_i4X - pnt2.m_i4X, pnt1.m_i4Y - pnt2.m_i4Y);
 }
@@ -156,8 +136,7 @@ TPoint::AbsDiffFrom(const TPoint& pntOther, TPoint& pntDiff) const
 
 
 // Just adjusts this point by a signed amount in both axes
-tCIDLib::TVoid
-TPoint::Adjust(const tCIDLib::TInt4 i4XOfs, const tCIDLib::TInt4 i4YOfs)
+tCIDLib::TVoid TPoint::Adjust(const tCIDLib::TInt4 i4XOfs, const tCIDLib::TInt4 i4YOfs) noexcept
 {
     m_i4X += i4XOfs;
     m_i4Y += i4YOfs;
@@ -165,19 +144,19 @@ TPoint::Adjust(const tCIDLib::TInt4 i4XOfs, const tCIDLib::TInt4 i4YOfs)
 
 
 // And these adjust one just axis
-tCIDLib::TVoid TPoint::AdjustX(const tCIDLib::TInt4 i4Ofs)
+tCIDLib::TVoid TPoint::AdjustX(const tCIDLib::TInt4 i4Ofs) noexcept
 {
     m_i4X += i4Ofs;
 }
 
-tCIDLib::TVoid TPoint::AdjustY(const tCIDLib::TInt4 i4Ofs)
+tCIDLib::TVoid TPoint::AdjustY(const tCIDLib::TInt4 i4Ofs) noexcept
 {
     m_i4Y += i4Ofs;
 }
 
 
 // Indicates whether this point is within the passed area, border included
-tCIDLib::TBoolean TPoint::bInArea(const TArea& areaTarget) const
+tCIDLib::TBoolean TPoint::bInArea(const TArea& areaTarget) const noexcept
 {
     if ((m_i4X < areaTarget.m_i4X)
     ||  (m_i4Y < areaTarget.m_i4Y)
@@ -230,7 +209,7 @@ TPoint::bParseFromText( const   TString&            strText
 //  Returns the sum of the absolute differnces between this point and
 //  the other point.
 //
-tCIDLib::TCard4 TPoint::c4AbsDiff(const TPoint& pntOther) const
+tCIDLib::TCard4 TPoint::c4AbsDiff(const TPoint& pntOther) const noexcept
 {
     tCIDLib::TInt4 i4XDiff = 0;
     tCIDLib::TInt4 i4YDiff = 0;
@@ -353,7 +332,7 @@ tCIDLib::TVoid TPoint::FromPolarRadians(const   tCIDLib::TFloat8&   f8Theta
 
 
 // Return the larger of the dimensions
-tCIDLib::TInt4 TPoint::i4LargestDim() const
+tCIDLib::TInt4 TPoint::i4LargestDim() const noexcept
 {
     if (m_i4X > m_i4Y)
         return m_i4X;

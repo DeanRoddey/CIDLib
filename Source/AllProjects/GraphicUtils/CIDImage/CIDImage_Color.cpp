@@ -46,7 +46,7 @@ RTTIDecls(TFRGBClr,TObject)
 // ---------------------------------------------------------------------------
 //  TRGBClr: Public, static methods
 // ---------------------------------------------------------------------------
-TFRGBClr& TFRGBClr::Nul_TFRGBClr()
+TFRGBClr& TFRGBClr::Nul_TFRGBClr() noexcept
 {
     static TFRGBClr frgbNull;
     return frgbNull;

@@ -217,7 +217,7 @@ const TString& TLocale::strAMString()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::AMString);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::AMString);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::AMString] = new TString(szTmp);
         }
     }
@@ -233,7 +233,7 @@ const TString& TLocale::strCountry()
         TCritSecLocker lockCache(pcrsSync());
 
         tCIDLib::TZStr128   szTmp;
-        LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Country);
+        LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Country);
         CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Country] = new TString(szTmp);
     }
     return *CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Country];
@@ -251,7 +251,7 @@ const TString& TLocale::strDateFormat()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::DateFormat);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::DateFormat);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::DateFormat] = new TString(szTmp);
         }
     }
@@ -275,7 +275,7 @@ const TString& TLocale::strDay(const tCIDLib::EWeekDays eDay)
         if (!CIDLib_Locale::apstrCache[eStr])
         {
             tCIDLib::TZStr128 szTmp;
-            if (!TKrnlLocale::bQueryLongDay(eDay, szTmp, c4MaxBufChars(szTmp)))
+            if (!TKrnlLocale::bQueryLongDay(eDay, szTmp, tCIDLib::c4MaxBufChars(szTmp)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -309,7 +309,7 @@ const TString& TLocale::strDayAbbrev(const tCIDLib::EWeekDays eDay)
         if (!CIDLib_Locale::apstrCache[eStr])
         {
             tCIDLib::TZStr128 szTmp;
-            if (!TKrnlLocale::bQueryShortDay(eDay, szTmp, c4MaxBufChars(szTmp)))
+            if (!TKrnlLocale::bQueryShortDay(eDay, szTmp, tCIDLib::c4MaxBufChars(szTmp)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -369,7 +369,7 @@ const TString& TLocale::strEnglishCountry()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishCountry);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishCountry);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishCountry] = new TString(szTmp);
         }
     }
@@ -388,7 +388,7 @@ const TString& TLocale::strEnglishLanguage()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishLanguage);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::EnglishLanguage);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::EnglishLanguage] = new TString(szTmp);
         }
     }
@@ -407,7 +407,7 @@ const TString& TLocale::strLanguage()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Language);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::Language);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::Language] = new TString(szTmp);
         }
     }
@@ -474,7 +474,7 @@ const TString& TLocale::strISOCountry()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOCountry);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOCountry);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOCountry] = new TString(szTmp);
         }
     }
@@ -493,7 +493,7 @@ const TString& TLocale::strISOLanguage()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOLanguage);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::ISOLanguage);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::ISOLanguage] = new TString(szTmp);
         }
     }
@@ -512,7 +512,7 @@ const TString& TLocale::strNegMonFormat()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::NegMonFormat);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::NegMonFormat);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::NegMonFormat] = new TString(szTmp);
         }
     }
@@ -531,7 +531,7 @@ const TString& TLocale::strPosMonFormat()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PosMonFormat);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PosMonFormat);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PosMonFormat] = new TString(szTmp);
         }
     }
@@ -550,7 +550,7 @@ const TString& TLocale::strPMString()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PMString);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::PMString);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::PMString] = new TString(szTmp);
         }
     }
@@ -574,7 +574,7 @@ const TString& TLocale::strMonth(const tCIDLib::EMonths eMonth)
         if (!CIDLib_Locale::apstrCache[eStr])
         {
             tCIDLib::TZStr128 szTmp;
-            if (!TKrnlLocale::bQueryLongMonth(eMonth, szTmp, c4MaxBufChars(szTmp)))
+            if (!TKrnlLocale::bQueryLongMonth(eMonth, szTmp, tCIDLib::c4MaxBufChars(szTmp)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -608,7 +608,7 @@ const TString& TLocale::strMonthAbbrev(const tCIDLib::EMonths eMonth)
         if (!CIDLib_Locale::apstrCache[eStr])
         {
             tCIDLib::TZStr128 szTmp;
-            if (!TKrnlLocale::bQueryShortMonth(eMonth, szTmp, c4MaxBufChars(szTmp)))
+            if (!TKrnlLocale::bQueryShortMonth(eMonth, szTmp, tCIDLib::c4MaxBufChars(szTmp)))
             {
                 facCIDLib().ThrowKrnlErr
                 (
@@ -638,7 +638,7 @@ const TString& TLocale::strTimeFormat()
         if (!CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat])
         {
             tCIDLib::TZStr128   szTmp;
-            LoadStr(szTmp, c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::TimeFormat);
+            LoadStr(szTmp, tCIDLib::c4MaxBufChars(szTmp), TKrnlLocale::EStrFlds::TimeFormat);
             CIDLib_Locale::apstrCache[CIDLib_Locale::ECacheStrs::TimeFormat] = new TString(szTmp);
         }
     }

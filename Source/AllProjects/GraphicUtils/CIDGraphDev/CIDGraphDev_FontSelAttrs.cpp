@@ -535,7 +535,7 @@ TString TFontSelAttrs::strFaceName() const
 
 TString TFontSelAttrs::strFaceName(const TString& strNewFace)
 {
-    strNewFace.ToZStr(m_pHostInfo->lfFaceName, c4MaxBufChars(m_pHostInfo->lfFaceName));
+    strNewFace.ToZStr(m_pHostInfo->lfFaceName, tCIDLib::c4MaxBufChars(m_pHostInfo->lfFaceName));
     return strNewFace;
 }
 

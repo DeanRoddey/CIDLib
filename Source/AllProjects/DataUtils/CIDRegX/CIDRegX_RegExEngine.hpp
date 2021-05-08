@@ -61,7 +61,10 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
             const   tCIDLib::TCh* const     pszExpression
         );
 
-        TRegEx(const TRegEx&) = delete;
+        TRegEx
+        (
+            const   TRegEx&                 regxSrc
+        );
 
         TRegEx
         (
@@ -74,7 +77,10 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         // --------------------------------------------------------------------
         //  Public operators
         // --------------------------------------------------------------------
-        TRegEx& operator=(const TRegEx&) = delete;
+        TRegEx& operator=
+        (
+            const   TRegEx&                 regxSrc
+        );
 
         TRegEx& operator=
         (
@@ -142,6 +148,8 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
 
+        tCIDLib::TVoid Reset();
+
         TString strExpression() const;
 
         tCIDLib::TVoid SetExpression
@@ -187,7 +195,7 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         // --------------------------------------------------------------------
         //  Private data members
         //
-        //  m_pszPattern
+        //  m_strPattern
         //      A copy of the pattern string that is currently set up as our
         //      NFA. If it has not been set yet, then its still a null pointer.
         //
@@ -195,7 +203,7 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         //      The NFA that contains the compiled pattern built up from parsing the
         //      expression that gets set on us.
         // --------------------------------------------------------------------
-        tCIDLib::TCh*           m_pszPattern;
+        TString                 m_strPattern;
         TRegExNFA*              m_prxnfaPattern;
 
         // Only used during parsing of pattern
@@ -203,7 +211,6 @@ class CIDREGXEXP TRegEx : public TObject, public MFormattable
         tCIDLib::TBoolean       m_bLetter;
         tCIDLib::TCard4         m_c4CurInd;
         tCIDLib::TCard4         m_c4CurState;
-        tCIDLib::TCard4         m_c4PatLen;
 
 
         // --------------------------------------------------------------------

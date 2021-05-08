@@ -47,7 +47,7 @@ AdvRTTIDecls(TBoolean,TObject)
 // ---------------------------------------------------------------------------
 //  TBoolean: Public, static methods
 // ---------------------------------------------------------------------------
-TBoolean& TBoolean::Nul_TBoolean()
+TBoolean& TBoolean::Nul_TBoolean() noexcept
 {
     static TBoolean bNull;
     return bNull;
@@ -57,21 +57,12 @@ TBoolean& TBoolean::Nul_TBoolean()
 // ---------------------------------------------------------------------------
 //  TBoolean: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TBoolean::TBoolean(const tCIDLib::TBoolean bVal) :
+TBoolean::TBoolean(const tCIDLib::TBoolean bVal) noexcept :
 
     m_bVal(bVal)
 {
 }
 
-TBoolean::TBoolean() :
-
-    m_bVal(kCIDLib::False)
-{
-}
-
-TBoolean::~TBoolean()
-{
-}
 
 // ---------------------------------------------------------------------------
 //  TBoolean: Public operators
@@ -109,7 +100,7 @@ tCIDLib::TBoolean TBoolean::operator==(const TBoolean& bToTest) const
 // ---------------------------------------------------------------------------
 //  TBoolean: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TBoolean::bVal(const tCIDLib::TBoolean bNewVal)
+tCIDLib::TBoolean TBoolean::bVal(const tCIDLib::TBoolean bNewVal) noexcept
 {
     m_bVal = bNewVal;
     return m_bVal;

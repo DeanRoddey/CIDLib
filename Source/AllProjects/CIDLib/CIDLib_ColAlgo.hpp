@@ -48,6 +48,49 @@
 namespace tCIDColAlgo
 {
     //
+    //  Find the first element that matches the passed object to find. If found the
+    //  cursor will be pointed at that element, else invalid. The default equality
+    //  comparison functor will be used if not explicitly provided, which requires
+    //  that the elements provide the equality operator. We have const and non-const
+    //  versions.
+    //
+    //  These are first becasue some others below can make use of these.
+    //
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TCursor cursFind(const   TCol&       colSrc
+                                    , const TElem&      objToFind
+                                    ,       TComp       pfnComp = TComp())
+    {
+        typename TCol::TCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
+    template<typename   TCol
+            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
+            , typename  TElem = TCol::TMyElemType>
+    typename TCol::TNCCursor cursFindNC(        TCol&       colSrc
+                                        , const TElem&      objToFind
+                                        ,       TComp       pfnComp = TComp())
+    {
+        typename TCol::TNCCursor cursSrc(&colSrc);
+        for (; cursSrc; ++cursSrc)
+        {
+            if (pfnComp(*cursSrc, objToFind))
+                break;
+        }
+        return cursSrc;
+    }
+
+
+
+    //
     //  If the passed object is not in the collection already, add it. Some
     //  collections have such things built in, like has sets. But, for other
     //  types, we have to just search it. This assumes it's not sorted already
@@ -70,6 +113,61 @@ namespace tCIDColAlgo
 
         // Never found it, so add it
         colTar.objAdd(objToAdd);
+        return kCIDLib::True;
+    }
+
+
+    //
+    //  Returns true if the passed element is in the passed container. This assumes they are
+    //  not sorted so we have to do an exhaustive search until we find one or fail. If the
+    //  container is sorted use the binary search options provided by the collection itself
+    //  (those that can support such things will provide one, they have to indexable.)
+    //
+    template<typename  TCol
+            , typename TElem = TCol::TMyElemType
+            , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    tCIDLib::TBoolean bContains(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
+    {
+        typename TCol::TCursor cursContains(&colContains);
+        for (; cursContains; ++cursContains)
+        {
+            if (pfnComp(*cursContains, tFind))
+                return kCIDLib::True;
+        }
+
+        // Never found a match
+        return kCIDLib::False;
+    }
+
+
+    //
+    //  Returns true if all of the elements of colTest are in conContains. This assumes that
+    //  that the elements of conContains are not sorted, so this can be quite slow for large
+    //  lists. We can't do better than just search, though we can stop as soon as we get a
+    //  failure.
+    //
+    template<typename  TCol
+            , typename TElem = TCol::TMyElemType
+            , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    tCIDLib::TBoolean bContainsAll(const TCol& colContains, const TCol& colTest, TComp pfnComp = TComp())
+    {
+        typename TCol::TCursor cursTest(&colTest);
+        typename TCol::TCursor cursContains(&colContains);
+        for (; cursTest; ++cursTest)
+        {
+            cursContains.bReset();
+            for (; cursContains; ++cursContains)
+            {
+                if (pfnComp(*cursContains, *cursTest))
+                    break;
+            }
+
+            // If we got to the end of contains, then we don't have this one
+            if (!cursContains)
+                return kCIDLib::False;
+        }
+
+        // Never failed to find a match
         return kCIDLib::True;
     }
 
@@ -140,6 +238,27 @@ namespace tCIDColAlgo
             }
         }
         return bRet;
+    }
+
+
+    //
+    //  Returns the number of times that the indicted find element exists in the contains
+    //  collection. We don't assume that the list is sorted, so we have to search the whole
+    //  thing.
+    //
+    template<typename  TCol
+            , typename TElem = TCol::TMyElemType
+            , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
+    tCIDLib::TCard4 c4Count(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
+    {
+        typename TCol::TCursor cursContains(&colContains);
+        tCIDLib::TCard4 c4Ret = 0;
+        for (; cursContains; ++cursContains)
+        {
+            if (pfnComp(*cursContains, tFind))
+                c4Ret++;
+        }
+        return c4Ret;
     }
 
 
@@ -238,9 +357,10 @@ namespace tCIDColAlgo
 
 
     //
-    //  Does a map and reduce operation. It does the map operation and then runs through the
-    //  resulting list, applying the reduce callback to each element in sequence. The final
-    //  resulting value is returned.
+    //  Does a map and reduce operation. It finds all of the elements that the test selects,
+    //  and applies the reduce callback on them. We start with the passed initial value. This
+    //  one doesn't need to allocate anything new, it's operating directly on the source
+    //  collection.
     //
     template<typename  TCol, typename TTest, typename Reduce>
     typename TCol::TMyElemType
@@ -255,69 +375,13 @@ namespace tCIDColAlgo
             tCIDLib::EAdoptOpts::NoAdopt, (c4InitAlloc == 0) ? colSrc.c4ElemCount() / 4 : c4InitAlloc
         );
         typename TCol::TCursor cursSrc(&colSrc);
+        typename TCol::TMyElemType tRet = tInitVal;
         for (; cursSrc; ++cursSrc)
         {
             if (pfnTest(*cursSrc))
-            {
-                if (colKept.c4ElemCount() == colKept.c4CurAlloc())
-                {
-                    const tCIDLib::TCard4 c4Exp = colKept.c4ElemCount() / 4;
-                    if (colKept.c4ElemCount() + c4Exp > colSrc.c4ElemCount())
-                        colKept.CheckExpansion(colSrc.c4ElemCount());
-                    else
-                        colKept.CheckExpansion(c4Exp);
-                }
-                colKept.Add(&cursSrc.objRCur());
-            }
+                pfnReduce(tRet, *cursSrc);
         }
-
-        typename TCol::TMyElemType tRet = tInitVal;
-        using TKeptCursor = typename TRefVector<const typename TCol::TMyElemType>::TCursor;
-        TKeptCursor cursKept = TKeptCursor(&colKept);
-        for (; cursKept; ++cursKept)
-            pfnReduce(tRet, *cursKept);
-
         return tRet;
-    }
-
-
-    //
-    //  Find the first element that matches the passed object to find. If found the
-    //  cursor will be pointed at that element, else invalid. The default equality
-    //  comparison functor will be used if not explicitly provided, which requires
-    //  that the elements provide the equality operator. We have const and non-const
-    //  versions.
-    //
-    template<typename   TCol
-            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
-    typename TCol::TCursor cursFind(const   TCol&       colSrc
-                                    , const TElem&      objToFind
-                                    ,       TComp       pfnComp = TComp())
-    {
-        typename TCol::TCursor cursSrc(&colSrc);
-        for (; cursSrc; ++cursSrc)
-        {
-            if (pfnComp(*cursSrc, objToFind))
-                break;
-        }
-        return cursSrc;
-    }
-
-    template<typename   TCol
-            , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
-            , typename  TElem = TCol::TMyElemType>
-    typename TCol::TNCCursor cursFindNC(        TCol&       colSrc
-                                        , const TElem&      objToFind
-                                        ,       TComp       pfnComp = TComp())
-    {
-        typename TCol::TNCCursor cursSrc(&colSrc);
-        for (; cursSrc; ++cursSrc)
-        {
-            if (pfnComp(*cursSrc, objToFind))
-                break;
-        }
-        return cursSrc;
     }
 
 

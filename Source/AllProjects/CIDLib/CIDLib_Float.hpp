@@ -56,40 +56,40 @@ class CIDLIBEXP TFloat :
         explicit TFloat
         (
             const   tCIDLib::TFloat4&       f4Val
-        );
+        )   noexcept;
 
         explicit TFloat
         (
             const   tCIDLib::TFloat8&       f8Val
-        );
+        )   noexcept;
 
         TFloat
         (
             const   tCIDLib::TFloat8&       f8Val
             , const tCIDLib::TCard1         c1Precision
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TFloat
         (
             const   tCIDLib::TCard4         c4Val
             , const tCIDLib::TCard1         c1Precision = 0
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TFloat
         (
             const   tCIDLib::TInt4          i4Val
             , const tCIDLib::TCard1         c1Precision = 0
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TFloat
         (
             const   tCIDLib::TSInt          sVal
             , const tCIDLib::TCard1         c1Precision = 0
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TFloat(const TFloat&) = default;
         TFloat(TFloat&&) = default;
@@ -103,7 +103,7 @@ class CIDLIBEXP TFloat :
         TFloat& operator=(const TFloat&) = default;
         TFloat& operator=(TFloat&&) = default;
 
-        constexpr operator tCIDLib::TFloat8() const
+        constexpr operator tCIDLib::TFloat8() const noexcept
         {
             return m_f8Val;
         }
@@ -111,87 +111,87 @@ class CIDLIBEXP TFloat :
         TFloat& operator=
         (
             const   tCIDLib::TFloat8&       f8Src
-        );
+        )   noexcept;
 
         tCIDLib::TBoolean operator==
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator==
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<=
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>=
         (
             const   TFloat&                 fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<=
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>=
         (
             const   tCIDLib::TFloat8&       f8ToTest
-        )   const;
+        )   const noexcept;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TCard1 c1Precision() const;
+        tCIDLib::TCard1 c1Precision() const noexcept;
 
         tCIDLib::TCard1 c1Precision
         (
             const   tCIDLib::TCard1         c1Precision
-        );
+        )   noexcept;
 
-        tCIDLib::ETrailFmts eTrailingStyle() const;
+        tCIDLib::ETrailFmts eTrailingStyle() const noexcept;
 
         tCIDLib::ETrailFmts eTrailingStyle
         (
             const   tCIDLib::ETrailFmts  eStyle
-        );
+        )   noexcept;
 
-        constexpr tCIDLib::TFloat8 f8Val() const
+        constexpr tCIDLib::TFloat8 f8Val() const noexcept
         {
             return m_f8Val;
         }
@@ -199,7 +199,7 @@ class CIDLIBEXP TFloat :
         tCIDLib::TFloat8 f8Val
         (
             const   tCIDLib::TFloat8&       f8NewVal
-        );
+        )   noexcept;
 
 
     protected   :
@@ -263,38 +263,38 @@ class CIDLIBEXP TLocFloat : public TFloat
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TLocFloat();
+        TLocFloat() = default;
 
         explicit TLocFloat
         (
             const   tCIDLib::TFloat8&       f8Val
-        );
+        )   noexcept;
 
         TLocFloat
         (
             const   tCIDLib::TFloat8&       f8Val
             , const tCIDLib::TCard1         c1Precision
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TLocFloat
         (
             const   tCIDLib::TCard4         c4Val
             , const tCIDLib::TCard1         c1Precision = 0
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TLocFloat
         (
             const   tCIDLib::TInt4          i4Val
             , const tCIDLib::TCard1         c1Precision = 0
             , const tCIDLib::ETrailFmts     eStyle = tCIDLib::ETrailFmts::Zeroes
-        );
+        )   noexcept;
 
         TLocFloat(const TLocFloat&) = default;
         TLocFloat(TLocFloat&&) = default;
 
-        ~TLocFloat();
+        ~TLocFloat() = default;
 
 
         // -------------------------------------------------------------------
@@ -306,32 +306,32 @@ class CIDLIBEXP TLocFloat : public TFloat
         tCIDLib::TBoolean operator==
         (
             const   TLocFloat&              fToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator!=
         (
             const   TLocFloat&              fToCompare
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<
         (
             const   TLocFloat&              fToCompare
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator<=
         (
             const   TLocFloat&              fToCompare
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>
         (
             const   TLocFloat&              fToCompare
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean operator>=
         (
             const   TLocFloat&              fToCompare
-        )   const;
+        )   const noexcept;
 
 
     protected   :

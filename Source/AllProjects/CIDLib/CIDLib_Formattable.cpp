@@ -44,7 +44,7 @@
 // ---------------------------------------------------------------------------
 //  MFormattable: Public, static methods
 // ---------------------------------------------------------------------------
-MFormattable& MFormattable::Nul_MFormattable()
+MFormattable& MFormattable::Nul_MFormattable() noexcept
 {
     //
     //  We have to have some real class for this, which derives from formattable

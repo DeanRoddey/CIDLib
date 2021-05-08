@@ -133,11 +133,7 @@ static tCIDLib::TVoid BasicEventTests()
     //
     //  Build the full name to the event and construct an event object
     //
-    if (!krsnTest.bBuildFullName
-    (
-        szTmpName
-        , c4MaxBufChars(szTmpName)
-        , tCIDLib::ENamedRscTypes::Event))
+    if (!krsnTest.bBuildFullName(szTmpName, tCIDLib::c4MaxBufChars(szTmpName), tCIDLib::ENamedRscTypes::Event))
     {
         throw TKrnlError::kerrLast();
     }

@@ -37,7 +37,6 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TRegEx,TObject)
 
-
 namespace CIDRegX_Engine
 {
     namespace
@@ -50,7 +49,7 @@ namespace CIDRegX_Engine
         //      the DFA. It separates the states for the current character and
         //      those for the next character.
         // -----------------------------------------------------------------------
-        const tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
+        constexpr tCIDLib::TCard4    c4Scan = kCIDLib::c4MaxCard;
     }
 }
 
@@ -70,9 +69,8 @@ TRegEx::TRegEx() :
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
     , m_c4CurState(0)
-    , m_c4PatLen(0)
     , m_prxnfaPattern(nullptr)
-    , m_pszPattern(nullptr)
+    , m_strPattern()
 {
 }
 
@@ -82,11 +80,10 @@ TRegEx::TRegEx(const TString& strExpression) :
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
     , m_c4CurState(0)
-    , m_c4PatLen(0)
     , m_prxnfaPattern(nullptr)
-    , m_pszPattern(nullptr)
+    , m_strPattern()
 {
-    SetExpression(strExpression.pszBuffer());
+    SetExpression(strExpression);
 }
 
 TRegEx::TRegEx(const tCIDLib::TCh* const pszExpression) :
@@ -95,29 +92,33 @@ TRegEx::TRegEx(const tCIDLib::TCh* const pszExpression) :
     , m_bLetter(kCIDLib::False)
     , m_c4CurInd(0)
     , m_c4CurState(0)
-    , m_c4PatLen(0)
     , m_prxnfaPattern(nullptr)
-    , m_pszPattern(nullptr)
+    , m_strPattern()
 {
     SetExpression(pszExpression);
 }
 
+TRegEx::TRegEx(const TRegEx& regxSrc) :
+
+    m_bEscaped(regxSrc.m_bEscaped)
+    , m_bLetter(regxSrc.m_bLetter)
+    , m_c4CurInd(regxSrc.m_c4CurInd)
+    , m_c4CurState(regxSrc.m_c4CurState)
+    , m_prxnfaPattern(nullptr)
+{
+    // We don't try to dup the data, we just rebuild it
+    SetExpression(regxSrc.m_strPattern);
+}
+
 TRegEx::TRegEx(TRegEx&& regxSrc) :
 
-    m_bEscaped(kCIDLib::False)
-    , m_bLetter(kCIDLib::False)
-    , m_c4CurInd(0)
-    , m_c4CurState(0)
-    , m_c4PatLen(0)
-    , m_prxnfaPattern(nullptr)
-    , m_pszPattern(nullptr)
+    TRegEx()
 {
     *this = tCIDLib::ForceMove(regxSrc);
 }
 
 TRegEx::~TRegEx()
 {
-    delete [] m_pszPattern;
     delete m_prxnfaPattern;
 }
 
@@ -133,13 +134,28 @@ TRegEx& TRegEx::operator=(TRegEx&& regxSrc)
         tCIDLib::Swap(m_bLetter, regxSrc.m_bLetter);
         tCIDLib::Swap(m_c4CurInd, regxSrc.m_c4CurInd);
         tCIDLib::Swap(m_c4CurState, regxSrc.m_c4CurState);
-        tCIDLib::Swap(m_c4PatLen, regxSrc.m_c4PatLen);
         tCIDLib::Swap(m_prxnfaPattern, regxSrc.m_prxnfaPattern);
-        tCIDLib::Swap(m_pszPattern, regxSrc.m_pszPattern);
+
+        m_strPattern = tCIDLib::ForceMove(regxSrc.m_strPattern);
     }
     return *this;
 }
 
+TRegEx& TRegEx::operator=(const TRegEx& regxSrc)
+{
+    if (&regxSrc != this)
+    {
+        m_bEscaped = regxSrc.m_bEscaped;
+        m_bLetter = regxSrc.m_bLetter;
+        m_c4CurInd = regxSrc.m_c4CurInd;
+        m_c4CurState = regxSrc.m_c4CurState;
+        m_strPattern = regxSrc.m_strPattern;
+
+        // We don't try to dup the NFA data, we just rebuild it
+        SetExpression(m_strPattern);
+    }
+    return *this;
+}
 
 
 // ---------------------------------------------------------------------------
@@ -558,22 +574,29 @@ TRegEx::bReplaceAll(        TString&            strFindIn
 }
 
 
+// We just reset the pattern, so they have to set a new one
+tCIDLib::TVoid TRegEx::Reset()
+{
+    delete m_prxnfaPattern;
+    m_prxnfaPattern = nullptr;
+    m_strPattern.Clear();
+}
+
+
 TString TRegEx::strExpression() const
 {
-    if (m_pszPattern)
-        return TString(m_pszPattern);
-    return TString::strEmpty();
+    return m_strPattern;
 }
 
 
 // Set the expression to use in matching
-tCIDLib::TVoid TRegEx::SetExpression(const TString& strExpression)
+tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszToSet)
 {
     // Just call the other version with the raw string
-    SetExpression(strExpression.pszBuffer());
+    SetExpression(TString(pszToSet));
 }
 
-tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszExpression)
+tCIDLib::TVoid TRegEx::SetExpression(const TString& strToSet)
 {
     //
     //  Get the maximum number of entries that this new expression could
@@ -582,25 +605,17 @@ tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszExpression)
     //  transition.) And we need an extra 0th state to kick start with and
     //  an extra last state.
     //
-    const tCIDLib::TCard4 c4NewLen = TRawStr::c4StrLen(pszExpression);
+    m_strPattern = strToSet;
+    const tCIDLib::TCard4 c4NewLen = m_strPattern.c4Length();
     const tCIDLib::TCard4 c4NewEntries = (c4NewLen * 2) + 2;
 
-    // Make sure the new expression is not empty
+    // If it's empty, then we just don't have a pattern anymore
     if (!c4NewLen)
     {
-        facCIDRegX().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kRegXErrs::errcRegEx_EmptyPattern
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotReady
-        );
+        delete m_prxnfaPattern;
+        m_prxnfaPattern = nullptr;
+        return;
     }
-
-    // Get our private copy of the raw pattern and its length
-    m_c4PatLen = c4NewLen;
-    m_pszPattern = TRawStr::pszReplicate(pszExpression);
 
     //
     //  If we have not created our NFA object yet, then create it. If
@@ -627,14 +642,14 @@ tCIDLib::TVoid TRegEx::SetExpression(const tCIDLib::TCh* const pszExpression)
     m_prxnfaPattern->c4AddState();
     const tCIDLib::TCard4 c4Start = c4ParseExpr();
 
-    if (m_c4CurInd != m_c4PatLen)
+    if (m_c4CurInd != m_strPattern.c4Length())
     {
         facCIDRegX().ThrowErr
         (
             CID_FILE
             , CID_LINE
             , kRegXErrs::errcRegEx_ExpectedExpr
-            , TString(m_pszPattern)
+            , m_strPattern
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
             , TCardinal(m_c4CurInd)
@@ -666,7 +681,7 @@ tCIDLib::TVoid TRegEx::FormatTo(TTextOutStream& strmDest) const
 
     // Display the pattern and the NFA we created from it
     strmDest << facCIDRegX().strMsg(kRegXMsgs::midGen_Pattern) << L": "
-             << m_pszPattern << kCIDLib::NewLn
+             << m_strPattern << kCIDLib::NewLn
              << facCIDRegX().strMsg(kRegXMsgs::midRegEx_NFA) << kCIDLib::NewLn
              << *m_prxnfaPattern;
 }
@@ -677,7 +692,7 @@ tCIDLib::TVoid TRegEx::FormatTo(TTextOutStream& strmDest) const
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TRegEx::bEndOfPattern() const
 {
-    return (m_c4CurInd >= m_c4PatLen);
+    return (m_c4CurInd >= m_strPattern.c4Length());
 }
 
 
@@ -775,7 +790,7 @@ tCIDLib::TCard4 TRegEx::c4ParseFactor()
                 CID_FILE
                 , CID_LINE
                 , kRegXErrs::errcRegEx_CloseParen
-                , TString(m_pszPattern)
+                , m_strPattern
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::AppError
                 , TCardinal(m_c4CurInd)
@@ -834,7 +849,7 @@ tCIDLib::TCard4 TRegEx::c4ParseFactor()
             CID_FILE
             , CID_LINE
             , kRegXErrs::errcRegEx_ExpectedFactor
-            , TString(m_pszPattern)
+            , m_strPattern
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::AppError
             , TCardinal(m_c4CurInd)
@@ -962,8 +977,9 @@ tCIDLib::TCard4 TRegEx::c4ParseTerm()
 
 tCIDLib::TCh TRegEx::chPeekNext()
 {
-    // Get the char at the current position
-    tCIDLib::TCh chRet = m_pszPattern[m_c4CurInd];
+    tCIDLib::TCh chRet = kCIDLib::chNull;
+    if (m_c4CurInd < m_strPattern.c4Length())
+        chRet = m_strPattern[m_c4CurInd];
 
     // Check special case of end of pattern
     if (chRet == kCIDLib::chNull)
@@ -990,7 +1006,7 @@ tCIDLib::TCh TRegEx::chPeekNext()
         //  in the pattern, which could not be legal since it could not be
         //  escaping anything.
         //
-        if (m_c4CurInd+1 == m_c4PatLen)
+        if (m_c4CurInd+1 == m_strPattern.c4Length())
         {
             facCIDRegX().ThrowErr
             (
@@ -1001,7 +1017,7 @@ tCIDLib::TCh TRegEx::chPeekNext()
                 , tCIDLib::EErrClasses::AppError
             );
         }
-        chRet = m_pszPattern[m_c4CurInd+1];
+        chRet = m_strPattern[m_c4CurInd+1];
         m_bEscaped = kCIDLib::True;
     }
      else
@@ -1026,7 +1042,7 @@ tCIDLib::TCh TRegEx::chPeekNext()
         //  something special (match at end), so we treat it like a non
         //  character in that one case.
         //
-        if ((chRet == kCIDLib::chDollarSign) && (m_c4CurInd == m_c4PatLen-1))
+        if ((chRet == kCIDLib::chDollarSign) && (m_c4CurInd == m_strPattern.c4Length() - 1))
         {
             m_bLetter = kCIDLib::False;
         }
@@ -1058,12 +1074,12 @@ tCIDLib::TCh TRegEx::chNext()
     tCIDLib::TCh chRet = kCIDLib::chNull;
     if (m_bEscaped)
     {
-        chRet =  m_pszPattern[m_c4CurInd+1];
+        chRet =  m_strPattern[m_c4CurInd+1];
         m_c4CurInd += 2;
     }
      else
     {
-        chRet = m_pszPattern[m_c4CurInd];
+        chRet = m_strPattern[m_c4CurInd];
         m_c4CurInd++;
     }
 

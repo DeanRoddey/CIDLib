@@ -211,7 +211,7 @@ static tCIDLib::TVoid InitCharTable()
 // ---------------------------------------------------------------------------
 //  TURL: Public, static methods
 // ---------------------------------------------------------------------------
-TURL& TURL::Nul_TURL()
+TURL& TURL::Nul_TURL() noexcept
 {
     static TURL urlNull;
     return urlNull;

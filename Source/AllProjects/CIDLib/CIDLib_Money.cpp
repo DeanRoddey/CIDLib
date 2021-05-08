@@ -47,7 +47,7 @@ AdvRTTIDecls(TMoney,TObject)
 // ---------------------------------------------------------------------------
 //  TMoney: Public, static methods
 // ---------------------------------------------------------------------------
-TMoney& TMoney::Nul_TMoney()
+TMoney& TMoney::Nul_TMoney() noexcept
 {
     static TMoney monNull;
     return monNull;

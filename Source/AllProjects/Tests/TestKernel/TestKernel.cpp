@@ -511,7 +511,7 @@ static tCIDLib::TVoid ShowSysInfo()
             strmOut << L"Couldn't get DST state" << EndLn;
 
         tCIDLib::TZStr64 szTZName;
-        if (!ktsCurrent.bTZName(szTZName, c4MaxBufChars(szTZName)))
+        if (!ktsCurrent.bTZName(szTZName, tCIDLib::c4MaxBufChars(szTZName)))
             strmOut << L"Couldn't get DST name" << EndLn;
 
         strmOut << L"Date and Time Information\n"

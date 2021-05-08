@@ -92,10 +92,10 @@ struct  TDirSearchHandleImpl
 //
 //  An event semaphore under Win32 is just a handle to the event.
 //
-struct  TEventHandleImpl
-{
-    HANDLE hEvent;
-};
+//struct  TEventHandleImpl
+//{
+//    HANDLE hEvent;
+//};
 
 
 //

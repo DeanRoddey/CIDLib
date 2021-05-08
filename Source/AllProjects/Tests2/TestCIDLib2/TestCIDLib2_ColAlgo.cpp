@@ -136,6 +136,41 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
+    // Test the 'contains' algorithms
+    {
+        if (!tCIDColAlgo::bContains(colPoints, TPoint(2, 2)))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"bContains failed to find contained element\n\n";
+        }
+
+        if (tCIDColAlgo::bContains(colPoints, TPoint(9999, 1111)))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"bContains found a non-contained element\n\n";
+        }
+
+        // Set up a list with some points in the point list and check all are present
+        TPntList colTest;
+        colTest.objPlace(5, 5);
+        colTest.objPlace(8, 8);
+        colTest.objPlace(11, 11);
+        if (!tCIDColAlgo::bContainsAll(colPoints, colTest))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"bContainsAll reported present elements not found\n\n";
+        }
+
+        // Add one that's not in the list and test that
+        colTest.objPlace(9995, 103);
+        if (tCIDColAlgo::bContainsAll(colPoints, colTest))
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"bContainsAll round non-present-elements\n\n";
+        }
+    }
+
+
     // And now test the finder variation that looks for a key
     {
         // Search for one we know is there
@@ -225,7 +260,7 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         }
     }
 
-    // Test the copying one, to copy between two different types of collections
+    // Test copying, to copy between two different types of collections
     {
         TBag<TString> colTar;
         tCIDColAlgo::CopyElems(colTar, colStrs);
@@ -415,6 +450,43 @@ TTest_ColAlgo1::eRunTest(TTextStringOutStream&  strmOut
         {
             eRes = tTestFWLib::ETestRes::Failed;
             strmOut << TFWCurLn << L"Different case element was rejected\n\n";
+        }
+    }
+
+    // Test some miscellaneous bits
+    {
+        tCIDLib::TStrList colTest(8UL);
+        colTest.objAdd(L"Third");
+        colTest.objAdd(L"First");
+        colTest.objAdd(L"Second");
+        colTest.objAdd(L"Third");
+        colTest.objAdd(L"Fourth");
+        colTest.objAdd(L"Fifth");
+        colTest.objAdd(L"Third");
+
+        if (tCIDColAlgo::c4Count(colTest, TString(L"Third")) != 3)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"c4Count algorithm got incorrect count for Third\n\n";
+        }
+
+        if (tCIDColAlgo::c4Count(colTest, TString(L"Fifth")) != 1)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"c4Count algorithm got incorrect count for Fifth\n\n";
+        }
+
+        if (tCIDColAlgo::c4Count(colTest, TString(L"Sixth")) != 0)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"c4Count algorithm found value not in list\n\n";
+        }
+
+        colTest.RemoveAll();
+        if (tCIDColAlgo::c4Count(colTest, TString(L"Third")) != 0)
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"c4Count algorithm found values in empty collection\n\n";
         }
     }
 

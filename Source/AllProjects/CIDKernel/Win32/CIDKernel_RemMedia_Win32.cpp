@@ -314,7 +314,7 @@ TKrnlRemMediaDrv::TKrnlRemMediaDrv(const tCIDLib::TCh* const pszDevPath) :
     // Store the device path
     TRawStr::CopyStr
     (
-        m_pPlatData->szDrivePath, pszDevPath, c4MaxBufChars(m_pPlatData->szDrivePath)
+        m_pPlatData->szDrivePath, pszDevPath, tCIDLib::c4MaxBufChars(m_pPlatData->szDrivePath)
     );
 
     // Store the device path
@@ -624,7 +624,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bOpen()
     pPTBuf->PTInfo.DataTransferLength = 100;
     pPTBuf->PTInfo.TimeOutValue    = 2;
     pPTBuf->PTInfo.DataBuffer      = ac1InqData;
-    pPTBuf->PTInfo.SenseInfoOffset = c4FieldOfs(SPTD_WITH_BUFFER,ucSenseBuf);
+    pPTBuf->PTInfo.SenseInfoOffset = tCIDLib::c4FieldOfs(&SPTD_WITH_BUFFER::ucSenseBuf);
     pPTBuf->PTInfo.Cdb[0]          = 0x12;
     pPTBuf->PTInfo.Cdb[4]          = 100;
 
@@ -816,7 +816,7 @@ tCIDLib::TBoolean TKrnlRemMediaDrv::bSetPath(const tCIDLib::TCh* const pszToSet)
     (
         m_pPlatData->szDrivePath
         , pszToSet
-        , c4MaxBufChars(m_pPlatData->szDrivePath)
+        , tCIDLib::c4MaxBufChars(m_pPlatData->szDrivePath)
     );
     return kCIDLib::True;
 }

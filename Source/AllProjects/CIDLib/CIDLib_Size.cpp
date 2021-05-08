@@ -46,7 +46,7 @@ AdvRTTIDecls(TSize,TObject)
 // ---------------------------------------------------------------------------
 //  TSize: Public, static methods
 // ---------------------------------------------------------------------------
-TSize& TSize::Nul_TSize()
+TSize& TSize::Nul_TSize() noexcept
 {
     static TSize szNull;
     return szNull;

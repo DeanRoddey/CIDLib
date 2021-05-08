@@ -1119,9 +1119,9 @@ TCGenEnumInfo::FormatOperatorSigs(          TTextOutStream&     strmTar
     TStreamIndentJan janIndent(&strmTar, c4Indent);
     if (m_eIncDecOps != tCIDIDL::EIncDecOps::None)
     {
-        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator++("
+        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator++(CIOP "
                 << strPrefix << m_strTypeName
-                << L"& eVal, int)\n{\n    " << strPrefix
+                << L"& eVal, int)\n{\n    const " << strPrefix
                 << m_strTypeName << L" eTmp = eVal;\n"
                 << L"    eVal = " << strPrefix << m_strTypeName << L"(int(eVal)+1);\n"
                 << L"    return eTmp;\n}\n\n";
@@ -1129,9 +1129,9 @@ TCGenEnumInfo::FormatOperatorSigs(          TTextOutStream&     strmTar
 
     if (m_eIncDecOps == tCIDIDL::EIncDecOps::Both)
     {
-        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator--("
+        strmTar << L"inline " << strPrefix << m_strTypeName << L" operator--(CIOP "
                 << strPrefix << m_strTypeName
-                << L"& eVal, int)\n{\n    " << strPrefix
+                << L"& eVal, int)\n{\n    const " << strPrefix
                 << m_strTypeName << L" eTmp = eVal;\n"
                 << L"    eVal = " << strPrefix  << m_strTypeName << L"(int(eVal)-1);\n"
                 << L"    return eTmp;\n}\n\n";

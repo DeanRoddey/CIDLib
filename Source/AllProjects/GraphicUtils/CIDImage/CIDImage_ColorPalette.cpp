@@ -61,7 +61,7 @@ namespace CIDImage_ColorPalette
 // ---------------------------------------------------------------------------
 //  TClrPalette: Public, static methods
 // ---------------------------------------------------------------------------
-TClrPalette& TClrPalette::Nul_TClrPalette()
+TClrPalette& TClrPalette::Nul_TClrPalette() noexcept
 {
     static TClrPalette palNull;
     return palNull;

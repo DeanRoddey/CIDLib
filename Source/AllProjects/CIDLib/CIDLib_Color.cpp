@@ -48,7 +48,7 @@ RTTIDecls(TRGBClr,TObject)
 // ---------------------------------------------------------------------------
 //  TRGBClr: Public, static methods
 // ---------------------------------------------------------------------------
-TRGBClr& TRGBClr::Nul_TRGBClr()
+TRGBClr& TRGBClr::Nul_TRGBClr() noexcept
 {
     static TRGBClr rgbNull;
     return rgbNull;
@@ -58,16 +58,7 @@ TRGBClr& TRGBClr::Nul_TRGBClr()
 // ---------------------------------------------------------------------------
 //  TRGBClr: Constructors and operators
 // ---------------------------------------------------------------------------
-TRGBClr::TRGBClr(const tCIDLib::TCard4 c4Color) :
-
-    m_c1Red(((const tCIDLib::TCodedRGB*)&c4Color)->c1Red)
-    , m_c1Green(((const tCIDLib::TCodedRGB*)&c4Color)->c1Green)
-    , m_c1Blue(((const tCIDLib::TCodedRGB*)&c4Color)->c1Blue)
-    , m_c1Alpha(((const tCIDLib::TCodedRGB*)&c4Color)->c1Alpha)
-{
-}
-
-TRGBClr::TRGBClr(const tCIDLib::TRawRGB& rgbRaw) :
+TRGBClr::TRGBClr(const tCIDLib::TRawRGB& rgbRaw)  noexcept :
 
     m_c1Blue(rgbRaw.c1Blue)
     , m_c1Green(rgbRaw.c1Green)
@@ -75,7 +66,7 @@ TRGBClr::TRGBClr(const tCIDLib::TRawRGB& rgbRaw) :
 {
 }
 
-TRGBClr::TRGBClr(const tCIDLib::TCodedRGB& rgbCoded) :
+TRGBClr::TRGBClr(const tCIDLib::TCodedRGB& rgbCoded) noexcept :
 
     m_c1Blue(rgbCoded.c1Blue)
     , m_c1Green(rgbCoded.c1Green)
@@ -84,27 +75,6 @@ TRGBClr::TRGBClr(const tCIDLib::TCodedRGB& rgbCoded) :
 {
 }
 
-TRGBClr::TRGBClr(const  tCIDLib::TCard1 c1Red
-                , const tCIDLib::TCard1 c1Green
-                , const tCIDLib::TCard1 c1Blue) :
-
-    m_c1Blue(c1Blue)
-    , m_c1Green(c1Green)
-    , m_c1Red(c1Red)
-{
-}
-
-TRGBClr::TRGBClr(const  tCIDLib::TCard1 c1Red
-                , const tCIDLib::TCard1 c1Green
-                , const tCIDLib::TCard1 c1Blue
-                , const tCIDLib::TCard1 c1Alpha) :
-
-    m_c1Blue(c1Blue)
-    , m_c1Green(c1Green)
-    , m_c1Red(c1Red)
-    , m_c1Alpha(c1Alpha)
-{
-}
 
 
 // ---------------------------------------------------------------------------
@@ -493,12 +463,16 @@ tCIDLib::TCard1 TRGBClr::c1ClrComp(const tCIDLib::EClrComps eComp) const
                 + (m_c1Blue * 0.114F)
             );
             break;
+
+        default :
+            CIDAssert2(L"Unkown color component");
+            break;
     };
     return c1Ret;
 }
 
 
-tCIDLib::TCard1 TRGBClr::c1MaxComponent() const
+tCIDLib::TCard1 TRGBClr::c1MaxComponent() const noexcept
 {
     if (m_c1Red > m_c1Green)
     {
@@ -512,7 +486,7 @@ tCIDLib::TCard1 TRGBClr::c1MaxComponent() const
 }
 
 
-tCIDLib::TCard1 TRGBClr::c1MinComponent() const
+tCIDLib::TCard1 TRGBClr::c1MinComponent() const noexcept
 {
     if (m_c1Red < m_c1Green)
     {
@@ -526,32 +500,32 @@ tCIDLib::TCard1 TRGBClr::c1MinComponent() const
 }
 
 
-tCIDLib::TCard4 TRGBClr::c4Magnitude() const
+tCIDLib::TCard4 TRGBClr::c4Magnitude() const noexcept
 {
     return tCIDLib::TCard4(m_c1Red + m_c1Green + m_c1Blue);
 }
 
 
 // Make our components available as floating point as a convenience
-tCIDLib::TFloat4 TRGBClr::f4Alpha() const
+tCIDLib::TFloat4 TRGBClr::f4Alpha() const noexcept
 {
     return tCIDLib::TFloat4(m_c1Alpha) / 255;
 }
 
 
-tCIDLib::TFloat4 TRGBClr::f4Blue() const
+tCIDLib::TFloat4 TRGBClr::f4Blue() const noexcept
 {
     return tCIDLib::TFloat4(m_c1Blue) / 255;
 }
 
 
-tCIDLib::TFloat4 TRGBClr::f4Green() const
+tCIDLib::TFloat4 TRGBClr::f4Green() const noexcept
 {
     return tCIDLib::TFloat4(m_c1Green) / 255;
 }
 
 
-tCIDLib::TFloat4 TRGBClr::f4Red() const
+tCIDLib::TFloat4 TRGBClr::f4Red() const noexcept
 {
     return tCIDLib::TFloat4(m_c1Red) / 255;
 }

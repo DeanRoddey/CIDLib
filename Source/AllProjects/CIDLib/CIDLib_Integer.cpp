@@ -52,7 +52,7 @@ AdvRTTIDecls(TLocInteger64,TInteger64)
 // ---------------------------------------------------------------------------
 //  TInteger: Public, static methods
 // ---------------------------------------------------------------------------
-TInteger& TInteger::Nul_TInteger()
+TInteger& TInteger::Nul_TInteger() noexcept
 {
     static TInteger iNull;
     return iNull;
@@ -247,7 +247,7 @@ tCIDLib::TVoid TInteger::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TInteger64: Public, static methods
 // ---------------------------------------------------------------------------
-TInteger64& TInteger64::Nul_TInteger64()
+TInteger64& TInteger64::Nul_TInteger64() noexcept
 {
     static TInteger64 iNull;
     return iNull;

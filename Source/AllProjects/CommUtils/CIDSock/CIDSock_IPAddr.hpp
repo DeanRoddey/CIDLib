@@ -317,6 +317,7 @@ class CIDSOCKEXP TIPEndPoint : public TIPAddress
         );
 
         TIPEndPoint(const TIPEndPoint&) = default;
+        TIPEndPoint(TIPEndPoint&&) = default;
 
         ~TIPEndPoint();
 
@@ -325,6 +326,7 @@ class CIDSOCKEXP TIPEndPoint : public TIPAddress
         //  Public operators
         // -------------------------------------------------------------------
         TIPEndPoint& operator=(const TIPEndPoint&) = default;
+        TIPEndPoint& operator=(TIPEndPoint&&) = default;
 
         TIPEndPoint& operator=
         (
@@ -387,17 +389,17 @@ class CIDSOCKEXP TIPEndPoint : public TIPAddress
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmDest
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const override;
+        )   const final;
 
 
     private :

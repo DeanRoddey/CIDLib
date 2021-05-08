@@ -586,7 +586,7 @@ TKrnlFile::bReadBufferTO(       tCIDLib::TVoid* const   pBuffer
 {
     // Set up an overlapped structure
     OVERLAPPED OverData = {0};
-    OverData.hEvent = *((HANDLE*)&kevToPost.hevThis().heviThis());
+    OverData.hEvent = *tCIDLib::pReCastPtr<HANDLE>(kevToPost.pHandle());
 
     //
     //  Do the read. If there's data already there, it'll come back just
@@ -788,7 +788,7 @@ TKrnlFile::bWriteBufferTO(  const   tCIDLib::TVoid* const   pBuffer
 {
     // Set up an overlapped structure
     OVERLAPPED OverData = {0};
-    OverData.hEvent = *((HANDLE*)&kevToPost.hevThis().heviThis());
+    OverData.hEvent = *tCIDLib::pReCastPtr<HANDLE>(kevToPost.pHandle());
 
     //
     //  Do the write. If there's data already there, it'll come back just

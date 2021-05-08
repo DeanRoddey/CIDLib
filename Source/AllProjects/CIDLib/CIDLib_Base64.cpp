@@ -108,33 +108,8 @@ namespace CIDLib_Base64
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TBase64: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TBase64::TBase64() :
-
-    m_bEscapeForwardSlashes(kCIDLib::False)
-    , m_c4LineWidth(72)
-{
-}
-
-
-// ---------------------------------------------------------------------------
 //  TBase64: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-
-// Get or set the forward slash escapement flag
-tCIDLib::TBoolean TBase64::bEscapeForwardSlashes() const
-{
-    return m_bEscapeForwardSlashes;
-}
-
-tCIDLib::TBoolean TBase64::bEscapeForwardSlashes(const tCIDLib::TBoolean bToSet)
-{
-    m_bEscapeForwardSlashes = bToSet;
-    return m_bEscapeForwardSlashes;
-}
-
-
 
 //
 //  These decode/encode methods work in terms of binary streams, for those
@@ -205,11 +180,8 @@ tCIDLib::TCard4 TBase64::c4Decode(TBinInStream& strmIn, TBinOutStream& strmOut)
         //  If it's an end of stream error, then handle any partial last
         //  block. Else, rethrow it.
         //
-        if (!errToCatch.bCheckEvent(facCIDLib().strName()
-                                    , kCIDErrs::errcStrm_EndOfStream))
-        {
+        if (!errToCatch.bCheckEvent(facCIDLib().strName(), kCIDErrs::errcStrm_EndOfStream))
             throw;
-        }
 
         // Handle the last partial block if any
         if (c4BlkCnt)
@@ -293,11 +265,6 @@ tCIDLib::TCard4 TBase64::c4Encode(TBinInStream& strmIn, TBinOutStream& strmOut)
     return c4Count;
 }
 
-
-tCIDLib::TCard4 TBase64::c4LineWidth() const
-{
-    return m_c4LineWidth;
-}
 
 tCIDLib::TCard4 TBase64::c4LineWidth(const tCIDLib::TCard4 c4ToSet)
 {

@@ -34,8 +34,9 @@ namespace tCIDLib
     struct TrueType { static constexpr tCIDLib::TBoolean bState = true; };
 
     // See if two types are the same
-    template <class T, class U> struct IsSameType : FalseType {};
-    template <class T> struct IsSameType<T,T> : TrueType {};
+    template <typename T, typename U> struct IsSameType : FalseType {};
+    template <typename  T> struct IsSameType<T,T> : TrueType {};
+    template <typename T, typename U> constexpr tCIDLib::TBoolean bIsSameType = IsSameType<T,U>::bState;
 
 
     //
@@ -70,15 +71,18 @@ namespace tCIDLib
     template <> struct IsTCardX<tCIDLib::TCard1> : TrueType {};
     template <> struct IsTCardX<tCIDLib::TCard2> : TrueType {};
     template <> struct IsTCardX<tCIDLib::TCard4> : TrueType {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsTCardX = IsTCardX<T>::bState;
 
     template <typename T> struct IsTFloatX : FalseType {};
     template <> struct IsTFloatX<tCIDLib::TFloat4> : TrueType {};
     template <> struct IsTFloatX<tCIDLib::TFloat8> : TrueType {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsTFloatX = IsTFloatX<T>::bState;
 
     template <typename T> struct IsTIntX : FalseType {};
     template <> struct IsTIntX<tCIDLib::TInt1> : TrueType {};
     template <> struct IsTIntX<tCIDLib::TInt2> : TrueType {};
     template <> struct IsTIntX<tCIDLib::TInt4> : TrueType {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsTIntX = IsTIntX<T>::bState;
 
     template <typename T> struct IsNumeric
     {
@@ -87,6 +91,7 @@ namespace tCIDLib
             IsTCardX<T>::bState || IsTFloatX<T>::bState || IsTIntX<T>::bState
         );
     };
+    template <typename T> constexpr tCIDLib::TBoolean bIsNumeric = IsNumeric<T>::bState;
 
     template <typename T> struct IsArray : FalseType {};
     template <typename T> struct IsArray<T[]> : TrueType {};
@@ -95,10 +100,12 @@ namespace tCIDLib
     // For conditional stuff based on const'ness
     template <typename T> struct IsConst : FalseType {};
     template <typename T> struct IsConst<const T> : TrueType {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsConst = IsConst<T>::bState;
 
     // For conditional inclusion
-    template<bool C, typename T = tCIDLib::TVoid> struct EnableIf { };
-    template<typename T> struct EnableIf<kCIDLib::True, T> { typedef T Type; };
+    template <bool C, typename T = tCIDLib::TVoid> struct EnableIf { };
+    template <typename T> struct EnableIf<kCIDLib::True, T> { typedef T Type; };
+    template <bool C, typename T = tCIDLib::TVoid> using EnableIfType = typename EnableIf<C,T>::Type;
 
 
     // Remove constness
@@ -108,11 +115,11 @@ namespace tCIDLib
     template <typename T> struct AddConst { typedef const T Type; };
     template <typename T> struct AddConst<const T> { typedef T Type; };
 
-
     //  To force move semantics
-    template<class T> struct RemoveRef    {typedef T Type;};
-    template<class T> struct RemoveRef    <T&>  {typedef T Type;};
-    template<class T> struct RemoveRef    <T&&> {typedef T Type;};
+    template <typename T> struct RemoveRef    {typedef T Type;};
+    template <typename T> struct RemoveRef    <T&>  {typedef T Type;};
+    template <typename T> struct RemoveRef    <T&&> {typedef T Type;};
+    template <typename T> using tRemoveRef = typename RemoveRef<T>::Type;
 
     template <typename T>
     typename RemoveRef<T>::Type&& ForceMove(T&& src) noexcept
@@ -120,24 +127,35 @@ namespace tCIDLib
         return static_cast<typename RemoveRef<T>::Type&&>(src);
     }
 
+    // Remove both const and reference
+    template <typename T> struct RemoveCR { typedef T Type; };
+    template <typename T> struct RemoveCR<const T> { typedef T Type; };
+    template <typename T> struct RemoveCR<T&> { typedef T Type; };
+    template <typename T> struct RemoveCR<const T&> { typedef T Type; };
+    template <typename T> using tRemoveCR = typename RemoveCR<T>::Type;
 
     // Is it a pointer to a type or not
     template <typename T> struct IsPointerBase : FalseType{};
     template <typename T> struct IsPointerBase<T*> : TrueType{};
     template <typename T> struct IsPointer : IsPointerBase<typename RemoveConst<T>::Type> {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsPointer = IsPointer<T>::bState;
 
     // Is it a ref to a type or not
     template <typename T> struct IsRefBase : FalseType{};
     template <typename T> struct IsRefBase<T&> : TrueType{};
     template <typename T> struct IsRef : IsRefBase<typename RemoveConst<T>::Type> {};
+    template <typename T> constexpr tCIDLib::TBoolean bIsRef = IsRef<T>:bState;
+
+
+    // This is a hack for the 'else' clause of if constexpr sequences, so we can static assert
+    template<typename T> struct FalseDependType : FalseType {};
 
 
     // -----------------------------------------------------------------------
     //  Return a const ref to the passed ref, effectively add const to it if it
     //  is not already.
     // -----------------------------------------------------------------------
-    template <typename T>
-    constexpr AddConst<T>& tAsConst(T& tRet) noexcept
+    template <typename T> constexpr AddConst<T>& tAsConst(T& tRet) noexcept
     {
         return tRet;
     }
@@ -151,16 +169,14 @@ namespace tCIDLib
     //  type and casts it to a universal reference type. We need one for regular
     //  references and one for r-value refs.
     // -----------------------------------------------------------------------
-    template <typename T>
-    constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
+    template <typename T> constexpr T&& Forward(typename RemoveRef<T>::Type& t) noexcept
     {
         // Often causes an unneeded cast warning, but we can never know when so suppress
         CIDLib_Suppress(26473)
         return static_cast<T&&>(t);
     }
 
-    template <typename T>
-    constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
+    template <typename T> constexpr T&& Forward(typename RemoveRef<T>::type&& t) noexcept
     {
         // Often causes an unneeded cast warning, but we can never know when so suppress
         CIDLib_Suppress(26473)
@@ -187,7 +203,22 @@ namespace tCIDLib
     //  Calculate the size of an array
     // ---------------------------------------------------------------------------
     template <typename T, int size>
-    constexpr tCIDLib::TCard4 c4ArrayElems(T(&)[size]) {return size;}
+    constexpr tCIDLib::TCard4 c4ArrayElems(T(&)[size]) noexcept {return size;}
+
+
+    // ---------------------------------------------------------------------------
+    //  Calculate the number of chars storable in a raw string buffer. This keeps the
+    //  calculation from being all over the place. The reason for it is that
+    //  sizeof(buff) is not valid in a wide char environment. Note that the max
+    //  chars is 1 less than the full count because it does not include the
+    //  nul.
+    // ---------------------------------------------------------------------------
+    template <typename T, int size> constexpr tCIDLib::TCard4 c4MaxBufChars(T(&)[size]) noexcept
+    {
+        if (!size)
+            return 0;
+        return size - 1;
+    }
 
 
     // -----------------------------------------------------------------------
@@ -198,6 +229,16 @@ namespace tCIDLib
         if (v1 > v2)
             return v1 - v2;
         return v2 - v1;
+    }
+
+
+    // -----------------------------------------------------------------------
+    //  Calculate the offset of a field in a struct/class
+    // -----------------------------------------------------------------------
+    template<typename T, typename U> tCIDLib::TCard4 c4FieldOfs(U T::*member)
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<tCIDLib::TCard1*>(&(static_cast<T*>(nullptr)->*member)) - static_cast<tCIDLib::TCard1*>(nullptr);
     }
 
 
@@ -372,8 +413,8 @@ namespace tCIDLib
 
     //
     //  A simple generic pair of values of arbitrary type. Any required functionality
-    //  of the members is the business of the user. But they have to be assignable
-    //  at least.
+    //  of the members is the business of the user. But they have to be copyable/assignable
+    //  at least since they are by value.
     //
     template <typename F, typename S> struct TBasicPair
     {
@@ -386,6 +427,7 @@ namespace tCIDLib
         F m_tF;
         S m_tS;
     };
+
 
 
     // Default relative magnitude comparator for sorting
@@ -530,20 +572,18 @@ namespace tCIDLib
         using type = T;
     };
 
-
-    // Sometimes we have to use a reinterpret cast, so make the analyzer be quiet about it
-    template <typename T, typename F> T* pReCastPtr(F* pSrc)
-    {
-        CIDLib_Suppress(26490)
-        return reinterpret_cast<T*>(pSrc);
-    }
-
-    //
-    //  A fairly common cast when dealing with C interfaces, which requires a reinterpret cast
-    //
-    template <typename F> tCIDLib::TVoid** pToVoidPP(F** pSrc)
+    // A fairly common cast when dealing with C interfaces, which requires a reinterpret cast
+    template <typename F> tCIDLib::TVoid** pToVoidPP(F** pSrc) noexcept
     {
         CIDLib_Suppress(26490)
         return reinterpret_cast<tCIDLib::TVoid**>(pSrc);
+    }
+
+
+    // Sometimes we have to use a reinterpret cast, so make the analyzer be quiet about it
+    template <typename T, typename F> T* pReCastPtr(F* pSrc) noexcept
+    {
+        CIDLib_Suppress(26490)
+        return reinterpret_cast<T*>(pSrc);
     }
 }

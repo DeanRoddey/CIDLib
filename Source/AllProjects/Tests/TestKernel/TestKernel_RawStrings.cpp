@@ -393,7 +393,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(12345.9876)
         , szTmp
         , 3
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -406,7 +406,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(12345.9878)
         , szTmp
         , 3
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -419,7 +419,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(12345.987)
         , szTmp
         , 3
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -432,7 +432,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(12345.98)
         , szTmp
         , 3
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -445,7 +445,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(12345.98)
         , szTmp
         , 0
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -458,7 +458,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(0)
         , szTmp
         , 0
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Spaces))
     {
         throw TKrnlError::kerrLast();
@@ -471,7 +471,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(0)
         , szTmp
         , 2
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Zeroes))
     {
         throw TKrnlError::kerrLast();
@@ -484,7 +484,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(0.001)
         , szTmp
         , 4
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Zeroes))
     {
         throw TKrnlError::kerrLast();
@@ -497,7 +497,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(0.001)
         , szTmp
         , 2
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Zeroes))
     {
         throw TKrnlError::kerrLast();
@@ -510,7 +510,7 @@ static tCIDLib::TVoid TestFormatting()
         tCIDLib::TFloat8(-0.01455)
         , szTmp
         , 6
-        , c4MaxBufChars(szTmp)
+        , tCIDLib::c4MaxBufChars(szTmp)
         , tCIDLib::ETrailFmts::Ignore))
     {
         throw TKrnlError::kerrLast();

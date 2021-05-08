@@ -65,46 +65,71 @@ class CIDLIBEXP TArea :
 
         TArea
         (
-            const   tCIDLib::THostRectl&    rectlToCopy
-        );
+            const   tCIDLib::THostRectl&    rectlSrc
+        )   noexcept;
 
         explicit TArea
         (
-            const   tCIDLib::TRawArea&      areaToCopy
-        );
+            const   tCIDLib::TRawArea&      areaSrc
+        )   noexcept;
 
-        TArea
-        (
-            const   tCIDLib::THostPoint&    ptULeft
-            , const tCIDLib::THostPoint&    ptLRight
-        );
+        constexpr TArea(const   tCIDLib::THostPoint&    ptULeft
+                        , const tCIDLib::THostPoint&    ptLRt)  noexcept :
 
-        TArea
-        (
-            const   TPoint&                 pntULeft
-            , const TPoint&                 pntLRight
-        );
+            // Note that this depends upon correct member order!!
+            m_i4X(tCIDLib::MinVal(ptULeft.i4X, ptLRt.i4X))
+            , m_i4Y(tCIDLib::MinVal(ptULeft.i4Y, ptLRt.i4Y))
+            , m_c4CX(tCIDLib::MaxVal(ptULeft.i4X, ptLRt.i4X) - m_i4X)
+            , m_c4CY(tCIDLib::MaxVal(ptULeft.i4Y, ptLRt.i4Y) - m_i4Y)
+        {
+        }
 
-        TArea
-        (
-            const   tCIDLib::TInt4          i4X
-            , const tCIDLib::TInt4          i4Y
-            , const tCIDLib::TCard4         c4CX
-            , const tCIDLib::TCard4         c4CY
-        );
+        constexpr TArea(const   TPoint& pntULeft
+                        , const TPoint& pntLRt) noexcept
+        {
+            // Get the values out of the points for greater efficiency
+            tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
+            tCIDLib::TInt4 i4Y1 = pntULeft.m_i4Y;
+            tCIDLib::TInt4 i4X2 = pntLRt.m_i4X;
+            tCIDLib::TInt4 i4Y2 = pntLRt.m_i4Y;
 
-        TArea
-        (
-            const   TPoint&                 pntULeft
-            , const tCIDLib::TCard4         c4CX
-            , const tCIDLib::TCard4         c4CY
-        );
+            m_i4X   = tCIDLib::MinVal(i4X1, i4X2);
+            m_c4CX  = i4X1 > i4X2 ? i4X1 - i4X2 : i4X2 - i4X1;
+            m_i4Y   = tCIDLib::MinVal(i4Y1, i4Y2);
+            m_c4CY  = i4Y1 > i4Y2 ? i4Y1 - i4Y2 : i4Y2 - i4Y1;
+        }
 
-        TArea
-        (
-            const   TPoint&                 pntULeft
-            , const TSize&                  szExtent
-        );
+        constexpr TArea(const   tCIDLib::TInt4  i4X
+                        , const tCIDLib::TInt4  i4Y
+                        , const tCIDLib::TCard4 c4CX
+                        , const tCIDLib::TCard4 c4CY) noexcept :
+
+            m_i4X(i4X)
+            , m_i4Y(i4Y)
+            , m_c4CX(c4CX)
+            , m_c4CY(c4CY)
+        {
+        }
+
+        constexpr TArea(const TPoint& pntOrg, const TSize& szExtent) noexcept :
+
+            m_i4X(pntOrg.m_i4X)
+            , m_i4Y(pntOrg.m_i4Y)
+            , m_c4CX(szExtent.c4Width())
+            , m_c4CY(szExtent.c4Height())
+        {
+        }
+
+        constexpr TArea(const   TPoint&         pntOrg
+                        , const tCIDLib::TCard4 c4CX
+                        , const tCIDLib::TCard4 c4CY) noexcept :
+
+            m_i4X(pntOrg.m_i4X)
+            , m_i4Y(pntOrg.m_i4Y)
+            , m_c4CX(c4CX)
+            , m_c4CY(c4CY)
+        {
+        }
 
         TArea(const TArea&) = default;
         TArea(TArea&&) = default;
@@ -121,7 +146,7 @@ class CIDLIBEXP TArea :
         TArea& operator=
         (
             const   tCIDLib::TRawArea&     areaSrc
-        );
+        )   noexcept;
 
         friend TArea CIDLIBEXP operator|
         (
@@ -252,12 +277,12 @@ class CIDLIBEXP TArea :
         tCIDLib::TBoolean bIntersects
         (
             const   TArea&                  areaToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bIsInside
         (
             const   TArea&                  areaToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bMoveWithin
         (
@@ -281,12 +306,12 @@ class CIDLIBEXP TArea :
         tCIDLib::TBoolean bSameOrg
         (
             const   TArea&                  areaToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bSameSize
         (
             const   TArea&                  areaToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bVertOverlap
         (
@@ -304,23 +329,23 @@ class CIDLIBEXP TArea :
             , const tCIDLib::TBoolean       bHCenter = kCIDLib::False
         );
 
-        constexpr tCIDLib::TCard4 c4Height() const
+        constexpr tCIDLib::TCard4 c4Height() const noexcept
         {
             return m_c4CY;
         }
 
-        tCIDLib::TCard4 c4Height(const tCIDLib::TCard4 c4NewCY)
+        tCIDLib::TCard4 c4Height(const tCIDLib::TCard4 c4NewCY) noexcept
         {
             m_c4CY = c4NewCY;
             return m_c4CY;
         }
 
-        constexpr tCIDLib::TCard4 c4SquareUnits() const
+        constexpr tCIDLib::TCard4 c4SquareUnits() const noexcept
         {
             return (m_c4CX * m_c4CY);
         }
 
-        constexpr tCIDLib::TCard4 c4Width() const
+        constexpr tCIDLib::TCard4 c4Width() const noexcept
         {
             return m_c4CX;
         }
@@ -407,14 +432,14 @@ class CIDLIBEXP TArea :
             const   tCIDLib::THostRectl&    rectlSrc
         );
 
-        tCIDLib::TInt4 i4Bottom() const;
+        tCIDLib::TInt4 i4Bottom() const noexcept;
 
         tCIDLib::TInt4 i4Bottom
         (
             const   tCIDLib::TInt4          i4NewBottom
         );
 
-        constexpr tCIDLib::TInt4 i4Left() const
+        constexpr tCIDLib::TInt4 i4Left() const noexcept
         {
             return m_i4X;
         }
@@ -423,16 +448,16 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::TInt4          i4NewLeft
             , const tCIDLib::TBoolean       bLockRight = kCIDLib::False
-        );
+        )   noexcept;
 
-        tCIDLib:: TInt4 i4Right() const;
+        tCIDLib:: TInt4 i4Right() const noexcept;
 
         tCIDLib:: TInt4 i4Right
         (
             const   tCIDLib::TInt4          i4XRight
         );
 
-        constexpr tCIDLib::TInt4 i4Top() const
+        constexpr tCIDLib::TInt4 i4Top() const noexcept
         {
             return m_i4Y;
         }
@@ -441,9 +466,9 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::TInt4          i4YTop
             , const tCIDLib::TBoolean       bLockBottom = kCIDLib::False
-        );
+        )   noexcept;
 
-        constexpr tCIDLib::TInt4 i4X() const
+        constexpr tCIDLib::TInt4 i4X() const noexcept
         {
             return m_i4X;
         }
@@ -452,9 +477,9 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::TInt4          i4NewX
             , const tCIDLib::TBoolean       bLockRight = kCIDLib::False
-        );
+        )   noexcept;
 
-        tCIDLib::TInt4 i4Y() const
+        tCIDLib::TInt4 i4Y() const noexcept
         {
             return m_i4Y;
         }
@@ -463,7 +488,7 @@ class CIDLIBEXP TArea :
         (
             const   tCIDLib::TInt4          i4NewY
             , const tCIDLib::TBoolean       bLockBottom = kCIDLib::False
-        );
+        )   noexcept;
 
         tCIDLib::TVoid Inflate( const tCIDLib::TCard4 c4XOfs, const tCIDLib::TCard4 c4YOfs)
         {
@@ -493,35 +518,35 @@ class CIDLIBEXP TArea :
             const   tCIDLib::EDirs          eDir
         );
 
-        tCIDLib::TVoid NegateOrg()
+        tCIDLib::TVoid NegateOrg() noexcept
         {
             m_i4X *= -1;
             m_i4Y *= -1;
         }
 
-        TPoint pntCenter() const;
+        TPoint pntCenter() const noexcept;
 
-        TPoint pntLL(const tCIDLib::TInt4 i4XAdj= 0, const tCIDLib::TInt4 i4YAdj = 0) const
+        TPoint pntLL(const tCIDLib::TInt4 i4XAdj= 0, const tCIDLib::TInt4 i4YAdj = 0) const noexcept
         {
             return TPoint(m_i4X + i4XAdj, i4Bottom() + i4YAdj);
         }
 
-        TPoint pntLR(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const
+        TPoint pntLR(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const noexcept
         {
             return TPoint(i4Right() + i4XAdj, i4Bottom() + i4YAdj);
         }
 
-        TPoint pntOrg() const
+        TPoint pntOrg() const noexcept
         {
             return TPoint(m_i4X, m_i4Y);
         }
 
-        TPoint pntUL(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const
+        TPoint pntUL(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const noexcept
         {
             return TPoint(m_i4X + i4XAdj, m_i4Y + i4YAdj);
         }
 
-        TPoint pntUR(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const
+        TPoint pntUR(const tCIDLib::TInt4 i4XAdj = 0, const tCIDLib::TInt4 i4YAdj = 0) const noexcept
         {
             return TPoint(i4Right() + i4XAdj, m_i4Y + i4YAdj);
         }
@@ -689,11 +714,11 @@ class CIDLIBEXP TArea :
             , const tCIDLib::TCard4         c4CY
         );
 
-        tCIDLib::TVoid ZeroAll();
+        tCIDLib::TVoid ZeroAll() noexcept;
 
-        tCIDLib::TVoid ZeroOrg();
+        tCIDLib::TVoid ZeroOrg() noexcept;
 
-        tCIDLib::TVoid ZeroSizes();
+        tCIDLib::TVoid ZeroSizes() noexcept;
 
 
     protected           :

@@ -30,6 +30,10 @@
 //  assign, and move semantics on the pointer. The default is to use delete and the
 //  copy constructor, but you can provide a custom deleter and copier.
 //
+//      NOTE that is is imperative that no polymorhpism is involved here, or all kinds
+//      of weirdness will occur. So this class will require that the passed object is
+//      the same type as the template parameter type.
+//
 //  4. Unique = Similar to the standard library unique pointers. They don't allow copy
 //  or assign, just move and give away the pointer to the next one in line. The last
 //  one that has when it destructs will clean up the object. The default is to just
@@ -92,7 +96,6 @@ namespace TSmartPtrHelpers
         const   tCIDLib::TCard4         c4Line
         , const tCIDLib::TCh* const     pszType
     );
-
 
     // Default deleter and copier handlers
     template <typename T> struct TDefDeleter
@@ -1225,10 +1228,11 @@ template <typename T> class TMemberPtr
         {
         }
 
-        explicit TMemberPtr(T* const pobjAdopt) :
+        template <typename TPtr> explicit TMemberPtr(TPtr* const pobjAdopt) :
 
             m_pdpInfo(new TDataPtrDefDC<T>(pobjAdopt))
         {
+            static_assert(tCIDLib::bIsSameType<TPtr, T>);
         }
 
         // Let them set custom copy/delete handlers
@@ -1276,7 +1280,7 @@ template <typename T> class TMemberPtr
             if (&mbptrSrc != this)
             {
                 ReleaseData(kCIDLib::False);
-                m_pdpInfo = mbptrSrc->pdpDuplicate();
+                m_pdpInfo = mbptrSrc.m_pdpInfo->pdpDuplicate();
             }
             return *this;
         }
@@ -1344,16 +1348,18 @@ template <typename T> class TMemberPtr
         }
 
         // Drop any current data and create a new default handler for the new data
-        tCIDLib::TVoid SetPointer(T* const pobjAdopt)
+        template <typename TPtr> tCIDLib::TVoid SetPointer(TPtr* const pobjAdopt)
         {
+            static_assert(tCIDLib::bIsSameType<TPtr, T>);
             ReleaseData(kCIDLib::False);
             m_pdpInfo = new TDataPtrDefDC<T>(pobjAdopt);
         }
 
         // For this one, let them set their own copy/delete handlers
-        template <typename TCopy, typename TDel>
-        tCIDLib::TVoid SetPointer(T* const pobjAdopt, TCopy fnCopy, TDel fnDelete)
+        template <typename TCopy, typename TDel, typename TPtr>
+        tCIDLib::TVoid SetPointer(TPtr* const pobjAdopt, TCopy fnCopy, TDel fnDelete)
         {
+            static_assert(tCIDLib::bIsSameType<TPtr, T>);
             ReleaseData(kCIDLib::False);
             m_pdpInfo = new TDataPtrCustDC<T,TCopy,TDel>(pobjAdopt, fnCopy, fnDelete);
         }
@@ -1480,6 +1486,11 @@ namespace tCIDLib
     template <typename T, typename... TArgs> TUniquePtr<T> uptrMakeNew(TArgs&& ...Args)
     {
         return TUniquePtr<T>(new T(tCIDLib::Forward<TArgs>(Args)...));
+    }
+
+    template <typename T, typename... TArgs> TMemberPtr<T> mbptrMakeNew(TArgs&& ...Args)
+    {
+        return TMemberPtr<T>(new T(tCIDLib::Forward<TArgs>(Args)...));
     }
 }
 

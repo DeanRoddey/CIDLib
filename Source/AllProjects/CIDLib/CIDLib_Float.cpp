@@ -48,7 +48,7 @@ AdvRTTIDecls(TLocFloat,TFloat)
 // ---------------------------------------------------------------------------
 //  TFloat: Public, static methods
 // ---------------------------------------------------------------------------
-TFloat& TFloat::Nul_TFloat()
+TFloat& TFloat::Nul_TFloat() noexcept
 {
     static TFloat fNull;
     return fNull;
@@ -58,13 +58,13 @@ TFloat& TFloat::Nul_TFloat()
 // ---------------------------------------------------------------------------
 //  TFloat: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TFloat::TFloat(const tCIDLib::TFloat4& f4Val) :
+TFloat::TFloat(const tCIDLib::TFloat4& f4Val)  noexcept :
 
     m_f8Val(f4Val)
 {
 }
 
-TFloat::TFloat(const tCIDLib::TFloat8& f8Val) :
+TFloat::TFloat(const tCIDLib::TFloat8& f8Val)  noexcept :
 
     m_f8Val(f8Val)
 {
@@ -72,7 +72,7 @@ TFloat::TFloat(const tCIDLib::TFloat8& f8Val) :
 
 TFloat::TFloat( const   tCIDLib::TFloat8&   f8Val
                 , const tCIDLib::TCard1     c1Precision
-                , const tCIDLib::ETrailFmts eStyle) :
+                , const tCIDLib::ETrailFmts eStyle)  noexcept :
 
     m_c1Precision(c1Precision)
     , m_eTrailingStyle(eStyle)
@@ -82,7 +82,7 @@ TFloat::TFloat( const   tCIDLib::TFloat8&   f8Val
 
 TFloat::TFloat( const   tCIDLib::TCard4     c4Val
                 , const tCIDLib::TCard1     c1Precision
-                , const tCIDLib::ETrailFmts eStyle) :
+                , const tCIDLib::ETrailFmts eStyle)  noexcept :
 
     m_c1Precision(c1Precision)
     , m_eTrailingStyle(eStyle)
@@ -92,7 +92,7 @@ TFloat::TFloat( const   tCIDLib::TCard4     c4Val
 
 TFloat::TFloat( const   tCIDLib::TInt4      i4Val
                 , const tCIDLib::TCard1     c1Precision
-                , const tCIDLib::ETrailFmts eStyle) :
+                , const tCIDLib::ETrailFmts eStyle)  noexcept :
 
     m_c1Precision(c1Precision)
     , m_eTrailingStyle(eStyle)
@@ -102,7 +102,7 @@ TFloat::TFloat( const   tCIDLib::TInt4      i4Val
 
 TFloat::TFloat( const   tCIDLib::TSInt      sVal
                 , const tCIDLib::TCard1     c1Precision
-                , const tCIDLib::ETrailFmts eStyle) :
+                , const tCIDLib::ETrailFmts eStyle)  noexcept :
 
     m_c1Precision(c1Precision)
     , m_eTrailingStyle(eStyle)
@@ -114,7 +114,7 @@ TFloat::TFloat( const   tCIDLib::TSInt      sVal
 // ---------------------------------------------------------------------------
 //  TFloat: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TFloat::operator==(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator==(const TFloat& fToTest) const noexcept
 {
     if (this == &fToTest)
         return kCIDLib::True;
@@ -130,63 +130,63 @@ tCIDLib::TBoolean TFloat::operator==(const TFloat& fToTest) const
 }
 
 
-TFloat& TFloat::operator=(const tCIDLib::TFloat8& f8NewVal)
+TFloat& TFloat::operator=(const tCIDLib::TFloat8& f8NewVal) noexcept
 {
     m_f8Val = f8NewVal;
     return *this;
 }
 
-tCIDLib::TBoolean TFloat::operator!=(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator!=(const TFloat& fToTest) const noexcept
 {
     return !operator==(fToTest);
 }
 
-tCIDLib::TBoolean TFloat::operator==(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator==(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (f8ToTest == m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator!=(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator!=(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (f8ToTest != m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator<(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator<(const TFloat& fToTest) const noexcept
 {
     return (m_f8Val < fToTest.m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator<=(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator<=(const TFloat& fToTest) const noexcept
 {
     return (m_f8Val <= fToTest.m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator>(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator>(const TFloat& fToTest) const noexcept
 {
     return (m_f8Val > fToTest.m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator>=(const TFloat& fToTest) const
+tCIDLib::TBoolean TFloat::operator>=(const TFloat& fToTest) const noexcept
 {
     return (m_f8Val >= fToTest.m_f8Val);
 }
 
-tCIDLib::TBoolean TFloat::operator<(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator<(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (m_f8Val < f8ToTest);
 }
 
-tCIDLib::TBoolean TFloat::operator<=(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator<=(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (m_f8Val <= f8ToTest);
 }
 
-tCIDLib::TBoolean TFloat::operator>(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator>(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (m_f8Val > f8ToTest);
 }
 
-tCIDLib::TBoolean TFloat::operator>=(const tCIDLib::TFloat8& f8ToTest) const
+tCIDLib::TBoolean TFloat::operator>=(const tCIDLib::TFloat8& f8ToTest) const noexcept
 {
     return (m_f8Val >= f8ToTest);
 }
@@ -195,30 +195,29 @@ tCIDLib::TBoolean TFloat::operator>=(const tCIDLib::TFloat8& f8ToTest) const
 // ---------------------------------------------------------------------------
 //  TFloat: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TCard1 TFloat::c1Precision() const
+tCIDLib::TCard1 TFloat::c1Precision() const noexcept
 {
     return m_c1Precision;
 }
 
-tCIDLib::TCard1 TFloat::c1Precision(const tCIDLib::TCard1 c1Precision)
+tCIDLib::TCard1 TFloat::c1Precision(const tCIDLib::TCard1 c1Precision) noexcept
 {
     m_c1Precision = c1Precision;
     return m_c1Precision;
 }
 
-tCIDLib::ETrailFmts TFloat::eTrailingStyle() const
+tCIDLib::ETrailFmts TFloat::eTrailingStyle() const noexcept
 {
     return m_eTrailingStyle;
 }
 
-tCIDLib::ETrailFmts
-TFloat::eTrailingStyle(const tCIDLib::ETrailFmts eStyle)
+tCIDLib::ETrailFmts TFloat::eTrailingStyle(const tCIDLib::ETrailFmts eStyle) noexcept
 {
     m_eTrailingStyle = eStyle;
     return eStyle;
 }
 
-tCIDLib::TFloat8 TFloat::f8Val(const tCIDLib::TFloat8& f8NewVal)
+tCIDLib::TFloat8 TFloat::f8Val(const tCIDLib::TFloat8& f8NewVal) noexcept
 {
     m_f8Val = f8NewVal;
     return m_f8Val;
@@ -272,11 +271,7 @@ tCIDLib::TVoid TFloat::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TLocFloat: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TLocFloat::TLocFloat()
-{
-}
-
-TLocFloat::TLocFloat(const  tCIDLib::TFloat8& f8Val) :
+TLocFloat::TLocFloat(const  tCIDLib::TFloat8& f8Val)  noexcept :
 
     TFloat(f8Val)
 {
@@ -284,14 +279,16 @@ TLocFloat::TLocFloat(const  tCIDLib::TFloat8& f8Val) :
 
 TLocFloat::TLocFloat(const  tCIDLib::TFloat8&   f8Val
                     , const tCIDLib::TCard1     c1Precision
-                    , const tCIDLib::ETrailFmts eStyle) :
+                    , const tCIDLib::ETrailFmts eStyle)  noexcept :
+
     TFloat(f8Val, c1Precision, eStyle)
 {
 }
 
 TLocFloat::TLocFloat(const  tCIDLib::TCard4     c4Val
                     , const tCIDLib::TCard1     c1Precision
-                    , const tCIDLib::ETrailFmts eStyle) :
+                    , const tCIDLib::ETrailFmts eStyle)  noexcept:
+
     TFloat(c4Val, c1Precision, eStyle)
 {
 }
@@ -299,12 +296,9 @@ TLocFloat::TLocFloat(const  tCIDLib::TCard4     c4Val
 
 TLocFloat::TLocFloat(const  tCIDLib::TInt4      i4Val
                     , const tCIDLib::TCard1     c1Precision
-                    , const tCIDLib::ETrailFmts eStyle) :
-    TFloat(i4Val, c1Precision, eStyle)
-{
-}
+                    , const tCIDLib::ETrailFmts eStyle)  noexcept :
 
-TLocFloat::~TLocFloat()
+    TFloat(i4Val, c1Precision, eStyle)
 {
 }
 
@@ -312,7 +306,7 @@ TLocFloat::~TLocFloat()
 // ---------------------------------------------------------------------------
 //  TLocFloat: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TLocFloat::operator==(const TLocFloat& fToTest) const
+tCIDLib::TBoolean TLocFloat::operator==(const TLocFloat& fToTest) const noexcept
 {
     if (this == &fToTest)
         return kCIDLib::True;
@@ -320,27 +314,27 @@ tCIDLib::TBoolean TLocFloat::operator==(const TLocFloat& fToTest) const
     return TParent::operator==(fToTest);
 }
 
-tCIDLib::TBoolean TLocFloat::operator!=(const TLocFloat& fToTest) const
+tCIDLib::TBoolean TLocFloat::operator!=(const TLocFloat& fToTest) const noexcept
 {
     return !TParent::operator==(fToTest);
 }
 
-tCIDLib::TBoolean TLocFloat::operator<(const TLocFloat& cComp) const
+tCIDLib::TBoolean TLocFloat::operator<(const TLocFloat& cComp) const noexcept
 {
     return TParent::operator<(cComp);
 }
 
-tCIDLib::TBoolean TLocFloat::operator<=(const TLocFloat& cComp) const
+tCIDLib::TBoolean TLocFloat::operator<=(const TLocFloat& cComp) const noexcept
 {
     return TParent::operator<=(cComp);
 }
 
-tCIDLib::TBoolean TLocFloat::operator>(const TLocFloat& cComp) const
+tCIDLib::TBoolean TLocFloat::operator>(const TLocFloat& cComp) const noexcept
 {
     return TParent::operator>(cComp);
 }
 
-tCIDLib::TBoolean TLocFloat::operator>=(const TLocFloat& cComp) const
+tCIDLib::TBoolean TLocFloat::operator>=(const TLocFloat& cComp) const noexcept
 {
     return TParent::operator>=(cComp);
 }

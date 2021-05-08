@@ -232,7 +232,7 @@ static tCIDLib::TVoid LoadDDraw()
 // ---------------------------------------------------------------------------
 //  TGraphicDevice: Public, static methods
 // ---------------------------------------------------------------------------
-TGraphicDevice& TGraphicDevice::Nul_TGraphicDevice()
+TGraphicDevice& TGraphicDevice::Nul_TGraphicDevice() noexcept
 {
     static TGraphicDevice gdevNull;
     return gdevNull;

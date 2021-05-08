@@ -50,7 +50,7 @@ AdvRTTIDecls(TLocCardinal64,TCardinal64)
 // ---------------------------------------------------------------------------
 //  TCardinal: Public, static methods
 // ---------------------------------------------------------------------------
-TCardinal& TCardinal::Nul_TCardinal()
+TCardinal& TCardinal::Nul_TCardinal() noexcept
 {
     static TCardinal cNull;
     return cNull;
@@ -60,38 +60,38 @@ TCardinal& TCardinal::Nul_TCardinal()
 // ---------------------------------------------------------------------------
 //  TCardinal: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TCardinal::TCardinal(const tCIDLib::TCard1 c1Val) :
+TCardinal::TCardinal(const tCIDLib::TCard1 c1Val)  noexcept:
 
     m_c4Val(c1Val)
 {
 }
 
-TCardinal::TCardinal(const tCIDLib::TCard2 c2Val) :
+TCardinal::TCardinal(const tCIDLib::TCard2 c2Val)  noexcept:
 
     m_c4Val(c2Val)
 {
 }
 
-TCardinal::TCardinal(const tCIDLib::TCard4 c4Val) :
+TCardinal::TCardinal(const tCIDLib::TCard4 c4Val)  noexcept:
 
     m_c4Val(c4Val)
 {
 }
 
-TCardinal::TCardinal(const tCIDLib::TUInt uVal) :
+TCardinal::TCardinal(const tCIDLib::TUInt uVal)  noexcept:
 
     m_c4Val(uVal)
 {
 }
 
-TCardinal::TCardinal(const tCIDLib::TSInt iVal) :
+TCardinal::TCardinal(const tCIDLib::TSInt iVal)  noexcept:
 
     m_c4Val(tCIDLib::TCard4(iVal))
 {
 }
 
 TCardinal::TCardinal(   const   tCIDLib::TCard4     c4Val
-                        , const tCIDLib::ERadices   eRadix) :
+                        , const tCIDLib::ERadices   eRadix)  noexcept:
     m_c4Val(c4Val)
     , m_eRadix(eRadix)
 {
@@ -185,18 +185,13 @@ TCardinal& TCardinal::operator-=(const tCIDLib::TCard4 c4Src)
 // ---------------------------------------------------------------------------
 //  TCardinal: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TCard4 TCardinal::c4Val(const tCIDLib::TCard4 c4NewVal)
+tCIDLib::TCard4 TCardinal::c4Val(const tCIDLib::TCard4 c4NewVal) noexcept
 {
     m_c4Val = c4NewVal;
     return m_c4Val;
 }
 
-tCIDLib::ERadices TCardinal::eRadix() const
-{
-    return m_eRadix;
-}
-
-tCIDLib::ERadices TCardinal::eRadix(const tCIDLib::ERadices eNewRadix)
+tCIDLib::ERadices TCardinal::eRadix(const tCIDLib::ERadices eNewRadix) noexcept
 {
     m_eRadix = eNewRadix;
     return m_eRadix;
@@ -209,7 +204,7 @@ tCIDLib::ERadices TCardinal::eRadix(const tCIDLib::ERadices eNewRadix)
 tCIDLib::TVoid TCardinal::FormatTo(TTextOutStream& strmToWriteTo) const
 {
     tCIDLib::TZStr64    szTmp;
-    if (!TRawStr::bFormatVal(m_c4Val, szTmp, 64, m_eRadix))
+    if (!TRawStr::bFormatVal(m_c4Val, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -248,7 +243,7 @@ tCIDLib::TVoid TCardinal::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TCardinal64: Public, static methods
 // ---------------------------------------------------------------------------
-TCardinal64& TCardinal64::Nul_TCardinal64()
+TCardinal64& TCardinal64::Nul_TCardinal64() noexcept
 {
     static TCardinal64 cNull;
     return cNull;
@@ -259,7 +254,7 @@ TCardinal64& TCardinal64::Nul_TCardinal64()
 //  TCardinal64: Constructors and Destructor
 // ---------------------------------------------------------------------------
 TCardinal64::TCardinal64(const  tCIDLib::TCard8&    c8Val
-                        , const tCIDLib::ERadices   eRadix) :
+                        , const tCIDLib::ERadices   eRadix) noexcept :
     m_c8Val(c8Val)
     , m_eRadix(eRadix)
 {
@@ -379,7 +374,7 @@ tCIDLib::ERadices TCardinal64::eRadix(const tCIDLib::ERadices eNewRadix)
 tCIDLib::TVoid TCardinal64::FormatTo(TTextOutStream& strmToWriteTo) const
 {
     tCIDLib::TZStr128 szTmp;
-    if (!TRawStr::bFormatVal(m_c8Val, szTmp, 128, m_eRadix))
+    if (!TRawStr::bFormatVal(m_c8Val, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -418,17 +413,9 @@ tCIDLib::TVoid TCardinal64::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TLocCardinal: Constructor and Destructor
 // ---------------------------------------------------------------------------
-TLocCardinal::TLocCardinal()
-{
-}
-
-TLocCardinal::TLocCardinal(const tCIDLib::TCard4 c4Val) :
+TLocCardinal::TLocCardinal(const tCIDLib::TCard4 c4Val)  noexcept :
 
     TCardinal(c4Val, tCIDLib::ERadices::Dec)
-{
-}
-
-TLocCardinal::~TLocCardinal()
 {
 }
 
@@ -475,10 +462,10 @@ tCIDLib::TBoolean TLocCardinal::operator>=(const TLocCardinal& cComp) const
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TLocCardinal::FormatTo(TTextOutStream& strmToWriteTo) const
 {
-    tCIDLib::TZStr64  szTmp;
+    tCIDLib::TZStr128  szTmp;
     if (!TRawStr::bFormatVal(c4Val()
                             , szTmp
-                            , 64
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , tCIDLib::ERadices::Dec
                             , TLocale::c4GroupSize()
                             , TLocale::chGroupSeparator()))
@@ -507,17 +494,9 @@ tCIDLib::TVoid TLocCardinal::FormatTo(TTextOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TLocCardinal64: Constructor and Destructor
 // ---------------------------------------------------------------------------
-TLocCardinal64::TLocCardinal64()
-{
-}
-
-TLocCardinal64::TLocCardinal64(const tCIDLib::TCard8& c8Val) :
+TLocCardinal64::TLocCardinal64(const tCIDLib::TCard8& c8Val)  noexcept :
 
     TCardinal64(c8Val, tCIDLib::ERadices::Dec)
-{
-}
-
-TLocCardinal64::~TLocCardinal64()
 {
 }
 
@@ -567,7 +546,7 @@ tCIDLib::TVoid TLocCardinal64::FormatTo(TTextOutStream& strmToWriteTo) const
     tCIDLib::TZStr128  szTmp;
     if (!TRawStr::bFormatVal(c8Val()
                             , szTmp
-                            , 128
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , tCIDLib::ERadices::Dec
                             , TLocale::c4GroupSize()
                             , TLocale::chGroupSeparator()))

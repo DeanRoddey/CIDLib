@@ -29,14 +29,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  For this file we want to pre instantiate some collections, but not for any
-//  other files. Only this file defines this toke, which prevents the use of the
-//  extern declaration.
-// ---------------------------------------------------------------------------
-#define CIDLIB_PREINST  1
-
-
-// ---------------------------------------------------------------------------
 //  Includes
 // ---------------------------------------------------------------------------
 #include    "CIDLib_.hpp"
@@ -536,11 +528,7 @@ static tCIDLib::TVoid DummyFunc()
     TBasicTreeCol<TString> colTree;
     StreamOutBasicTree<TString>(colTree, strmOut);
 
-//    TString strFmtTest;
-//    strFmtTest.Format(L"%(1) %(2)", TPoint(1, 2), TSize(3, 4));
-//    if (strFmtTest == L"1,2 3,4")
-//    {
-//    }
+    TString::strConcat(strNC, kCIDLib::chOpenBrace, L" Some text");
 
     constexpr tCIDLib::TFloat4 f4Test = 0;
     if (tCIDLib::IsTFloatX<decltype(f4Test)>::bState)
@@ -549,8 +537,8 @@ static tCIDLib::TVoid DummyFunc()
 
     tCIDLib::TCard4 c4Val1 = 16;
     tCIDLib::TCard4 c4Val2 = 32;
-    alignas(4) tCIDLib::TCard4* pTest1 = &c4Val1;
-    alignas(4) tCIDLib::TCard4* pTest2 = &c4Val2;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4* pTest1 = &c4Val1;
+    alignas(kCIDLib::c4CacheAlign) tCIDLib::TCard4* pTest2 = &c4Val2;
     if (TAtomic::pFencedGet(&pTest1) != &c4Val1)
     {
     }

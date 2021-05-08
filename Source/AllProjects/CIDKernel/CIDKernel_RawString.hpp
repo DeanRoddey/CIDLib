@@ -583,6 +583,22 @@ namespace TRawStr
 
 
     //
+    //  A null pointer safe version. If both are null, they are equal, if one is and
+    //  one isn't, they aren't. Else it does the actual compare.
+    //
+    inline tCIDLib::TBoolean
+    bCompareStrSafe(const tCIDLib::TCh* const psz1, const tCIDLib::TCh* const psz2)
+    {
+        const tCIDLib::TBoolean bN1 = psz1 == nullptr;
+        const tCIDLib::TBoolean bN2 = psz2 == nullptr;
+        if (!bN1 && !bN2)
+            return kCIDLib::True;
+        if (bN1 != bN2)
+            return kCIDLib::False;
+        return eCompareStr(psz1, psz2) == tCIDLib::ESortComps::Equal;
+    }
+
+    //
     //  These we can do ourself as inlines, to avoid the overhead of an RTL
     //  call or out of line code for such trivial ops.
     //

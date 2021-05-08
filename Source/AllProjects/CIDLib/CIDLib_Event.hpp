@@ -19,6 +19,8 @@
 //  TEvent class. This class implements a traditional event semaphore, which
 //  is a kind of gate which can stop threads or let them through.
 //
+//  They are moveable, not copyable.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -76,7 +78,7 @@ class CIDLIBEXP TEvent : public TObject, public MFormattable
         );
 
         TEvent(const TEvent&) = delete;
-        TEvent(TEvent&&) = delete;
+        TEvent(TEvent&&) = default;
 
         ~TEvent();
 
@@ -85,7 +87,7 @@ class CIDLIBEXP TEvent : public TObject, public MFormattable
         //  Public operators
         // -------------------------------------------------------------------
         TEvent& operator=(const TEvent&) = delete;
-        TEvent& operator=(TEvent&&) = delete;
+        TEvent& operator=(TEvent&&) = default;
 
 
         // -------------------------------------------------------------------

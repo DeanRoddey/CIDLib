@@ -555,186 +555,46 @@ tCIDLib::TVoid TString::FromHex(const   tCIDLib::TCard1 c1ToXlat
     }
 }
 
-
-TString TString::strConcat(const TString& str1, const TString& str2)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-TString TString::strConcat(const  TString& str1, const TString& str2, const TString& str3)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + c4Len3;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat( const   TString&    str1
-                            , const TString&    str2
-                            , const TString&    str3
-                            , const TString&    str4)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    const tCIDLib::TCard4 c4Len3 = str3.c4Length();
-    const tCIDLib::TCard4 c4Len4 = str4.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + c4Len3 + c4Len4 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2], str3.pszBuffer(), c4Len3 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + c4Len2 + c4Len3], str4.pszBuffer(), c4Len4 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + c4Len3 + c4Len4;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat(const TString& str1, const tCIDLib::TCh chSep)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + 2];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + 1;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat( const   TString&        str1
-                            , const tCIDLib::TCh    chSep
-                            , const TString&        str2)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + 1], str2.pszBuffer(), c4Len2 *  kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + 1;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat(const TString& str1, const tCIDLib::TCh* const psz2)
-{
-    const tCIDLib::TCard4 c4Len1 = str1.c4Length();
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, str1.pszBuffer(), c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat(const tCIDLib::TCh* const psz1, const TString& str2)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = str2.c4Length();
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 *  kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], str2.pszBuffer(), c4Len2 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat(const tCIDLib::TCh* const psz1, const tCIDLib::TCh* const psz2)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 1];
-
-    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-TString TString::strConcat( const   tCIDLib::TCh* const psz1
-                            , const tCIDLib::TCh        chSep
-                            , const tCIDLib::TCh* const psz2)
-{
-    const tCIDLib::TCard4 c4Len1 = (psz1 == nullptr) ? 0 : TRawStr::c4StrLen(psz1);
-    const tCIDLib::TCard4 c4Len2 = (psz2 == nullptr) ? 0 : TRawStr::c4StrLen(psz2);
-    tCIDLib::TCh* pszBuf = new tCIDLib::TCh[c4Len1 + c4Len2 + 2];
-
-    TRawMem::CopyMemBuf(pszBuf, psz1, c4Len1 * kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1], &chSep, kCIDLib::c4CharBytes);
-    TRawMem::CopyMemBuf(&pszBuf[c4Len1 + 1], psz2, c4Len2 * kCIDLib::c4CharBytes);
-
-    const tCIDLib::TCard4 c4FullLen = c4Len1 + c4Len2 + 1;
-    pszBuf[c4FullLen] = kCIDLib::chNull;
-    return TString(pszBuf, c4FullLen, EBogusCtorParm::x);
-}
-
-
-const TString& TString::strEmpty()
+const TString& TString::strEmpty() noexcept
 {
     static TString strEmpty;
     return strEmpty;
 }
 
-TString& TString::Nul_TString()
+TString& TString::Nul_TString() noexcept
 {
     static TString strNull;
     return strNull;
 }
 
 
+// We pre-instantiate some common variations on the concatenation template method
+template CIDLIBEXP TString TString::strConcat(const TString&, const TString&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh*&);
+template CIDLIBEXP TString TString::strConcat(const TString&, const tCIDLib::TCh*&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh*&, const TString&);
+
+
+template CIDLIBEXP TString TString::strConcat(const TString&, const TString&, const TString&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh*&, const tCIDLib::TCh*&);
+
+template CIDLIBEXP TString TString::strConcat(const TString&, const tCIDLib::TCh&, const TString&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh&, const tCIDLib::TCh*&);
+template CIDLIBEXP TString TString::strConcat(const TString&, const tCIDLib::TCh&, const tCIDLib::TCh*&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh*&, const tCIDLib::TCh&, const TString&);
+
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh&, const TString&);
+template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh&, const tCIDLib::TCh*&);
+
+
+
 // ---------------------------------------------------------------------------
 //  TString: Constructors and Destructor
 // ---------------------------------------------------------------------------
 
-// We just go with an empty buffer. It'll get faulted in if needed
-TString::TString() :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
-{
-}
-
 TString::TString(const tCIDLib::TCard4 c4BufSize) :
 
     m_c4BufChars(c4BufSize)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
 {
     // Catch psycho scenario and bump it back to 1
     if (!m_c4BufChars)
@@ -755,11 +615,7 @@ TString::TString(const tCIDLib::TCh chInit) :
     m_pszBuffer[1] = kCIDLib::chNull;
 }
 
-TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt)
 {
     if (!pszToAdopt)
     {
@@ -778,30 +634,18 @@ TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt) :
     }
 }
 
-TString::TString(const tCIDLib::TCh* pszInit, const tCIDLib::TCard4 c4ExtraChars) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const tCIDLib::TCh* pszInit, const tCIDLib::TCard4 c4ExtraChars)
 {
     Set(pszInit, c4ExtraChars);
 }
 
-TString::TString(const  TString& strInit, const tCIDLib::TCard4 c4ExtraChars) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const  TString& strInit, const tCIDLib::TCard4 c4ExtraChars)
 {
     Set(strInit, c4ExtraChars);
 }
 
 
-TString::TString(const tCIDLib::TErrCode midToLoad, const TFacility& facSrc) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const tCIDLib::TErrCode midToLoad, const TFacility& facSrc)
 {
     Set(facSrc.pszLoadCIDMsg(midToLoad), 64);
 }
@@ -811,11 +655,7 @@ TString::TString(const  tCIDLib::TMsgId     midToLoad
                 , const MFormattable&       fmtblToken1
                 , const MFormattable&       fmtblToken2
                 , const MFormattable&       fmtblToken3
-                , const MFormattable&       fmtblToken4) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+                , const MFormattable&       fmtblToken4)
 {
     tCIDLib::TBoolean bLoaded;
     const tCIDLib::TCh* pszMsg = facSrc.pszLoadCIDMsg(midToLoad, bLoaded);
@@ -838,23 +678,14 @@ TString::TString(const  tCIDLib::TMsgId     midToLoad
     }
 }
 
-TString::TString(const  MFormattable&   fmtblInitValue
-                , const TStreamFmt&     strmfToUse) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const  MFormattable& fmtblInitValue, const TStreamFmt& strmfToUse)
 {
     TTextStringOutStream strmTmp(1024UL, strmfToUse);
     strmTmp << fmtblInitValue << kCIDLib::FlushIt;
     Set(strmTmp.strData());
 }
 
-TString::TString(const MFormattable& fmtblInitValue) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const MFormattable& fmtblInitValue)
 {
     TTextStringOutStream strmTmp(1024UL);
     strmTmp << fmtblInitValue << kCIDLib::FlushIt;
@@ -868,11 +699,7 @@ TString::TString(const  TString&        strPattern
                 , const MFormattable&   fmtblToken1
                 , const MFormattable&   fmtblToken2
                 , const MFormattable&   fmtblToken3
-                , const MFormattable&   fmtblToken4) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+                , const MFormattable&   fmtblToken4)
 {
     Set(strPattern, 64);
 
@@ -891,11 +718,7 @@ TString::TString(const  tCIDLib::TCh* const pszPattern
                 , const MFormattable&       fmtblToken1
                 , const MFormattable&       fmtblToken2
                 , const MFormattable&       fmtblToken3
-                , const MFormattable&       fmtblToken4) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+                , const MFormattable&       fmtblToken4)
 {
     Set(pszPattern);
 
@@ -912,11 +735,7 @@ TString::TString(const  tCIDLib::TCh* const pszPattern
 
 
 // Convert a short character string
-TString::TString(const tCIDLib::TSCh* const pszInit) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const tCIDLib::TSCh* const pszInit)
 {
     //
     //  Check for a null initial value. If it is, then set it to the special
@@ -929,31 +748,19 @@ TString::TString(const tCIDLib::TSCh* const pszInit) :
         SetFromShort(pszInit);
 }
 
-TString::TString(const TString& strSrc) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(const TString& strSrc)
 {
     Set(strSrc);
 }
 
 // We swap out an null string to the source
-TString::TString(TString&& strSrc) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(TString&& strSrc)
 {
     *this = tCIDLib::ForceMove(strSrc);
 }
 
 // We just steal the kernel string's buffer
-TString::TString(TKrnlString&& kstrSrc) :
-
-    m_c4BufChars(0)
-    , m_c4CurEnd(0)
-    , m_pszBuffer(nullptr)
+TString::TString(TKrnlString&& kstrSrc)
 {
     m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4CurEnd, m_c4BufChars);
 }
@@ -1011,7 +818,7 @@ TString& TString::operator=(TKrnlString&& kstrSrc)
 }
 
 
-tCIDLib::TBoolean TString::operator==(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator==(const TString& strSrc) const noexcept
 {
     if (this == &strSrc)
         return kCIDLib::True;
@@ -1029,22 +836,22 @@ tCIDLib::TBoolean TString::operator==(const TString& strSrc) const
 }
 
 tCIDLib::TBoolean
-TString::operator==(const tCIDLib::TCh* const pszSrc) const
+TString::operator==(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return (TRawStr::eCompareStr(pszBuffer(), pszSrc) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean TString::operator!=(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator!=(const TString& strSrc) const noexcept
 {
     return !operator==(strSrc);
 }
 
-tCIDLib::TBoolean TString::operator!=(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator!=(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return !operator==(pszSrc);
 }
 
-tCIDLib::TBoolean TString::operator!=(const tCIDLib::TSCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator!=(const tCIDLib::TSCh* const pszSrc) const noexcept
 {
     return !operator==(pszSrc);
 }
@@ -1056,7 +863,7 @@ tCIDLib::TCh TString::operator[](const tCIDLib::TCard4 c4Ind) const
 
 
 tCIDLib::TBoolean
-TString::operator==(const tCIDLib::TSCh* const pszSrc) const
+TString::operator==(const tCIDLib::TSCh* const pszSrc) const noexcept
 {
     // Convert the short string so we can compare it
     tCIDLib::TCh* pszConverted = TRawStr::pszConvert(pszSrc);
@@ -1065,48 +872,48 @@ TString::operator==(const tCIDLib::TSCh* const pszSrc) const
 }
 
 
-tCIDLib::TBoolean TString::operator<=(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator<=(const TString& strSrc) const noexcept
 {
     const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer());
     return (eComp != tCIDLib::ESortComps::FirstGreater);
 }
 
-tCIDLib::TBoolean TString::operator>=(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator>=(const TString& strSrc) const noexcept
 {
     const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer());
     return (eComp != tCIDLib::ESortComps::FirstLess);
 }
 
 
-tCIDLib::TBoolean TString::operator<=(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator<=(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), pszSrc);
     return (eComp != tCIDLib::ESortComps::FirstGreater);
 }
 
-tCIDLib::TBoolean TString::operator>=(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator>=(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), pszSrc);
     return (eComp != tCIDLib::ESortComps::FirstLess);
 }
 
 
-tCIDLib::TBoolean TString::operator<(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator<(const TString& strSrc) const noexcept
 {
     return TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer()) == tCIDLib::ESortComps::FirstLess;
 }
 
-tCIDLib::TBoolean TString::operator>(const TString& strSrc) const
+tCIDLib::TBoolean TString::operator>(const TString& strSrc) const noexcept
 {
     return TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer()) == tCIDLib::ESortComps::FirstGreater;
 }
 
-tCIDLib::TBoolean TString::operator<(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator<(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return TRawStr::eCompareStr(pszBuffer(), pszSrc) == tCIDLib::ESortComps::FirstLess;
 }
 
-tCIDLib::TBoolean TString::operator>(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::operator>(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return TRawStr::eCompareStr(pszBuffer(), pszSrc) == tCIDLib::ESortComps::FirstGreater;
 }
@@ -1212,7 +1019,7 @@ TString::AppendFormatted(const  tCIDLib::TCard1     c1ToFmt
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c1ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , c4GroupSize
                             , chGroupSep))
@@ -1239,7 +1046,7 @@ TString::AppendFormatted(const  tCIDLib::TCard2     c2ToFmt
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c2ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , c4GroupSize
                             , chGroupSep))
@@ -1266,7 +1073,7 @@ TString::AppendFormatted(const  tCIDLib::TCard4     c4ToFmt
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c4ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , c4GroupSize
                             , chGroupSep))
@@ -1293,7 +1100,7 @@ TString::AppendFormatted(const  tCIDLib::TCard8     c8ToFmt
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c8ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , c4GroupSize
                             , chGroupSep))
@@ -1323,7 +1130,7 @@ TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
     if (!TRawStr::bFormatVal(f8ToFmt
                             , szTmp
                             , c4DecPlaces
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eTrail))
     {
         facCIDLib().ThrowKrnlErr
@@ -1355,7 +1162,7 @@ TString::AppendFormatted(const  tCIDLib::TFloat8    f8ToFmt
     if (!TRawStr::bFormatVal(f8ToFmt
                             , szTmp
                             , c4DecPlaces
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eTrail
                             , chNegSign
                             , chDecimal
@@ -1386,7 +1193,7 @@ TString::AppendFormatted(const  tCIDLib::TInt1      i1ToFmt
     tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i1ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , chNegSign
                             , c4GroupSize
@@ -1415,7 +1222,7 @@ TString::AppendFormatted(const  tCIDLib::TInt2      i2ToFmt
     tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i2ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , chNegSign
                             , c4GroupSize
@@ -1444,7 +1251,7 @@ TString::AppendFormatted(const  tCIDLib::TInt4      i4ToFmt
     tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i4ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , chNegSign
                             , c4GroupSize
@@ -1474,7 +1281,7 @@ TString::AppendFormatted(const  tCIDLib::TInt8      i8ToFmt
     tCIDLib::TZStr128 szTmp = L"";
     if (!TRawStr::bFormatVal(i8ToFmt
                             , szTmp
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , eRadix
                             , chNegSign
                             , c4GroupSize
@@ -1689,7 +1496,7 @@ tCIDLib::TBoolean TString::bCapAtChar(const tCIDLib::TCh chAt)
 //  until we get a different character or hit the end of both, which the
 //  underlying methods do.
 //
-tCIDLib::TBoolean TString::bCompare(const TString& strSrc) const
+tCIDLib::TBoolean TString::bCompare(const TString& strSrc) const noexcept
 {
     if (c4Length() != strSrc.c4Length())
         return kCIDLib::False;
@@ -1697,13 +1504,13 @@ tCIDLib::TBoolean TString::bCompare(const TString& strSrc) const
     return (eCompare(strSrc) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean TString::bCompare(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::bCompare(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return (eCompare(pszSrc) == tCIDLib::ESortComps::Equal);
 }
 
 
-tCIDLib::TBoolean TString::bCompareI(const TString& strSrc) const
+tCIDLib::TBoolean TString::bCompareI(const TString& strSrc) const noexcept
 {
     if (c4Length() != strSrc.c4Length())
         return kCIDLib::False;
@@ -1711,14 +1518,14 @@ tCIDLib::TBoolean TString::bCompareI(const TString& strSrc) const
     return (eCompareI(strSrc) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean TString::bCompareI(const tCIDLib::TCh* const pszSrc) const
+tCIDLib::TBoolean TString::bCompareI(const tCIDLib::TCh* const pszSrc) const noexcept
 {
     return (eCompareI(pszSrc) == tCIDLib::ESortComps::Equal);
 }
 
 
 tCIDLib::TBoolean TString::bCompareN(const  TString&        strSrc
-                                    , const tCIDLib::TCard4 c4Count) const
+                                    , const tCIDLib::TCard4 c4Count) const noexcept
 {
     // If we are less than the indicted count, obviously can't be
     if (c4Length() < strSrc.c4Length())
@@ -1729,14 +1536,14 @@ tCIDLib::TBoolean TString::bCompareN(const  TString&        strSrc
 
 tCIDLib::TBoolean
 TString::bCompareN( const   tCIDLib::TCh* const     pszSrc
-                    , const tCIDLib::TCard4         c4Count) const
+                    , const tCIDLib::TCard4         c4Count) const noexcept
 {
     return (eCompareN(pszSrc, c4Count) == tCIDLib::ESortComps::Equal);
 }
 
 
 tCIDLib::TBoolean TString::bCompareNI(  const   TString&        strSrc
-                                        , const tCIDLib::TCard4 c4Count) const
+                                        , const tCIDLib::TCard4 c4Count) const noexcept
 {
     // If we are less than the indicted count, obviously can't be
     if (c4Length() < strSrc.c4Length())
@@ -1747,7 +1554,7 @@ tCIDLib::TBoolean TString::bCompareNI(  const   TString&        strSrc
 
 tCIDLib::TBoolean
 TString::bCompareNI(const   tCIDLib::TCh* const     pszSrc
-                    , const tCIDLib::TCard4         c4Count) const
+                    , const tCIDLib::TCard4         c4Count) const noexcept
 {
     return (eCompareNI(pszSrc, c4Count) == tCIDLib::ESortComps::Equal);
 }
@@ -1965,7 +1772,7 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
 }
 
 
-tCIDLib::TBoolean TString::bIsAlpha() const
+tCIDLib::TBoolean TString::bIsAlpha() const noexcept
 {
     const tCIDLib::TCh* pszCur = pszBuffer();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
@@ -1976,7 +1783,7 @@ tCIDLib::TBoolean TString::bIsAlpha() const
     return kCIDLib::True;
 }
 
-tCIDLib::TBoolean TString::bIsAlphaNum() const
+tCIDLib::TBoolean TString::bIsAlphaNum() const noexcept
 {
     const tCIDLib::TCh* pszCur = pszBuffer();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
@@ -2665,17 +2472,6 @@ tCIDLib::TCard8 TString::c8Val(const tCIDLib::ERadices eRadix) const
 }
 
 
-tCIDLib::TCard4 TString::c4BufChars() const
-{
-    return m_c4BufChars;
-}
-
-tCIDLib::TCard4 TString::c4Length() const
-{
-    return m_c4CurEnd;
-}
-
-
 tCIDLib::TCh TString::chAt(const tCIDLib::TCard4 c4Ind) const
 {
     if (c4Ind >= m_c4CurEnd)
@@ -2705,7 +2501,7 @@ tCIDLib::TCh TString::chFirst() const
     return chAt(0);
 }
 
-tCIDLib::TCh TString::chLast() const
+tCIDLib::TCh TString::chLast() const noexcept
 {
     if (!m_c4CurEnd)
         return kCIDLib::chNull;

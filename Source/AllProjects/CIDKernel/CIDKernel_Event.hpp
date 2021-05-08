@@ -104,12 +104,9 @@ class KRNLEXPORT TKrnlEvent
             const   TKrnlEvent&             kevToDup
         );
 
-        [[nodiscard]] tCIDLib::TBoolean bIsValid() const
-        {
-            return m_hevThis.bIsValid();
-        }
+        [[nodiscard]] tCIDLib::TBoolean bIsValid() const noexcept;
 
-        tCIDLib::TBoolean bNamed() const
+        tCIDLib::TBoolean bNamed() const noexcept
         {
             return (m_pszName != nullptr);
         }
@@ -139,12 +136,9 @@ class KRNLEXPORT TKrnlEvent
             const   tCIDLib::TCard4         c4MilliSecs = kCIDLib::c4MaxWait
         );
 
-        const TEventHandle& hevThis() const
-        {
-            return m_hevThis;
-        }
+        tCIDLib::TVoid* pHandle() const;
 
-        const tCIDLib::TCh* pszName() const
+        const tCIDLib::TCh* pszName() const noexcept
         {
             return m_pszName;
         }
@@ -162,6 +156,7 @@ class KRNLEXPORT TKrnlEvent
             ,       tCIDLib::TBoolean&      bCreated
         );
 
+        struct TEventData;
 
         // -------------------------------------------------------------------
         //  Private data members
@@ -172,7 +167,7 @@ class KRNLEXPORT TKrnlEvent
         //  m_pszName
         //      The name of the semaphore.
         // -------------------------------------------------------------------
-        TEventHandle        m_hevThis;
+        TEventData*         m_pData;
         tCIDLib::TCh*       m_pszName;
 };
 

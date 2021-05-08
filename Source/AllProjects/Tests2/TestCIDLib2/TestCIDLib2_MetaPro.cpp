@@ -75,7 +75,8 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"TCard1 test failed\n\n";
     }
 
-    if (!tCIDLib::IsTCardX<tCIDLib::TCard2>::bState)
+    // Abreviated version
+    if (!tCIDLib::bIsTCardX<tCIDLib::TCard2>)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TCard2 test failed\n\n";
@@ -87,7 +88,7 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"TCard4 test failed\n\n";
     }
 
-    if (tCIDLib::IsTCardX<TPoint>::bState)
+    if (tCIDLib::bIsTCardX<TPoint>)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Point object reported being Card\n\n";
@@ -101,7 +102,7 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"TFloat4 test failed\n\n";
     }
 
-    if (!tCIDLib::IsTFloatX<tCIDLib::TFloat8>::bState)
+    if (!tCIDLib::bIsTFloatX<tCIDLib::TFloat8>)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TFloat8 test failed\n\n";
@@ -121,7 +122,7 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"TInt1 test failed\n\n";
     }
 
-    if (!tCIDLib::IsTIntX<tCIDLib::TInt2>::bState)
+    if (!tCIDLib::bIsTIntX<tCIDLib::TInt2>)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"TInt2 test failed\n\n";
@@ -133,7 +134,7 @@ TTest_MetaProg1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"TInt4 test failed\n\n";
     }
 
-    if (tCIDLib::IsTIntX<TString>::bState)
+    if (tCIDLib::bIsTIntX<TString>)
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"String  object reported being Int\n\n";

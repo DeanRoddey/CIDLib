@@ -83,7 +83,7 @@ namespace CIDSock_IPAddr
 // ---------------------------------------------------------------------------
 //  TIPAddress: Public, static methods
 // ---------------------------------------------------------------------------
-TIPAddress& TIPAddress::Nul_TIPAddress()
+TIPAddress& TIPAddress::Nul_TIPAddress() noexcept
 {
     static TIPAddress ipaNull;
     return ipaNull;
@@ -626,7 +626,7 @@ TIPAddress::SetAddr(const   TString&                strIPAddress
 // ---------------------------------------------------------------------------
 //  TIPEndPoint: Public, static methods
 // ---------------------------------------------------------------------------
-TIPEndPoint& TIPEndPoint::Nul_TIPEndPoint()
+TIPEndPoint& TIPEndPoint::Nul_TIPEndPoint() noexcept
 {
     static TIPEndPoint ipepNull;
     return ipepNull;

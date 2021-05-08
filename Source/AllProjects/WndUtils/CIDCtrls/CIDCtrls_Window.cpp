@@ -598,7 +598,7 @@ TWindow::CheckHandlerRegParms(  const   TWindow* const  pwndSrc
 
 
 // Lazy eval for the null window object
-TWindow& TWindow::Nul_TWindow()
+TWindow& TWindow::Nul_TWindow() noexcept
 {
     static TWindow wndNull(kCIDLib::False);
     return wndNull;

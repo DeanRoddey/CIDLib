@@ -53,7 +53,7 @@ namespace kCIDLib
     //  Memory related constants
     // -----------------------------------------------------------------------
     constexpr tCIDLib::TCard4               c4MemPageSize   = 4096;
-    constexpr tCIDLib::TCard4               c4CacheAlign    = 4;
+    constexpr tCIDLib::TCard4               c4CacheAlign    = 8;
 
 
     // -----------------------------------------------------------------------

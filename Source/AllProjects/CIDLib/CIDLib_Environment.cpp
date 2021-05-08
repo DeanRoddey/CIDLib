@@ -322,7 +322,7 @@ TProcEnvLocker::~TProcEnvLocker()
 // ---------------------------------------------------------------------------
 //  TEnvironment: Public, static methods
 // ---------------------------------------------------------------------------
-TEnvironment& TEnvironment::Nul_TEnvironment()
+TEnvironment& TEnvironment::Nul_TEnvironment() noexcept
 {
     static TEnvironment envNull;
     return envNull;

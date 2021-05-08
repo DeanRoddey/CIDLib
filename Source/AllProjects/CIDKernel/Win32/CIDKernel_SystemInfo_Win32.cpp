@@ -214,7 +214,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //
         tCIDLib::TCard4 c4NodeNameChars
         (
-            c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szNodeName) - 1
+            tCIDLib::c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szNodeName)
         );
         DWORD Res = ::GetComputerNameEx
         (
@@ -234,7 +234,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
         //  Query the module name for the 0 module, which will get us the
         //  main process Exe module's file name.
         //
-        constexpr tCIDLib::TCard4 c4Len = c4MaxBufChars
+        constexpr tCIDLib::TCard4 c4Len = tCIDLib::c4MaxBufChars
         (
             CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName
         );
@@ -256,7 +256,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
             (
                 CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName
                 , szTmp
-                , c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName)
+                , tCIDLib::c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName)
             );
         }
         else
@@ -265,7 +265,7 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
             (
                 CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName
                 , pszTmp+1
-                , c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName)
+                , tCIDLib::c4MaxBufChars(CIDKernel_SystemInfo_Win32::CachedInfo.szProcessName)
             );
         }
 
@@ -351,12 +351,12 @@ TCIDKrnlModule::bInitTermSysInfo(const tCIDLib::EInitTerm eState)
                             (
                                 szVolumePath
                                 , szVolumeLabel
-                                , c4MaxBufChars(szVolumeLabel)
+                                , tCIDLib::c4MaxBufChars(szVolumeLabel)
                                 , &c4SerNum
                                 , &c4MaxPathCompLen
                                 , &c4VolFlags
                                 , szFileSysType
-                                , c4MaxBufChars(szFileSysType)))
+                                , tCIDLib::c4MaxBufChars(szFileSysType)))
                             {
                                 //
                                 //  Add this guy's label info to the hash. It's

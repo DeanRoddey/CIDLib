@@ -47,35 +47,47 @@ class CIDLIBEXP TRGBClr :
         // -------------------------------------------------------------------
         TRGBClr() = default;
 
-        TRGBClr
-        (
-            const   tCIDLib::TCard1         c1Red
-            , const tCIDLib::TCard1         c1Green
-            , const tCIDLib::TCard1         c1Blue
-        );
+        constexpr TRGBClr(  const   tCIDLib::TCard1 c1Red
+                            , const tCIDLib::TCard1 c1Green
+                            , const tCIDLib::TCard1 c1Blue) noexcept :
 
-        TRGBClr
-        (
-            const   tCIDLib::TCard1         c1Red
-            , const tCIDLib::TCard1         c1Green
-            , const tCIDLib::TCard1         c1Blue
-            , const tCIDLib::TCard1         c1Alpha
-        );
+            m_c1Blue(c1Blue)
+            , m_c1Green(c1Green)
+            , m_c1Red(c1Red)
+        {
+        }
+
+        constexpr TRGBClr(  const  tCIDLib::TCard1 c1Red
+                            , const tCIDLib::TCard1 c1Green
+                            , const tCIDLib::TCard1 c1Blue
+                            , const tCIDLib::TCard1 c1Alpha) noexcept :
+
+            m_c1Blue(c1Blue)
+            , m_c1Green(c1Green)
+            , m_c1Red(c1Red)
+            , m_c1Alpha(c1Alpha)
+        {
+        }
+
+        constexpr TRGBClr(const tCIDLib::TCard4 c4Color)  noexcept :
+
+            m_c1Red(((const tCIDLib::TCodedRGB*)&c4Color)->c1Red)
+            , m_c1Green(((const tCIDLib::TCodedRGB*)&c4Color)->c1Green)
+            , m_c1Blue(((const tCIDLib::TCodedRGB*)&c4Color)->c1Blue)
+            , m_c1Alpha(((const tCIDLib::TCodedRGB*)&c4Color)->c1Alpha)
+        {
+        }
 
         TRGBClr
         (
             const   tCIDLib::TRawRGB&       rgbRaw
-        );
+        )   noexcept;
 
         TRGBClr
         (
             const   tCIDLib::TCodedRGB&     rgbCoded
-        );
+        )   noexcept;
 
-        TRGBClr
-        (
-            const   tCIDLib::TCard4         c4Color
-        );
 
         TRGBClr(const TRGBClr&) = default;
         TRGBClr(TRGBClr&&) = default;
@@ -177,23 +189,23 @@ class CIDLIBEXP TRGBClr :
             const   tCIDLib::TInt4          i4Offset
         );
 
-        tCIDLib::TCard1 c1Alpha() const
+        tCIDLib::TCard1 c1Alpha() const noexcept
         {
             return m_c1Alpha;
         }
 
-        tCIDLib::TCard1 c1Alpha(const tCIDLib::TCard1 c1Alpha)
+        tCIDLib::TCard1 c1Alpha(const tCIDLib::TCard1 c1Alpha) noexcept
         {
             m_c1Alpha = c1Alpha;
             return m_c1Alpha;
         }
 
-        tCIDLib::TCard1 c1Blue() const
+        tCIDLib::TCard1 c1Blue() const noexcept
         {
             return m_c1Blue;
         }
 
-        tCIDLib::TCard1 c1Blue(const tCIDLib::TCard1 c1Blue)
+        tCIDLib::TCard1 c1Blue(const tCIDLib::TCard1 c1Blue) noexcept
         {
             m_c1Blue = c1Blue;
             return c1Blue;
@@ -204,66 +216,66 @@ class CIDLIBEXP TRGBClr :
             const   tCIDLib::EClrComps      eComp
         )   const;
 
-        tCIDLib::TCard1 c1Green() const
+        tCIDLib::TCard1 c1Green() const noexcept
         {
             return m_c1Green;
         }
 
-        tCIDLib::TCard1 c1Green(const tCIDLib::TCard1 c1Green)
+        tCIDLib::TCard1 c1Green(const tCIDLib::TCard1 c1Green) noexcept
         {
             m_c1Green = c1Green;
             return c1Green;
         }
 
-        tCIDLib::TCard1 c1MaxComponent() const;
+        tCIDLib::TCard1 c1MaxComponent() const noexcept;
 
-        tCIDLib::TCard1 c1MinComponent() const;
+        tCIDLib::TCard1 c1MinComponent() const noexcept;
 
-        tCIDLib::TCard1 c1Red() const
+        tCIDLib::TCard1 c1Red() const noexcept
         {
             return m_c1Red;
         }
 
-        tCIDLib::TCard1 c1Red(const tCIDLib::TCard1 c1Red)
+        tCIDLib::TCard1 c1Red(const tCIDLib::TCard1 c1Red) noexcept
         {
             m_c1Red = c1Red;
             return c1Red;
         }
 
-        tCIDLib::TCard4 c4Alpha() const
+        tCIDLib::TCard4 c4Alpha() const noexcept
         {
             return m_c1Alpha;
         }
 
-        tCIDLib::TCard4 c4Blue() const
+        tCIDLib::TCard4 c4Blue() const noexcept
         {
             return m_c1Blue;
         }
 
-        tCIDLib::TCard4 c4Color() const
+        tCIDLib::TCard4 c4Color() const noexcept
         {
             return *((const tCIDLib::TCard4*)&m_c1Red);
         }
 
-        tCIDLib::TCard4 c4Green() const
+        tCIDLib::TCard4 c4Green() const noexcept
         {
             return m_c1Green;
         }
 
-        tCIDLib::TCard4 c4Magnitude() const;
+        tCIDLib::TCard4 c4Magnitude() const noexcept;
 
-        tCIDLib::TCard4 c4Red() const
+        tCIDLib::TCard4 c4Red() const noexcept
         {
             return m_c1Red;
         }
 
-        tCIDLib::TFloat4 f4Alpha() const;
+        tCIDLib::TFloat4 f4Alpha() const noexcept;
 
-        tCIDLib::TFloat4 f4Blue() const;
+        tCIDLib::TFloat4 f4Blue() const noexcept;
 
-        tCIDLib::TFloat4 f4Green() const;
+        tCIDLib::TFloat4 f4Green() const noexcept;
 
-        tCIDLib::TFloat4 f4Red() const;
+        tCIDLib::TFloat4 f4Red() const noexcept;
 
         tCIDLib::TVoid FormatToText
         (
@@ -317,7 +329,7 @@ class CIDLIBEXP TRGBClr :
             const   tCIDLib::TFloat4        f4ToSet
         );
 
-        tCIDLib::TVoid ToBlack()
+        tCIDLib::TVoid ToBlack() noexcept
         {
             m_c1Red = 0;
             m_c1Green = 0;

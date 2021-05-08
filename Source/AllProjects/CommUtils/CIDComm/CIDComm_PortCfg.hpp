@@ -65,6 +65,7 @@ class CIDCOMMEXP TCommPortCfg : public TObject, public MStreamable
         );
 
         TCommPortCfg(const TCommPortCfg&) = default;
+        TCommPortCfg(TCommPortCfg&&) = default;
 
         ~TCommPortCfg() = default;
 
@@ -73,6 +74,7 @@ class CIDCOMMEXP TCommPortCfg : public TObject, public MStreamable
         //  Public operators
         // -------------------------------------------------------------------
         TCommPortCfg& operator=(const TCommPortCfg&) = default;
+        TCommPortCfg& operator=(TCommPortCfg&&) = default;
 
         tCIDLib::TBoolean operator==
         (

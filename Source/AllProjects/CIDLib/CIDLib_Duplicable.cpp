@@ -39,7 +39,7 @@
 // ---------------------------------------------------------------------------
 //  MDuplicable: Public, static methods
 // ---------------------------------------------------------------------------
-MDuplicable& MDuplicable::Nul_MDuplicable()
+MDuplicable& MDuplicable::Nul_MDuplicable() noexcept
 {
     //
     //  We need some object to represent this and it's not a concrete class

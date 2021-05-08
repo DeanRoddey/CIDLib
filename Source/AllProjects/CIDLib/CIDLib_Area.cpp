@@ -52,7 +52,7 @@ const TArea  TArea::areaEmpty(0, 0, 0UL, 0UL);
 // ---------------------------------------------------------------------------
 //  TArea: Public, static methods
 // ---------------------------------------------------------------------------
-TArea& TArea::Nul_TArea()
+TArea& TArea::Nul_TArea() noexcept
 {
     static TArea areaNull;
     return areaNull;
@@ -62,40 +62,13 @@ TArea& TArea::Nul_TArea()
 // ---------------------------------------------------------------------------
 //  TArea: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TArea::TArea(const tCIDLib::THostRectl& rectlSrc)
+TArea::TArea(const tCIDLib::THostRectl& rectlSrc) noexcept
 {
     FromRectl(rectlSrc);
 }
 
-TArea::TArea(   const   tCIDLib::THostPoint&    ptULeft
-                , const tCIDLib::THostPoint&    ptLRt) :
-
-    // Note that this depends upon correct member order!!
-    m_i4X(tCIDLib::MinVal(ptULeft.i4X, ptLRt.i4X))
-    , m_i4Y(tCIDLib::MinVal(ptULeft.i4Y, ptLRt.i4Y))
-    , m_c4CX(tCIDLib::MaxVal(ptULeft.i4X, ptLRt.i4X) - m_i4X)
-    , m_c4CY(tCIDLib::MaxVal(ptULeft.i4Y, ptLRt.i4Y) - m_i4Y)
-{
-}
-
-TArea::TArea(const  TPoint&                 pntULeft
-            , const TPoint&                 pntLRt)
-{
-    // Get the values out of the points for greater efficiency
-    tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
-    tCIDLib::TInt4 i4Y1 = pntULeft.m_i4Y;
-    tCIDLib::TInt4 i4X2 = pntLRt.m_i4X;
-    tCIDLib::TInt4 i4Y2 = pntLRt.m_i4Y;
-
-    m_i4X   = tCIDLib::MinVal(i4X1, i4X2);
-    m_c4CX  = i4X1 > i4X2 ? i4X1 - i4X2 : i4X2 - i4X1;
-    m_i4Y   = tCIDLib::MinVal(i4Y1, i4Y2);
-    m_c4CY  = i4Y1 > i4Y2 ? i4Y1 - i4Y2 : i4Y2 - i4Y1;
-}
-
-
 // Just a direct copy of the values
-TArea::TArea(const tCIDLib::TRawArea& areaSrc) :
+TArea::TArea(const tCIDLib::TRawArea& areaSrc) noexcept :
 
     m_i4X(areaSrc.i4X)
     , m_i4Y(areaSrc.i4Y)
@@ -104,42 +77,10 @@ TArea::TArea(const tCIDLib::TRawArea& areaSrc) :
 {
 }
 
-TArea::TArea(   const   tCIDLib::TInt4  i4X
-                , const tCIDLib::TInt4  i4Y
-                , const tCIDLib::TCard4 c4CX
-                , const tCIDLib::TCard4 c4CY) :
-    m_i4X(i4X)
-    , m_i4Y(i4Y)
-    , m_c4CX(c4CX)
-    , m_c4CY(c4CY)
-{
-}
-
-TArea::TArea(const TPoint& pntOrg, const TSize& szExtent) :
-
-    m_i4X(pntOrg.m_i4X)
-    , m_i4Y(pntOrg.m_i4Y)
-    , m_c4CX(szExtent.c4Width())
-    , m_c4CY(szExtent.c4Height())
-{
-}
-
-TArea::TArea(   const   TPoint&         pntOrg
-                , const tCIDLib::TCard4 c4CX
-                , const tCIDLib::TCard4 c4CY) :
-
-    m_i4X(pntOrg.m_i4X)
-    , m_i4Y(pntOrg.m_i4Y)
-    , m_c4CX(c4CX)
-    , m_c4CY(c4CY)
-{
-}
-
-
 // ---------------------------------------------------------------------------
 //  TArea: Public operators
 // ---------------------------------------------------------------------------
-TArea& TArea::operator=(const tCIDLib::TRawArea& areaSrc)
+TArea& TArea::operator=(const tCIDLib::TRawArea& areaSrc) noexcept
 {
     m_i4X = areaSrc.i4X;
     m_i4Y = areaSrc.i4Y;
@@ -416,7 +357,7 @@ TArea::bContainsPoint(  const   tCIDLib::TInt4  i4X
 }
 
 
-tCIDLib::TBoolean TArea::bIntersects(const TArea& areaTest) const
+tCIDLib::TBoolean TArea::bIntersects(const TArea& areaTest) const noexcept
 {
     // If either is empty, then cannot intersect
     if (bIsEmpty() || areaTest.bIsEmpty())
@@ -442,7 +383,7 @@ tCIDLib::TBoolean TArea::bIntersects(const TArea& areaTest) const
 }
 
 
-tCIDLib::TBoolean TArea::bIsInside(const TArea& areaTest) const
+tCIDLib::TBoolean TArea::bIsInside(const TArea& areaTest) const noexcept
 {
     //
     //  Make sure that we are fully inside (i.e. don't touch the edges of)
@@ -580,7 +521,7 @@ TArea::bPercentFromOrg( const   TPoint&             pntToTest
 //  Indicates whether this area is the same origin as the passed area,
 //  ignoring the sizes.
 //
-tCIDLib::TBoolean TArea::bSameOrg(const TArea& areaToTest) const
+tCIDLib::TBoolean TArea::bSameOrg(const TArea& areaToTest) const noexcept
 {
     return ((areaToTest.m_i4X == m_i4X) && (areaToTest.m_i4Y == m_i4Y));
 }
@@ -589,7 +530,7 @@ tCIDLib::TBoolean TArea::bSameOrg(const TArea& areaToTest) const
 //  Indicates whether this area is the same size as the passed area,
 //  ignoring the origins.
 //
-tCIDLib::TBoolean TArea::bSameSize(const TArea& areaToTest) const
+tCIDLib::TBoolean TArea::bSameSize(const TArea& areaToTest) const noexcept
 {
     return ((areaToTest.m_c4CX == m_c4CX) && (areaToTest.m_c4CY == m_c4CY));
 }
@@ -882,7 +823,7 @@ TArea::FormatToText(        TString&            strTar
 
 
 // This is always inclusive, so if y=1 and cy=1, you get 1
-tCIDLib::TInt4 TArea::i4Bottom() const
+tCIDLib::TInt4 TArea::i4Bottom() const noexcept
 {
     return m_i4Y + tCIDLib::TInt4(m_c4CY);
 }
@@ -923,7 +864,7 @@ tCIDLib::TInt4 TArea::i4Bottom(const tCIDLib::TInt4 i4NewBottom)
 //  different name (i.e. i4Left and i4X.)
 //
 tCIDLib::TInt4 TArea::i4Left(const  tCIDLib::TInt4      i4NewLeft
-                            , const tCIDLib::TBoolean   bLockRight)
+                            , const tCIDLib::TBoolean   bLockRight) noexcept
 {
     //
     //  If the right is locked, we need to adjust the horz size to keep
@@ -945,7 +886,7 @@ tCIDLib::TInt4 TArea::i4Left(const  tCIDLib::TInt4      i4NewLeft
 
 
 // This is always inclusive! So if x=1 and cx=1, then you get 1
-tCIDLib:: TInt4 TArea::i4Right() const
+tCIDLib:: TInt4 TArea::i4Right() const noexcept
 {
     return m_i4X + tCIDLib::TInt4(m_c4CX);
 }
@@ -978,7 +919,7 @@ tCIDLib:: TInt4 TArea::i4Right(const tCIDLib::TInt4 i4NewXRight)
 
 
 tCIDLib::TInt4 TArea::i4Top(const tCIDLib::TInt4        i4NewTop
-                            , const tCIDLib::TBoolean   bLockBottom)
+                            , const tCIDLib::TBoolean   bLockBottom) noexcept
 {
     //
     //  If the bottom is locked, we need to adjust the vert size to keep
@@ -1000,7 +941,7 @@ tCIDLib::TInt4 TArea::i4Top(const tCIDLib::TInt4        i4NewTop
 
 
 tCIDLib::TInt4 TArea::i4X(  const   tCIDLib::TInt4      i4NewX
-                            , const tCIDLib::TBoolean   bLockRight)
+                            , const tCIDLib::TBoolean   bLockRight) noexcept
 {
     //
     //  If the right is locked, we need to adjust the horz size to keep
@@ -1021,7 +962,7 @@ tCIDLib::TInt4 TArea::i4X(  const   tCIDLib::TInt4      i4NewX
 }
 
 tCIDLib::TInt4 TArea::i4Y(  const   tCIDLib::TInt4      i4NewY
-                            , const tCIDLib::TBoolean   bLockBottom)
+                            , const tCIDLib::TBoolean   bLockBottom) noexcept
 {
     //
     //  If the bottom is locked, we need to adjust the vert size to keep
@@ -1175,7 +1116,7 @@ tCIDLib::TVoid TArea::Move(const tCIDLib::EDirs eDir)
 
 
 // Returns the center point of this area.
-TPoint TArea::pntCenter() const
+TPoint TArea::pntCenter() const noexcept
 {
     return TPoint(m_i4X + (m_c4CX >> 1), m_i4Y + (m_c4CY >> 1));
 }
@@ -1638,7 +1579,7 @@ tCIDLib::TVoid TArea::UpdateSizesIfZero(const   tCIDLib::TCard4 c4CX
 //
 //  Zero out various components of this area.
 //
-tCIDLib::TVoid TArea::ZeroAll()
+tCIDLib::TVoid TArea::ZeroAll() noexcept
 {
     m_i4X = 0;
     m_i4Y = 0;
@@ -1646,13 +1587,13 @@ tCIDLib::TVoid TArea::ZeroAll()
     m_c4CY = 0;
 }
 
-tCIDLib::TVoid TArea::ZeroOrg()
+tCIDLib::TVoid TArea::ZeroOrg() noexcept
 {
     m_i4X = 0;
     m_i4Y = 0;
 }
 
-tCIDLib::TVoid TArea::ZeroSizes()
+tCIDLib::TVoid TArea::ZeroSizes() noexcept
 {
     m_c4CX = 0;
     m_c4CY = 0;

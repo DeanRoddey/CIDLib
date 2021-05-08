@@ -38,6 +38,8 @@
 RTTIDecls(TTest_Parse,TTestFWTest)
 RTTIDecls(TTest_Match,TTestFWTest)
 RTTIDecls(TTest_RepAll,TTestFWTest)
+RTTIDecls(TTest_CpMv,TTestFWTest)
+RTTIDecls(TTest_Misc,TTestFWTest)
 
 
 
@@ -336,34 +338,6 @@ TTest_Parse::eRunTest(  TTextStringOutStream&   strmOut
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Failed to catch match before pattern set"
-                << kCIDLib::NewLn;
-    }
-
-    // And make sure we catch setting an empty pattern
-    bCaughtIt = kCIDLib::False;
-    try
-    {
-        regxTest.SetExpression(L"");
-    }
-
-    catch(const TError& errToCatch)
-    {
-        if (errToCatch.bCheckEvent(facCIDRegX().strName(), kRegXErrs::errcRegEx_EmptyPattern))
-        {
-            bCaughtIt = kCIDLib::True;
-        }
-         else
-        {
-            eRes = tTestFWLib::ETestRes::Failed;
-            strmOut << TFWCurLn << L"Got the wrong exception" << kCIDLib::NewLn
-                    << errToCatch << kCIDLib::DNewLn;
-        }
-    }
-
-    if (!bCaughtIt)
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"Failed to catch match set of empty pattern"
                 << kCIDLib::NewLn;
     }
 
@@ -669,7 +643,6 @@ TTest_Match::eRunTest(  TTextStringOutStream&   strmOut
 
 
 
-
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_RepAll
 // PREFIX: tfwt
@@ -742,3 +715,206 @@ TTest_RepAll::eRunTest( TTextStringOutStream&   strmOut
 }
 
 
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_CpMv
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_CpMv: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_CpMv::TTest_CpMv() :
+
+    TTestFWTest
+    (
+        L"Copy/Move", L"Tests copy, move, and assign for RegEx", 3
+    )
+{
+}
+
+TTest_CpMv::~TTest_CpMv()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_CpMv: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_CpMv::eRunTest( TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    // Do a basic test
+    TRegEx regxTest(L"A.");
+    TString strTest("ABCABDABE");
+    if (regxTest.bReplaceAll(strTest, L"X", kCIDLib::True))
+    {
+        if (strTest != L"XCXDXE")
+        {
+            strmOut << L"Replace all created wrong output"
+                    << kCIDLib::DNewLn;
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+     else
+    {
+        strmOut << L"Failed to change the string in a replace all"
+                << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Make a copy and run it again
+    TRegEx regxTest2(regxTest);
+    if (regxTest.strExpression() != regxTest2.strExpression())
+    {
+        strmOut << L"Copy ctor did not copy dupplicate expression"
+                << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+    strTest = "ABCABDABE";
+    if (regxTest2.bReplaceAll(strTest, L"X", kCIDLib::True))
+    {
+        if (strTest != L"XCXDXE")
+        {
+            strmOut << L"Replace 2 all created wrong output"
+                    << kCIDLib::DNewLn;
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+     else
+    {
+        strmOut << L"Failed to change the string in a replace all 2"
+                << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+
+    // Now move #2 to #3 and try again
+    TRegEx regxTest3(tCIDLib::ForceMove(regxTest2));
+    if (regxTest.strExpression() != regxTest3.strExpression())
+    {
+        strmOut << L"Copy ctor did not copy dupplicate expression"
+                << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    strTest = "ABCABDABE";
+    if (regxTest3.bReplaceAll(strTest, L"X", kCIDLib::True))
+    {
+        if (strTest != L"XCXDXE")
+        {
+            strmOut << L"Replace 3 all created wrong output"
+                    << kCIDLib::DNewLn;
+            eRes = tTestFWLib::ETestRes::Failed;
+        }
+    }
+     else
+    {
+        strmOut << L"Failed to change the string in a replace all 3"
+                << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    return eRes;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_Misc
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TTest_Misc: Constructor and Destructor
+// ---------------------------------------------------------------------------
+TTest_Misc::TTest_Misc() :
+
+    TTestFWTest
+    (
+        L"Miscellaneous", L"Miscellaneous regular expression tests", 4
+    )
+{
+}
+
+TTest_Misc::~TTest_Misc()
+{
+}
+
+
+// ---------------------------------------------------------------------------
+//  TTest_Misc: Public, inherited methods
+// ---------------------------------------------------------------------------
+tTestFWLib::ETestRes
+TTest_Misc::eRunTest( TTextStringOutStream&   strmOut
+                        , tCIDLib::TBoolean&    bWarning)
+{
+    tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
+
+    // Default ctor and set a pattern and make sure we get that pattern back
+    TRegEx regxTest;
+    regxTest.SetExpression(L"XY+");
+    if (regxTest.strExpression() != L"XY+")
+    {
+        strmOut << L"Set expression was not reported back" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Make sure we don't use leading/trailing whitespace, which may be important for the pattern
+    regxTest.SetExpression(L"  XY+  ");
+    if (regxTest.strExpression() != L"  XY+  ")
+    {
+        strmOut << L"Set expression stripped white space" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Call reset, which should get us an empty expression
+    regxTest.Reset();
+    if (!regxTest.strExpression().bIsEmpty())
+    {
+        strmOut << L"Reset not report back empty expression" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // Try the reset again, by setting an empty expression
+    regxTest.SetExpression(L"  XY+  ");
+    if (regxTest.strExpression() != L"  XY+  ")
+    {
+        strmOut << L"Set expression was not reported back" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    regxTest.SetExpression(L"");
+    if (!regxTest.strExpression().bIsEmpty())
+    {
+        strmOut << L"Set empty expression did not report back empty" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    // If we try to search without an expression, we get an exception
+    try
+    {
+        tCIDLib::TCard4 c4Ofs = 0;
+        tCIDLib::TCard4 c4Len = 0;
+        regxTest.bFindMatchAt
+        (
+            L"A"
+            , c4Ofs
+            , c4Len
+            , kCIDLib::False
+            , kCIDLib::True
+        );
+
+        strmOut << L"search without set expression did not fail" << kCIDLib::DNewLn;
+        eRes = tTestFWLib::ETestRes::Failed;
+    }
+
+    catch(...)
+    {
+    }
+
+    return eRes;
+}

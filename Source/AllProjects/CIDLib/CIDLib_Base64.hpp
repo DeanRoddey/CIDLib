@@ -42,7 +42,7 @@ class CIDLIBEXP TBase64 : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TBase64();
+        TBase64() = default;
 
         TBase64(const TBase64&) = default;
         TBase64(TBase64&&) = default;
@@ -60,12 +60,16 @@ class CIDLIBEXP TBase64 : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bEscapeForwardSlashes() const;
+        tCIDLib::TBoolean bEscapeForwardSlashes() const noexcept
+        {
+            return m_bEscapeForwardSlashes;
+        }
 
-        tCIDLib::TBoolean bEscapeForwardSlashes
-        (
-            const   tCIDLib::TBoolean       bToSet
-        );
+        tCIDLib::TBoolean bEscapeForwardSlashes(const tCIDLib::TBoolean bToSet) noexcept
+        {
+            m_bEscapeForwardSlashes = bToSet;
+            return m_bEscapeForwardSlashes;
+        }
 
         tCIDLib::TCard4 c4Decode
         (
@@ -79,7 +83,10 @@ class CIDLIBEXP TBase64 : public TObject
             ,       TBinOutStream&          strmOut
         );
 
-        tCIDLib::TCard4 c4LineWidth() const;
+        tCIDLib::TCard4 c4LineWidth() const noexcept
+        {
+            return m_c4LineWidth;
+        }
 
         tCIDLib::TCard4 c4LineWidth
         (
@@ -140,8 +147,8 @@ class CIDLIBEXP TBase64 : public TObject
         //      The maximum line width to generate when encoding. Defaults to
         //      the standard 72.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean   m_bEscapeForwardSlashes;
-        tCIDLib::TCard4     m_c4LineWidth;
+        tCIDLib::TBoolean   m_bEscapeForwardSlashes = kCIDLib::False;
+        tCIDLib::TCard4     m_c4LineWidth = 72;
 
 
         // -------------------------------------------------------------------

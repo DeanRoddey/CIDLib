@@ -950,29 +950,6 @@ TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
     }
 
 
-    // Should handle nulls
-    const TString strTest15(TString::strConcat(nullptr, strSrc1));
-    if (strTest15 != L"ABC")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"null/TString cat helper failed\n";
-    }
-
-    const TString strTest16(TString::strConcat(strSrc2, nullptr));
-    if (strTest16 != L"DEF")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TString/null cat helper failed\n";
-    }
-
-    const TString strTest17(TString::strConcat(nullptr, nullptr));
-    if (!strTest17.bIsEmpty())
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"null/null cat helper failed\n";
-    }
-
-
     // Should handle empty strings
     const TString strTest20(TString::strConcat(L"", pszSrc1));
     if (strTest20 != L"abc")

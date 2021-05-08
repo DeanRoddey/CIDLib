@@ -48,7 +48,7 @@ RTTIDecls(TMemBuf,TObject)
 // ---------------------------------------------------------------------------
 //  TMemBuf: Public, static methods
 // ---------------------------------------------------------------------------
-TMemBuf& TMemBuf::Nul_TMemBuf()
+TMemBuf& TMemBuf::Nul_TMemBuf() noexcept
 {
     static THeapBuf mbufNull(1);
     return mbufNull;

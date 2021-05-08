@@ -196,8 +196,8 @@ TKrnlTaskSched::bCreateSchedTask(const  tCIDLib::TCh* const pszName
         if (c4DelaySecs)
         {
             tCIDLib::TZStr32 szDelay;
-            TRawStr::bFormatVal(c4DelaySecs, szDelay, c4MaxBufChars(szDelay));
-            TRawStr::CopyCatStr(szDelay, c4MaxBufChars(szDelStr), szDelay, L"S");
+            TRawStr::bFormatVal(c4DelaySecs, szDelay, tCIDLib::c4MaxBufChars(szDelay));
+            TRawStr::CopyCatStr(szDelay, tCIDLib::c4MaxBufChars(szDelStr), szDelay, L"S");
         }
 
         // Get it as the actual type and set specific values

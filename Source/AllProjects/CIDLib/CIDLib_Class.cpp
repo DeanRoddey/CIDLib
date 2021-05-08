@@ -61,7 +61,7 @@ TTypeFactoryKicker::~TTypeFactoryKicker()
 // ---------------------------------------------------------------------------
 //  TClass: Public, static methods
 // ---------------------------------------------------------------------------
-TClass& TClass::Nul_TClass()
+TClass& TClass::Nul_TClass() noexcept
 {
     static TClass clsNull;
     return clsNull;
@@ -147,7 +147,7 @@ TClass::TClass(const tCIDLib::TCh* const pszClassName) :
         TRawStr::CopyCatStr
         (
             szTmp
-            , c4MaxBufChars(szTmp)
+            , tCIDLib::c4MaxBufChars(szTmp)
             , facCIDLib().pszLoadCIDMsg(kCIDMsgs::midClass_InvalidName)
             , pszClassName
             , L")"
@@ -380,7 +380,7 @@ tCIDLib::THashVal TClass::hshInternal() const
 }
 
 
-const tCIDLib::TCh* TClass::pszClassName() const
+const tCIDLib::TCh* TClass::pszClassName() const noexcept
 {
     return m_pszClassName;
 }

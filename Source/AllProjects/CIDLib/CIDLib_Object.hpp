@@ -81,7 +81,7 @@ class CIDLIBEXP TObject
         // -------------------------------------------------------------------
         //  Hidden Constructors and operators
         // -------------------------------------------------------------------
-        TObject() = default;
+        constexpr TObject() noexcept {};
         TObject(const TObject&) = default;
         TObject(TObject&&) = default;
         TObject& operator=(const TObject&) = default;

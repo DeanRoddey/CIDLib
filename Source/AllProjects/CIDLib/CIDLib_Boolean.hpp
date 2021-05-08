@@ -43,17 +43,17 @@ class CIDLIBEXP TBoolean :
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TBoolean();
+        TBoolean() = default;
 
         TBoolean
         (
             const   tCIDLib::TBoolean       bVal
-        );
+        )   noexcept;
 
         TBoolean(const TBoolean&) = default;
         TBoolean(TBoolean&&) = default;
 
-        ~TBoolean();
+        ~TBoolean() = default;
 
 
         // -------------------------------------------------------------------
@@ -91,7 +91,7 @@ class CIDLIBEXP TBoolean :
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bVal() const
+        tCIDLib::TBoolean bVal() const noexcept
         {
             return m_bVal;
         }
@@ -99,7 +99,7 @@ class CIDLIBEXP TBoolean :
         tCIDLib::TBoolean bVal
         (
             const   tCIDLib::TBoolean       bNewVal
-        );
+        )   noexcept;
 
 
     protected   :
@@ -129,7 +129,7 @@ class CIDLIBEXP TBoolean :
         //  m_bVal
         //      Storage for the data value.
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean       m_bVal;
+        tCIDLib::TBoolean       m_bVal = kCIDLib::False;
 
 
         // -------------------------------------------------------------------

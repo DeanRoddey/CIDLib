@@ -54,26 +54,30 @@ class CIDLIBEXP TPoint :
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TPoint() = default;
+        constexpr TPoint() {}
 
-        explicit TPoint
-        (
-            const   tCIDLib::THostPoint&    ptSrc
-        )   noexcept;
+        explicit constexpr TPoint(const tCIDLib::THostPoint& ptSrc) noexcept :
 
-        TPoint
-        (
-            const   tCIDLib::TRawPoint&     ptSrc
-        )   noexcept;
+            m_i4X(ptSrc.i4X)
+            , m_i4Y(ptSrc.i4Y)
+        {
+        }
 
-        explicit TPoint(const tCIDLib::TInt4 i4X, const tCIDLib::TInt4 i4Y) :
+        explicit constexpr TPoint(const tCIDLib::TRawPoint& ptSrc) noexcept :
+
+            m_i4X(ptSrc.i4X)
+            , m_i4Y(ptSrc.i4Y)
+        {
+        }
+
+        explicit constexpr TPoint(const tCIDLib::TInt4 i4X, const tCIDLib::TInt4 i4Y) :
 
             m_i4X(i4X)
             , m_i4Y(i4Y)
         {
         }
 
-        explicit TPoint(const tCIDLib::TInt4 i4Both) noexcept :
+        explicit constexpr TPoint(const tCIDLib::TInt4 i4Both) noexcept :
 
             m_i4X(i4Both)
             , m_i4Y(i4Both)
@@ -92,36 +96,36 @@ class CIDLIBEXP TPoint :
         TPoint& operator=(const TPoint&) = default;
         TPoint& operator=(TPoint&&) = default;
 
-        explicit operator const tCIDLib::THostPoint*() const;
+        explicit operator const tCIDLib::THostPoint*() const noexcept;
 
-        explicit operator tCIDLib::THostPoint*();
+        explicit operator tCIDLib::THostPoint*() noexcept;
 
         TPoint& operator=
         (
             const   tCIDLib::TRawPoint&     ptSrc
-        );
+        )   noexcept;
 
         TPoint& operator=
         (
             const   tCIDLib::THostPoint&    ptSrc
-        );
+        )   noexcept;
 
         tCIDLib::TVoid operator+=
         (
             const   TPoint&                 pntToAdd
-        );
+        )   noexcept;
 
         tCIDLib::TVoid operator-=
         (
             const   TPoint&                 pntToSub
-        );
+        )   noexcept;
 
-        constexpr tCIDLib::TBoolean operator==(const TPoint& pntToTest) const
+        constexpr tCIDLib::TBoolean operator==(const TPoint& pntToTest) const noexcept
         {
             return (m_i4X == pntToTest.m_i4X) && (m_i4Y == pntToTest.m_i4Y);
         }
 
-        constexpr tCIDLib::TBoolean operator!=(const TPoint& pntToTest) const
+        constexpr tCIDLib::TBoolean operator!=(const TPoint& pntToTest) const noexcept
         {
             return !operator==(pntToTest);
         }
@@ -130,13 +134,13 @@ class CIDLIBEXP TPoint :
         (
             const   TPoint&                 pnt1
             , const TPoint&                 pnt2
-        );
+        )   noexcept;
 
         friend TPoint CIDLIBEXP operator-
         (
             const   TPoint&                 pnt1
             , const TPoint&                 pnt2
-        );
+        )   noexcept;
 
 
         // -------------------------------------------------------------------
@@ -152,19 +156,19 @@ class CIDLIBEXP TPoint :
         (
             const   tCIDLib::TInt4          i4XOfs
             , const tCIDLib::TInt4          i4YOfs
-        );
+        )   noexcept;
 
         tCIDLib::TVoid AdjustX
         (
             const   tCIDLib::TInt4          i4Ofs
-        );
+        )   noexcept;
 
         tCIDLib::TVoid AdjustY
         (
             const   tCIDLib::TInt4          i4Ofs
-        );
+        )   noexcept;
 
-        [[nodiscard]] tCIDLib::TBoolean bAtOrg() const
+        [[nodiscard]] tCIDLib::TBoolean bAtOrg() const noexcept
         {
             return (!m_i4X && !m_i4Y);
         }
@@ -172,7 +176,7 @@ class CIDLIBEXP TPoint :
         tCIDLib::TBoolean bInArea
         (
             const   TArea&                  areaToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bParseFromText
         (
@@ -184,7 +188,7 @@ class CIDLIBEXP TPoint :
         tCIDLib::TCard4 c4AbsDiff
         (
             const   TPoint&                 pntOther
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TCard4 c4Packed() const;
 
@@ -220,42 +224,42 @@ class CIDLIBEXP TPoint :
             , const tCIDLib::TCard4         c4Radius
         );
 
-        tCIDLib::TInt4 i4LargestDim() const;
+        tCIDLib::TInt4 i4LargestDim() const noexcept;
 
-        constexpr tCIDLib::TInt4 i4X() const
+        constexpr tCIDLib::TInt4 i4X() const noexcept
         {
             return m_i4X;
         }
 
-        tCIDLib::TInt4 i4X(tCIDLib::TInt4 i4XNew)
+        tCIDLib::TInt4 i4X(tCIDLib::TInt4 i4XNew) noexcept
         {
             m_i4X = i4XNew;
             return m_i4X;
         }
 
-        constexpr tCIDLib::TInt4 i4Y() const
+        constexpr tCIDLib::TInt4 i4Y() const noexcept
         {
             return m_i4Y;
         }
 
-        tCIDLib::TInt4 i4Y(tCIDLib::TInt4 i4YNew)
+        tCIDLib::TInt4 i4Y(tCIDLib::TInt4 i4YNew) noexcept
         {
             m_i4Y = i4YNew;
             return m_i4Y;
         }
 
-        tCIDLib::TVoid Negate()
+        tCIDLib::TVoid Negate() noexcept
         {
             m_i4X *= -1;
             m_i4Y *= -1;
         }
 
-        tCIDLib::TVoid NegateX()
+        tCIDLib::TVoid NegateX() noexcept
         {
             m_i4X *= -1;
         }
 
-        tCIDLib::TVoid NegateY()
+        tCIDLib::TVoid NegateY() noexcept
         {
             m_i4Y *= -1;
         }
@@ -266,7 +270,7 @@ class CIDLIBEXP TPoint :
             , const tCIDLib::TFloat8        f8CYScale
         );
 
-        tCIDLib::TVoid Set(const tCIDLib::TInt4 i4XNew, const tCIDLib::TInt4 i4YNew)
+        tCIDLib::TVoid Set(const tCIDLib::TInt4 i4XNew, const tCIDLib::TInt4 i4YNew) noexcept
         {
             m_i4X = i4XNew;
             m_i4Y = i4YNew;
@@ -304,7 +308,7 @@ class CIDLIBEXP TPoint :
             ,       tCIDLib::TCard4&        c4Radius
         )   const;
 
-        tCIDLib::TVoid Zero()
+        tCIDLib::TVoid Zero() noexcept
         {
             m_i4X = 0;
             m_i4Y = 0;

@@ -80,6 +80,8 @@ tCIDLib::TVoid TRegXTestApp::LoadTests()
     AddTest(new TTest_Parse);
     AddTest(new TTest_Match);
     AddTest(new TTest_RepAll);
+    AddTest(new TTest_CpMv);
+    AddTest(new TTest_Misc);
 }
 
 tCIDLib::TVoid TRegXTestApp::PostTest(const TTestFWTest&)

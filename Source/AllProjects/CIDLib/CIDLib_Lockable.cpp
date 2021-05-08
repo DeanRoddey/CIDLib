@@ -46,7 +46,7 @@
 // ---------------------------------------------------------------------------
 //  MDuplicable: Public, static methods
 // ---------------------------------------------------------------------------
-MLockable& MLockable::Nul_MLockable()
+MLockable& MLockable::Nul_MLockable() noexcept
 {
     //
     //  We need some object to represent this and it's not a concrete class

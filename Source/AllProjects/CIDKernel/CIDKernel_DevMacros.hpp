@@ -118,43 +118,14 @@ inline constexpr eEnumType operator&(const eEnumType eLHS, const eEnumType eRHS)
 }
 
 
-
-
-// ---------------------------------------------------------------------------
-//  The number of bytes that contain both a1 and a2. a1 should be at the
-//  higher address. So it calculates the difference in addresses between the
-//  two and then adds in the size of the higher one.
-// ---------------------------------------------------------------------------
-#define c4BytesIn(a1,a2) \
-((((tCIDLib::TCard1*)&a1) - ((tCIDLib::TCard1*)&a2)) + sizeof(a1))
-
-
-// ---------------------------------------------------------------------------
-//  This macro calculates the offset of a field within a structure.
-// ---------------------------------------------------------------------------
-#define c4FieldOfs(t,f)     (tCIDLib::TCard4(&(((t *)0)->f)))
-
-
-
-// ---------------------------------------------------------------------------
-//  Calculate the number of chars storable in a buffer. This keeps the
-//  calculation from being all over the place. The reason for it is that
-//  sizeof(buff) is not valid in a wide char environment. Note that the max
-//  chars is 1 less than the full count because it does not include the
-//  nul.
-// ---------------------------------------------------------------------------
-#define c4MaxBufChars(buf)  ((sizeof(buf) / kCIDLib::c4CharBytes) - 1)
-
-
-
 // ---------------------------------------------------------------------------
 //  This guy generates the little bit of stuff needed to support a null
 //  object for a class.
 // ---------------------------------------------------------------------------
 #define NulObject(typ) \
 public : \
-  static typ& Nul_##typ(); \
-  inline static tCIDLib::TBoolean bIsNullObject(const typ& objToTest) \
+  static typ& Nul_##typ() noexcept; \
+  inline static tCIDLib::TBoolean bIsNullObject(const typ& objToTest) noexcept \
   { \
     return (&objToTest == &Nul_##typ()); \
   }

@@ -385,7 +385,6 @@ extern tCIDLib::TVoid CIDLIBEXP CIDLib_MakePrimary(TThread* const);
 //  For those collection types that we pre-generate in our main cpp file, we want to
 //  insure that they don't get generated again in users of the DLL.
 // ---------------------------------------------------------------------------
-#if     !defined(CIDLIB_PREINST)
 extern template class TBasicTreeCol<TKeyValuePair>;
 
 extern template class TFundVector<tCIDLib::TBoolean>;
@@ -430,6 +429,4 @@ extern template class TVector<TKeyValFPair>;
 extern template class TVector<TKeyValues>;
 extern template class TVector<TKeyNumPair>;
 extern template class TVector<TDirChangeInfo>;
-
-#endif
 

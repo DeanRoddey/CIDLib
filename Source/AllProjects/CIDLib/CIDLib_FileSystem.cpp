@@ -1079,9 +1079,9 @@ TFileSys::NormalizePath(const   TString&    strToNormalize
 
 tCIDLib::TVoid TFileSys::QueryCurrentDir(TString& strToFill)
 {
-    tCIDLib::TCh szPath[kCIDLib::c4MaxPathLen+1];
+    tCIDLib::TCh szPath[kCIDLib::c4MaxPathLen + 1];
 
-    if (!TKrnlFileSys::bQueryCurrentDir(szPath, c4MaxBufChars(szPath)))
+    if (!TKrnlFileSys::bQueryCurrentDir(szPath, tCIDLib::c4MaxBufChars(szPath)))
     {
         facCIDLib().ThrowKrnlErr
         (

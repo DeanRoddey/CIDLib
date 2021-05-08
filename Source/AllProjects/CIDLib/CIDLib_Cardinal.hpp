@@ -54,33 +54,33 @@ class CIDLIBEXP TCardinal :
         explicit TCardinal
         (
             const   tCIDLib::TCard1         c1Val
-        );
+        )   noexcept;
 
         explicit TCardinal
         (
             const   tCIDLib::TCard2         c2Val
-        );
+        )   noexcept;
 
         explicit TCardinal
         (
             const   tCIDLib::TCard4         c4Val
-        );
+        )   noexcept;
 
         explicit TCardinal
         (
             const   tCIDLib::TUInt          uVal
-        );
+        )   noexcept;
 
         explicit TCardinal
         (
             const   tCIDLib::TSInt          iVal
-        );
+        )   noexcept;
 
         TCardinal
         (
             const   tCIDLib::TCard4         c4Val
             , const tCIDLib::ERadices       eRadix
-        );
+        )   noexcept;
 
         TCardinal(const TCardinal&) = default;
         TCardinal(TCardinal&&) = default;
@@ -95,7 +95,7 @@ class CIDLIBEXP TCardinal :
 
         TCardinal& operator=(TCardinal&&) = default;
 
-        constexpr operator tCIDLib::TCard4() const
+        constexpr operator tCIDLib::TCard4() const noexcept
         {
             return m_c4Val;
         }
@@ -201,7 +201,7 @@ class CIDLIBEXP TCardinal :
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        constexpr tCIDLib::TCard4 c4Val() const
+        constexpr tCIDLib::TCard4 c4Val() const noexcept
         {
             return m_c4Val;
         }
@@ -209,14 +209,17 @@ class CIDLIBEXP TCardinal :
         tCIDLib::TCard4 c4Val
         (
             const   tCIDLib::TCard4         c4NewVal
-        );
+        )   noexcept;
 
-        tCIDLib::ERadices eRadix() const;
+        tCIDLib::ERadices eRadix() const noexcept
+        {
+            return m_eRadix;
+        }
 
         tCIDLib::ERadices eRadix
         (
             const   tCIDLib::ERadices       eNewRadix
-        );
+        )   noexcept;
 
 
     protected   :
@@ -281,7 +284,7 @@ class CIDLIBEXP TCardinal64 :
         (
             const   tCIDLib::TCard8&        c8Val
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
-        );
+        )   noexcept;
 
         TCardinal64(const TCardinal64&) = default;
         TCardinal64(TCardinal64&&) = default;
@@ -472,17 +475,17 @@ class CIDLIBEXP TLocCardinal : public TCardinal
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TLocCardinal();
+        TLocCardinal() = default;
 
         TLocCardinal
         (
             const   tCIDLib::TCard4         c4Val
-        );
+        )   noexcept;
 
         TLocCardinal(const TLocCardinal&) = default;
         TLocCardinal(TLocCardinal&&) = default;
 
-        ~TLocCardinal();
+        ~TLocCardinal() = default;
 
 
         // -------------------------------------------------------------------
@@ -550,17 +553,17 @@ class CIDLIBEXP TLocCardinal64 : public TCardinal64
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TLocCardinal64();
+        TLocCardinal64() = default;
 
         TLocCardinal64
         (
             const   tCIDLib::TCard8&        c8Val
-        );
+        )   noexcept;
 
         TLocCardinal64(const TLocCardinal64&) = default;
         TLocCardinal64(TLocCardinal64&&) = default;
 
-        ~TLocCardinal64();
+        ~TLocCardinal64() = default;
 
 
         // -------------------------------------------------------------------

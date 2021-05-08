@@ -810,7 +810,7 @@ TKrnlThread::bWaitEvOrDeath(        TKrnlEvent&         kevWait
 {
     HANDLE ahWait[2];
     ahWait[0] = m_hthrThis.m_phthriThis->hThread;
-    ahWait[1] = kevWait.hevThis().heviThis().hEvent;
+    ahWait[1] = *tCIDLib::pReCastPtr<HANDLE>(kevWait.pHandle());
 
     tCIDLib::TCard4 c4Which;
     const tCIDLib::EWaitRes eRes = TKrnlWin32::eWaitHandles

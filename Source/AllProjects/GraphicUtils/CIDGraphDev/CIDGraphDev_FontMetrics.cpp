@@ -140,7 +140,7 @@ TFontMetrics::c4EnumFontFace(const  TGraphDrawDev&              gdevTarget
 
     // Enumerate the fonts in this face
     LOGFONT Search = {0};
-    strFace.ToZStr(Search.lfFaceName, c4MaxBufChars(Search.lfFaceName));
+    strFace.ToZStr(Search.lfFaceName, tCIDLib::c4MaxBufChars(Search.lfFaceName));
     ::EnumFontFamiliesExW
     (
         gdevTarget.hdevThis()
@@ -182,7 +182,7 @@ TFontMetrics::c4EnumAllFonts(const  TGraphDrawDev&              gdevTarget
 }
 
 
-TFontMetrics& TFontMetrics::Nul_TFontMetrics()
+TFontMetrics& TFontMetrics::Nul_TFontMetrics() noexcept
 {
     static TFontMetrics fmtrNull;
     return fmtrNull;
@@ -581,6 +581,6 @@ tCIDLib::TVoid TFontMetrics::ToLogFont(LOGFONTW& ToFill) const
 //    ToFill.lfOrientation    = m_pHostInfo->tm;
 //    ToFill.lfOutPrecision   = m_pHostInfo->tm;
 
-    m_strFaceName.ToZStr(ToFill.lfFaceName, c4MaxBufChars(ToFill.lfFaceName));
+    m_strFaceName.ToZStr(ToFill.lfFaceName, tCIDLib::c4MaxBufChars(ToFill.lfFaceName));
 }
 

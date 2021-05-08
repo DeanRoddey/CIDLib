@@ -52,7 +52,7 @@ RTTIDecls(TNullPen,TGUIPen)
 // ---------------------------------------------------------------------------
 //  TGUIPen: Public, static methods
 // ---------------------------------------------------------------------------
-TGUIPen& TGUIPen::Nul_TGUIPen()
+TGUIPen& TGUIPen::Nul_TGUIPen() noexcept
 {
     static TCosmeticPen gpenNull(TRGBClr(0, 0, 0));
     return gpenNull;

@@ -311,9 +311,9 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TBoolean bToWrite)
 {
     tCIDLib::TZStr8 szTmp = L"";
     if (bToWrite)
-        TRawStr::CopyStr(szTmp, pszBool(bToWrite), c4MaxBufChars(szTmp));
+        TRawStr::CopyStr(szTmp, pszBool(bToWrite), tCIDLib::c4MaxBufChars(szTmp));
     else
-        TRawStr::CopyStr(szTmp, pszBool(bToWrite), c4MaxBufChars(szTmp));
+        TRawStr::CopyStr(szTmp, pszBool(bToWrite), tCIDLib::c4MaxBufChars(szTmp));
 
     if (m_c4Width)
     {
@@ -331,7 +331,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TBoolean bToWrite)
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCard4 c4ToWrite)
 {
     tCIDLib::TZStr64 szTmp;
-    if (!TRawStr::bFormatVal(c4ToWrite, szTmp, c4MaxBufChars(szTmp), m_eRadix))
+    if (!TRawStr::bFormatVal(c4ToWrite, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -360,7 +360,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCard4 c4ToWrite)
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCard8& c8ToWrite)
 {
     tCIDLib::TZStr128 szTmp;
-    if (!TRawStr::bFormatVal(c8ToWrite, szTmp, c4MaxBufChars(szTmp), m_eRadix))
+    if (!TRawStr::bFormatVal(c8ToWrite, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -392,7 +392,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TFloat8& f8ToWrite)
     if (!TRawStr::bFormatVal(f8ToWrite
                             , szTmp
                             , m_c4Precision
-                            , c4MaxBufChars(szTmp)
+                            , tCIDLib::c4MaxBufChars(szTmp)
                             , tCIDLib::ETrailFmts::Ignore))
     {
         facCIDLib().ThrowKrnlErr
@@ -422,7 +422,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TFloat8& f8ToWrite)
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt4 i4ToWrite)
 {
     tCIDLib::TZStr64 szTmp;
-    if (!TRawStr::bFormatVal(i4ToWrite, szTmp, c4MaxBufChars(szTmp), m_eRadix))
+    if (!TRawStr::bFormatVal(i4ToWrite, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -451,7 +451,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt4 i4ToWrite)
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt8& i8ToWrite)
 {
     tCIDLib::TZStr128 szTmp;
-    if (!TRawStr::bFormatVal(i8ToWrite, szTmp, c4MaxBufChars(szTmp), m_eRadix))
+    if (!TRawStr::bFormatVal(i8ToWrite, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -480,7 +480,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt8& i8ToWrite)
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TUInt uToWrite)
 {
     tCIDLib::TZStr128 szTmp;
-    if (!TRawStr::bFormatVal(uToWrite, szTmp, c4MaxBufChars(szTmp), m_eRadix))
+    if (!TRawStr::bFormatVal(uToWrite, szTmp, tCIDLib::c4MaxBufChars(szTmp), m_eRadix))
     {
         facCIDLib().ThrowKrnlErr
         (

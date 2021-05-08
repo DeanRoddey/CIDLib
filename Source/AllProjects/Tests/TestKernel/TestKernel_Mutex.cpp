@@ -167,14 +167,8 @@ static tCIDLib::TVoid BasicMutexTests()
     TKrnlRscName krsnTest(L"TestKernel", L"Test2", L"Mutex");
 
     // Build the real mutex name
-    if (!krsnTest.bBuildFullName
-    (
-        szTmpName
-        , c4MaxBufChars(szTmpName)
-        , tCIDLib::ENamedRscTypes::Mutex))
-    {
-        throw TKrnlError::kerrLast();
-    }
+    if (!krsnTest.bBuildFullName(szTmpName, tCIDLib::c4MaxBufChars(szTmpName), tCIDLib::ENamedRscTypes::Mutex))
+            throw TKrnlError::kerrLast();
 
     // Create a named semaphore now and test it out
     TKrnlMutex   kmtxTest2(szTmpName);

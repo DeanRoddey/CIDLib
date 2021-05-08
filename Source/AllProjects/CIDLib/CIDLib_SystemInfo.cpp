@@ -424,7 +424,7 @@ tCIDLib::TBoolean TSysInfo::bQueryLatLong(  tCIDLib::TFloat8&   f8Lat
 {
     #if CID_DEBUG_ON
     tCIDLib::TCh szTmp[64];
-    if (TKrnlEnvironment::bFind(L"CID_FAUXLOCINFO", szTmp, c4MaxBufChars(szTmp)))
+    if (TKrnlEnvironment::bFind(L"CID_FAUXLOCINFO", szTmp, tCIDLib::c4MaxBufChars(szTmp)))
     {
         // Break it into two floating point numbers
         tCIDLib::TCh* pszCtx = nullptr;

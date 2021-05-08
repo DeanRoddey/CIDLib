@@ -48,7 +48,7 @@ class KRNLEXPORT TKrnlRscName
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TKrnlRscName();
+        TKrnlRscName() = default;
 
         TKrnlRscName
         (
@@ -63,6 +63,11 @@ class KRNLEXPORT TKrnlRscName
             const   TKrnlRscName&           krscnSrc
         );
 
+        TKrnlRscName
+        (
+                    TKrnlRscName&&          krscnSrc
+        );
+
         ~TKrnlRscName();
 
 
@@ -72,6 +77,11 @@ class KRNLEXPORT TKrnlRscName
         TKrnlRscName& operator=
         (
             const   TKrnlRscName&           krscnSrc
+        );
+
+        TKrnlRscName& operator=
+        (
+                    TKrnlRscName&&          krscnSrc
         );
 
         tCIDLib::TBoolean operator==
@@ -116,23 +126,29 @@ class KRNLEXPORT TKrnlRscName
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid FaultInStrs() const;
+
+
+        // -------------------------------------------------------------------
         //  Private data members
         //
         //  m_pidOfName
-        //      This is the optional process id to format into the string.
-        //      It defaults to kCIDLib::pidInvalid, which means it won't
-        //      be used.
+        //      This is the optional process id to format into the string. It defaults
+        //      to kCIDLib::pidInvalid, which means it won't be used.
         //
         //  m_pszCompany
         //  m_pszSubsystem
         //  m_pszResource
-        //      These are the three name parts. They are filled in during
-        //      construction and are never changed.
+        //      These are the three name parts. To make move semantics efficient, these
+        //      can be null, and will be faulted in (to an empty string) if accessed.
+        //      They ahve to be mutable because of that.
         // -------------------------------------------------------------------
-        tCIDLib::TProcessId m_pidOfName;
-        tCIDLib::TCh*       m_pszCompany;
-        tCIDLib::TCh*       m_pszSubsystem;
-        tCIDLib::TCh*       m_pszResource;
+        tCIDLib::TProcessId     m_pidOfName = kCIDLib::pidInvalid;
+        mutable tCIDLib::TCh*   m_pszCompany = nullptr;
+        mutable tCIDLib::TCh*   m_pszSubsystem = nullptr;
+        mutable tCIDLib::TCh*   m_pszResource = nullptr;
 };
 
 #pragma CIDLIB_POPPACK

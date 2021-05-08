@@ -74,21 +74,17 @@ class TDbgExitException
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TDbgExitException(const tCIDMacroEng::EDbgActs eReason) :
-
-            m_eReason(eReason)
+        TDbgExitException(const tCIDMacroEng::EDbgActs eReason) : m_eReason(eReason)
         {
         }
 
-        TDbgExitException(const TDbgExitException& excptSrc) :
+        TDbgExitException(const TDbgExitException& excptSrc)  = default;
+        TDbgExitException(TDbgExitException&& excptSrc)  = default;
 
-            m_eReason(excptSrc.m_eReason)
-        {
-        }
+        ~TDbgExitException() = default;
 
-        ~TDbgExitException()
-        {
-        }
+        TDbgExitException& operator=(const TDbgExitException& excptSrc)  = default;
+        TDbgExitException& operator=(TDbgExitException&& excptSrc)  = default;
 
         tCIDMacroEng::EDbgActs m_eReason;
 };
@@ -108,17 +104,9 @@ class TExceptException
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TExceptException()
-        {
-        }
+        TExceptException() = default;
 
-        TExceptException(const TExceptException&)
-        {
-        }
-
-        ~TExceptException()
-        {
-        }
+        ~TExceptException() = default;
 };
 
 

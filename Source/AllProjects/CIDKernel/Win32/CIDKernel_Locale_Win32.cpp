@@ -676,7 +676,7 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
         //  Now query and convert the date/time formatting strings and
         //  store them.
         //
-        constexpr tCIDLib::TCard4 c4DTBufChars = c4MaxBufChars(s_szTimeFmt);
+        constexpr tCIDLib::TCard4 c4DTBufChars = tCIDLib::c4MaxBufChars(s_szTimeFmt);
         GetStringValue(LOCALE_STIMEFORMAT, s_szTimeFmt, c4DTBufChars);
         ConvertDateTimeFormat(s_szTimeFmt, c4DTBufChars, szDTSeps);
 
@@ -684,8 +684,8 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
         ConvertDateTimeFormat(s_szDateFmt, c4DTBufChars, szDTSeps);
 
         // And get the AM/PM strings
-        GetStringValue(LOCALE_S1159, s_szAMString, c4MaxBufChars(s_szAMString));
-        GetStringValue(LOCALE_S2359, s_szPMString, c4MaxBufChars(s_szAMString));
+        GetStringValue(LOCALE_S1159, s_szAMString, tCIDLib::c4MaxBufChars(s_szAMString));
+        GetStringValue(LOCALE_S2359, s_szPMString, tCIDLib::c4MaxBufChars(s_szAMString));
 
 
         // ------------------------------------------
@@ -747,7 +747,7 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
             (
                 s_szPosMonFmt
                 , apszPosMonFmt[c4Tmp]
-                , c4MaxBufChars(s_szPosMonFmt)
+                , tCIDLib::c4MaxBufChars(s_szPosMonFmt)
             );
         }
 
@@ -761,7 +761,7 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
         //  Local static array that maps the monetary format indices to our
         //  CIDLib type of format strings.
         //
-        static const tCIDLib::TCh* apszNegMonFmt[] =
+        static constexpr const tCIDLib::TCh* const apszNegMonFmt[] =
         {
             L"(%(y)%(v))"
             , L"%(s)%(y)%(v)"
@@ -791,7 +791,7 @@ tCIDLib::TBoolean TKrnlLocale::bLoadLocaleInfo()
             (
                 s_szNegMonFmt
                 , apszNegMonFmt[c4Tmp]
-                , c4MaxBufChars(s_szNegMonFmt)
+                , tCIDLib::c4MaxBufChars(s_szNegMonFmt)
             );
         }
 

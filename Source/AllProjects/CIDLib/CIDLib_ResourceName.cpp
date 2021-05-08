@@ -59,7 +59,7 @@ namespace CIDLib_ResourceName
 // ---------------------------------------------------------------------------
 //  TResourceName: Public, static methods
 // ---------------------------------------------------------------------------
-TResourceName& TResourceName::Nul_TResourceName()
+TResourceName& TResourceName::Nul_TResourceName() noexcept
 {
     static TResourceName rsnNull;
     return rsnNull;
@@ -69,16 +69,16 @@ TResourceName& TResourceName::Nul_TResourceName()
 // ---------------------------------------------------------------------------
 //  TResourceName: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TResourceName::TResourceName() :
+TResourceName::TResourceName() noexcept :
 
-    m_eTypeCache(tCIDLib::ENamedRscTypes::Event)
+    m_eTypeCache(tCIDLib::ENamedRscTypes::Count)
 {
-    strFullName(m_eTypeCache);
+    strFullName(tCIDLib::ENamedRscTypes::Event);
 }
 
-TResourceName::TResourceName(const TKrnlRscName& krsnToUse) :
+TResourceName::TResourceName(const TKrnlRscName& krsnToUse) noexcept :
 
-    m_eTypeCache(tCIDLib::ENamedRscTypes::Event)
+    m_eTypeCache(tCIDLib::ENamedRscTypes::Count)
 {
     try
     {
@@ -98,86 +98,44 @@ TResourceName::TResourceName(const TKrnlRscName& krsnToUse) :
         );
     }
 
-    strFullName(m_eTypeCache);
+    // We set Count above, so this will force an update with our actual type
+    strFullName(tCIDLib::ENamedRscTypes::Event);
 }
 
 TResourceName::TResourceName(   const   TString&            strCompany
                                 , const TString&            strSubsystem
                                 , const TString&            strResource
-                                , const tCIDLib::TProcessId pidOfName) :
+                                , const tCIDLib::TProcessId pidOfName) noexcept :
 
-    m_eTypeCache(tCIDLib::ENamedRscTypes::Event)
-    , m_krsnThis
-      (
-        strCompany.pszBuffer()
-        , strSubsystem.pszBuffer()
-        , strResource.pszBuffer()
-        , pidOfName
-      )
+    m_eTypeCache(tCIDLib::ENamedRscTypes::Count)
+    , m_krsnThis(strCompany.pszBuffer(), strSubsystem.pszBuffer(), strResource.pszBuffer(), pidOfName)
 {
-    //
-    //  Use something different from the one set above, to force an update. The
-    //  actual type doesn't matter. It will get updated again if client calls
-    //  strFullName() with a different type.
-    //
-    strFullName(tCIDLib::ENamedRscTypes::Mutex);
+    // We set count above, so this will force an udpate
+    strFullName(tCIDLib::ENamedRscTypes::Event);
 }
 
-TResourceName::TResourceName(const TResourceName& rsnToCopy) :
-
-    m_eTypeCache(rsnToCopy.m_eTypeCache)
-    , m_krsnThis(rsnToCopy.m_krsnThis)
-    , m_strFullName(rsnToCopy.m_strFullName)
-{
-}
-
-TResourceName::~TResourceName()
-{
-}
 
 
 // ---------------------------------------------------------------------------
 //  TResourceName: Public operators
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TResourceName::operator!=(const TResourceName& rsnToCompare) const
+tCIDLib::TBoolean TResourceName::operator!=(const TResourceName& rsnToCompare) const noexcept
 {
     return !operator==(rsnToCompare);
 }
 
-tCIDLib::TBoolean
-TResourceName::operator==(const TResourceName& rsnToCompare) const
+tCIDLib::TBoolean TResourceName::operator==(const TResourceName& rsnToCompare) const noexcept
 {
     if (this == &rsnToCompare)
         return kCIDLib::True;
     return (m_krsnThis == rsnToCompare.m_krsnThis);
 }
 
-TResourceName& TResourceName::operator=(const TResourceName& rsnToAssign)
-{
-    if (this == &rsnToAssign)
-        return *this;
-
-    m_krsnThis == rsnToAssign.m_krsnThis;
-    return *this;
-}
 
 
 // ---------------------------------------------------------------------------
 //  TResourceName: Public, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TResourceName::bIsValid() const
-{
-    return m_krsnThis.bIsValid();
-}
-
-
-tCIDLib::TProcessId TResourceName::pidOfName() const
-{
-    return m_krsnThis.pidOfName();
-}
-
-
 tCIDLib::TVoid
 TResourceName::QueryNameParts(  TString&    strCompany
                                 , TString&  strSubsystem
@@ -208,8 +166,7 @@ TResourceName::SetName( const   TString&            strCompany
 }
 
 
-const TString&
-TResourceName::strFullName(const tCIDLib::ENamedRscTypes eType) const
+const TString& TResourceName::strFullName(const tCIDLib::ENamedRscTypes eType) const
 {
     // If this type is the cached name, then just return what we've got
     if (eType == m_eTypeCache)
@@ -220,7 +177,7 @@ TResourceName::strFullName(const tCIDLib::ENamedRscTypes eType) const
 
     // Build the full name into a temp string that should be big enough
     tCIDLib::TCh szTmp[2048];
-    if (!m_krsnThis.bBuildFullName(szTmp, c4MaxBufChars(szTmp), eType))
+    if (!m_krsnThis.bBuildFullName(szTmp, tCIDLib::c4MaxBufChars(szTmp), eType))
     {
         facCIDLib().ThrowKrnlErr
         (

@@ -31,19 +31,19 @@ namespace kCIDMacroEng
     // -----------------------------------------------------------------------
     //  The number of indices that an opcode can support
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4OpIndices = 4;
+    constexpr tCIDLib::TCard4   c4OpIndices = 4;
 
 
     // -----------------------------------------------------------------------
     //  The maximum parms a method can take
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       c4MaxMethodParms = 32;
+    constexpr tCIDLib::TCard4   c4MaxMethodParms = 32;
 
 
     // -----------------------------------------------------------------------
     //  Indicates a bad id (of a parm, method, class, etc...)
     // -----------------------------------------------------------------------
-    const tCIDLib::TCard2       c2BadId = 0xFFFF;
+    constexpr tCIDLib::TCard2   c2BadId = 0xFFFF;
 
 
     // -----------------------------------------------------------------------

@@ -444,7 +444,7 @@ bConvertFindBuf(const   WIN32_FIND_DATA&            FileData
     (
         fndbToFill.szName
         , FileData.cFileName
-        , c4MaxBufChars(fndbToFill.szName)
+        , tCIDLib::c4MaxBufChars(fndbToFill.szName)
     );
     return kCIDLib::True;
 }
@@ -2244,7 +2244,7 @@ TKrnlFileSys::bQueryVolHWType( const   tCIDLib::TCh* const     pszVolPath
     if (eType == tCIDLib::EVolHWTypes::Removable)
     {
         tCIDLib::TZStr64 szTmpName;
-        TRawStr::CopyStr(szTmpName, L"\\\\.\\ :", c4MaxBufChars(szTmpName));
+        TRawStr::CopyStr(szTmpName, L"\\\\.\\ :", tCIDLib::c4MaxBufChars(szTmpName));
         szTmpName[4] = pszVolPath[0];
         szTmpName[6] = 0;
         HANDLE hDev = ::CreateFile
@@ -2397,12 +2397,12 @@ TKrnlFileSys::bQueryVolumeInfo( const   tCIDLib::TCh* const pszSrcPath
     (
         szActual
         , szVolumeLabel
-        , c4MaxBufChars(szVolumeLabel)
+        , tCIDLib::c4MaxBufChars(szVolumeLabel)
         , &c4SerNum
         , &c4MaxPathCompLen
         , &c4VolFlags
         , szFileSysType
-        , c4MaxBufChars(szFileSysType)))
+        , tCIDLib::c4MaxBufChars(szFileSysType)))
     {
         TKrnlError::SetLastHostError(::GetLastError());
         return kCIDLib::False;

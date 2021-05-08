@@ -96,7 +96,7 @@ class CIDLIBEXP MStreamable
         //  Hidden but available so that including classes can have default
         //  generated copy/assignment.
         // -------------------------------------------------------------------
-        MStreamable() = default;
+        constexpr MStreamable() noexcept {}
         MStreamable(const MStreamable&) = default;
         MStreamable(MStreamable&&) = default;
         MStreamable& operator=(const MStreamable&) = default;
