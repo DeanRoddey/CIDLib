@@ -615,6 +615,18 @@ TString::TString(const tCIDLib::TCh chInit) :
     m_pszBuffer[1] = kCIDLib::chNull;
 }
 
+TString::TString(const TStringView& strvSrc, const tCIDLib::TCard4 c4ExtraChars) :
+
+    m_c4BufChars(strvSrc.c4Length() + c4ExtraChars)
+    , m_c4CurEnd(strvSrc.c4Length())
+    , m_pszBuffer(nullptr)
+{
+    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+    if (m_c4CurEnd)
+        TRawMem::CopyMemBuf(m_pszBuffer, strvSrc.pszBuffer(), m_c4CurEnd * kCIDLib::c4CharBytes);
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
 TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt)
 {
     if (!pszToAdopt)
@@ -794,6 +806,22 @@ TString& TString::operator=(const TString& strSrc)
 {
     if (this != &strSrc)
         Set(strSrc);
+    return *this;
+}
+
+TString& TString::operator=(const TStringView& strvSrc)
+{
+    if (m_c4BufChars < strvSrc.c4Length())
+    {
+        delete m_pszBuffer;
+        m_pszBuffer = new tCIDLib::TCh[strvSrc.c4Length() + 1];
+    }
+
+    m_c4BufChars = strvSrc.c4Length();
+    m_c4CurEnd = strvSrc.c4Length();
+    TRawMem::CopyMemBuf(m_pszBuffer, strvSrc.pszBuffer(), m_c4BufChars);
+    m_pszBuffer[m_c4BufChars] = kCIDLib::chNull;
+
     return *this;
 }
 

@@ -44,15 +44,8 @@ class CIDLIBEXP TStringId
 
         TStringId
         (
-            const   TString&                strText
+            const   TStringView&            strvText
             , const tCIDLib::TCard4         c4Id
-        );
-
-        TStringId
-        (
-            const   tCIDLib::TCh* const     pszText
-            , const tCIDLib::TCard4         c4Id
-
         );
 
         TStringId(const TStringId&) = default;
@@ -99,7 +92,7 @@ class CIDLIBEXP TStringId
 
         const TString& strText
         (
-            const   TString&                strToSet
+            const   TStringView&            strvToSet
         );
 
 

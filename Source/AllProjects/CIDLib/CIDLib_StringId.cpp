@@ -47,20 +47,11 @@ TStringId::TStringId() :
 {
 }
 
-TStringId::TStringId(const TString& strText, const tCIDLib::TCard4 c4Id) :
+TStringId::TStringId(const TStringView& strvText, const tCIDLib::TCard4 c4Id) :
 
     m_bFlag(kCIDLib::False)
     , m_c4Id(c4Id)
-    , m_strText(strText)
-{
-}
-
-TStringId::TStringId(const  tCIDLib::TCh* const     pszText
-                    , const tCIDLib::TCard4         c4Id) :
-
-    m_bFlag(kCIDLib::False)
-    , m_c4Id(c4Id)
-    , m_strText(pszText)
+    , m_strText(strvText)
 {
 }
 
@@ -123,9 +114,9 @@ const TString& TStringId::strText() const
     return m_strText;
 }
 
-const TString& TStringId::strText(const TString& strToSet)
+const TString& TStringId::strText(const TStringView& strvToSet)
 {
-    m_strText = strToSet;
+    m_strText = strvToSet;
     return m_strText;
 }
 

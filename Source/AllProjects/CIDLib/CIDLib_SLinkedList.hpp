@@ -53,7 +53,7 @@ class CIDLIBEXP TSLstNode : public TObject
         TSLstNode(const TSLstNode&) = delete;
         TSLstNode(TSLstNode&&) = delete;
 
-        ~TSLstNode();
+        ~TSLstNode() = default;
 
 
         // -------------------------------------------------------------------
@@ -66,7 +66,10 @@ class CIDLIBEXP TSLstNode : public TObject
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        TSLstNode* pnodeNext() const;
+        TSLstNode* pnodeNext() const noexcept
+        {
+            return m_pnodeNext;
+        }
 
 
     protected   :
@@ -80,7 +83,7 @@ class CIDLIBEXP TSLstNode : public TObject
         // -------------------------------------------------------------------
         //  Hidden constructors
         // -------------------------------------------------------------------
-        TSLstNode();
+        TSLstNode() = default;
 
 
     private :
@@ -90,7 +93,7 @@ class CIDLIBEXP TSLstNode : public TObject
         //  m_pnodeNext
         //      The next node of this node
         // -------------------------------------------------------------------
-        TSLstNode*      m_pnodeNext;
+        TSLstNode*      m_pnodeNext = nullptr;
 
 
         // -------------------------------------------------------------------
@@ -111,7 +114,7 @@ class CIDLIBEXP TSLinkedList : public TObject
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TSLinkedList();
+        TSLinkedList() = default;
 
         TSLinkedList(const TSLinkedList&) = delete;
 
@@ -157,19 +160,22 @@ class CIDLIBEXP TSLinkedList : public TObject
         tCIDLib::TBoolean bIsFirstNode
         (
             const   TSLstNode* const        pnodeToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bIsLastNode
         (
             const   TSLstNode* const        pnodeToTest
-        )   const;
+        )   const noexcept;
 
         tCIDLib::TBoolean bIsMemberNode
         (
             const   TSLstNode* const        pnodeToTest
         )   const;
 
-        tCIDLib::TCard4 c4ElemCount() const;
+        tCIDLib::TCard4 c4ElemCount() const noexcept
+        {
+            return m_c4ElemCount;
+        }
 
         tCIDLib::TVoid InsertNode
         (
@@ -203,6 +209,8 @@ class CIDLIBEXP TSLinkedList : public TObject
                     TSLstNode* const        pnodeToRemove
         );
 
+        tCIDLib::TVoid Reverse();
+
 
     private :
         // -------------------------------------------------------------------
@@ -214,15 +222,15 @@ class CIDLIBEXP TSLinkedList : public TObject
         //
         //  m_pnodeHead
         //      This is a pointer to the 1st node of the linked list. If it
-        //      is 0, then there are no elements in the list.
+        //      is nullptr, then there are no elements in the list.
         //
         //  m_pnodeTail
         //      This is the pointer to the last node of the linked list. If it
-        //      is 0, then there are no elements in the list.
+        //      is nullptr, then there are no elements in the list.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4         m_c4ElemCount;
-        TSLstNode*              m_pnodeHead;
-        TSLstNode*              m_pnodeTail;
+        tCIDLib::TCard4         m_c4ElemCount = 0;
+        TSLstNode*              m_pnodeHead = nullptr;
+        TSLstNode*              m_pnodeTail = nullptr;
 
 
         // -------------------------------------------------------------------

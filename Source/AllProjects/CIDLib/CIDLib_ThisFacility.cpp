@@ -81,18 +81,9 @@ tCIDLib::TCard4 TFacCIDLib::c4NextId()
 //
 // Build a new, unique thread name and return
 //
-TString TFacCIDLib::strNextThreadName(const tCIDLib::TCh* const pszBaseName)
+TString TFacCIDLib::strNextThreadName(const TStringView& strvBaseName)
 {
-    TString strRet(pszBaseName, 8);
-    strRet.Append(L"Thread");
-    strRet.AppendFormatted(m_scntThread++);
-
-    return tCIDLib::ForceMove(strRet);
-}
-
-TString TFacCIDLib::strNextThreadName(const TString& strBaseName)
-{
-    TString strRet(strBaseName, 8);
+    TString strRet(strvBaseName, 8);
     strRet.Append(L"Thread");
     strRet.AppendFormatted(m_scntThread++);
 

@@ -46,35 +46,6 @@ RTTIDecls(TSLinkedList,TObject)
 
 
 // ---------------------------------------------------------------------------
-//   CLASS: TSLstNode
-//  PREFIX: node
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-//  TSListNode: Constructors and Destructor
-// ---------------------------------------------------------------------------
-TSLstNode::TSLstNode() :
-
-    m_pnodeNext(nullptr)
-{
-}
-
-TSLstNode::~TSLstNode()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TSListNode: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-TSLstNode* TSLstNode::pnodeNext() const
-{
-    return m_pnodeNext;
-}
-
-
-
-// ---------------------------------------------------------------------------
 //   CLASS: TSLinkedList
 //  PREFIX: llst
 // ---------------------------------------------------------------------------
@@ -82,21 +53,9 @@ TSLstNode* TSLstNode::pnodeNext() const
 // ---------------------------------------------------------------------------
 //  TSLinkedList: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TSLinkedList::TSLinkedList() :
-
-    m_c4ElemCount(0)
-    , m_pnodeHead(nullptr)
-    , m_pnodeTail(nullptr)
+TSLinkedList::TSLinkedList(TSLinkedList&& listSrc)
 {
-}
-
-TSLinkedList::TSLinkedList(TSLinkedList&& listSrc) :
-
-    m_c4ElemCount(0)
-    , m_pnodeHead(nullptr)
-    , m_pnodeTail(nullptr)
-{
-    operator=(tCIDLib::ForceMove(listSrc));
+    *this = tCIDLib::ForceMove(listSrc);
 }
 
 TSLinkedList::~TSLinkedList()
@@ -120,11 +79,11 @@ TSLinkedList& TSLinkedList::operator=(TSLinkedList&& llstSrc)
 }
 
 
-tCIDLib::TBoolean TSLinkedList::operator==(const TSLinkedList& llstToTest) const
+tCIDLib::TBoolean TSLinkedList::operator==(const TSLinkedList& llstSrc) const
 {
-    if (this != &llstToTest)
+    if (this != &llstSrc)
     {
-        if (m_c4ElemCount != llstToTest.m_c4ElemCount)
+        if (m_c4ElemCount != llstSrc.m_c4ElemCount)
             return kCIDLib::False;
     }
     return kCIDLib::True;
@@ -190,14 +149,14 @@ tCIDLib::TBoolean TSLinkedList::bIsEmpty() const
 
 
 tCIDLib::TBoolean
-TSLinkedList::bIsFirstNode(const TSLstNode* const pnodeToTest) const
+TSLinkedList::bIsFirstNode(const TSLstNode* const pnodeToTest) const noexcept
 {
     return (pnodeToTest == m_pnodeHead);
 }
 
 
 tCIDLib::TBoolean
-TSLinkedList::bIsLastNode(const TSLstNode* const pnodeToTest) const
+TSLinkedList::bIsLastNode(const TSLstNode* const pnodeToTest) const noexcept
 {
     return (pnodeToTest == m_pnodeTail);
 }
@@ -217,12 +176,6 @@ TSLinkedList::bIsMemberNode(const TSLstNode* const pnodeToTest) const
         pnodeCur = pnodeCur->m_pnodeNext;
     }
     return kCIDLib::False;
-}
-
-
-tCIDLib::TCard4 TSLinkedList::c4ElemCount() const
-{
-    return m_c4ElemCount;
 }
 
 
@@ -608,3 +561,35 @@ TSLinkedList::RemoveNode(TSLstNode* const pnodeToRemove)
     delete pnodeToRemove;
 }
 
+
+// Just reverses the list in place
+tCIDLib::TVoid TSLinkedList::Reverse()
+{
+    // If there's less than 2 elements, nothing to do
+    if (!m_pnodeHead || !m_pnodeHead->m_pnodeNext)
+        return;
+
+    //
+    //  Else, we grab the second node. We'll loop from there forward.
+    //  Then we can store the current head as the tail node now since
+    //  it will end up the last and we will have otherwise lost it. We
+    //  set it's next node to null now since we've got a copy, and it
+    //  needs to be null since it will end up last.
+    //
+    TSLstNode* pnodeCur = m_pnodeHead->m_pnodeNext;
+    m_pnodeTail =  m_pnodeHead;
+    m_pnodeTail->m_pnodeNext = nullptr;
+
+    // Now we just stick each next node in at the head
+    while (pnodeCur)
+    {
+        // Remember the next node before we update this one
+        TSLstNode* pnodeNext = pnodeCur->m_pnodeNext;
+
+        TSLstNode* pnodeTmp = m_pnodeHead;
+        m_pnodeHead = pnodeCur;
+        m_pnodeHead->m_pnodeNext = pnodeTmp;
+
+        pnodeCur = pnodeNext;
+    }
+}

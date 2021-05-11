@@ -100,12 +100,7 @@ class CIDLIBEXP TFacCIDLib : public TFacility
 
         TString strNextThreadName
         (
-            const   tCIDLib::TCh* const     pszBaseName
-        );
-
-        TString strNextThreadName
-        (
-            const   TString&                strBaseName
+            const   TStringView&            strvBaseName
         );
 
         TString strUnknown() const;

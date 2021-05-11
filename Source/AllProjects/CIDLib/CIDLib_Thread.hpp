@@ -65,7 +65,17 @@ class CIDLIBEXP TThreadFunc : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         //  Constructors and destructor
         // -------------------------------------------------------------------
-        ~TThreadFunc();
+        TThreadFunc() = default;
+        TThreadFunc(const TThreadFunc&) = default;
+        TThreadFunc(TThreadFunc&&) = default;
+        ~TThreadFunc() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TThreadFunc& operator=(const TThreadFunc&) = default;
+        TThreadFunc& operator=(TThreadFunc&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -95,14 +105,6 @@ class CIDLIBEXP TThreadFunc : public TObject, public MDuplicable
         )   = 0;
 
 
-        // -------------------------------------------------------------------
-        //  Hidden constructors and operators
-        // -------------------------------------------------------------------
-        TThreadFunc();
-        TThreadFunc(const TThreadFunc&);
-        TThreadFunc& operator=(const TThreadFunc&);
-
-
     private :
         // -------------------------------------------------------------------
         //  Magic macros
@@ -121,22 +123,24 @@ class CIDLIBEXP TGlobalThreadFunc : public TThreadFunc
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TGlobalThreadFunc();
+        TGlobalThreadFunc() = default;
 
         TGlobalThreadFunc
         (
                     tCIDLib::TThreadFuncPtr pfnThreadFunc
         );
 
-        TGlobalThreadFunc(const TGlobalThreadFunc&);
+        TGlobalThreadFunc(const TGlobalThreadFunc&) = default;
+        TGlobalThreadFunc(TGlobalThreadFunc&&) = default;
 
-        ~TGlobalThreadFunc();
+        ~TGlobalThreadFunc() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TGlobalThreadFunc& operator=(const TGlobalThreadFunc&);
+        TGlobalThreadFunc& operator=(const TGlobalThreadFunc&) = default;
+        TGlobalThreadFunc& operator=(TGlobalThreadFunc&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -171,7 +175,7 @@ class CIDLIBEXP TGlobalThreadFunc : public TThreadFunc
         //      The global thread function that we run. We use the same
         //      function type alias that TThread itself does in this case.
         // -------------------------------------------------------------------
-        tCIDLib::TThreadFuncPtr     m_pfnThreadFunc;
+        tCIDLib::TThreadFuncPtr     m_pfnThreadFunc = nullptr;
 };
 
 
@@ -192,12 +196,7 @@ template <typename T> class TMemberFunc : public TThreadFunc
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TMemberFunc() :
-
-            m_pfnMemberFunc(nullptr)
-            , m_pobjTarget(nullptr)
-        {
-        }
+        TMemberFunc() = default;
 
         TMemberFunc(T* const pobjTarget, TMemFunc pfnMemberFunc) :
 
@@ -206,12 +205,8 @@ template <typename T> class TMemberFunc : public TThreadFunc
         {
         }
 
-        TMemberFunc(const TMemberFunc<T>& tfuncSrc) :
-
-            m_pfnMemberFunc(tfuncSrc.m_pfnMemberFunc)
-            , m_pobjTarget(tfuncSrc.m_pobjTarget)
-        {
-        }
+        TMemberFunc(const TMemberFunc&) = default;
+        TMemberFunc(TMemberFunc&&) = default;
 
         ~TMemberFunc()
         {
@@ -221,16 +216,8 @@ template <typename T> class TMemberFunc : public TThreadFunc
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TMemberFunc& operator=(const TMemberFunc<T>& tfuncSrc)
-        {
-            if (this != &tfuncSrc)
-            {
-                m_pfnMemberFunc = tfuncSrc.m_pfnMemberFunc;
-                m_pobjTarget = tfuncSrc.m_pobjTarget;
-            }
-            return *this;
-        }
-
+        TMemberFunc& operator=(const TMemberFunc&) = default;
+        TMemberFunc& operator=(TMemberFunc&&) = default;
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
@@ -268,8 +255,8 @@ template <typename T> class TMemberFunc : public TThreadFunc
         //  m_pobjTarget
         //      The target object whose method we are to run.
         // -------------------------------------------------------------------
-        TMemFunc    m_pfnMemberFunc;
-        T*          m_pobjTarget;
+        TMemFunc    m_pfnMemberFunc = nullptr;
+        T*          m_pobjTarget = nullptr;
 };
 
 

@@ -128,6 +128,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_FundVectorLambda);
 
     // Collection tests
+    AddTest(new TTest_SLinkedList);
     AddTest(new TTest_ObjArrayLambda);
     AddTest(new TTest_ObjArrayMoveSem);
     AddTest(new TTest_RefVectorBasic);

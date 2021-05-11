@@ -2151,6 +2151,39 @@ class TTest_SafeCnt2 : public TTestFWTest
 };
 
 
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_SimplePool
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_SimplePool : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_SimplePool();
+
+        ~TTest_SimplePool();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_SimplePool,TTestFWTest)
+};
+
+
 
 // ---------------------------------------------------------------------------
 //  CLASS: TTest_SimplePoolPtr
@@ -2182,6 +2215,42 @@ class TTest_SimplePoolPtr : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_SimplePoolPtr,TTestFWTest)
+};
+
+
+// ---------------------------------------------------------------------------
+//  CLASS: TTest_SLInkedList
+// PREFIX: tfwt
+// ---------------------------------------------------------------------------
+class TTest_SLinkedList : public TTestFWTest
+{
+    public  :
+        // -------------------------------------------------------------------
+        //  Constructor and Destructor
+        // -------------------------------------------------------------------
+        TTest_SLinkedList();
+
+        TTest_SLinkedList(const TTest_SLinkedList&) = delete;
+        TTest_SLinkedList(TTest_SLinkedList&&) = delete;
+
+        ~TTest_SLinkedList();
+
+
+        // -------------------------------------------------------------------
+        //  Public, inherited methods
+        // -------------------------------------------------------------------
+        tTestFWLib::ETestRes eRunTest
+        (
+                    TTextStringOutStream&   strmOutput
+            ,       tCIDLib::TBoolean&      bWarning
+        )   override;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Do any needed magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TTest_SLinkedList,TTestFWTest)
 };
 
 
@@ -2684,40 +2753,6 @@ class TTest_Types  : public TTestFWTest
         //  Do any needed magic macros
         // -------------------------------------------------------------------
         RTTIDefs(TTest_Types,TTestFWTest)
-};
-
-
-
-// ---------------------------------------------------------------------------
-//  CLASS: TTest_SimplePool
-// PREFIX: tfwt
-// ---------------------------------------------------------------------------
-class TTest_SimplePool : public TTestFWTest
-{
-    public  :
-        // -------------------------------------------------------------------
-        //  Constructor and Destructor
-        // -------------------------------------------------------------------
-        TTest_SimplePool();
-
-        ~TTest_SimplePool();
-
-
-        // -------------------------------------------------------------------
-        //  Public, inherited methods
-        // -------------------------------------------------------------------
-        tTestFWLib::ETestRes eRunTest
-        (
-                    TTextStringOutStream&   strmOutput
-            ,       tCIDLib::TBoolean&      bWarning
-        )   override;
-
-
-    private :
-        // -------------------------------------------------------------------
-        //  Do any needed magic macros
-        // -------------------------------------------------------------------
-        RTTIDefs(TTest_SimplePool,TTestFWTest)
 };
 
 

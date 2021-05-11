@@ -44,13 +44,6 @@
 #include    "CIDLib_.hpp"
 
 
-
-// ---------------------------------------------------------------------------
-//  Forward prototypes
-// ---------------------------------------------------------------------------
-
-
-
 // ---------------------------------------------------------------------------
 //  Do our class' RTTI macros
 // ---------------------------------------------------------------------------
@@ -665,14 +658,6 @@ tCIDLib::TVoid CIDLib_MakePrimary(TThread* const pthrPrimary)
 
 
 // ---------------------------------------------------------------------------
-//  TThreadFunc: Destructor
-// ---------------------------------------------------------------------------
-TThreadFunc::~TThreadFunc()
-{
-}
-
-
-// ---------------------------------------------------------------------------
 //  TThreadFunc: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
@@ -686,59 +671,13 @@ tCIDLib::EExitCodes TThreadFunc::eRun(TThread& thrThis, tCIDLib::TVoid* const pD
     return eRunImpl(thrThis, pData);
 }
 
-
-// ---------------------------------------------------------------------------
-//  TThreadFunc: Hidden constructors and operators
-// ---------------------------------------------------------------------------
-TThreadFunc::TThreadFunc()
-{
-}
-
-TThreadFunc::TThreadFunc(const TThreadFunc&)
-{
-}
-
-TThreadFunc& TThreadFunc::operator=(const TThreadFunc&)
-{
-    return *this;
-}
-
-
 // ---------------------------------------------------------------------------
 //  TGlobalThreadFunc: Constructors and destructor
 // ---------------------------------------------------------------------------
-TGlobalThreadFunc::TGlobalThreadFunc() :
-
-    m_pfnThreadFunc(nullptr)
-{
-}
-
 TGlobalThreadFunc::TGlobalThreadFunc(const tCIDLib::TThreadFuncPtr pfnThreadFunc) :
 
     m_pfnThreadFunc(pfnThreadFunc)
 {
-}
-
-TGlobalThreadFunc::TGlobalThreadFunc(const TGlobalThreadFunc& tfuncSrc) :
-
-    m_pfnThreadFunc(tfuncSrc.m_pfnThreadFunc)
-{
-}
-
-TGlobalThreadFunc::~TGlobalThreadFunc()
-{
-}
-
-// ---------------------------------------------------------------------------
-//  TGlobalThreadFunc: Public operators
-// ---------------------------------------------------------------------------
-TGlobalThreadFunc& TGlobalThreadFunc::operator=(const TGlobalThreadFunc& tfuncSrc)
-{
-    if (this != &tfuncSrc)
-    {
-        m_pfnThreadFunc = tfuncSrc.m_pfnThreadFunc;
-    }
-    return *this;
 }
 
 
@@ -795,6 +734,7 @@ TThreadPrioJan::~TThreadPrioJan()
     if (m_pthrTarget && (m_eLevel != tCIDLib::EPrioLevels::Count))
         m_pthrTarget->SetPriority(m_eLevel);
 }
+
 
 
 // ---------------------------------------------------------------------------

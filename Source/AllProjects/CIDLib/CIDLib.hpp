@@ -86,6 +86,7 @@ namespace tCIDLib
 #include    "CIDLib_ErrorIds.hpp"
 #include    "CIDLib_MessageIds.hpp"
 #include    "CIDLib_String.hpp"
+#include    "CIDLib_StringView.hpp"
 #include    "CIDLib_StringId.hpp"
 #include    "CIDLib_ResourceName.hpp"
 #include    "CIDLib_CriticalSection.hpp"

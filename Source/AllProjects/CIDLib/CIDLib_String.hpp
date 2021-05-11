@@ -62,6 +62,7 @@ class   TFacility;
 class   TStreamFmt;
 class   TTextConverter;
 class   TString;
+class   TStringView;
 
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
@@ -295,7 +296,7 @@ class CIDLIBEXP TString :
 
 
         // -------------------------------------------------------------------
-        //  Constructors and Destructor.
+        //  Constructors and Destructor
         // -------------------------------------------------------------------
         TString() = default;
 
@@ -312,6 +313,12 @@ class CIDLIBEXP TString :
         explicit TString
         (
             const   tCIDLib::TSCh* const    pszInitValue
+        );
+
+        explicit TString
+        (
+            const   TStringView&            strvSrc
+            , const tCIDLib::TCard4         c4ExtraChars = 0
         );
 
         TString
@@ -406,6 +413,11 @@ class CIDLIBEXP TString :
         TString& operator=
         (
             const   tCIDLib::TCh* const     pszSrc
+        );
+
+        TString& operator=
+        (
+            const   TStringView&            strvSrc
         );
 
         TString& operator=
