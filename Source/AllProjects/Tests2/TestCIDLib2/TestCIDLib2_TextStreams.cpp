@@ -74,6 +74,24 @@ TTest_BaseTextStream::eRunBaseTests(TTextInStream&          strmTestIn
                                     , TTextStringOutStream& strmOutput
                                     , tCIDLib::TBoolean&    bWarning)
 {
+    // test field width stuff
+    {
+        strmTestIn.Reset();
+        strmTestOut.Reset();
+
+        TString strVal(L"1234");
+        strmTestOut.c4Width(10);
+        strmTestOut.chFill(L'%');
+        strmTestOut << strVal << kCIDLib::FlushIt;
+
+        // Read in a string back again and check it
+        strmTestIn >> strVal;
+        if (strVal != L"1234%%%%%%")
+        {
+            strmOutput << TFWCurLn << L"Width based format did not work\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
+    }
 
     return tTestFWLib::ETestRes::Success;
 }
@@ -111,6 +129,7 @@ TTest_ChunkedTextStream::eRunTest(  TTextStringOutStream&   strmOut
                                     , tCIDLib::TBoolean&    bWarning)
 {
     tTestFWLib::ETestRes eRet = tTestFWLib::ETestRes::Success;
+
     try
     {
         const tCIDLib::TCard4 c4MaxBufSz = 3 * (1024 * 1024);

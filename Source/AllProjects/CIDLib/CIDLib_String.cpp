@@ -4688,11 +4688,7 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TString::FormatTo(CIOP TTextOutStream& strmToWriteTo) const
 {
-    //
-    //  Dump the raw string pointer to the string. DO NOT dump 'this'
-    //  to the stream! This will kick off a recursive circle jerk.
-    //
-    strmToWriteTo << pszBuffer();
+    strmToWriteTo << *this;
 }
 
 

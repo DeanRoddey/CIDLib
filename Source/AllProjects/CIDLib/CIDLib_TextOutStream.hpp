@@ -286,6 +286,11 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         TTextOutStream& operator<<
         (
+            const   tCIDLib::TCh            chToWrite
+        );
+
+        TTextOutStream& operator<<
+        (
             const   tCIDLib::TCard1         c1ToWrite
         );
 
@@ -351,7 +356,7 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         TTextOutStream& operator<<
         (
-            const   tCIDLib::TCh            chToWrite
+            const   TString&                strToWrite
         );
 
         TTextOutStream& operator<<
@@ -503,12 +508,7 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         tCIDLib::TVoid PutLine
         (
-            const   TString&                strToWrite
-        );
-
-        tCIDLib::TVoid PutLine
-        (
-            const   tCIDLib::TCh* const     pszToWrite
+            const   TStringView&            strvToWrite
         );
 
         tCIDLib::TVoid Reset();

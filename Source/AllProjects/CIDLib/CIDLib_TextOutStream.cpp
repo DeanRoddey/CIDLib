@@ -319,7 +319,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TBoolean bToWrite)
     {
         TString strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -348,7 +348,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCard4 c4ToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -377,7 +377,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCard8& c8ToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -410,7 +410,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TFloat8& f8ToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -439,7 +439,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt4 i4ToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -468,7 +468,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TInt8& i8ToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -497,7 +497,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TUInt uToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(szTmp, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
@@ -512,6 +512,7 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh chToWrite)
     return *this;
 }
 
+
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh* const pszToWrite)
 {
 
@@ -525,11 +526,31 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh* const pszToWrite)
     {
         TString  strFmt(m_c4Width + m_c4TrailingSp);
         strFmt.FormatToFld(pszActual, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer());
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
     }
      else
     {
         WriteChars(pszActual);
+    }
+    return *this;
+}
+
+
+//
+//  We HAVE TO be careful here. we are using strings to format stuff, and we are formatting
+//  a string. We can get into a bad circular freakout if we aren't careful.
+//
+TTextOutStream& TTextOutStream::operator<<(const TString& strToWrite)
+{
+    if (m_c4Width)
+    {
+        TString  strFmt(m_c4Width + m_c4TrailingSp);
+        strFmt.FormatToFld(strToWrite.pszBuffer(), m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
+    }
+     else
+    {
+        WriteChars(strToWrite.pszBuffer(), strToWrite.c4Length());
     }
     return *this;
 }
@@ -838,15 +859,9 @@ tCIDLib::TVoid TTextOutStream::Flush()
 }
 
 
-tCIDLib::TVoid TTextOutStream::PutLine(const TString& strToWrite)
+tCIDLib::TVoid TTextOutStream::PutLine(const TStringView& strvToWrite)
 {
-    WriteChars(strToWrite.pszBuffer());
-}
-
-
-tCIDLib::TVoid TTextOutStream::PutLine(const tCIDLib::TCh* const pszToWrite)
-{
-    WriteChars(pszToWrite);
+    WriteChars(strvToWrite.pszBuffer(), strvToWrite.c4Length());
 }
 
 
@@ -910,6 +925,8 @@ const TTextConverter& TTextOutStream::tcvtThis() const
 //  This method is the one point of actual output of text, so all other
 //  output methods call here eventually. This guy spools out the passed text
 //  to the cache, flushing the cache as required.
+//
+//  THIS GUY DOES NOT honor formatting.
 //
 tCIDLib::TVoid
 TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite

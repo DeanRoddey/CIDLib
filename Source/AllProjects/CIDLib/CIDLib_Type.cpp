@@ -911,30 +911,6 @@ operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::EAudioCues eCue)
 
 
 TTextOutStream&
-operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::TBoolean bBool)
-{
-    if (bBool == kCIDLib::True)
-        strmToWriteTo << facCIDLib().strMsg(kCIDMsgs::midGen_True);
-    else if (bBool == kCIDLib::False)
-        strmToWriteTo << facCIDLib().strMsg(kCIDMsgs::midGen_False);
-    else
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_BadEnumValue
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-            , TInteger(bBool)
-            , TString(L"tCIDLib::TBoolean")
-        );
-    }
-    return strmToWriteTo;
-}
-
-
-TTextOutStream&
 operator<<(TTextOutStream& strmToWriteTo, const tCIDLib::ECreateActs eAction)
 {
     if (eAction == tCIDLib::ECreateActs::None)

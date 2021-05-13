@@ -38,11 +38,13 @@
 //  because it's going to stream it out to something that expects a string
 //  object or some such, then you need to take the actual string object.
 //
-//  It's for use in those cases where, ultimately down there somewhere, you need
-//  the raw string contents.
+//  It's for use in those cases where, ultimately down there somewhere, you just
+//  need the raw string contents.
 //
 //  Since this guy just references whatever underlies it, we can freely copy and
 //  move. The dtor does nothing. And we can use defaults for that reason.
+//
+//  We don't accept a null pointer. That will cause an exception.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -67,20 +69,34 @@ class CIDLIBEXP TStringView
         // -------------------------------------------------------------------
         TStringView() = delete;
 
-        TStringView
-        (
-            const   tCIDLib::TCh* const     pszRaw
-        );
+        TStringView(const tCIDLib::TCh* const pszRaw) :
 
-        TStringView
-        (
-            const   TString&                strObj
-        );
+            m_pszRaw(pszRaw)
+        {
+            if (pszRaw == nullptr)
+                ThrowNull(CID_FILE, CID_LINE);
+        }
 
-        TStringView
-        (
-            const   TString* const          pstrObj
-        );
+        TStringView(const TString& strObj) :
+
+            m_pstrObj(&strObj)
+        {
+            if (m_pstrObj == nullptr)
+                ThrowNull(CID_FILE, CID_LINE);
+        }
+
+        TStringView(const TString* const pstrObj) :
+
+            m_pstrObj(pstrObj)
+        {
+            if (m_pstrObj == nullptr)
+                ThrowNull(CID_FILE, CID_LINE);
+        }
+
+        template <tCIDLib::TCard4 c4Sz> TStringView(const tCIDLib::TCh(&aChars)[c4Sz])
+        {
+            m_pszRaw = aChars;
+        }
 
         TStringView(const TStringView&) = default;
         TStringView(TStringView&&) = default;;
@@ -115,6 +131,18 @@ class CIDLIBEXP TStringView
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const;
 
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith
+        (
+            const   TString&                strToFind
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
+        )   const;
+
+        [[nodiscard]] tCIDLib::TBoolean bStartsWith
+        (
+            const   tCIDLib::TCh* const     pszToFind
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
+        )   const;
+
         [[nodiscard]] tCIDLib::TCard4 c4Length() const noexcept;
 
         [[nodiscard]] const tCIDLib::TCh* pszBuffer() const noexcept;
@@ -127,25 +155,30 @@ class CIDLIBEXP TStringView
 
     private :
         // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        [[noreturn]] tCIDLib::TVoid ThrowNull
+        (
+            const   tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+        );
+
+
+        // -------------------------------------------------------------------
         //  Private data members
         //
-        //  m_bIsRaw
-        //      If true we have a raw pointer, else we have a string object.
-        //
         //  m_c4RawLen
-        //      If this is a raw string, this is the cached length. If m_bRawLen
-        //      is true, we've already gotten it. Else it will be faulted in when
-        //      needed.
+        //      If this is a raw string, this is the cached length. It is initialized
+        //      to max to indicate not gotten yet. We'll fault it in for raw strings
+        //      if actually needed.
         //
         //  m_pszRaw
-        //      If m_bIsRaw, then this is the raw string pointer, else null.
+        //      If this is non-null, then this is wrapping a raw string.
         //
         //  m_pstrObj
-        //      If not m_bIsRaw, then this is the string object
+        //      If this is non-null, this is wrapping a string object
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean           m_bIsRaw = kCIDLib::False;
-        mutable tCIDLib::TBoolean   m_bRawLen = kCIDLib::False;
-        mutable tCIDLib::TCard4     m_c4RawLen = 0;
+        mutable tCIDLib::TCard4     m_c4RawLen = kCIDLib::c4MaxCard;
         const tCIDLib::TCh*         m_pszRaw = nullptr;
         const TString*              m_pstrObj = nullptr;
 };

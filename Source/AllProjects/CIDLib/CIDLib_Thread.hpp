@@ -287,7 +287,7 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
         // -------------------------------------------------------------------
         TThread
         (
-            const   TString&                strName
+            const   TStringView&            strvName
             , const tCIDLib::TThreadFuncPtr pfnToRun
             , const tCIDLib::TCard4         c4StackSz = 0
             , const tCIDLib::TBoolean       bSelfPrio = kCIDLib::False
@@ -295,14 +295,14 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
 
         TThread
         (
-            const   TString&                strName
+            const   TStringView&            strName
             , const tCIDLib::TCard4         c4StackSz = 0
             , const tCIDLib::TBoolean       bSelfPrio = kCIDLib::False
         );
 
         TThread
         (
-            const   TString&                strName
+            const   TStringView&            strName
             , const TThreadFunc&            tfuncToRun
             , const tCIDLib::TCard4         c4StackSz = 0
             , const tCIDLib::TBoolean       bSelfPrio = kCIDLib::False

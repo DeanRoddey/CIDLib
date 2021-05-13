@@ -770,7 +770,7 @@ TThreadSyncJan::~TThreadSyncJan()
 // ---------------------------------------------------------------------------
 //  TThread: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TThread::TThread(   const   TString&            strName
+TThread::TThread(   const   TStringView&        strvName
                     , const TThreadFunc&        tfuncToRun
                     , const tCIDLib::TCard4     c4StackSz
                     , const tCIDLib::TBoolean   bSelfPrio) :
@@ -782,7 +782,7 @@ TThread::TThread(   const   TString&            strName
     , m_kthrThis()
     , m_ptfuncToRun(nullptr)
     , m_pfnOnExit(nullptr)
-    , m_strName(strName)
+    , m_strName(strvName)
     , m_tidSyncReq(kCIDLib::tidInvalid)
 {
     //
@@ -799,7 +799,7 @@ TThread::TThread(   const   TString&            strName
     CommonInit();
 }
 
-TThread::TThread(   const   TString&                strName
+TThread::TThread(   const   TStringView&            strvName
                     , const tCIDLib::TThreadFuncPtr pfnToRun
                     , const tCIDLib::TCard4         c4StackSz
                     , const tCIDLib::TBoolean       bSelfPrio) :
@@ -811,7 +811,7 @@ TThread::TThread(   const   TString&                strName
     , m_kthrThis()
     , m_ptfuncToRun(nullptr)
     , m_pfnOnExit(nullptr)
-    , m_strName(strName)
+    , m_strName(strvName)
     , m_tidSyncReq(kCIDLib::tidInvalid)
 {
     // Create a thread function object for the global function
@@ -824,7 +824,7 @@ TThread::TThread(   const   TString&                strName
     CommonInit();
 }
 
-TThread::TThread(   const   TString&            strName
+TThread::TThread(   const   TStringView&        strvName
                     , const tCIDLib::TCard4     c4StackSz
                     , const tCIDLib::TBoolean   bSelfPrio) :
 
@@ -835,7 +835,7 @@ TThread::TThread(   const   TString&            strName
     , m_kthrThis()
     , m_ptfuncToRun(nullptr)
     , m_pfnOnExit(nullptr)
-    , m_strName(strName)
+    , m_strName(strvName)
     , m_tidSyncReq(kCIDLib::tidInvalid)
 {
     //
