@@ -60,33 +60,33 @@
 //  should be.
 // ---------------------------------------------------------------------------
 #define StdEnumTricks(eEnumType) \
-inline constexpr eEnumType operator++(eEnumType& eVal, int) noexcept \
+constexpr eEnumType operator++(eEnumType& eVal, int) noexcept \
 { \
     const eEnumType eTmp = eVal; \
     eVal = eEnumType(tCIDLib::TCard4(eVal) + 1); \
     return eTmp; \
 } \
 \
-inline constexpr eEnumType operator++(eEnumType& eVal) noexcept \
+constexpr eEnumType operator++(eEnumType& eVal) noexcept \
 { \
     eVal = eEnumType(tCIDLib::TCard4(eVal) + 1); \
     return eVal; \
 } \
 \
-inline constexpr eEnumType operator--(eEnumType& eVal, int) noexcept \
+constexpr eEnumType operator--(eEnumType& eVal, int) noexcept \
 { \
     const eEnumType eTmp = eVal; \
     eVal = eEnumType(tCIDLib::TCard4(eVal) - 1); \
     return eTmp; \
 } \
 \
-inline constexpr eEnumType operator--(eEnumType& eVal) noexcept \
+constexpr eEnumType operator--(eEnumType& eVal) noexcept \
 { \
     eVal = eEnumType(tCIDLib::TCard4(eVal) - 1); \
     return eVal; \
 } \
 \
-inline constexpr tCIDLib::TBoolean bIsValidEnum(const eEnumType eVal) noexcept \
+constexpr tCIDLib::TBoolean bIsValidEnum(const eEnumType eVal) noexcept \
 { \
     if ((eVal < eEnumType::Min) || (eVal > eEnumType::Max)) \
         return kCIDLib::False; \
@@ -95,24 +95,24 @@ inline constexpr tCIDLib::TBoolean bIsValidEnum(const eEnumType eVal) noexcept \
 
 
 #define BmpEnumTricks(eEnumType) \
-inline constexpr eEnumType operator|=(eEnumType& eLHS, const eEnumType eRHS) noexcept \
+constexpr eEnumType operator|=(eEnumType& eLHS, const eEnumType eRHS) noexcept \
 { \
     eLHS = eEnumType(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS)); \
     return eLHS; \
 } \
 \
-inline constexpr eEnumType operator&=(eEnumType& eLHS, const eEnumType eRHS) noexcept \
+constexpr eEnumType operator&=(eEnumType& eLHS, const eEnumType eRHS) noexcept \
 { \
     eLHS = eEnumType(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS)); \
     return eLHS; \
 } \
 \
-inline constexpr eEnumType operator|(const eEnumType eLHS, const eEnumType eRHS) noexcept \
+constexpr eEnumType operator|(const eEnumType eLHS, const eEnumType eRHS) noexcept \
 { \
     return eEnumType(tCIDLib::TEnumMaskType(eLHS) | tCIDLib::TEnumMaskType(eRHS)); \
 } \
 \
-inline constexpr eEnumType operator&(const eEnumType eLHS, const eEnumType eRHS) noexcept \
+constexpr eEnumType operator&(const eEnumType eLHS, const eEnumType eRHS) noexcept \
 { \
     return eEnumType(tCIDLib::TEnumMaskType(eLHS) & tCIDLib::TEnumMaskType(eRHS)); \
 }

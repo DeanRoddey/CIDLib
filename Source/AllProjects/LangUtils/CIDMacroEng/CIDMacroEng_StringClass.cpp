@@ -3290,11 +3290,7 @@ TMEngStringInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             eRadix = tCIDLib::ERadices(m_pmeciRadices->c4MapValue(mecvRadix));
         }
 
-        const tCIDLib::TCard4 c4Tmp = TRawStr::c4AsBinary
-        (
-            strVal.pszBuffer(), bOk, eRadix
-        );
-
+        const tCIDLib::TCard4 c4Tmp = TRawStr::c4AsBinary(strVal.pszBuffer(), bOk, eRadix);
         if (c2MethId == m_c2MethId_ToCard4Ex)
         {
             // Here the return is the bookean result and the value an out parm
@@ -3331,11 +3327,7 @@ TMEngStringInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             eRadix = tCIDLib::ERadices(m_pmeciRadices->c4MapValue(mecvRadix));
         }
 
-        const tCIDLib::TCard8 c8Tmp = TRawStr::c8AsBinary
-        (
-            strVal.pszBuffer(), bOk, eRadix
-        );
-
+        const tCIDLib::TCard8 c8Tmp = TRawStr::c8AsBinary(strVal.pszBuffer(), bOk, eRadix);
         if (c2MethId == m_c2MethId_ToCard8Ex)
         {
             // Here the return is the bookean result and the value an out parm
@@ -3427,12 +3419,7 @@ TMEngStringInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
             eRadix = tCIDLib::ERadices(m_pmeciRadices->c4MapValue(mecvRadix));
         }
 
-        const tCIDLib::TInt4 i4Tmp = TRawStr::i4AsBinary
-        (
-            strVal.pszBuffer(), bOk, eRadix
-        );
-
-
+        const tCIDLib::TInt4 i4Tmp = TRawStr::i4AsBinary(strVal.pszBuffer(), bOk, eRadix);
         if (c2MethId == m_c2MethId_ToInt4Ex)
         {
             // Here the return is the bookean result and the value an out parm
@@ -5053,10 +5040,7 @@ TMEngTextXCoderInfo::bInvokeMethod(         TCIDMacroEngine&    meOwner
         tCIDLib::TCard4 c4Chars = 0;
         try
         {
-            c4Chars = mecvActual.tcvtValue().c4ConvertTo
-            (
-                strSrc.pszBuffer(), c4Count, expbToFill
-            );
+            c4Chars = mecvActual.tcvtValue().c4ConvertTo(strSrc.pszBuffer(), c4Count, expbToFill);
         }
 
         catch(const TError& errToCatch)

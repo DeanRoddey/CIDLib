@@ -963,6 +963,8 @@ static tCIDLib::TVoid TestSubString(TTextOutStream& strmOut)
 
 
     // Do some substring replacement
+
+    // Start at one which should skip the first One and repalce the second one
     str1 = L"One Two Three One Four One Five";
     str2 = L"One";
     tCIDLib::TCard4 c4Index = 1;

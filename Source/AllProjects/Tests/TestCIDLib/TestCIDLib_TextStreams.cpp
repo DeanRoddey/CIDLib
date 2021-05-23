@@ -81,9 +81,6 @@ static tCIDLib::TVoid CommonTests(  TTextOutStream&     strmOut
     // Stream out some lines with various data in it
     strmTestOut << TString(szTestText3);
 
-    // String out a null pointer, which should create a special text string
-    strmTestOut << (tCIDLib::TCh*)0 << kCIDLib::NewLn;
-
     // And flush out the data
     strmTestOut.Flush();
 
@@ -159,15 +156,6 @@ static tCIDLib::TVoid CommonTests(  TTextOutStream&     strmOut
     if (bTmp)
     {
         strmOut << CUR_LN << L"Streamed in value was != False" << kCIDLib::EndLn;
-        return;
-    }
-
-    // See if we get the magic null pointer representation next
-    strmTestIn.c4GetLine(strTmp);
-    if (strTmp != kCIDLib::pszNullStr)
-    {
-        strmOut << CUR_LN << L"Streamed null pointer != to magic value"
-                << kCIDLib::EndLn;
         return;
     }
 

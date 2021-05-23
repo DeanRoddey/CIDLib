@@ -507,4 +507,3 @@ TTest_CMLRuntime::eRunTestMacro(        TTextStringOutStream&   strmOut
     return eRes;
 }
 
-

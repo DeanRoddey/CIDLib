@@ -515,22 +515,19 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh chToWrite)
 
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh* const pszToWrite)
 {
-
-    //
-    //  If the passed buffer pointer is null, then substitute the magic
-    //  null pointer string.
-    //
-    const tCIDLib::TCh* const pszActual = pszToWrite ? pszToWrite
-                                                     : kCIDLib::pszNullStr;
-    if (m_c4Width)
+    //  If the passed buffer pointer is null, then do nothing
+    if (pszToWrite)
     {
-        TString  strFmt(m_c4Width + m_c4TrailingSp);
-        strFmt.FormatToFld(pszActual, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
-        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
-    }
-     else
-    {
-        WriteChars(pszActual);
+        if (m_c4Width)
+        {
+            TString  strFmt(m_c4Width + m_c4TrailingSp);
+            strFmt.FormatToFld(pszToWrite, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
+            WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
+        }
+         else
+        {
+            WriteChars(pszToWrite);
+        }
     }
     return *this;
 }

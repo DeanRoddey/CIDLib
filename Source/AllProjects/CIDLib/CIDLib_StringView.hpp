@@ -44,7 +44,9 @@
 //  Since this guy just references whatever underlies it, we can freely copy and
 //  move. The dtor does nothing. And we can use defaults for that reason.
 //
-//  We don't accept a null pointer. That will cause an exception.
+//  We don't accept a null pointer. If you pass a null pointer, it will be
+//  replaced by a pointer to kCIDLib::pszEmptyZStr or TString::strEmpty(). We
+//  don't want to throw so that we constructor, assign in a constexpr way.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -69,37 +71,37 @@ class CIDLIBEXP TStringView
         // -------------------------------------------------------------------
         TStringView() = delete;
 
-        TStringView(const tCIDLib::TCh* const pszRaw) :
+        constexpr TStringView(const tCIDLib::TCh* const pszRaw) :
 
             m_pszRaw(pszRaw)
         {
             if (pszRaw == nullptr)
-                ThrowNull(CID_FILE, CID_LINE);
+                m_pszRaw = kCIDLib::pszEmptyZStr;
         }
 
-        TStringView(const TString& strObj) :
+        constexpr TStringView(const TString& strObj) :
 
             m_pstrObj(&strObj)
         {
             if (m_pstrObj == nullptr)
-                ThrowNull(CID_FILE, CID_LINE);
+                m_pstrObj = &TString::strEmpty();
         }
 
-        TStringView(const TString* const pstrObj) :
+        constexpr TStringView(const TString* const pstrObj) :
 
             m_pstrObj(pstrObj)
         {
             if (m_pstrObj == nullptr)
-                ThrowNull(CID_FILE, CID_LINE);
+                m_pstrObj = &TString::strEmpty();
         }
 
-        template <tCIDLib::TCard4 c4Sz> TStringView(const tCIDLib::TCh(&aChars)[c4Sz])
+        template <tCIDLib::TCard4 c4Sz> constexpr TStringView(const tCIDLib::TCh(&aChars)[c4Sz])
         {
             m_pszRaw = aChars;
         }
 
         TStringView(const TStringView&) = default;
-        TStringView(TStringView&&) = default;;
+        TStringView(TStringView&&) = default;
 
         ~TStringView() = default;
 
@@ -109,6 +111,17 @@ class CIDLIBEXP TStringView
         // -------------------------------------------------------------------
         TStringView& operator=(const TStringView&) = default;
         TStringView& operator=(TStringView&&) = default;
+
+        [[nodiscard]] tCIDLib::TBoolean operator==(const TString& strSrc) const
+        {
+            if (m_pstrObj)
+                return m_pstrObj->operator==(strSrc);
+
+            if (bHaveLength() && (c4Length() != strSrc.c4Length()))
+                return kCIDLib::False;
+
+            return TRawStr::bCompareStr(m_pszRaw, strSrc.pszBuffer());
+        }
 
 
         // -------------------------------------------------------------------
@@ -123,29 +136,68 @@ class CIDLIBEXP TStringView
         (
             const   TString&                strToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bContainsSubStr
         (
             const   tCIDLib::TCh* const     pszToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
-        )   const;
+        )   const noexcept;
+
+        [[nodiscard]] constexpr tCIDLib::TBoolean bIsEmpty() const
+        {
+            if (m_pstrObj)
+                return m_pstrObj->bIsEmpty();
+            return m_pszRaw[0] == kCIDLib::chNull;
+        }
+
+        [[nodiscard]] constexpr tCIDLib::TBoolean bHaveLength() const
+        {
+            return (m_pstrObj != nullptr) || (m_c4RawLen != kCIDLib::c4MaxCard);
+        }
+
+        [[nodiscard]] constexpr tCIDLib::TBoolean bIsString() const
+        {
+            return m_pstrObj != nullptr;
+        }
 
         [[nodiscard]] tCIDLib::TBoolean bStartsWith
         (
             const   TString&                strToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bStartsWith
         (
             const   tCIDLib::TCh* const     pszToFind
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
-        )   const;
+        )   const noexcept;
 
-        [[nodiscard]] tCIDLib::TCard4 c4Length() const noexcept;
+        [[nodiscard]] constexpr tCIDLib::TCard4 c4Length() const noexcept
+        {
+            if (m_pszRaw)
+            {
+                if (m_c4RawLen == kCIDLib::c4MaxCard)
+                    m_c4RawLen = TRawStr::c4StrLen(m_pszRaw);
+                return m_c4RawLen;
+            }
+            return m_pstrObj->c4Length();
+        }
 
-        [[nodiscard]] const tCIDLib::TCh* pszBuffer() const noexcept;
+        // Null if the string is empty
+        [[nodiscard]] constexpr tCIDLib::TCh chFirst() const
+        {
+            if (m_pstrObj)
+                return m_pstrObj->chFirst();
+            return m_pszRaw[0];
+        }
+
+        [[nodiscard]] constexpr const tCIDLib::TCh* pszBuffer() const noexcept
+        {
+            if (m_pszRaw)
+                return m_pszRaw;
+            return m_pstrObj->pszBuffer();
+        }
 
         [[nodiscard]] const tCIDLib::TCh* pszBufferAt
         (
@@ -155,22 +207,13 @@ class CIDLIBEXP TStringView
 
     private :
         // -------------------------------------------------------------------
-        //  Private, non-virtual methods
-        // -------------------------------------------------------------------
-        [[noreturn]] tCIDLib::TVoid ThrowNull
-        (
-            const   tCIDLib::TCh* const     pszFile
-            , const tCIDLib::TCard4         c4Line
-        );
-
-
-        // -------------------------------------------------------------------
         //  Private data members
         //
         //  m_c4RawLen
         //      If this is a raw string, this is the cached length. It is initialized
         //      to max to indicate not gotten yet. We'll fault it in for raw strings
-        //      if actually needed.
+        //      if actually needed. This way we don't have to pay multiple times for
+        //      returning the length of raw strings.
         //
         //  m_pszRaw
         //      If this is non-null, then this is wrapping a raw string.

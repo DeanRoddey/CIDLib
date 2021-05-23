@@ -98,14 +98,14 @@ TCmdLine::TCmdLine(const tCIDLib::TCh chOptionChar) :
 // ---------------------------------------------------------------------------
 
 // Some helpers to find specific types of parameters by name
-tCIDLib::TBoolean TCmdLine::bFindOption(const TString& strName)
+tCIDLib::TBoolean TCmdLine::bFindOption(const TStringView& strvName)
 {
     const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TCmdLineParm& cmdlpCur = m_colList[c4Index];
         if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::Option)
-        &&  cmdlpCur.strName().bCompareI(strName))
+        &&  cmdlpCur.strName().bCompareI(strvName))
         {
             if (m_bRemoveConsumed)
                 m_colList.RemoveAt(c4Index);
@@ -121,7 +121,7 @@ tCIDLib::TBoolean TCmdLine::bFindOption(const TString& strName)
 //  cause an exception.
 //
 tCIDLib::TBoolean
-TCmdLine::bFindOptionVal(const  TString&            strName
+TCmdLine::bFindOptionVal(const  TStringView&        strvName
                         ,       tCIDLib::TCard4&    c4Val
                         , const tCIDLib::TCard4     c4MinVal
                         , const tCIDLib::TCard4     c4MaxVal
@@ -129,7 +129,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 {
     // Call the other version to see if have the option value
     TString strVal;
-    if (!bFindOptionVal(strName, strVal))
+    if (!bFindOptionVal(strvName, strVal))
         return kCIDLib::False;
 
     if (!strVal.bToCard4(c4Val, eRadix))
@@ -141,7 +141,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
             , kCIDErrs::errcSysI_ConvertArg
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::BadParms
-            , strName
+            , TString(strvName)
             , TString(L"unsigned integer")
         );
     }
@@ -155,7 +155,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
             , kCIDErrs::errcSysI_ConvertArg
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::BadParms
-            , strName
+            , TString(strvName)
             , TCardinal(c4MinVal)
             , TCardinal(c4MaxVal)
         );
@@ -164,7 +164,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 }
 
 tCIDLib::TBoolean
-TCmdLine::bFindOptionVal(const  TString&            strName
+TCmdLine::bFindOptionVal(const  TStringView&        strvName
                         ,       tCIDLib::TInt4&     i4Val
                         , const tCIDLib::TInt4      i4MinVal
                         , const tCIDLib::TInt4      i4MaxVal
@@ -172,7 +172,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 {
     // Call the other version to see if have the option value
     TString strVal;
-    if (!bFindOptionVal(strName, strVal))
+    if (!bFindOptionVal(strvName, strVal))
         return kCIDLib::False;
 
     if (!strVal.bToInt4(i4Val, eRadix))
@@ -184,7 +184,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
             , kCIDErrs::errcSysI_ConvertArg
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::BadParms
-            , strName
+            , TString(strvName)
             , TString(L"signed integer")
         );
     }
@@ -198,7 +198,7 @@ TCmdLine::bFindOptionVal(const  TString&            strName
             , kCIDErrs::errcSysI_ConvertArg
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::BadParms
-            , strName
+            , TString(strvName)
             , TInteger(i4MinVal)
             , TInteger(i4MaxVal)
         );
@@ -209,14 +209,14 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 
 // False here means a bad value, else we get found value/default value and return true
 tCIDLib::TBoolean
-TCmdLine::bFindOptionVal(const  TString&            strName
+TCmdLine::bFindOptionVal(const  TStringView&        strvName
                         ,       tCIDLib::TCard4&    c4Val
                         , const tCIDLib::TCard4     c4DefVal
                         , const tCIDLib::ERadices   eRadix)
 {
     // Call the other version to see if have the option value
     TString strVal;
-    if (!bFindOptionVal(strName, strVal))
+    if (!bFindOptionVal(strvName, strVal))
     {
         c4Val = c4DefVal;
         return kCIDLib::True;
@@ -225,14 +225,14 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 }
 
 tCIDLib::TBoolean
-TCmdLine::bFindOptionVal(const  TString&            strName
+TCmdLine::bFindOptionVal(const  TStringView&        strvName
                         ,       tCIDLib::TInt4&     i4Val
                         , const tCIDLib::TInt4      i4DefVal
                         , const tCIDLib::ERadices   eRadix)
 {
     // Call the other version to see if have the option value
     TString strVal;
-    if (!bFindOptionVal(strName, strVal))
+    if (!bFindOptionVal(strvName, strVal))
     {
         i4Val = i4DefVal;
         return kCIDLib::True;
@@ -248,14 +248,14 @@ TCmdLine::bFindOptionVal(const  TString&            strName
 //  option for them, else they would try to do it again.
 //
 tCIDLib::TBoolean
-TCmdLine::bFindOptionVal(const TString& strName, TString& strValue)
+TCmdLine::bFindOptionVal(const TStringView& strvName, TString& strValue)
 {
     const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TCmdLineParm& cmdlpCur = m_colList[c4Index];
         if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
-        &&  cmdlpCur.strName().bCompareI(strName))
+        &&  cmdlpCur.strName().bCompareI(strvName))
         {
             strValue = cmdlpCur.strValue();
 
@@ -274,14 +274,14 @@ TCmdLine::bFindOptionVal(const TString& strName, TString& strValue)
 //  since it doesn't consume the parameter. So we can't call bFindOptionVal() above,
 //  we have to do our own search.
 //
-tCIDLib::TBoolean TCmdLine::bOptionExists(const TString& strName) const
+tCIDLib::TBoolean TCmdLine::bOptionExists(const TStringView& strvName) const
 {
         const tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         const TCmdLineParm& cmdlpCur = m_colList[c4Index];
         if ((cmdlpCur.eType() == tCIDLib::ECmdLnPTypes::OptionVal)
-        &&  cmdlpCur.strName().bCompareI(strName))
+        &&  cmdlpCur.strName().bCompareI(strvName))
         {
             return kCIDLib::True;
         }
@@ -999,7 +999,7 @@ tCIDLib::TVoid TSysInfo::DoInit()
                 , L"Could not obtain IP host name from system"
             );
         }
-        s_pstrIPHostName = new TString(kstrHost.pszValue());
+        s_pstrIPHostName = new TString(kstrHost);
 
 
         // And last of all do an atomic set of the done flag

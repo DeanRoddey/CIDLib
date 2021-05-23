@@ -47,9 +47,6 @@ RTTIDecls(TTreeChildCursor,TObject)
 
 
 
-
-
-
 // ---------------------------------------------------------------------------
 //   CLASS: TXMLTreeNode
 //  PREFIX: xtnode
@@ -191,11 +188,7 @@ tCIDLib::TCard2 TXMLTreeAttr::c2ValueAs(const tCIDLib::ERadices eRadix) const
 tCIDLib::TCard4 TXMLTreeAttr::c4ValueAs(const tCIDLib::ERadices eRadix) const
 {
     tCIDLib::TBoolean bValid;
-    const tCIDLib::TCard4 c4Ret = TRawStr::c4AsBinary
-    (
-        m_strValue.pszBuffer(), bValid, eRadix
-    );
-
+    const tCIDLib::TCard4 c4Ret = TRawStr::c4AsBinary(m_strValue.pszBuffer(), bValid, eRadix);
     if (!bValid)
     {
         facCIDXML().ThrowErr
@@ -217,11 +210,7 @@ tCIDLib::TCard4 TXMLTreeAttr::c4ValueAs(const tCIDLib::ERadices eRadix) const
 tCIDLib::TCard8 TXMLTreeAttr::c8ValueAs(const tCIDLib::ERadices eRadix) const
 {
     tCIDLib::TBoolean bValid;
-    const tCIDLib::TCard8 c8Ret = TRawStr::c8AsBinary
-    (
-        m_strValue.pszBuffer(), bValid, eRadix
-    );
-
+    const tCIDLib::TCard8 c8Ret = TRawStr::c8AsBinary(m_strValue.pszBuffer(), bValid, eRadix);
     if (!bValid)
     {
         facCIDXML().ThrowErr

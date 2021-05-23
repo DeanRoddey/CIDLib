@@ -41,6 +41,7 @@ ERRORS=
     errcGen_BadCreateAct        4       %(1) is not a valid create action for a %(2) object, name=%(3)
     errcGen_BadEnumText         5       '%(1)' is not a valid text value for enumeration %(2)
     errcGen_BadEnumAltNum       6       %(1) is not a valid alt numeric value for enumeration %(2)
+    errcGen_IndexUnderFlow      7       Index underflow error. Requested reduction was %(1)
 
     ; TArea errors
     errcArea_BehindOrg          128     The new right/top side (%(1)) is below the origin (%(2))
@@ -517,6 +518,7 @@ ERRORS=
     errcStr_FormatBin           3268    Could not format binary value into string
     errcStr_BadHexChar          3269    %(1) is not a valid hexadecimal Unicode code point
     errcStr_NotValidUnicode     3270    The string is not a valid Unicode string
+    errcStr_NotInStr            3271    The passed pointer is not within the string buffer
 
     ; String tokenizer errors
     errcSTok_NullSource         3320    The string to tokenize cannot be a null pointer

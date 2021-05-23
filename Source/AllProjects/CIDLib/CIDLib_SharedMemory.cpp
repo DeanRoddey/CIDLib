@@ -65,7 +65,7 @@ TSharedMemBuf::TSharedMemBuf(const  tCIDLib::TCard4         c4InitSize
                             , const TResourceName&          rsnToUse
                             ,       tCIDLib::TBoolean&      bCreated
                             , const tCIDLib::EMemAccFlags   eAccessFlags
-                            , const tCIDLib::ECreateActs eCreate) :
+                            , const tCIDLib::ECreateActs    eCreate) :
     m_c4Size(c4InitSize)
     , m_rsnThis(rsnToUse)
 {

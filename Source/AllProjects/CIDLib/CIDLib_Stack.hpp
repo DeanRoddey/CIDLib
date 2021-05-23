@@ -94,7 +94,7 @@ template <typename TElem> class TStack : public TBasicDLinkedCol<TElem>
             return this->objPlaceAtBottom(tCIDLib::Forward<TArgs>(Args)...);
         }
 
-        TElem objPop()
+        [[nodiscard]] TElem objPop()
         {
             return this->objGetFromBottom();
         }
@@ -165,7 +165,7 @@ template <typename TElem> class TStackJan
         {
             // And pop it back off, if it wasn't orphaned
             if (m_pcolTarget)
-                m_pcolTarget->objPop();
+                m_pcolTarget->TrashTop();
         }
 
 

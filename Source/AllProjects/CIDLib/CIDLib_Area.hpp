@@ -88,10 +88,10 @@ class CIDLIBEXP TArea :
                         , const TPoint& pntLRt) noexcept
         {
             // Get the values out of the points for greater efficiency
-            tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
-            tCIDLib::TInt4 i4Y1 = pntULeft.m_i4Y;
-            tCIDLib::TInt4 i4X2 = pntLRt.m_i4X;
-            tCIDLib::TInt4 i4Y2 = pntLRt.m_i4Y;
+            const tCIDLib::TInt4 i4X1 = pntULeft.m_i4X;
+            const tCIDLib::TInt4 i4Y1 = pntULeft.m_i4Y;
+            const tCIDLib::TInt4 i4X2 = pntLRt.m_i4X;
+            const tCIDLib::TInt4 i4Y2 = pntLRt.m_i4Y;
 
             m_i4X   = tCIDLib::MinVal(i4X1, i4X2);
             m_c4CX  = i4X1 > i4X2 ? i4X1 - i4X2 : i4X2 - i4X1;

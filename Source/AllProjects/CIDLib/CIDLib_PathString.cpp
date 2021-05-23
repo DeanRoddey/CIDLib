@@ -52,9 +52,21 @@ TPathStr::TPathStr() :
 {
 }
 
+TPathStr::TPathStr(const TStringView& strvInitVal) :
+
+    TString(strvInitVal)
+{
+}
+
 TPathStr::TPathStr(const TString& strInitVal) :
 
     TString(strInitVal)
+{
+}
+
+TPathStr::TPathStr(const tCIDLib::TCh* const pszInitVal) :
+
+    TString(pszInitVal)
 {
 }
 
@@ -64,17 +76,11 @@ TPathStr::TPathStr(const tCIDLib::TCard4 c4InitSize) :
 {
 }
 
-TPathStr::TPathStr(const TString& strFirstPart, const TString& strSecPart) :
+TPathStr::TPathStr(const TStringView& strvFirstPart, const TStringView& strvSecPart) :
 
-    TString(strFirstPart)
+    TString(strvFirstPart)
 {
-    AddLevel(strSecPart);
-}
-
-TPathStr::TPathStr(const tCIDLib::TCh* const pszInitValue) :
-
-    TString(pszInitValue)
-{
+    AddLevel(strvSecPart);
 }
 
 TPathStr::~TPathStr()
@@ -90,67 +96,67 @@ TPathStr::~TPathStr()
 //  Add a new directory level into this path, dealing with separators
 //  appropriately.
 //
-tCIDLib::TVoid TPathStr::AddLevel(const TString& strNewLevel)
+tCIDLib::TVoid TPathStr::AddLevel(const TStringView& strvNewLevel)
 {
     // If there is no text in the new level, then just return
-    if (!strNewLevel.c4Length())
+    if (!strvNewLevel.c4Length())
         return;
 
     //
     //  If anything in this string object, then see if we or the new level
     //  has the separator. If not add one. If both have it, get rid one of.
     //
-    if (strNewLevel.c4Length())
+    if (!strvNewLevel.bIsEmpty())
     {
         if ((chLast() == kCIDLib::chBackSlash)
-        &&  (strNewLevel.chFirst() == kCIDLib::chBackSlash))
+        &&  (strvNewLevel.chFirst() == kCIDLib::chBackSlash))
         {
             DeleteLast();
         }
          else if ((chLast() != kCIDLib::chBackSlash)
-              &&  (strNewLevel.chFirst() != kCIDLib::chBackSlash))
+              &&  (strvNewLevel.chFirst() != kCIDLib::chBackSlash))
         {
             if (!bIsEmpty())
                 Append(kCIDLib::chBackSlash);
         }
     }
-    Append(strNewLevel);
+    Append(strvNewLevel);
 }
 
 
 // These are just conveniences for multiple calls to AddLevel
 tCIDLib::TVoid
-TPathStr::AddLevels(const TString& strNewLevel1, const TString& strNewLevel2)
+TPathStr::AddLevels(const TStringView& strvNewLevel1, const TStringView& strvNewLevel2)
 {
-    AddLevel(strNewLevel1);
-    AddLevel(strNewLevel2);
+    AddLevel(strvNewLevel1);
+    AddLevel(strvNewLevel2);
 }
 
 tCIDLib::TVoid
-TPathStr::AddLevels(const   TString& strNewLevel1
-                    , const TString& strNewLevel2
-                    , const TString& strNewLevel3)
+TPathStr::AddLevels(const   TStringView& strvNewLevel1
+                    , const TStringView& strvNewLevel2
+                    , const TStringView& strvNewLevel3)
 {
-    AddLevel(strNewLevel1);
-    AddLevel(strNewLevel2);
-    AddLevel(strNewLevel3);
+    AddLevel(strvNewLevel1);
+    AddLevel(strvNewLevel2);
+    AddLevel(strvNewLevel3);
 }
 
 tCIDLib::TVoid
-TPathStr::AddLevels(const   TString& strNewLevel1
-                    , const TString& strNewLevel2
-                    , const TString& strNewLevel3
-                    , const TString& strNewLevel4)
+TPathStr::AddLevels(const   TStringView& strvNewLevel1
+                    , const TStringView& strvNewLevel2
+                    , const TStringView& strvNewLevel3
+                    , const TStringView& strvNewLevel4)
 {
-    AddLevel(strNewLevel1);
-    AddLevel(strNewLevel2);
-    AddLevel(strNewLevel3);
-    AddLevel(strNewLevel4);
+    AddLevel(strvNewLevel1);
+    AddLevel(strvNewLevel2);
+    AddLevel(strvNewLevel3);
+    AddLevel(strvNewLevel4);
 }
 
 
 // Add our current contents to the end of the passed base path
-tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)
+tCIDLib::TVoid TPathStr::AddToBasePath(const TStringView& strvBasePath)
 {
     //
     //  If we are fully qualified, then we don't take anything from the base
@@ -160,7 +166,7 @@ tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)
     //
     if (bIsEmpty())
     {
-        *this = strBasePath;
+        *this = strvBasePath;
     }
      else if (!bIsFullyQualified())
     {
@@ -171,7 +177,7 @@ tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)
             //  If there is some volume, tack ourself onto that, else we don't
             //  change.
             //
-            TPathStr pathTmpBase(strBasePath);
+            TPathStr pathTmpBase(strvBasePath);
             if (pathTmpBase.bQueryVolume(*this))
                 AddLevel(pathTmp);
             else
@@ -180,7 +186,7 @@ tCIDLib::TVoid TPathStr::AddToBasePath(const TString& strBasePath)
          else
         {
             // Just add ourselves to the base
-            *this = strBasePath;
+            *this = strvBasePath;
             AddLevel(pathTmp);
         }
     }
@@ -197,13 +203,13 @@ tCIDLib::TVoid TPathStr::AddTrailingSeparator()
 }
 
 
-tCIDLib::TVoid TPathStr::AppendExt(const TString& strExt)
+tCIDLib::TVoid TPathStr::AppendExt(const TStringView& strvExt)
 {
-    if (strExt.bIsEmpty())
+    if (strvExt.bIsEmpty())
         return;
 
     tCIDLib::TBoolean bPerEnd   = (chLast() == L'.');
-    tCIDLib::TBoolean bExtStart = (strExt.chFirst() == L'.');
+    tCIDLib::TBoolean bExtStart = (strvExt.chFirst() == L'.');
 
     if (bPerEnd && bExtStart)
     {
@@ -214,7 +220,7 @@ tCIDLib::TVoid TPathStr::AppendExt(const TString& strExt)
     if (!bPerEnd && !bExtStart)
         Append(L'.');
 
-    Append(strExt);
+    Append(strvExt);
 }
 
 

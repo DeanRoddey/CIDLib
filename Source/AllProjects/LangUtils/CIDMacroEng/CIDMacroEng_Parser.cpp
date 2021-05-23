@@ -900,7 +900,7 @@ TMEngClassInfo* TMacroEngParser::pmeciParseClass(TParserSrc& psrcClass)
 
     // Make sure we get rid of any classes we put on the stack
     while (m_colClassStack.c4ElemCount() > c4InitNestDepth)
-        m_colClassStack.objPop();
+        m_colClassStack.TrashTop();
 
     return pmeciRet;
 }

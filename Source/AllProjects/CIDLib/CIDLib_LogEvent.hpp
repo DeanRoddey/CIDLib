@@ -53,69 +53,69 @@ class CIDLIBEXP TLogEvent :
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const TString&                strMsgText
+            , const TStringView&            strvMsgText
             , const tCIDLib::ESeverities    eSev = tCIDLib::ESeverities::Status
             , const tCIDLib::EErrClasses    eClass = tCIDLib::EErrClasses::None
         );
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
-            , const TString&                strMsgText
-            , const TString&                strAuxText
+            , const TStringView&            strvMsgText
+            , const TStringView&            strvAuxText
             , const tCIDLib::ESeverities    eSev = tCIDLib::ESeverities::Status
             , const tCIDLib::EErrClasses    eClass = tCIDLib::EErrClasses::None
         );
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
             , const tCIDLib::TMsgId         midLoad
-            , const TString&                strErrText
-            , const TString&                strAuxText
+            , const TStringView&            strvErrText
+            , const TStringView&            strvAuxText
             , const tCIDLib::ESeverities    eSeverity
             , const tCIDLib::EErrClasses    eClass
         );
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
             , const tCIDLib::TMsgId         midLoad
-            , const TString&                strErrText
+            , const TStringView&            strvErrText
             , const tCIDLib::ESeverities    eSeverity
             , const tCIDLib::EErrClasses    eClass
         );
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
             , const tCIDLib::TMsgId         midLoad
             , const TKrnlError&             kerrIds
-            , const TString&                strErrText
-            , const TString&                strAuxText
+            , const TStringView&            strvErrText
+            , const TStringView&            strvAuxText
             , const tCIDLib::ESeverities    eSeverity
             , const tCIDLib::EErrClasses    eClass
         );
 
         TLogEvent
         (
-            const   TString&                strFacName
-            , const TString&                strFileName
+            const   TStringView&            strvFacName
+            , const TStringView&            strvFileName
             , const tCIDLib::TCard4         c4LineNum
             , const tCIDLib::TMsgId         midLoad
             , const TKrnlError&             kerrIds
-            , const TString&                strErrText
+            , const TStringView&            strvErrText
             , const tCIDLib::ESeverities    eSeverity
             , const tCIDLib::EErrClasses    eClass
         );
@@ -151,13 +151,7 @@ class CIDLIBEXP TLogEvent :
 
         [[nodiscard]] tCIDLib::TBoolean bCheckEvent
         (
-            const   TString&                strModName
-            , const tCIDLib::TErrCode       errcToCheck
-        )   const;
-
-        [[nodiscard]] tCIDLib::TBoolean bCheckEvent
-        (
-            const   tCIDLib::TCh* const     pszModName
+            const   TStringView&            strvModName
             , const tCIDLib::TErrCode       errcToCheck
         )   const;
 
@@ -237,42 +231,42 @@ class CIDLIBEXP TLogEvent :
 
         const TString& strAuxText
         (
-            const   TString&                strNewText
+            const   TStringView&            strvNewText
         );
 
         [[nodiscard]] const TString& strErrText() const;
 
         const TString& strErrText
         (
-            const   TString&                strNewText
+            const   TStringView&            strvNewText
         );
 
         [[nodiscard]] const TString& strFacName() const;
 
         const TString& strFacName
         (
-            const   TString&                strNewName
+            const   TStringView&            strvNewName
         );
 
         [[nodiscard]] const TString& strFileName() const;
 
         const TString& strFileName
         (
-            const   TString&                strNewName
+            const   TStringView&            strvNewName
         );
 
         [[nodiscard]] const TString& strHostName() const;
 
         const TString& strHostName
         (
-            const   TString&                strNewName
+            const   TStringView&            strvNewName
         );
 
         [[nodiscard]] const TString& strProcess() const;
 
         const TString& strProcess
         (
-            const   TString&                strNewName
+            const   TStringView&            strvNewName
         );
 
         [[nodiscard]] const TString& strStackTrace() const;
@@ -281,7 +275,7 @@ class CIDLIBEXP TLogEvent :
 
         const TString& strThread
         (
-            const   TString&                strNewName
+            const   TStringView&            strvNewName
         );
 
         tCIDLib::TVoid SetLogged() const;

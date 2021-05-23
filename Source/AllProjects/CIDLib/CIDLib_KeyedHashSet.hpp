@@ -108,12 +108,12 @@ template <typename TElem,class TKey> class TKeyedHashSetNode
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TElem& objData() const
+        [[nodiscard]] constexpr const TElem& objData() const
         {
             return m_objData;
         }
 
-        TElem& objData()
+        [[nodiscard]] constexpr TElem& objData()
         {
             return m_objData;
         }
@@ -124,12 +124,12 @@ template <typename TElem,class TKey> class TKeyedHashSetNode
             return m_objData;
         }
 
-        TKeyedHashSetNode<TElem,TKey>* pnodeNext()
+        [[nodiscard]] constexpr TKeyedHashSetNode<TElem,TKey>* pnodeNext()
         {
             return m_pnodeNext;
         }
 
-        TKeyedHashSetNode<TElem,TKey>*
+        constexpr TKeyedHashSetNode<TElem,TKey>*
         pnodeNext(TKeyedHashSetNode<TElem,TKey>* const pnodeToSet)
         {
             m_pnodeNext = pnodeToSet;
@@ -1534,7 +1534,7 @@ class TKeyedHashSet : public TCollection<TElem>
         // -------------------------------------------------------------------
         //  Protected, non-virtual methods
         // -------------------------------------------------------------------
-        TNode* pnodeFindFirst(tCIDLib::THashVal& hshToUpdate) const
+        [[nodiscard]] constexpr TNode* pnodeFindFirst(tCIDLib::THashVal& hshToUpdate) const
         {
             for (tCIDLib::TCard4 c4BucketInd = 0; c4BucketInd < m_c4HashModulus; c4BucketInd++)
             {
@@ -1547,7 +1547,7 @@ class TKeyedHashSet : public TCollection<TElem>
             return nullptr;
         }
 
-        TNode* pnodeFindLast(tCIDLib::THashVal& hshToUpdate) const
+        [[nodiscard]] constexpr TNode* pnodeFindLast(tCIDLib::THashVal& hshToUpdate) const
         {
             // Start at the last bucket and work back
             tCIDLib::TCard4 c4BucketInd = m_c4HashModulus - 1;

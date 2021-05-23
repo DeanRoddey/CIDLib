@@ -301,9 +301,7 @@ tCIDLib::TCh TParserSrc::chEscape(const TString& strToEscape)
         tCIDLib::TBoolean bValid;
         const tCIDLib::TCard4 c4Ordinal = TRawStr::c4AsBinary
         (
-            strToEscape.pszBufferAt(2)
-            , bValid
-            , tCIDLib::ERadices::Hex
+            strToEscape.pszBufferAt(2), bValid, tCIDLib::ERadices::Hex
         );
 
         if (!bValid)
@@ -968,7 +966,7 @@ TParserSrc::eExtractToken(TString& strText, const tCIDLib::TBoolean bEOFOk)
 {
     tCIDLib::TBoolean       bInEscape = kCIDLib::False;
     tCIDLib::TBoolean       bQuoted = kCIDLib::False;
-    tCIDMacroEng::ETokens      eRet = tCIDMacroEng::ETokens::NoMatch;
+    tCIDMacroEng::ETokens   eRet = tCIDMacroEng::ETokens::NoMatch;
     tCIDLib::TCh            chCur;
     try
     {

@@ -1555,6 +1555,7 @@ PROJECT=Tests2
         TestORB
         StressTests
         TestServers
+        TestFW
     END DEPENDENTS
 
     DEPENDENTS [WIN32_*]

@@ -70,15 +70,8 @@ class CIDLIBEXP TSysBuf : public TMemBuf
 
         TSysBuf
         (
-            const   TString&                strInitData
+            const   TStringView&            strvInitData
             , const tCIDLib::TCard4         c4MaxSize
-            , const tCIDLib::EMemAccFlags   eAccFlags = tCIDLib::EMemAccFlags::ReadWrite
-        );
-
-        TSysBuf
-        (
-            const   tCIDLib::TCh* const     pszInitData
-            , const tCIDLib::TCard4         c4MaxSize = 0
             , const tCIDLib::EMemAccFlags   eAccFlags = tCIDLib::EMemAccFlags::ReadWrite
         );
 

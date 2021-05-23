@@ -188,7 +188,6 @@ namespace kCIDLib
     constexpr tCIDLib::TEncodedTime     enctMaxWait     = 0xFFFFFFFFFFFFFFFF;
     constexpr const tCIDLib::TCh* const pszEmptyZStr    = L"";
     constexpr tCIDLib::TCard4           c4MsgIdModulus  = 109;
-    constexpr const tCIDLib::TCh* const pszNullStr      = L"<Null>";
     constexpr const tCIDLib::TCh* const pszErrInfExt    = L".ErrorInf";
     constexpr const tCIDLib::TCh* const pszPrimaryThrdName = L"$PrimaryThread$";
 

@@ -102,13 +102,13 @@ TResourceName::TResourceName(const TKrnlRscName& krsnToUse) noexcept :
     strFullName(tCIDLib::ENamedRscTypes::Event);
 }
 
-TResourceName::TResourceName(   const   TString&            strCompany
-                                , const TString&            strSubsystem
-                                , const TString&            strResource
+TResourceName::TResourceName(   const   TStringView&        strvCompany
+                                , const TStringView&        strvSubsystem
+                                , const TStringView&        strvResource
                                 , const tCIDLib::TProcessId pidOfName) noexcept :
 
     m_eTypeCache(tCIDLib::ENamedRscTypes::Count)
-    , m_krsnThis(strCompany.pszBuffer(), strSubsystem.pszBuffer(), strResource.pszBuffer(), pidOfName)
+    , m_krsnThis(strvCompany.pszBuffer(), strvSubsystem.pszBuffer(), strvResource.pszBuffer(), pidOfName)
 {
     // We set count above, so this will force an udpate
     strFullName(tCIDLib::ENamedRscTypes::Event);
@@ -148,16 +148,16 @@ TResourceName::QueryNameParts(  TString&    strCompany
 
 
 tCIDLib::TVoid
-TResourceName::SetName( const   TString&            strCompany
-                        , const TString&            strSubsystem
-                        , const TString&            strResource
+TResourceName::SetName( const   TStringView&        strvCompany
+                        , const TStringView&        strvSubsystem
+                        , const TStringView&        strvResource
                         , const tCIDLib::TProcessId pidOfName)
 {
     m_krsnThis.SetName
     (
-        strCompany.pszBuffer()
-        , strSubsystem.pszBuffer()
-        , strResource.pszBuffer()
+        strvCompany.pszBuffer()
+        , strvSubsystem.pszBuffer()
+        , strvResource.pszBuffer()
         , pidOfName
     );
 

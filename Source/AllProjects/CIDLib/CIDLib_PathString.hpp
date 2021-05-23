@@ -48,11 +48,6 @@ class CIDLIBEXP TPathStr : public TString
         // -------------------------------------------------------------------
         TPathStr();
 
-        TPathStr
-        (
-            const   tCIDLib::TCh*           pszInitValue
-        );
-
         explicit TPathStr
         (
             const   tCIDLib::TCard4         c4InitSize
@@ -60,13 +55,23 @@ class CIDLIBEXP TPathStr : public TString
 
         TPathStr
         (
-            const   TString&                strInitComp
+            const   TStringView&            strvInit
         );
 
         TPathStr
         (
-            const   TString&                strFirstPart
-            , const TString&                strSecondPart
+            const   TString&                strInit
+        );
+
+        TPathStr
+        (
+            const   tCIDLib::TCh* const     pszInit
+        );
+
+        TPathStr
+        (
+            const   TStringView&            strvFirstPart
+            , const TStringView&            strvSecondPart
         );
 
         TPathStr(const TPathStr&) = default;
@@ -91,46 +96,64 @@ class CIDLIBEXP TPathStr : public TString
             return TString::operator==(pathSrc);
         }
 
+        TPathStr& operator=(const TString& strSrc)
+        {
+            TParent::operator=(strSrc);
+            return *this;
+        }
+
+        TPathStr& operator=(const TStringView& strvSrc)
+        {
+            TParent::operator=(strvSrc);
+            return *this;
+        }
+
+        TPathStr& operator=(const tCIDLib::TCh* const pszSrc)
+        {
+            TParent::operator=(pszSrc);
+            return *this;
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
         tCIDLib::TVoid AddLevel
         (
-            const   TString&                strNewLevel
+            const   TStringView&            strNewLevel
         );
 
         tCIDLib::TVoid AddLevels
         (
-            const   TString&                strNewLevel1
-            , const TString&                strNewLevel2
+            const   TStringView&            strNewLevel1
+            , const TStringView&            strNewLevel2
         );
 
         tCIDLib::TVoid AddLevels
         (
-            const   TString&                strNewLevel1
-            , const TString&                strNewLevel2
-            , const TString&                strNewLevel3
+            const   TStringView&            strNewLevel1
+            , const TStringView&            strNewLevel2
+            , const TStringView&            strNewLevel3
         );
 
         tCIDLib::TVoid AddLevels
         (
-            const   TString&                strNewLevel1
-            , const TString&                strNewLevel2
-            , const TString&                strNewLevel3
-            , const TString&                strNewLevel4
+            const   TStringView&            strNewLevel1
+            , const TStringView&            strNewLevel2
+            , const TStringView&            strNewLevel3
+            , const TStringView&            strNewLevel4
         );
 
         tCIDLib::TVoid AddToBasePath
         (
-            const   TString&                strBasePath
+            const   TStringView&            strBasePath
         );
 
         tCIDLib::TVoid AddTrailingSeparator();
 
         tCIDLib::TVoid AppendExt
         (
-            const   TString&                strExt
+            const   TStringView&            strvExt
         );
 
         tCIDLib::TBoolean bExtractExt

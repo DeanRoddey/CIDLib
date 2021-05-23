@@ -44,7 +44,7 @@ class TCmdLineParm
         // -------------------------------------------------------------------
         TCmdLineParm();
 
-        TCmdLineParm(const  TString&            strText
+        TCmdLineParm(const  TStringView&        strvText
                     , const tCIDLib::TBoolean   bOption)
 
         {
@@ -52,13 +52,13 @@ class TCmdLineParm
             {
                 // Valueless options have no value just a name
                 m_eType = tCIDLib::ECmdLnPTypes::Option;
-                m_strName = strText;
+                m_strName = strvText;
             }
             else
             {
                 // Values have no name, just a value
                 m_eType = tCIDLib::ECmdLnPTypes::Value;
-                m_strValue = strText;
+                m_strValue = strvText;
             }
         }
 
@@ -114,6 +114,8 @@ class TCmdLineParm
         TString                 m_strValue;
 };
 
+
+
 // ---------------------------------------------------------------------------
 //  CLASS: TCmdLine
 // PREFIX: cmdl
@@ -152,21 +154,21 @@ class CIDLIBEXP TCmdLine
         // -------------------------------------------------------------------
         tCIDLib::TBoolean bFindOption
         (
-            const   TString&                strName
+            const   TStringView&           strvName
         );
 
         tCIDLib::TBoolean bFindOptionVal
         (
-            const   TString&                strName
+            const   TStringView&            strvName
             ,       tCIDLib::TCard4&        c4Val
             , const tCIDLib::TCard4         c4MinVal
             , const tCIDLib::TCard4         c4MaxVal
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
         );
 
-        tCIDLib::TBoolean bFindOptionVal
+        ::tCIDLib::TBoolean bFindOptionVal
         (
-            const   TString&                strName
+            const   TStringView&            strName
             ,       tCIDLib::TCard4&        c4Val
             , const tCIDLib::TCard4         c4DefVal
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
@@ -174,7 +176,7 @@ class CIDLIBEXP TCmdLine
 
         tCIDLib::TBoolean bFindOptionVal
         (
-            const   TString&                strName
+            const   TStringView&            strName
             ,       tCIDLib::TInt4&         i4Val
             , const tCIDLib::TInt4          i4MinVal
             , const tCIDLib::TInt4          i4MaxVal
@@ -183,7 +185,7 @@ class CIDLIBEXP TCmdLine
 
         tCIDLib::TBoolean bFindOptionVal
         (
-            const   TString&                strName
+            const   TStringView&            strName
             ,       tCIDLib::TInt4&         i4Val
             , const tCIDLib::TInt4          i4DefVal
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
@@ -191,7 +193,7 @@ class CIDLIBEXP TCmdLine
 
         tCIDLib::TBoolean bFindOptionVal
         (
-            const   TString&                strName
+            const   TStringView&            strName
             ,       TString&                strValue
         );
 
@@ -202,7 +204,7 @@ class CIDLIBEXP TCmdLine
 
         tCIDLib::TBoolean bOptionExists
         (
-            const   TString&                strName
+            const   TStringView&            strName
         )   const;
 
         tCIDLib::TBoolean bRemoveConsumed() const

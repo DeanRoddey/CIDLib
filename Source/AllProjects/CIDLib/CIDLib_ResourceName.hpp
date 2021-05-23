@@ -64,9 +64,9 @@ class CIDLIBEXP TResourceName :
 
         TResourceName
         (
-            const   TString&                strCompany
-            , const TString&                strSubsystem
-            , const TString&                strResource
+            const   TStringView&            strvCompany
+            , const TStringView&            strvSubsystem
+            , const TStringView&            strvResource
             , const tCIDLib::TProcessId     pidOfName = kCIDLib::pidInvalid
         )   noexcept;
 
@@ -115,9 +115,9 @@ class CIDLIBEXP TResourceName :
 
         tCIDLib::TVoid SetName
         (
-            const   TString&                strCompany
-            , const TString&                strSubsystem
-            , const TString&                strResource
+            const   TStringView&            strCompany
+            , const TStringView&            strSubsystem
+            , const TStringView&            strResource
             , const tCIDLib::TProcessId     pidOfName = kCIDLib::pidInvalid
         );
 

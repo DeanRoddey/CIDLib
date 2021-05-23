@@ -722,7 +722,7 @@ template <typename T> class TCntPtr
         {
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = nullptr;
-            try
+            if (pcdTmp)
             {
                 //
                 //  Release a strong reference. If that leaves no references then we
@@ -730,11 +730,6 @@ template <typename T> class TCntPtr
                 //
                 if (!pcdTmp->bReleaseStrongRef())
                     delete pcdTmp;
-            }
-
-            catch(...)
-            {
-                // There's not much we can do. Even logging in this code is dangerous
             }
         }
 

@@ -855,8 +855,8 @@ TModule::BuildModName(  const   TString&            strBaseName
     }
 
     // Copy the result back to the caller's string
-    strPortable = kstrPortable.pszValue();
-    strLoadable = kstrLoadable.pszValue();
+    strPortable = tCIDLib::ForceMove(kstrPortable);
+    strLoadable = tCIDLib::ForceMove(kstrLoadable);
 
     //
     //  Now lets fill in the prefered and default language versions of the

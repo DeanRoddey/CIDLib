@@ -169,10 +169,10 @@ TLogEvent::TLogEvent() :
 {
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
-                    , const TString&                strErrText
+                    , const TStringView&            strvErrText
                     , const tCIDLib::ESeverities    eSev
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -186,23 +186,22 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
     , m_strAuxText()
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name, and the process name
@@ -214,11 +213,11 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
-                    , const TString&                strErrText
-                    , const TString&                strAuxText
+                    , const TStringView&            strvErrText
+                    , const TStringView&            strvAuxText
                     , const tCIDLib::ESeverities    eSev
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -231,24 +230,23 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(0)
     , m_errcKrnlId(0)
     , m_eSeverity(eSev)
-    , m_strAuxText(strAuxText)
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strAuxText(strvAuxText)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name
@@ -260,12 +258,12 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
                     , const tCIDLib::TErrCode       errcId
-                    , const TString&                strErrText
-                    , const TString&                strAuxText
+                    , const TStringView&            strvErrText
+                    , const TStringView&            strvAuxText
                     , const tCIDLib::ESeverities    eSeverity
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -278,24 +276,23 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
-    , m_strAuxText(strAuxText)
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strAuxText(strvAuxText)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name, and the process name
@@ -307,11 +304,11 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
                     , const tCIDLib::TErrCode       errcId
-                    , const TString&                strErrText
+                    , const TStringView&            strvErrText
                     , const tCIDLib::ESeverities    eSeverity
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -325,23 +322,22 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcKrnlId(0)
     , m_eSeverity(eSeverity)
     , m_strAuxText()
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name, and the process name
@@ -353,13 +349,13 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
                     , const tCIDLib::TErrCode       errcId
                     , const TKrnlError&             kerrIds
-                    , const TString&                strErrText
-                    , const TString&                strAuxText
+                    , const TStringView&            strvErrText
+                    , const TStringView&            strvAuxText
                     , const tCIDLib::ESeverities    eSeverity
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -372,24 +368,23 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcId(errcId)
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
-    , m_strAuxText(strAuxText)
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strAuxText(strvAuxText)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name, and the process name
@@ -401,12 +396,12 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     m_strProcess = TProcess::strProcessName();
 }
 
-TLogEvent::TLogEvent(const  TString&                strFacName
-                    , const TString&                strFileName
+TLogEvent::TLogEvent(const  TStringView&            strvFacName
+                    , const TStringView&            strvFileName
                     , const tCIDLib::TCard4         c4LineNum
                     , const tCIDLib::TErrCode       errcId
                     , const TKrnlError&             kerrIds
-                    , const TString&                strErrText
+                    , const TStringView&            strvErrText
                     , const tCIDLib::ESeverities    eSeverity
                     , const tCIDLib::EErrClasses    eClass) :
 
@@ -420,23 +415,22 @@ TLogEvent::TLogEvent(const  TString&                strFacName
     , m_errcKrnlId(kerrIds.errcId())
     , m_eSeverity(eSeverity)
     , m_strAuxText()
-    , m_strErrText(strErrText)
-    , m_strFacName(strFacName)
+    , m_strErrText(strvErrText)
+    , m_strFacName(strvFacName)
     , m_strHostName(TSysInfo::strIPHostName())
 {
     //
     //  Strip the path part off the file name, because its fed by the
     //  file macro that sometimes puts the whole friggin path on there.
     //
-    tCIDLib::TCard4 c4Dummy;
-    if (strFileName.bFirstOccurrence(kCIDLib::chPathSep, c4Dummy))
+    if (strvFileName.bContainsChar(kCIDLib::chPathSep))
     {
-        TPathStr pathTmp(strFileName);
+        TPathStr pathTmp(strvFileName);
         pathTmp.bQueryNameExt(m_strFileName);
     }
      else
     {
-        m_strFileName = strFileName;
+        m_strFileName = strvFileName;
     }
 
     // Get the calling thread's name, and the process name
@@ -544,20 +538,10 @@ tCIDLib::TBoolean TLogEvent::bAnyError() const
 //  the passed ones.
 //
 tCIDLib::TBoolean
-TLogEvent::bCheckEvent( const   TString&            strModName
+TLogEvent::bCheckEvent( const   TStringView&        strvModName
                         , const tCIDLib::TErrCode   errcToCheck) const
 {
-    if ((m_errcId == errcToCheck) && (strModName == m_strFacName))
-        return kCIDLib::True;
-    return kCIDLib::False;
-}
-
-
-tCIDLib::TBoolean
-TLogEvent::bCheckEvent( const   tCIDLib::TCh* const pszModName
-                        , const tCIDLib::TErrCode   errcToCheck) const
-{
-    if ((m_errcId == errcToCheck) && (m_strFacName == pszModName))
+    if ((m_errcId == errcToCheck) && (strvModName == m_strFacName))
         return kCIDLib::True;
     return kCIDLib::False;
 }
@@ -739,9 +723,9 @@ const TString& TLogEvent::strAuxText() const
     return m_strAuxText;
 }
 
-const TString& TLogEvent::strAuxText(const TString& strNewText)
+const TString& TLogEvent::strAuxText(const TStringView& strvNewText)
 {
-    m_strAuxText = strNewText;
+    m_strAuxText = strvNewText;
     return m_strAuxText;
 }
 
@@ -752,9 +736,9 @@ const TString& TLogEvent::strErrText() const
     return m_strErrText;
 }
 
-const TString& TLogEvent::strErrText(const TString& strNewText)
+const TString& TLogEvent::strErrText(const TStringView& strvNewText)
 {
-    m_strErrText = strNewText;
+    m_strErrText = strvNewText;
     return m_strErrText;
 }
 
@@ -765,9 +749,9 @@ const TString& TLogEvent::strFacName() const
     return m_strFacName;
 }
 
-const TString& TLogEvent::strFacName(const TString& strNewName)
+const TString& TLogEvent::strFacName(const TStringView& strvNewName)
 {
-    m_strFacName = strNewName;
+    m_strFacName = strvNewName;
     return m_strFacName;
 }
 
@@ -778,9 +762,9 @@ const TString& TLogEvent::strFileName() const
     return m_strFileName;
 }
 
-const TString& TLogEvent::strFileName(const TString& strToSet)
+const TString& TLogEvent::strFileName(const TStringView& strvToSet)
 {
-    m_strFileName = strToSet;
+    m_strFileName = strvToSet;
     return m_strFileName;
 }
 
@@ -791,9 +775,9 @@ const TString& TLogEvent::strHostName() const
     return m_strHostName;
 }
 
-const TString& TLogEvent::strHostName(const TString& strToSet)
+const TString& TLogEvent::strHostName(const TStringView& strvToSet)
 {
-    m_strHostName = strToSet;
+    m_strHostName = strvToSet;
     return m_strHostName;
 }
 
@@ -803,9 +787,9 @@ const TString& TLogEvent::strProcess() const
     return m_strProcess;
 }
 
-const TString& TLogEvent::strProcess(const TString& strToSet)
+const TString& TLogEvent::strProcess(const TStringView& strvToSet)
 {
-    m_strProcess = strToSet;
+    m_strProcess = strvToSet;
     return m_strProcess;
 }
 
@@ -823,9 +807,9 @@ const TString& TLogEvent::strThread() const
     return m_strThread;
 }
 
-const TString& TLogEvent::strThread(const TString& strToSet)
+const TString& TLogEvent::strThread(const TStringView& strvToSet)
 {
-    m_strThread = strToSet;
+    m_strThread = strvToSet;
     return m_strThread;
 }
 

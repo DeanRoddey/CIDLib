@@ -96,7 +96,7 @@ TSysBuf::TSysBuf() :
 //  If the max size is zero, it's set to the initial size to make the buffer
 //  fully allocated.
 //
-TSysBuf::TSysBuf(   const   TString&                strInitData
+TSysBuf::TSysBuf(   const   TStringView&            strvInitData
                     , const tCIDLib::TCard4         c4MaxSize
                     , const tCIDLib::EMemAccFlags   eAccessFlags) :
 
@@ -106,7 +106,7 @@ TSysBuf::TSysBuf(   const   TString&                strInitData
     , m_pc1Data(nullptr)
 {
     // Calc the source bytes we need to copy
-    const tCIDLib::TCard4 c4SrcSize = strInitData.c4Length() * kCIDLib::c4CharBytes;
+    const tCIDLib::TCard4 c4SrcSize = strvInitData.c4Length() * kCIDLib::c4CharBytes;
 
     // Use this to set the init alloc size. If zero, default it
     m_c4Size = c4SrcSize;
@@ -142,57 +142,10 @@ TSysBuf::TSysBuf(   const   TString&                strInitData
         TRawMem::CopyMemBuf
         (
             m_pc1Data
-            , strInitData.pszBuffer()
+            , strvInitData.pszBuffer()
             , c4SrcSize
         );
     }
-}
-
-TSysBuf::TSysBuf(   const   tCIDLib::TCh* const     pszInitData
-                    , const tCIDLib::TCard4         c4MaxSize
-                    , const tCIDLib::EMemAccFlags   eAccessFlags) :
-
-    m_c4Size(0)
-    , m_c4MaxSize(c4MaxSize)
-    , m_eAccess(eAccessFlags)
-    , m_pc1Data(nullptr)
-{
-    // Calc the source bytes we need to copy
-    const tCIDLib::TCard4 c4SrcSize
-    (
-        TRawStr::c4StrLen(pszInitData) * kCIDLib::c4CharBytes
-    );
-
-    // Use this to set the init alloc size. If zero, default it
-    m_c4Size = c4SrcSize;
-    if (!m_c4Size)
-    {
-        m_c4Size = tCIDLib::MinVal(CIDLib_SysMemBuf::c4DefMinSize, m_c4MaxSize);
-        if (!m_c4Size)
-            m_c4Size = CIDLib_SysMemBuf::c4DefMinSize;
-    }
-
-    //
-    //  If it's zero, then set it to the alloc size. Else, validate the sizes,
-    //  since we aren't defaulting them.
-    //
-    if (!m_c4MaxSize)
-        m_c4MaxSize = m_c4Size;
-    else
-        ValidateSizes(m_c4Size, m_c4MaxSize);
-
-    //
-    //  Create the buffer. Our initial size is big enough to hold the initial
-    //  string contents, so this is will do enough for now. If c4MaxSize is
-    //  bigger, it can grow later.
-    //
-    Create();
-
-    //
-    //  And copy in the text. Note that we use the source size here, not
-    //  our calculated initial alloc size.
-    //
-    TRawMem::CopyMemBuf(m_pc1Data, pszInitData, c4SrcSize);
 }
 
 

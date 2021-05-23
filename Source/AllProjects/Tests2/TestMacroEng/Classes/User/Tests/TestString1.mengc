@@ -187,8 +187,9 @@ Methods=[Public,Final]
             m_RetVal := -1;
         EndIf;
 
-        If (m_Test3.GetAlloc() != 1025)
-            m_Helper.PrintErr("The initial buffer allocation was wrong", m_Output, $CurLine);
+        // It could be somewhat more than requested
+        If (m_Test3.GetAlloc() < 1025)
+            m_Helper.PrintErr("The initial buffer allocation was < than requested", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;
 
@@ -805,7 +806,7 @@ Methods=[Public,Final]
 
         // Do a reallocation and get the allocation size again
         m_Test3.Reallocate(2048, False);
-        If (m_Test3.GetAlloc() != 2048)
+        If (m_Test3.GetAlloc() < 2048)
             m_Helper.PrintErr("Reallocation failed", m_Output, $CurLine);
             m_RetVal := -1;
         EndIf;

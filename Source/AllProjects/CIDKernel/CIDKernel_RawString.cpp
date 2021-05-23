@@ -58,7 +58,7 @@
 // ---------------------------------------------------------------------------
 namespace CIDKernel_RawString
 {
-    const tCIDLib::TCh achList[16] =
+    constexpr tCIDLib::TCh achList[16] =
     {
           L'0'  , L'1'  , L'2'  , L'3'  , L'4'  , L'5'  , L'6'  , L'7'
         , L'8'  , L'9'  , L'A'  , L'B'  , L'C'  , L'D'  , L'E'  , L'F'
@@ -90,7 +90,7 @@ tCIDLib::TBoolean bApplyGroupInfo(  const   tCIDLib::TCh* const pszInStr
                                     , const tCIDLib::TCard4     c4MaxChars
                                     , const tCIDLib::TCard4     c4GroupSize
                                     , const tCIDLib::TCh        chGroupSep
-                                    , const tCIDLib::TCh        chDecimal)
+                                    , const tCIDLib::TCh        chDecimal) noexcept
 {
     tCIDLib::TCard4 c4Len = TRawStr::c4StrLen(pszInStr);
     tCIDLib::TCard4 c4OutInd = 0;
@@ -154,7 +154,7 @@ static tCIDLib::TCard4
 c4FindChar( const   tCIDLib::TCh* const     pszToSearch
             , const tCIDLib::TCh            chToFind
             , const tCIDLib::TCard4         c4StartAt
-            , const tCIDLib::TBoolean       bCase)
+            , const tCIDLib::TBoolean       bCase) noexcept
 {
     // Assume no find
     tCIDLib::TCard4 c4Ret = kCIDLib::c4MaxCard;
@@ -188,7 +188,7 @@ static tCIDLib::TCard4
 c4FindChars(const  tCIDLib::TCh* const      pszToSearch
             , const tCIDLib::TCh* const     pszChars
             , const tCIDLib::TCard4         c4StartAt
-            , const tCIDLib::TBoolean       bCase)
+            , const tCIDLib::TBoolean       bCase) noexcept
 {
     tCIDLib::TCard4 c4Ret;
 
@@ -220,7 +220,7 @@ static tCIDLib::TCard4
 c4FindPrevChar( const  tCIDLib::TCh* const      pszToSearch
                 , const tCIDLib::TCh            chToFind
                 , const tCIDLib::TCard4         c4StartAt
-                , const tCIDLib::TBoolean       bCase)
+                , const tCIDLib::TBoolean       bCase) noexcept
 {
     tCIDLib::TCard4 c4Index = c4StartAt;
     tCIDLib::TBoolean   bDone = kCIDLib::False;
@@ -262,7 +262,7 @@ static tCIDLib::TCard4
 c4FindPrevChars(const   tCIDLib::TCh* const     pszToSearch
                 , const tCIDLib::TCh* const     pszChars
                 , const tCIDLib::TCard4         c4StartAt
-                , const tCIDLib::TBoolean       bCase)
+                , const tCIDLib::TBoolean       bCase) noexcept
 {
     //
     //  Loop backwards through the search string, starting at the start index.
@@ -298,7 +298,7 @@ static
 tCIDLib::TBoolean bCard4ToText( const   tCIDLib::TCard4     c4ToConvert
                                 ,       tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars
-                                , const tCIDLib::ERadices   eRadix)
+                                , const tCIDLib::ERadices   eRadix) noexcept
 {
     // If the buffer is empty, return an error
     if (!c4MaxChars)
@@ -409,7 +409,7 @@ static
 tCIDLib::TBoolean bCard8ToText( const   tCIDLib::TCard8&    c8ToConvert
                                 ,       tCIDLib::TCh* const pszToFill
                                 , const tCIDLib::TCard4     c4MaxChars
-                                , const tCIDLib::ERadices   eRadix)
+                                , const tCIDLib::ERadices   eRadix) noexcept
 {
     // If the buffer is empty, return an error
     if (!c4MaxChars)
@@ -690,7 +690,7 @@ static tCIDLib::TInt4 i4TextToCard4( const  tCIDLib::TCh* const pszSrcText
 static tCIDLib::TInt4 i4TextToCard8( const  tCIDLib::TCh* const pszSrcText
                                     , const tCIDLib::TCard4     c4Radix
                                     ,       tCIDLib::TCard8&    c8ToFill
-                                    ,       tCIDLib::TBoolean&  bNegative)
+                                    ,       tCIDLib::TBoolean&  bNegative) noexcept
 {
     // A temp local value to accumulate into
     tCIDLib::TCard8 c8Accum = 0;
@@ -845,8 +845,14 @@ TRawStr::bFormatStr(const   tCIDLib::TCh* const pszVal
                     ,       tCIDLib::TCh* const pszBuf
                     , const tCIDLib::TCard4     c4FldWidth
                     , const tCIDLib::TCh        chFill
-                    , const tCIDLib::EHJustify  eJustify)
+                    , const tCIDLib::EHJustify  eJustify) noexcept
 {
+    if (!pszVal || !pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     //
     //  If no field width is indicated, then just copy as much of the
     //  source string as possible.
@@ -867,7 +873,7 @@ TRawStr::bFormatStr(const   tCIDLib::TCh* const pszVal
     //  the field width, so go ahead and do that.
     //
     FillString(pszBuf, chFill, c4FldWidth);
-    pszBuf[c4FldWidth] = 0;
+    pszBuf[c4FldWidth] = kCIDLib::chNull;
 
     //
     //  If there is no text in the source buffer, then we have nothing to
@@ -946,8 +952,14 @@ TRawStr::bFormatVal(const   tCIDLib::TCard4     c4Val
                     , const tCIDLib::TCard4     c4MaxChars
                     , const tCIDLib::ERadices   eRadix
                     , const tCIDLib::TCard4     c4GroupSize
-                    , const tCIDLib::TCh        chGroupSep)
+                    , const tCIDLib::TCh        chGroupSep) noexcept
 {
+    if (!pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     // Watch for pathological case of zero sized buffer
     if (!c4MaxChars)
     {
@@ -1003,8 +1015,14 @@ TRawStr::bFormatVal(const   tCIDLib::TCard8&    c8Val
                     , const tCIDLib::TCard4     c4MaxChars
                     , const tCIDLib::ERadices   eRadix
                     , const tCIDLib::TCard4     c4GroupSize
-                    , const tCIDLib::TCh        chGroupSep)
+                    , const tCIDLib::TCh        chGroupSep) noexcept
 {
+    if (!pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     // Watch for pathological case of zero sized buffer
     if (!c4MaxChars)
     {
@@ -1061,8 +1079,14 @@ TRawStr::bFormatVal(const   tCIDLib::TInt4      i4Val
                     , const tCIDLib::ERadices   eRadix
                     , const tCIDLib::TCh        chNegSign
                     , const tCIDLib::TCard4     c4GroupSize
-                    , const tCIDLib::TCh        chGroupSep)
+                    , const tCIDLib::TCh        chGroupSep) noexcept
 {
+    if (!pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     // Watch for pathological case of zero sized buffer
     if (!c4MaxChars)
     {
@@ -1119,8 +1143,14 @@ TRawStr::bFormatVal(const   tCIDLib::TInt8&     i8Val
                     , const tCIDLib::ERadices   eRadix
                     , const tCIDLib::TCh        chNegSign
                     , const tCIDLib::TCard4     c4GroupSize
-                    , const tCIDLib::TCh        chGroupSep)
+                    , const tCIDLib::TCh        chGroupSep) noexcept
 {
+    if (!pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     // Watch for pathological case of zero sized buffer
     if (!c4MaxChars)
     {
@@ -1176,7 +1206,7 @@ TRawStr::bFormatVal(const   tCIDLib::TUInt      uVal
                     , const tCIDLib::TCard4     c4MaxChars
                     , const tCIDLib::ERadices   eRadix
                     , const tCIDLib::TCard4     c4GroupSize
-                    , const tCIDLib::TCh        chGroupSep)
+                    , const tCIDLib::TCh        chGroupSep) noexcept
 {
     // Just call the TCard4 version
     return bFormatVal
@@ -1200,8 +1230,14 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
                     , const tCIDLib::TCh            chNegSign
                     , const tCIDLib::TCh            chDecimal
                     , const tCIDLib::TCard4         c4GroupSize
-                    , const tCIDLib::TCh            chGroupSep)
+                    , const tCIDLib::TCh            chGroupSep) noexcept
 {
+    if (!pszBuf)
+    {
+        TKrnlError::SetLastKrnlError(kKrnlErrs::errcData_NullParm);
+        return kCIDLib::False;
+    }
+
     // Watch for pathological case of zero sized buffer
     if (!c4MaxChars)
     {
@@ -1240,7 +1276,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
 
         if (c4MaxChars == c4Ind)
         {
-            pszBuf[c4Ind++] = 0;
+            pszBuf[c4Ind++] = kCIDLib::chNull;
             return kCIDLib::True;
         }
 
@@ -1249,7 +1285,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
             pszBuf[c4Ind++] = chDecimal;
             if (c4MaxChars == c4Ind)
             {
-                pszBuf[c4Ind] = 0;
+                pszBuf[c4Ind] = kCIDLib::chNull;
                 return kCIDLib::True;
             }
 
@@ -1260,7 +1296,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
                 pszBuf[c4Ind++] = kCIDLib::chDigit0;
             }
         }
-        pszBuf[c4Ind] = 0;
+        pszBuf[c4Ind] = kCIDLib::chNull;
         return kCIDLib::True;
     }
 
@@ -1271,10 +1307,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
     //  trailing digits. We also then convert it to a wide char string.
     //
     tCIDLib::TSCh szRaw[512];
-    CIDStrOp_FmtFloat
-    (
-        szRaw, 512, f8Val, c4Precision + 2, &iDec, &iSign
-    );
+    CIDStrOp_FmtFloat(szRaw, 512, f8Val, c4Precision + 2, &iDec, &iSign);
     pszConvert(szRaw, szTmp, tCIDLib::c4MaxBufChars(szTmp));
 
     // Get the length of the string
@@ -1336,7 +1369,7 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
             }
             *pszCur++ = szTmp[c4Index];
         }
-        *pszCur = 0;
+        *pszCur = kCIDLib::chNull;
     }
 
     //
@@ -1437,56 +1470,56 @@ TRawStr::bFormatVal(const   tCIDLib::TFloat8&       f8Val
 
 
 
-tCIDLib::TBoolean TRawStr::bIsAlpha(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsAlpha(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsAlpha(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsAlphaNum(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsAlphaNum(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsAlphaNum(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsDigit(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsDigit(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsDigit(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsHexDigit(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsHexDigit(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsXDigit(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsPunct(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsPunct(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsPunct(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsLower(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsLower(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsLower(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsSpace(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsSpace(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsSpace(chToTest))
         return kCIDLib::True;
     return kCIDLib::False;
 }
 
-tCIDLib::TBoolean TRawStr::bIsUpper(const tCIDLib::TCh chToTest)
+tCIDLib::TBoolean TRawStr::bIsUpper(const tCIDLib::TCh chToTest) noexcept
 {
     if (CIDStrOp_IsUpper(chToTest))
         return kCIDLib::True;
@@ -1500,7 +1533,7 @@ tCIDLib::TBoolean TRawStr::bIsUpper(const tCIDLib::TCh chToTest)
 //
 tCIDLib::TBoolean TRawStr::bMakeHexByte(const   tCIDLib::TCh        ch1
                                         , const tCIDLib::TCh        ch2
-                                        ,       tCIDLib::TCard1&    c1ToFill)
+                                        ,       tCIDLib::TCard1&    c1ToFill) noexcept
 {
     if ((ch1 >= kCIDLib::chLatin_A) && (ch1 <= kCIDLib::chLatin_F))
         c1ToFill = tCIDLib::TCard1((ch1 - kCIDLib::chLatin_A) + 10);
@@ -1531,6 +1564,12 @@ TRawStr::c4AsBinary(const   tCIDLib::TCh* const pszToConvert
                     , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
+    if (!pszToConvert)
+    {
+        bValid = kCIDLib::False;
+        return 0;
+    }
+
     tCIDLib::TCard4     c4Ret = 0;
     tCIDLib::TBoolean   bNeg;
     bValid = (i4TextToCard4(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c4Ret, bNeg) == -1);
@@ -1540,7 +1579,7 @@ TRawStr::c4AsBinary(const   tCIDLib::TCh* const pszToConvert
 }
 
 
-tCIDLib::TCard4 TRawStr::c4ToHex(const tCIDLib::TCh ch1)
+tCIDLib::TCard4 TRawStr::c4ToHex(const tCIDLib::TCh ch1) noexcept
 {
     tCIDLib::TCard4 c4Ret = 0;
     if ((ch1 >= kCIDLib::chLatin_A) && (ch1 <= kCIDLib::chLatin_F))
@@ -1558,6 +1597,12 @@ TRawStr::c8AsBinary(const   tCIDLib::TCh* const pszToConvert
                     , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
+    if (!pszToConvert)
+    {
+        bValid = kCIDLib::False;
+        return 0;
+    }
+
     tCIDLib::TCard8     c8Ret = 0;
     tCIDLib::TBoolean   bNeg;
     bValid = (i4TextToCard8(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c8Ret, bNeg) == -1);
@@ -1581,10 +1626,10 @@ tCIDLib::TCh TRawStr::chUpper(const tCIDLib::TCh chToUpper) noexcept
 
 tCIDLib::TVoid TRawStr::CatStr(         tCIDLib::TCh* const pszTarget
                                 , const tCIDLib::TCh* const pszSrc
-                                , const tCIDLib::TCard4     c4MaxChars)
+                                , const tCIDLib::TCard4     c4MaxChars) noexcept
 {
-    // Watch for null source and do nothing
-    if (!pszSrc)
+    // Can't do anything in this case
+    if (!pszSrc || !pszTarget)
         return;
 
     // Get the current length of the target
@@ -1633,8 +1678,12 @@ tCIDLib::TVoid
 TRawStr::CopyCatStr(        tCIDLib::TCh* const     pszTarget
                     , const tCIDLib::TCard4         c4MaxChars
                     , const tCIDLib::TCh* const     pszCopy
-                    , const tCIDLib::TCh* const     pszCat)
+                    , const tCIDLib::TCh* const     pszCat) noexcept
 {
+    // Can't do anything if not target. Null sources will be ignored below
+    if (!pszTarget)
+        return;
+
     // Empty the target regardless of what happens
     pszTarget[0] = kCIDLib::chNull;
 
@@ -1647,8 +1696,12 @@ TRawStr::CopyCatStr(        tCIDLib::TCh* const     pszTarget
                     , const tCIDLib::TCard4         c4MaxChars
                     , const tCIDLib::TCh* const     pszCopy
                     , const tCIDLib::TCh* const     pszCat1
-                    , const tCIDLib::TCh* const     pszCat2)
+                    , const tCIDLib::TCh* const     pszCat2) noexcept
 {
+    // Can't do anything if not target. Null sources will be ignored below
+    if (!pszTarget)
+        return;
+
     // Empty the target regardless of what happens
     pszTarget[0] = kCIDLib::chNull;
 
@@ -1663,8 +1716,12 @@ TRawStr::CopyCatStr(        tCIDLib::TCh* const     pszTarget
                     , const tCIDLib::TCh* const     pszCopy
                     , const tCIDLib::TCh* const     pszCat1
                     , const tCIDLib::TCh* const     pszCat2
-                    , const tCIDLib::TCh* const     pszCat3)
+                    , const tCIDLib::TCh* const     pszCat3) noexcept
 {
+    // Can't do anything if not target. Null sources will be ignored below
+    if (!pszTarget)
+        return;
+
     // Empty the target regardless of what happens
     pszTarget[0] = kCIDLib::chNull;
 
@@ -1678,12 +1735,15 @@ TRawStr::CopyCatStr(        tCIDLib::TCh* const     pszTarget
 tCIDLib::TVoid
 TRawStr::CopyStr(           tCIDLib::TSCh* const    pszTarget
                     , const tCIDLib::TSCh* const    pszSrc
-                    , const tCIDLib::TCard4         c4MaxChars)
+                    , const tCIDLib::TCard4         c4MaxChars) noexcept
 {
+    if (!pszTarget)
+        return;
+
     // If a nul source, then obviously nothing to do
     if (!pszSrc)
     {
-        *pszTarget = 0;
+        *pszTarget = kCIDLib::chNull;
         return;
     }
 
@@ -1709,14 +1769,18 @@ TRawStr::CopyStr(           tCIDLib::TSCh* const    pszTarget
     }
 
     // Cap it off
-    *pszT = 0;
+    *pszT = kCIDLib::chNull;
 }
 
 tCIDLib::TVoid
 TRawStr::CopyStr(           tCIDLib::TCh* const pszTarget
                     , const tCIDLib::TCh* const pszSrc
-                    , const tCIDLib::TCard4     c4MaxChars)
+                    , const tCIDLib::TCard4     c4MaxChars) noexcept
 {
+    // If a null target, we can't do anything
+    if (!pszTarget)
+        return;
+
     // If a nul source, then obviously nothing to do
     if (!pszSrc)
     {
@@ -1925,6 +1989,17 @@ tCIDLib::ESortComps
 TRawStr::eCompareStr(   const   tCIDLib::TSCh* const pszStr1
                         , const tCIDLib::TSCh* const pszStr2) noexcept
 {
+    // Deal with possible nulls
+    const tCIDLib::TBoolean bNull1 = pszStr1 == nullptr;
+    const tCIDLib::TBoolean bNull2 = pszStr2 == nullptr;
+    if (bNull1 && bNull2)
+        return tCIDLib::ESortComps::Equal;
+
+    if (bNull1 && !bNull2)
+        return tCIDLib::ESortComps::FirstLess;
+    else if (!bNull1 && bNull2)
+        return tCIDLib::ESortComps::FirstGreater;
+
     const tCIDLib::TCard1* pc1Cur1 = reinterpret_cast<const tCIDLib::TCard1*>(pszStr1);
     const tCIDLib::TCard1* pc1Cur2 = reinterpret_cast<const tCIDLib::TCard1*>(pszStr2);
     tCIDLib::TSInt iRes = 0;
@@ -2009,6 +2084,12 @@ tCIDLib::TFloat8
 TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
                     ,       tCIDLib::TBoolean&  bValid) noexcept
 {
+    if (!pszToConvert)
+    {
+        bValid = kCIDLib::False;
+        return 0;
+    }
+
     // Try to convert it
     tCIDLib::TCh* pszEnd;
     tCIDLib::TFloat8 f8Ret = CIDStrOp_CnvtFloat(pszToConvert, &pszEnd);
@@ -2030,7 +2111,7 @@ TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
             if (!bIsSpace(*pszEnd))
             {
                 bValid = kCIDLib::False;
-                return 0.0;
+                return 0;
             }
             pszEnd++;
         }
@@ -2044,13 +2125,15 @@ TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
 tCIDLib::TVoid
 TRawStr::FillString(        tCIDLib::TCh* const pszBuf
                     , const tCIDLib::TCh        chFill
-                    , const tCIDLib::TCard4     c4Count)
+                    , const tCIDLib::TCard4     c4Count) noexcept
 {
-
-    tCIDLib::TCh* pchBuf = pszBuf;
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-        *pchBuf++ = chFill;
-    pszBuf[c4Count] = kCIDLib::chNull;
+    if (pszBuf)
+    {
+        tCIDLib::TCh* pchBuf = pszBuf;
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
+            *pchBuf++ = chFill;
+        pszBuf[c4Count] = kCIDLib::chNull;
+    }
 }
 
 
@@ -2061,12 +2144,16 @@ TRawStr::FillString(        tCIDLib::TCh* const pszBuf
 //
 tCIDLib::THashVal
 TRawStr::hshHashStr(const   tCIDLib::TCh* const pszSrc
-                    , const tCIDLib::TCard4     c4Modulus)
+                    , const tCIDLib::TCard4     c4Modulus) noexcept
 {
-    static const tCIDLib::TCard1 ac1FirstByteMark[7] =
+    constexpr tCIDLib::TCard1 ac1FirstByteMark[7] =
     {
         0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
     };
+
+    // We just return zero for a null string
+    if (!pszSrc)
+        return 0;
 
     // Start the value off as zero
     tCIDLib::TCard4 c4Ret = 0;
@@ -2155,6 +2242,12 @@ TRawStr::i4AsBinary(const   tCIDLib::TCh* const pszToConvert
                     ,       tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
+    if (!pszToConvert)
+    {
+        bValid = kCIDLib::False;
+        return 0;
+    }
+
     tCIDLib::TBoolean   bNeg;
     tCIDLib::TCard4     c4Ret = 0;
     bValid = (i4TextToCard4(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c4Ret, bNeg) == -1);
@@ -2179,6 +2272,12 @@ TRawStr::i8AsBinary(const   tCIDLib::TCh* const pszToConvert
                     ,       tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
+    if (!pszToConvert)
+    {
+        bValid = kCIDLib::False;
+        return 0;
+    }
+
     tCIDLib::TBoolean   bNeg;
     tCIDLib::TCard8     c8Ret = 0;
     bValid = (i4TextToCard8(pszToConvert, tCIDLib::c4EnumOrd(eRadix), c8Ret, bNeg) == -1);
@@ -2209,7 +2308,7 @@ TRawStr::i8AsBinary(const   tCIDLib::TCh* const pszToConvert
 tCIDLib::TCh*
 TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
                     ,       tCIDLib::TCh*           pszTarget
-                    , const tCIDLib::TCard4         c4MaxChars)
+                    , const tCIDLib::TCard4         c4MaxChars) noexcept
 {
     if (!pszTarget)
         return nullptr;
@@ -2225,7 +2324,7 @@ TRawStr::pszConvert(const   tCIDLib::TSCh* const    pszToConvert
     return pszTarget;
 }
 
-tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
+tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert) noexcept
 {
     tCIDLib::TCh* pszNew = nullptr;
     tCIDLib::TCard4 c4NeededChars = 0;
@@ -2274,7 +2373,7 @@ tCIDLib::TCh* TRawStr::pszConvert(const tCIDLib::TSCh* const pszToConvert)
 tCIDLib::TSCh*
 TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
                     ,       tCIDLib::TSCh*          pszTarget
-                    , const tCIDLib::TCard4         c4MaxChars)
+                    , const tCIDLib::TCard4         c4MaxChars) noexcept
 {
     if (!pszTarget)
         return nullptr;
@@ -2284,12 +2383,12 @@ TRawStr::pszConvert(const   tCIDLib::TCh* const     pszToConvert
     {
         tCIDLib::TCard4 c4OutBytes = tCIDLib::TCard4(-1);
         if (!CIDStrOp_WCToMB(pszTarget, c4MaxChars, pszToConvert, c4OutBytes))
-            pszTarget[0] = 0;
+            pszTarget[0] = kCIDLib::chNull;
     }
     return pszTarget;
 }
 
-tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
+tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert) noexcept
 {
     tCIDLib::TSCh* pszNew = nullptr;
     tCIDLib::TCard4 c4NeededBytes = 0;
@@ -2320,7 +2419,7 @@ tCIDLib::TSCh* TRawStr::pszConvert(const tCIDLib::TCh* const pszToConvert)
     // If we didn't get it, create an empty one. If we did, terminate it
     if (pszNew)
     {
-        pszNew[c4NeededBytes] = 0;
+        pszNew[c4NeededBytes] = kCIDLib::chNull;
     }
      else
     {
@@ -2339,8 +2438,11 @@ tCIDLib::TCh*
 TRawStr::pszFindChar(       tCIDLib::TCh* const     pszToSearch
                     , const tCIDLib::TCh            chToFind
                     , const tCIDLib::TCard4         c4StartAt
-                    , const tCIDLib::TBoolean       bCase)
+                    , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4At = ::c4FindChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
@@ -2351,8 +2453,11 @@ const tCIDLib::TCh*
 TRawStr::pszFindChar(const  tCIDLib::TCh* const     pszToSearch
                     , const tCIDLib::TCh            chToFind
                     , const tCIDLib::TCard4         c4StartAt
-                    , const tCIDLib::TBoolean       bCase)
+                    , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4At = ::c4FindChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
@@ -2368,8 +2473,11 @@ tCIDLib::TCh*
 TRawStr::pszFindChars(          tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszChars
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4At = ::c4FindChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
@@ -2380,8 +2488,11 @@ const tCIDLib::TCh*
 TRawStr::pszFindChars(  const   tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszChars
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4At = ::c4FindChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
@@ -2393,8 +2504,11 @@ TRawStr::pszFindChars(  const   tCIDLib::TCh* const     pszToSearch
 tCIDLib::TCh*
 TRawStr::pszFindLastChar(       tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh            chToFind
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4Len = c4StrLen(pszToSearch);
     if (!c4Len)
         return nullptr;
@@ -2410,8 +2524,11 @@ TRawStr::pszFindLastChar(       tCIDLib::TCh* const     pszToSearch
 const tCIDLib::TCh*
 TRawStr::pszFindLastChar(   const   tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh            chToFind
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4Len = c4StrLen(pszToSearch);
     if (!c4Len)
         return nullptr;
@@ -2429,8 +2546,11 @@ TRawStr::pszFindLastChar(   const   tCIDLib::TCh* const     pszToSearch
 tCIDLib::TCh*
 TRawStr::pszFindLastChars(          tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4Len = c4StrLen(pszToSearch);
     if (!c4Len)
         return nullptr;
@@ -2446,8 +2566,11 @@ TRawStr::pszFindLastChars(          tCIDLib::TCh* const     pszToSearch
 const tCIDLib::TCh*
 TRawStr::pszFindLastChars(  const   tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
+    if (!pszToSearch)
+        return nullptr;
+
     const tCIDLib::TCard4 c4Len = c4StrLen(pszToSearch);
     if (!c4Len)
         return nullptr;
@@ -2466,12 +2589,12 @@ tCIDLib::TCh*
 TRawStr::pszFindPrevChar(       tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh            chToFind
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
-    const tCIDLib::TCard4 c4At = ::c4FindPrevChar
-    (
-        pszToSearch, chToFind, c4StartAt, bCase
-    );
+    if (!pszToSearch)
+        return nullptr;
+
+    const tCIDLib::TCard4 c4At = ::c4FindPrevChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
     return &pszToSearch[c4At];
@@ -2481,12 +2604,12 @@ const tCIDLib::TCh*
 TRawStr::pszFindPrevChar(const  tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh            chToFind
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
-    const tCIDLib::TCard4 c4At = ::c4FindPrevChar
-    (
-        pszToSearch, chToFind, c4StartAt, bCase
-    );
+    if (!pszToSearch)
+        return nullptr;
+
+    const tCIDLib::TCard4 c4At = ::c4FindPrevChar(pszToSearch, chToFind, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
     return &pszToSearch[c4At];
@@ -2498,12 +2621,12 @@ tCIDLib::TCh*
 TRawStr::pszFindPrevChars(          tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
                             , const tCIDLib::TCard4         c4StartAt
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
-    const tCIDLib::TCard4 c4At = ::c4FindPrevChars
-    (
-        pszToSearch, pszChars, c4StartAt, bCase
-    );
+    if (!pszToSearch)
+        return nullptr;
+
+    const tCIDLib::TCard4 c4At = ::c4FindPrevChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
     return &pszToSearch[c4At];
@@ -2513,12 +2636,12 @@ const tCIDLib::TCh*
 TRawStr::pszFindPrevChars(  const   tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszChars
                             , const tCIDLib::TCard4         c4StartAt
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
-    const tCIDLib::TCard4 c4At = ::c4FindPrevChars
-    (
-        pszToSearch, pszChars, c4StartAt, bCase
-    );
+    if (!pszToSearch)
+        return nullptr;
+
+    const tCIDLib::TCard4 c4At = ::c4FindPrevChars(pszToSearch, pszChars, c4StartAt, bCase);
     if (c4At == kCIDLib::c4MaxCard)
         return nullptr;
     return &pszToSearch[c4At];
@@ -2530,7 +2653,7 @@ tCIDLib::TCh*
 TRawStr::pszFindPrevSubStr(         tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszSubStr
                             , const tCIDLib::TCard4         c4StartAt
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
     //
     //  To avoid alot of duplicated code, we call the const version and
@@ -2539,13 +2662,7 @@ TRawStr::pszFindPrevSubStr(         tCIDLib::TCh* const     pszToSearch
     //
     return const_cast<tCIDLib::TCh*>
     (
-        pszFindPrevSubStr
-        (
-            static_cast<const tCIDLib::TCh*>(pszToSearch)
-            , pszSubStr
-            , c4StartAt
-            , bCase
-        )
+        pszFindPrevSubStr(static_cast<const tCIDLib::TCh*>(pszToSearch), pszSubStr, c4StartAt, bCase)
     );
 }
 
@@ -2553,11 +2670,11 @@ const tCIDLib::TCh*
 TRawStr::pszFindPrevSubStr( const   tCIDLib::TCh* const     pszToSearch
                             , const tCIDLib::TCh* const     pszSubStr
                             , const tCIDLib::TCard4         c4StartAt
-                            , const tCIDLib::TBoolean       bCase)
+                            , const tCIDLib::TBoolean       bCase) noexcept
 {
     // If either string is null, then nothing to do
     if (!pszToSearch || !pszSubStr)
-        return 0;
+        return nullptr;
 
     // Get the length of the string to search and the substring
     const tCIDLib::TCard4 c4SearchLen = c4StrLen(pszToSearch);
@@ -2565,11 +2682,11 @@ TRawStr::pszFindPrevSubStr( const   tCIDLib::TCh* const     pszToSearch
 
     // If either length is zero, then nothing to do
     if (!c4SearchLen || !c4SubLen)
-        return 0;
+        return nullptr;
 
     // If the sub length is greater than the search length, then done
     if (c4SubLen > c4SearchLen)
-        return 0;
+        return nullptr;
 
     //
     //  If the substring is only one char long, then just call the single
@@ -2663,7 +2780,7 @@ tCIDLib::TCh*
 TRawStr::pszFindSubStr(         tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszSubStr
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
     //
     //  To avoid alot of duplicated code, we call the const version and
@@ -2686,7 +2803,7 @@ const tCIDLib::TCh*
 TRawStr::pszFindSubStr( const   tCIDLib::TCh* const     pszToSearch
                         , const tCIDLib::TCh* const     pszSubStr
                         , const tCIDLib::TCard4         c4StartAt
-                        , const tCIDLib::TBoolean       bCase)
+                        , const tCIDLib::TBoolean       bCase) noexcept
 {
     // If either string is null, then nothing to do
     if (!pszToSearch || !pszSubStr)
@@ -2809,11 +2926,14 @@ TRawStr::pszFindSubStr( const   tCIDLib::TCh* const     pszToSearch
 // We implement this in terms of the platform specific chLower()
 tCIDLib::TCh* TRawStr::pszLowerCase(tCIDLib::TCh* pszToLower) noexcept
 {
-    tCIDLib::TCh* pszCur = pszToLower;
-    while (*pszCur)
+    if (pszToLower)
     {
-        *pszCur = chLower(*pszCur);
-        pszCur++;
+        tCIDLib::TCh* pszCur = pszToLower;
+        while (*pszCur)
+        {
+            *pszCur = chLower(*pszCur);
+            pszCur++;
+        }
     }
     return pszToLower;
 }
@@ -2823,19 +2943,25 @@ tCIDLib::TCh* TRawStr::pszLowerCase(tCIDLib::TCh* pszToLower) noexcept
 tCIDLib::TCh*
 TRawStr::pszStrTokenize(        tCIDLib::TCh* const pszSource
                         , const tCIDLib::TCh* const pszWhitespace
-                        ,       tCIDLib::TCh**      pszContext)
+                        ,       tCIDLib::TCh**      pszContext) noexcept
 {
+    if (!pszSource || !pszWhitespace)
+        return nullptr;
+
     return CIDStrOp_StrTok(pszSource, pszWhitespace, pszContext);
 }
 
 // We implement this in terms of the platform specific chUpper()
 tCIDLib::TCh* TRawStr::pszUpperCase(tCIDLib::TCh* pszToUpper) noexcept
 {
-    tCIDLib::TCh* pszCur = pszToUpper;
-    while (*pszCur)
+    if (pszToUpper)
     {
-        *pszCur = chUpper(*pszCur);
-        pszCur++;
+        tCIDLib::TCh* pszCur = pszToUpper;
+        while (*pszCur)
+        {
+            *pszCur = chUpper(*pszCur);
+            pszCur++;
+        }
     }
     return pszToUpper;
 }
@@ -2856,7 +2982,7 @@ tCIDLib::TVoid
 TRawStr::StripStr(          tCIDLib::TCh* const     pszStripBuf
                     , const tCIDLib::TCh* const     pszStripChars
                     , const tCIDLib::EStripModes    eMode
-                    , const tCIDLib::TCh            chRepChar)
+                    , const tCIDLib::TCh            chRepChar) noexcept
 {
     // If the string is already empty, then do nothing
     if (!(*pszStripBuf) || !(*pszStripChars))

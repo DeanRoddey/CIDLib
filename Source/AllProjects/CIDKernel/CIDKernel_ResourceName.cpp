@@ -140,13 +140,13 @@ tCIDLib::TBoolean TKrnlRscName::operator==(const TKrnlRscName& krscnSrc) const
     //  Then compare in the order that they are most likely to differ. We use the safe
     //  compare since either side could be null.
     //
-    if (!TRawStr::bCompareStrSafe(m_pszResource, krscnSrc.m_pszResource))
+    if (!TRawStr::bCompareStr(m_pszResource, krscnSrc.m_pszResource))
         return kCIDLib::False;
 
-    if (!TRawStr::bCompareStrSafe(m_pszSubsystem, krscnSrc.m_pszSubsystem))
+    if (!TRawStr::bCompareStr(m_pszSubsystem, krscnSrc.m_pszSubsystem))
         return kCIDLib::False;
 
-    if (!TRawStr::bCompareStrSafe(m_pszCompany, krscnSrc.m_pszCompany))
+    if (!TRawStr::bCompareStr(m_pszCompany, krscnSrc.m_pszCompany))
         return kCIDLib::False;
 
     return kCIDLib::True;

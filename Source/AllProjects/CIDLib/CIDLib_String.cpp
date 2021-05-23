@@ -74,6 +74,27 @@ namespace CIDLib_String
 //  TString: Public, static methods
 // ---------------------------------------------------------------------------
 
+// These have to be out of line because bCompare takes a string view and it's after our header
+tCIDLib::TBoolean TString::bComp(const TString& str1, const TString& str2) noexcept
+{
+    return str1.bCompare(str2);
+}
+
+tCIDLib::TBoolean TString::bCompI(const TString& str1, const TString& str2)  noexcept
+{
+    return str1.bCompareI(str2);
+}
+
+tCIDLib::ESortComps TString::eComp(const TString& str1, const TString& str2) noexcept
+{
+    return str1.eCompare(str2);
+}
+
+tCIDLib::ESortComps TString::eCompI(const TString& str1, const TString& str2) noexcept
+{
+    return str1.eCompareI(str2);
+}
+
 //
 //  We have various scenarios where we need to find a given token, find all the tokens
 //  or find the tokens and text that goes between them. This function provides the core
@@ -594,72 +615,36 @@ template CIDLIBEXP TString TString::strConcat(const tCIDLib::TCh&, const tCIDLib
 
 TString::TString(const tCIDLib::TCard4 c4BufSize) :
 
-    m_c4BufChars(c4BufSize)
+    m_strbData(c4BufSize)
 {
-    // Catch psycho scenario and bump it back to 1
-    if (!m_c4BufChars)
-        m_c4BufChars = 1;
-
-    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 TString::TString(const tCIDLib::TCh chInit) :
 
-    m_c4BufChars(1)
-    , m_c4CurEnd(1)
-    , m_pszBuffer(nullptr)
+    m_strbData(1UL)
 {
-    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-    m_pszBuffer[0] = chInit;
-    m_pszBuffer[1] = kCIDLib::chNull;
+    tCIDLib::TCh achTmp[2];
+    achTmp[0] = chInit;
+    achTmp[1] = kCIDLib::chNull;
+    m_strbData.Append(achTmp, 2);
 }
 
 TString::TString(const TStringView& strvSrc, const tCIDLib::TCard4 c4ExtraChars) :
 
-    m_c4BufChars(strvSrc.c4Length() + c4ExtraChars)
-    , m_c4CurEnd(strvSrc.c4Length())
-    , m_pszBuffer(nullptr)
+    m_strbData(strvSrc.pszBuffer(), strvSrc.c4Length(), c4ExtraChars)
 {
-    m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-    if (m_c4CurEnd)
-        TRawMem::CopyMemBuf(m_pszBuffer, strvSrc.pszBuffer(), m_c4CurEnd * kCIDLib::c4CharBytes);
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
-TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt)
-{
-    if (!pszToAdopt)
-    {
-        // Be tolerant of a null pointer and set us to the null string value
-        Set(kCIDLib::pszNullStr);
-    }
-     else
-    {
-        m_c4CurEnd = TRawStr::c4StrLen(pszToAdopt);
-        m_c4BufChars = m_c4CurEnd;
+TString::TString(tCIDLib::TCh* pszToAdopt, const tCIDLib::EAdoptOpts eAdopt) :
 
-        if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
-            m_pszBuffer = pszToAdopt;
-        else
-            m_pszBuffer = TRawStr::pszReplicate(pszToAdopt);
-    }
+    m_strbData(pszToAdopt, eAdopt)
+{
 }
 
-TString::TString(const tCIDLib::TCh* pszInit, const tCIDLib::TCard4 c4ExtraChars)
-{
-    Set(pszInit, c4ExtraChars);
-}
+TString::TString(const tCIDLib::TErrCode midToLoad, const TFacility& facSrc) :
 
-TString::TString(const  TString& strInit, const tCIDLib::TCard4 c4ExtraChars)
+    m_strbData(facSrc.pszLoadCIDMsg(midToLoad), 0, 64)
 {
-    Set(strInit, c4ExtraChars);
-}
-
-
-TString::TString(const tCIDLib::TErrCode midToLoad, const TFacility& facSrc)
-{
-    Set(facSrc.pszLoadCIDMsg(midToLoad), 64);
 }
 
 TString::TString(const  tCIDLib::TMsgId     midToLoad
@@ -667,7 +652,9 @@ TString::TString(const  tCIDLib::TMsgId     midToLoad
                 , const MFormattable&       fmtblToken1
                 , const MFormattable&       fmtblToken2
                 , const MFormattable&       fmtblToken3
-                , const MFormattable&       fmtblToken4)
+                , const MFormattable&       fmtblToken4) :
+
+    m_strbData(0UL)
 {
     tCIDLib::TBoolean bLoaded;
     const tCIDLib::TCh* pszMsg = facSrc.pszLoadCIDMsg(midToLoad, bLoaded);
@@ -690,14 +677,18 @@ TString::TString(const  tCIDLib::TMsgId     midToLoad
     }
 }
 
-TString::TString(const  MFormattable& fmtblInitValue, const TStreamFmt& strmfToUse)
+TString::TString(const  MFormattable& fmtblInitValue, const TStreamFmt& strmfToUse) :
+
+    m_strbData(0UL)
 {
     TTextStringOutStream strmTmp(1024UL, strmfToUse);
     strmTmp << fmtblInitValue << kCIDLib::FlushIt;
     Set(strmTmp.strData());
 }
 
-TString::TString(const MFormattable& fmtblInitValue)
+TString::TString(const MFormattable& fmtblInitValue) :
+
+    m_strbData(0UL)
 {
     TTextStringOutStream strmTmp(1024UL);
     strmTmp << fmtblInitValue << kCIDLib::FlushIt;
@@ -711,10 +702,10 @@ TString::TString(const  TString&        strPattern
                 , const MFormattable&   fmtblToken1
                 , const MFormattable&   fmtblToken2
                 , const MFormattable&   fmtblToken3
-                , const MFormattable&   fmtblToken4)
-{
-    Set(strPattern, 64);
+                , const MFormattable&   fmtblToken4) :
 
+    m_strbData(strPattern.pszBuffer(), strPattern.c4Length(), 64)
+{
     // Handle the token replacement
     if (!MFormattable::bIsNullObject(fmtblToken1))
         eReplaceToken(fmtblToken1, L'1');
@@ -730,10 +721,10 @@ TString::TString(const  tCIDLib::TCh* const pszPattern
                 , const MFormattable&       fmtblToken1
                 , const MFormattable&       fmtblToken2
                 , const MFormattable&       fmtblToken3
-                , const MFormattable&       fmtblToken4)
-{
-    Set(pszPattern);
+                , const MFormattable&       fmtblToken4) :
 
+    m_strbData(pszPattern, 0, 64)
+{
     // Handle the token replacement
     if (!MFormattable::bIsNullObject(fmtblToken1))
         eReplaceToken(fmtblToken1, L'1');
@@ -747,171 +738,56 @@ TString::TString(const  tCIDLib::TCh* const pszPattern
 
 
 // Convert a short character string
-TString::TString(const tCIDLib::TSCh* const pszInit)
+TString::TString(const tCIDLib::TSCh* const pszInit) :
+
+    m_strbData(0UL)
 {
-    //
-    //  Check for a null initial value. If it is, then set it to the special
-    //  null string. Otherwise, convert the init string to internal format and
-    //  make the new copy the buffer.
-    //
-    if (!pszInit)
-        Set(kCIDLib::pszNullStr);
-    else
+    if (pszInit)
         SetFromShort(pszInit);
-}
-
-TString::TString(const TString& strSrc)
-{
-    Set(strSrc);
-}
-
-// We swap out an null string to the source
-TString::TString(TString&& strSrc)
-{
-    *this = tCIDLib::ForceMove(strSrc);
-}
-
-// We just steal the kernel string's buffer
-TString::TString(TKrnlString&& kstrSrc)
-{
-    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4CurEnd, m_c4BufChars);
-}
-
-TString::TString(const TKrnlString& kstrSrc) :
-
-    m_c4BufChars(kstrSrc.c4BufSize())
-    , m_c4CurEnd(kstrSrc.c4Length())
-    , m_pszBuffer(kstrSrc.pszReplicate())
-{
-}
-
-TString::~TString()
-{
-    // If we allocated our buffer, clean it up
-    if (m_pszBuffer)
-        delete [] m_pszBuffer;
 }
 
 
 // ---------------------------------------------------------------------------
 //  TString: Public operators
 // ---------------------------------------------------------------------------
-TString& TString::operator=(const tCIDLib::TCh* const pszSrc)
-{
-    Set(pszSrc);
-    return *this;
-}
-
-TString& TString::operator=(const TString& strSrc)
-{
-    if (this != &strSrc)
-        Set(strSrc);
-    return *this;
-}
-
-TString& TString::operator=(const TStringView& strvSrc)
-{
-    if (m_c4BufChars < strvSrc.c4Length())
-    {
-        delete m_pszBuffer;
-        m_pszBuffer = new tCIDLib::TCh[strvSrc.c4Length() + 1];
-    }
-
-    m_c4BufChars = strvSrc.c4Length();
-    m_c4CurEnd = strvSrc.c4Length();
-    TRawMem::CopyMemBuf(m_pszBuffer, strvSrc.pszBuffer(), m_c4BufChars);
-    m_pszBuffer[m_c4BufChars] = kCIDLib::chNull;
-
-    return *this;
-}
-
-TString& TString::operator=(TString&& strSrc)
-{
-    if (this != &strSrc)
-    {
-        tCIDLib::Swap(m_c4CurEnd, strSrc.m_c4CurEnd);
-        tCIDLib::Swap(m_c4BufChars, strSrc.m_c4BufChars);
-        tCIDLib::Swap(m_pszBuffer, strSrc.m_pszBuffer);
-    }
-    return *this;
-}
-
-
-// We just steal the kernel string's buffer
-TString& TString::operator=(TKrnlString&& kstrSrc)
-{
-    delete [] m_pszBuffer;
-    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4CurEnd, m_c4BufChars);
-    return *this;
-}
-
-
 tCIDLib::TBoolean TString::operator==(const TString& strSrc) const noexcept
 {
     if (this == &strSrc)
         return kCIDLib::True;
 
     // Can't be equal if not the same length
-    if (m_c4CurEnd != strSrc.m_c4CurEnd)
+    if (m_strbData.c4CurEnd() != strSrc.m_strbData.c4CurEnd())
         return kCIDLib::False;
 
-    // We know the lengths, so just do a memory compare now
+    // We know the lengths are equal, so just do a memory compare now
     const tCIDLib::ESortComps eRes = TRawMem::eCompareMemBuf
     (
-        pszBuffer(), strSrc.pszBuffer(), m_c4CurEnd * kCIDLib::c4CharBytes
+        m_strbData.pszBuffer(), strSrc.m_strbData.pszBuffer(), strSrc.m_strbData.c4CurEnd() * kCIDLib::c4CharBytes
     );
     return (eRes == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean
-TString::operator==(const tCIDLib::TCh* const pszSrc) const noexcept
+tCIDLib::TBoolean TString::operator==(const TStringView& strvSrc) const noexcept
 {
-    return (TRawStr::eCompareStr(pszBuffer(), pszSrc) == tCIDLib::ESortComps::Equal);
+    //
+    //  If we already have the length, use it. Else it's not worth getting the length,
+    //  since it's a raw string (that the length hasn't been gotten on yet) and we'd
+    //  likely end up having to scan it once for the length and then again for the
+    //  comparison. We can lose either way, but this is probabyl the safer bet most of the
+    //  time.
+    //
+    if (strvSrc.bHaveLength() && (strvSrc.c4Length() != c4Length()))
+        return kCIDLib::False;
+    return (TRawStr::eCompareStr(pszBuffer(), strvSrc.pszBuffer()) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean TString::operator!=(const TString& strSrc) const noexcept
-{
-    return !operator==(strSrc);
-}
-
-tCIDLib::TBoolean TString::operator!=(const tCIDLib::TCh* const pszSrc) const noexcept
-{
-    return !operator==(pszSrc);
-}
-
-tCIDLib::TBoolean TString::operator!=(const tCIDLib::TSCh* const pszSrc) const noexcept
-{
-    return !operator==(pszSrc);
-}
-
-tCIDLib::TCh TString::operator[](const tCIDLib::TCard4 c4Ind) const
-{
-    return chAt(c4Ind);
-}
-
-
-tCIDLib::TBoolean
-TString::operator==(const tCIDLib::TSCh* const pszSrc) const noexcept
+tCIDLib::TBoolean TString::operator==(const tCIDLib::TSCh* const pszSrc) const noexcept
 {
     // Convert the short string so we can compare it
     tCIDLib::TCh* pszConverted = TRawStr::pszConvert(pszSrc);
     TArrayJanitor<tCIDLib::TCh> janConverted(pszConverted);
     return (TRawStr::eCompareStr(pszBuffer(), pszConverted) == tCIDLib::ESortComps::Equal);
 }
-
-
-tCIDLib::TBoolean TString::operator<=(const TString& strSrc) const noexcept
-{
-    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer());
-    return (eComp != tCIDLib::ESortComps::FirstGreater);
-}
-
-tCIDLib::TBoolean TString::operator>=(const TString& strSrc) const noexcept
-{
-    const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer());
-    return (eComp != tCIDLib::ESortComps::FirstLess);
-}
-
 
 tCIDLib::TBoolean TString::operator<=(const tCIDLib::TCh* const pszSrc) const noexcept
 {
@@ -923,17 +799,6 @@ tCIDLib::TBoolean TString::operator>=(const tCIDLib::TCh* const pszSrc) const no
 {
     const tCIDLib::ESortComps eComp = TRawStr::eCompareStr(pszBuffer(), pszSrc);
     return (eComp != tCIDLib::ESortComps::FirstLess);
-}
-
-
-tCIDLib::TBoolean TString::operator<(const TString& strSrc) const noexcept
-{
-    return TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer()) == tCIDLib::ESortComps::FirstLess;
-}
-
-tCIDLib::TBoolean TString::operator>(const TString& strSrc) const noexcept
-{
-    return TRawStr::eCompareStr(pszBuffer(), strSrc.pszBuffer()) == tCIDLib::ESortComps::FirstGreater;
 }
 
 tCIDLib::TBoolean TString::operator<(const tCIDLib::TCh* const pszSrc) const noexcept
@@ -951,54 +816,20 @@ tCIDLib::TBoolean TString::operator>(const tCIDLib::TCh* const pszSrc) const noe
 //  TString: Public, non-virtual methods
 // ---------------------------------------------------------------------------
 
-tCIDLib::TVoid TString::Append(const TString& strSrc)
-{
-    //
-    //  Calculate the buffer size we'll need. If the passed string is empty,
-    //  then just bail out now.
-    //
-    const tCIDLib::TCard4 c4Needed = m_c4CurEnd + strSrc.m_c4CurEnd;
-    if (c4Needed == m_c4CurEnd)
-        return;
-
-    //
-    //  Reallocate if needed. Maintain the current content. This also handles the nulled
-    //  buffer scenario and will reallocate us something.
-    //
-    if (c4Needed > m_c4BufChars)
-        Reallocate(c4Needed, kCIDLib::True);
-
-    // Copy the source onto the end, getting the null terminator
-    TRawMem::CopyMemBuf
-    (
-        pszBufferWAt(m_c4CurEnd), strSrc.pszBuffer(), strSrc.m_c4CurEnd * kCIDLib::c4CharBytes
-    );
-
-    m_c4CurEnd = c4Needed;
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
-}
-
-
+// Append a count of characters
 tCIDLib::TVoid TString::Append(const tCIDLib::TCh chSrc, const tCIDLib::TCard4 c4Count)
 {
-    // See if we have enough to hold it, else expand. Maintain the current text
-    if (m_c4CurEnd + c4Count > m_c4BufChars)
-        Reallocate(m_c4CurEnd + c4Count + 16, kCIDLib::True);
+    if (!c4Count)
+        return;
 
-    // And append the char and update the length
-    tCIDLib::TCh* pszTar = pszBufferWAt(m_c4CurEnd);
+    // See if we have enough to hold it, else expand. Maintain the current text
+    m_strbData.ExpandBy(c4Count + 16, kCIDLib::True);
+
+    tCIDLib::TCh* pszTar = m_strbData.pszAtEnd();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         *pszTar++ = chSrc;
 
-    m_c4CurEnd += c4Count;
-    *pszTar = kCIDLib::chNull;
-}
-
-
-tCIDLib::TVoid TString::Append(const TString&  strSrc1, const TString&  strSrc2)
-{
-    Append(strSrc1);
-    Append(strSrc2);
+    m_strbData.IncEnd(c4Count);
 }
 
 
@@ -1007,34 +838,21 @@ TString::Append(const   tCIDLib::TCh* const psz1
                 , const tCIDLib::TCh* const psz2
                 , const tCIDLib::TCh* const psz3)
 {
-    // If the source string is a null pointer, then make it the special value
-    const tCIDLib::TCh* pszActual = psz1 ? psz1 : kCIDLib::pszNullStr;
-
-    // Get the length of the strings to append
-    const tCIDLib::TCard4 c4Len1 = TRawStr::c4StrLen(pszActual);
+    // Get the length of the strings to append and our length
+    const tCIDLib::TCard4 c4Len1 = psz1 ? TRawStr::c4StrLen(psz1) : 0;
     const tCIDLib::TCard4 c4Len2 = psz2 ? TRawStr::c4StrLen(psz2) : 0;
     const tCIDLib::TCard4 c4Len3 = psz3 ? TRawStr::c4StrLen(psz3) : 0;
 
-    // See if we have enough to hold it, else expand. Maintain the current text
+    // Expand if need be, preserving existing content
     const tCIDLib::TCard4 c4TotalNew = c4Len1 + c4Len2 + c4Len3;
-    if (m_c4CurEnd + c4TotalNew > m_c4BufChars)
-        Reallocate(m_c4CurEnd + c4TotalNew, kCIDLib::True);
+    m_strbData.ExpandBy(c4TotalNew, kCIDLib::True);
 
-    TRawMem::CopyMemBuf(pszBufferWAt(m_c4CurEnd), pszActual, c4Len1 * kCIDLib::c4CharBytes);
-    m_c4CurEnd += c4Len1;
-
+    if (psz1)
+        m_strbData.Append(psz1, c4Len1);
     if (psz2)
-    {
-        TRawMem::CopyMemBuf(pszBufferWAt(m_c4CurEnd), psz2, c4Len2 * kCIDLib::c4CharBytes);
-        m_c4CurEnd += c4Len2;
-    }
-
+        m_strbData.Append(psz2, c4Len2);
     if (psz3)
-    {
-        TRawMem::CopyMemBuf(pszBufferWAt(m_c4CurEnd), psz3, c4Len3 * kCIDLib::c4CharBytes);
-        m_c4CurEnd += c4Len3;
-    }
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+        m_strbData.Append(psz3, c4Len3);
 }
 
 
@@ -1341,7 +1159,7 @@ TString::AppendFormatted(const  tCIDLib::TSInt      iToFmt
 
 //
 //  The trailing parameter is a dummy one that helps us deal with an otherwise
-//  much more messy issue with the variac recursion processing of Format().
+//  much more messy issue with the variadic recursion processing of Format().
 //
 tCIDLib::TVoid TString::AppendFormatted(const MFormattable& fmtblSrc, const tCIDLib::TCard4)
 {
@@ -1357,18 +1175,18 @@ TString::AppendSubStr( const   TString&         strSrc
                         , const tCIDLib::TCard4 c4Len)
 {
     // Is the source string is empty, then just return cause nothing to do
-    if (!strSrc.m_c4CurEnd)
+    if (strSrc.bIsEmpty())
         return;
 
     // Make sure the start is within the current length of the source
-    if (c4Start >= strSrc.m_c4CurEnd)
+    if (c4Start >= strSrc.c4Length())
     {
         //
         //  If it'as at the end, and the length is max card, just do nothing, since basically
         //  they are just telling us to copy what's available, and that's just nothing in
         //  this case. Else throw.
         //
-        if ((c4Start == strSrc.m_c4CurEnd) && (c4Len == kCIDLib::c4MaxCard))
+        if ((c4Start == strSrc.c4Length()) && (c4Len == kCIDLib::c4MaxCard))
             return;
 
         facCIDLib().ThrowErr
@@ -1380,7 +1198,7 @@ TString::AppendSubStr( const   TString&         strSrc
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4Start)
             , clsThis()
-            , TCardinal(strSrc.m_c4CurEnd)
+            , TCardinal(strSrc.c4Length())
         );
     }
 
@@ -1391,11 +1209,11 @@ TString::AppendSubStr( const   TString&         strSrc
     tCIDLib::TCard4 c4ActualLen = c4Len;
     if (c4ActualLen == kCIDLib::c4MaxCard)
     {
-        c4ActualLen = strSrc.m_c4CurEnd - c4Start;
+        c4ActualLen = strSrc.c4Length() - c4Start;
     }
      else
     {
-        if (c4Start + c4ActualLen > strSrc.m_c4CurEnd)
+        if (c4Start + c4ActualLen > strSrc.c4Length())
         {
             facCIDLib().ThrowErr
             (
@@ -1406,7 +1224,7 @@ TString::AppendSubStr( const   TString&         strSrc
                 , tCIDLib::EErrClasses::BadParms
                 , TCardinal(c4Start + c4Len)
                 , clsThis()
-                , TCardinal(strSrc.m_c4CurEnd)
+                , TCardinal(strSrc.c4Length())
             );
         }
     }
@@ -1415,27 +1233,7 @@ TString::AppendSubStr( const   TString&         strSrc
     if (!c4ActualLen)
         return;
 
-    //
-    //  See if we need to reallocate. If so it will reallocate to the
-    //  nearest next realloc increment thats equal to or greater than
-    //  c4Actual. Maintain the current text content in the new buffer.
-    //
-    if (m_c4CurEnd + c4ActualLen > m_c4BufChars)
-        Reallocate(m_c4CurEnd + c4ActualLen, kCIDLib::True);
-
-    //
-    //  Copy over the data. We multiply by the character size to convert
-    //  chars to bytes.
-    //
-    TRawMem::CopyMemBuf
-    (
-        pszBufferWAt(m_c4CurEnd), strSrc.pszBufferAt(c4Start), c4ActualLen * kCIDLib::c4CharBytes
-    );
-
-    // And update the current length
-    m_c4CurEnd += c4ActualLen;
-
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    m_strbData.Append(strSrc.pszBufferAt(c4Start), c4ActualLen);
 }
 
 
@@ -1444,7 +1242,7 @@ TString::AppendSubStr(  const   tCIDLib::TCh* const pszAppend
                         , const tCIDLib::TCard4     c4Start
                         , const tCIDLib::TCard4     c4Len)
 {
-    // The source cannot be a null pointer in this case
+    // This shouldn't happen, so throw
     if (!pszAppend)
     {
         facCIDLib().ThrowErr
@@ -1473,46 +1271,19 @@ TString::AppendSubStr(  const   tCIDLib::TCh* const pszAppend
     if (!c4ActualLen)
         return;
 
-    //
-    //  See if we need to reallocate. If so it will reallocate to the
-    //  nearest next realloc increment thats equal to or greater than
-    //  c4Actual. Maintain the current text content in the new buffer.
-    //
-    if (m_c4CurEnd + c4ActualLen > m_c4BufChars)
-        Reallocate(m_c4CurEnd + c4ActualLen, kCIDLib::True);
-
-    //
-    //  Copy over the data. We multiply by the character size to convert
-    //  chars to bytes.
-    //
-    CIDLib_Suppress(6011)  // We null checked above
-    TRawMem::CopyMemBuf
-    (
-        pszBufferWAt(m_c4CurEnd), &pszAppend[c4Start], c4ActualLen * kCIDLib::c4CharBytes
-    );
-
-    // And update the current length
-    m_c4CurEnd += c4ActualLen;
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    m_strbData.Append(&pszAppend[c4Start], c4ActualLen);
 }
 
 
 // Cap the string at the first instance of the indicated character
 tCIDLib::TBoolean TString::bCapAtChar(const tCIDLib::TCh chAt)
 {
-    tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
-    (
-        pszBufferW(), chAt, 0, kCIDLib::True
-    );
-
-    // If not, then we are done
+    // If no match, then we are done
+    tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(m_strbData.pszBuffer(), chAt, 0, kCIDLib::True);
     if (!pszMatch)
         return kCIDLib::False;
 
-    // Cap it at the match point and update our end index
-    *pszMatch = kCIDLib::chNull;
-    m_c4CurEnd = c4CalcBufDiff(pszMatch);
-
+    m_strbData.SetEnd(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1524,87 +1295,41 @@ tCIDLib::TBoolean TString::bCapAtChar(const tCIDLib::TCh chAt)
 //  until we get a different character or hit the end of both, which the
 //  underlying methods do.
 //
-tCIDLib::TBoolean TString::bCompare(const TString& strSrc) const noexcept
+tCIDLib::TBoolean TString::bCompare(const TStringView& strvSrc) const noexcept
 {
-    if (c4Length() != strSrc.c4Length())
+    if (strvSrc.bHaveLength() && (c4Length() != strvSrc.c4Length()))
         return kCIDLib::False;
 
-    return (eCompare(strSrc) == tCIDLib::ESortComps::Equal);
-}
-
-tCIDLib::TBoolean TString::bCompare(const tCIDLib::TCh* const pszSrc) const noexcept
-{
-    return (eCompare(pszSrc) == tCIDLib::ESortComps::Equal);
+    return (eCompare(strvSrc) == tCIDLib::ESortComps::Equal);
 }
 
 
-tCIDLib::TBoolean TString::bCompareI(const TString& strSrc) const noexcept
+tCIDLib::TBoolean TString::bCompareI(const TStringView& strvSrc) const noexcept
 {
-    if (c4Length() != strSrc.c4Length())
+    if (strvSrc.bHaveLength() && (c4Length() != strvSrc.c4Length()))
         return kCIDLib::False;
 
-    return (eCompareI(strSrc) == tCIDLib::ESortComps::Equal);
+    return (eCompareI(strvSrc) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean TString::bCompareI(const tCIDLib::TCh* const pszSrc) const noexcept
-{
-    return (eCompareI(pszSrc) == tCIDLib::ESortComps::Equal);
-}
-
-
-tCIDLib::TBoolean TString::bCompareN(const  TString&        strSrc
+tCIDLib::TBoolean TString::bCompareN(const  TStringView&    strvSrc
                                     , const tCIDLib::TCard4 c4Count) const noexcept
 {
-    // If we are less than the indicted count, obviously can't be
-    if (c4Length() < strSrc.c4Length())
+    // If we are less than the min of the indicted count or source length, obviously can't be
+    if (strvSrc.bHaveLength() && (c4Length() < tCIDLib::MinVal(c4Count, strvSrc.c4Length())))
         return kCIDLib::False;
 
-    return (eCompareN(strSrc, c4Count) == tCIDLib::ESortComps::Equal);
+    return (eCompareN(strvSrc, c4Count) == tCIDLib::ESortComps::Equal);
 }
 
-tCIDLib::TBoolean
-TString::bCompareN( const   tCIDLib::TCh* const     pszSrc
-                    , const tCIDLib::TCard4         c4Count) const noexcept
-{
-    return (eCompareN(pszSrc, c4Count) == tCIDLib::ESortComps::Equal);
-}
-
-
-tCIDLib::TBoolean TString::bCompareNI(  const   TString&        strSrc
+tCIDLib::TBoolean TString::bCompareNI(  const   TStringView&    strvSrc
                                         , const tCIDLib::TCard4 c4Count) const noexcept
 {
-    // If we are less than the indicted count, obviously can't be
-    if (c4Length() < strSrc.c4Length())
+    // If we are less than the min of the indicted count or source length, obviously can't be
+    if (strvSrc.bHaveLength() && (c4Length() < tCIDLib::MinVal(c4Count, strvSrc.c4Length())))
         return kCIDLib::False;
 
-    return (eCompareNI(strSrc, c4Count) == tCIDLib::ESortComps::Equal);
-}
-
-tCIDLib::TBoolean
-TString::bCompareNI(const   tCIDLib::TCh* const     pszSrc
-                    , const tCIDLib::TCard4         c4Count) const noexcept
-{
-    return (eCompareNI(pszSrc, c4Count) == tCIDLib::ESortComps::Equal);
-}
-
-
-//
-//  Just a convenience method to see if this string contains the indicated
-//  character or not.
-//
-tCIDLib::TBoolean TString::bContainsChar(const tCIDLib::TCh chToFind) const noexcept
-{
-    return TRawStr::pszFindChar(pszBuffer(), chToFind) != nullptr;
-}
-
-
-// Just call the first occurrence check
-tCIDLib::TBoolean
-TString::bContainsSubStr(const  TString&            strToFind
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
-{
-    tCIDLib::TCard4 c4At = 0;
-    return bFirstOccurrence(strToFind, c4At, kCIDLib::False, bCaseSensitive);
+    return (eCompareNI(strvSrc, c4Count) == tCIDLib::ESortComps::Equal);
 }
 
 
@@ -1616,8 +1341,10 @@ tCIDLib::TBoolean
 TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
                             , const tCIDLib::TCh        chSepChar
                             , COP   TString&            strToFill
-                            , const tCIDLib::TBoolean   bStripWS) const
+                            , const tCIDLib::TBoolean   bStripWS) const noexcept
 {
+    strToFill.Clear();
+
     //
     //  Ok, find the start of the token. We do a loop here. Each one is
     //  finding the start of the indicated token. We do < toknum here. If
@@ -1625,8 +1352,8 @@ TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
     //  buffer as the start of the token. Else, we keep moving forward until
     //  we count through toknum sep chars.
     //
-    const tCIDLib::TCh* pchStart = pszBuffer();
-    const tCIDLib::TCh* pchEnd = pchStart + c4Length();
+    const tCIDLib::TCh* pchStart = m_strbData.pszBuffer();
+    const tCIDLib::TCh* pchEnd = m_strbData.pszAtEnd();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TokInd; c4Index++)
     {
         // Find the next sep char
@@ -1685,13 +1412,10 @@ TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
     //  we found, it's just empty.
     //
     if (pchStart == pchTokEnd)
-    {
-        strToFill.Clear();
         return kCIDLib::True;
-    }
 
     // We have one, so copy out to the target string
-    strToFill.FromZStr(pchStart, c4CalcBufDiff(pchTokEnd, pchStart));
+    strToFill.FromZStr(pchStart, m_strbData.c4CalcBufDiff(pchTokEnd, pchStart));
 
     // And strip trailing now, if asked
     if (bStripWS)
@@ -1710,7 +1434,7 @@ tCIDLib::TBoolean TString::bFindTokenList(COP TString& strToFill) const
 {
     strToFill.Clear();
 
-    const tCIDLib::TCh* pszStart = pszBuffer();
+    const tCIDLib::TCh* pszStart = m_strbData.pszBuffer();
     const tCIDLib::TCh* pszEnd = nullptr;
     while (*pszStart)
     {
@@ -1765,7 +1489,7 @@ TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1775,12 +1499,7 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
                             , const tCIDLib::TBoolean       bAnyChar
                             , const tCIDLib::TBoolean       bCaseSensitive) const
 {
-    //
-    //  See if there is a match.
-    //
-    //  NOTE: We don't pass the position in on these, its just an output
-    //          parameter. We pass in zero to start at the beginning!
-    //
+    // See if there is a match, starting at 0
     const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
         pszMatch = TRawStr::pszFindChars(pszBuffer(), strSubStr.pszBuffer(), 0, bCaseSensitive);
@@ -1795,7 +1514,7 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
     }
 
     // Calc the position and return true
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1803,7 +1522,7 @@ TString::bFirstOccurrence(  const   TString&                strSubStr
 tCIDLib::TBoolean TString::bIsAlpha() const noexcept
 {
     const tCIDLib::TCh* pszCur = pszBuffer();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_strbData.c4CurEnd(); c4Index++)
     {
         if (!TRawStr::bIsAlpha(pszCur[c4Index]))
             return kCIDLib::False;
@@ -1814,7 +1533,7 @@ tCIDLib::TBoolean TString::bIsAlpha() const noexcept
 tCIDLib::TBoolean TString::bIsAlphaNum() const noexcept
 {
     const tCIDLib::TCh* pszCur = pszBuffer();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
+    for (tCIDLib::TCard4 c4Index = 0; c4Index < m_strbData.c4CurEnd(); c4Index++)
     {
         if (!TRawStr::bIsAlphaNum(pszCur[c4Index]))
             return kCIDLib::False;
@@ -1842,7 +1561,7 @@ TString::bLastOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position and return true
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1855,19 +1574,9 @@ TString::bLastOccurrence(   const   TString&                strSubStr
     // See if there is a match
     const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
-    {
-        pszMatch = TRawStr::pszFindLastChars
-        (
-            pszBuffer(), strSubStr.pszBuffer(), bCaseSensitive
-        );
-    }
-     else
-    {
-        pszMatch = TRawStr::pszFindLastSubStr
-        (
-            pszBuffer(), strSubStr.pszBuffer(), bCaseSensitive
-        );
-    }
+        pszMatch = TRawStr::pszFindLastChars(pszBuffer(), strSubStr.pszBuffer(), bCaseSensitive);
+    else
+        pszMatch = TRawStr::pszFindLastSubStr(pszBuffer(), strSubStr.pszBuffer(), bCaseSensitive);
 
     // If not, then get out
     if (!pszMatch)
@@ -1877,7 +1586,7 @@ TString::bLastOccurrence(   const   TString&                strSubStr
     }
 
     // Calc the position of the match and return true
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1903,13 +1612,8 @@ TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
         );
     }
 
-    // See if there is a match
-    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
-    (
-        pszBuffer(), chTarget, c4Pos + 1, bCaseSensitive
-    );
-
-    // If not, then get out
+    // See if there is a match. If not, we are done
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(pszBuffer(), chTarget, c4Pos + 1, bCaseSensitive);
     if (!pszMatch)
     {
         c4Pos = kCIDLib::c4MaxCard;
@@ -1917,7 +1621,7 @@ TString::bNextOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -1946,19 +1650,9 @@ TString::bNextOccurrence(   const   TString&                strSubStr
     // See if there is a match
     const tCIDLib::TCh* pszMatch = nullptr;
     if (bAnyChar)
-    {
-        pszMatch = TRawStr::pszFindChars
-        (
-            pszBuffer(), strSubStr.pszBuffer(), c4Pos + 1, bCaseSensitive
-        );
-    }
-     else
-    {
-        pszMatch = TRawStr::pszFindSubStr
-        (
-            pszBuffer(), strSubStr.pszBuffer(), c4Pos + 1, bCaseSensitive
-        );
-    }
+        pszMatch = TRawStr::pszFindChars(pszBuffer(), strSubStr.pszBuffer(), c4Pos + 1, bCaseSensitive);
+    else
+        pszMatch = TRawStr::pszFindSubStr(pszBuffer(), strSubStr.pszBuffer(), c4Pos + 1, bCaseSensitive);
     const tCIDLib::TCh* pszLast = pszMatch;
 
     // If not, then get out with negative result
@@ -1969,7 +1663,7 @@ TString::bNextOccurrence(   const   TString&                strSubStr
     }
 
     // Calc the position of the match and return true
-    c4Pos = c4CalcBufDiff(pszLast);
+    c4Pos = m_strbData.c4CalcBufDiff(pszLast);
     return kCIDLib::True;
 }
 
@@ -2003,11 +1697,7 @@ TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     const tCIDLib::TCh* pszMatch = nullptr;
-    pszMatch = TRawStr::pszFindPrevChar
-    (
-        pszBuffer(), chTarget, c4Pos - 1, bCaseSensitive
-    );
-
+    pszMatch = TRawStr::pszFindPrevChar(pszBuffer(), chTarget, c4Pos - 1, bCaseSensitive);
     if (!pszMatch)
     {
         c4Pos = kCIDLib::c4MaxCard;
@@ -2015,7 +1705,7 @@ TString::bPrevOccurrence(   const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position of the match and return true
-    c4Pos = c4CalcBufDiff(pszMatch);
+    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
     return kCIDLib::True;
 }
 
@@ -2061,22 +1751,16 @@ TString::bPrevOccurrence(   const   TString&                strSubStr
         //  All we have to do is find the the previous char that shows up
         //  in the substring anywhere.
         //
-        pszFind = TRawStr::pszFindPrevChars
-        (
-            pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive
-        );
+        pszFind = TRawStr::pszFindPrevChars(pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive);
     }
      else
     {
-        pszFind = TRawStr::pszFindPrevSubStr
-        (
-            pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive
-        );
+        pszFind = TRawStr::pszFindPrevSubStr(pszBuffer(), strSubStr.pszBuffer(), c4Pos - 1, bCaseSensitive);
     }
 
     if (pszFind)
     {
-        c4Pos = c4CalcBufDiff(pszFind);
+        c4Pos = m_strbData.c4CalcBufDiff(pszFind);
         return kCIDLib::True;
     }
 
@@ -2090,15 +1774,16 @@ tCIDLib::TBoolean
 TString::bReplaceChar(  const   tCIDLib::TCh    chToReplace
                         , const tCIDLib::TCh    chReplaceWith)
 {
-    if (chToReplace)
+    // Ignore nulls in either
+    if (chToReplace && chReplaceWith)
     {
         //
         //  Loop through the string and replace any instances of the replacement
         //  character with the replacement character.
         //
-        tCIDLib::TCh* pszTar = pszBufferW();
+        tCIDLib::TCh* pszTar = m_strbData.pszBuffer();
         tCIDLib::TCard4 c4Count = 0;
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4CurEnd; c4Index++)
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < m_strbData.c4CurEnd(); c4Index++)
         {
             if (pszTar[c4Index] == chToReplace)
             {
@@ -2170,11 +1855,12 @@ TString::bReplaceSubStr(const   TString&            strToReplace
     tCIDLib::TBoolean bRet = kCIDLib::False;
     while(kCIDLib::True)
     {
-        // See if there is a match
-        const tCIDLib::TCh* pszMatch = TRawStr::pszFindSubStr
-        (
-            pszBuffer(), pszTarText, c4StartAt, bCaseSensitive
-        );
+        //
+        //  See if there is a match. We call pszBuffer on each round since the below
+        //  could expand the buffer.
+        //
+        tCIDLib::TCh* pszBase = m_strbData.pszBuffer();
+        const tCIDLib::TCh* pszMatch = TRawStr::pszFindSubStr(pszBase, pszTarText, c4StartAt, bCaseSensitive);
 
         // If no match, we are done
         if (!pszMatch)
@@ -2188,7 +1874,7 @@ TString::bReplaceSubStr(const   TString&            strToReplace
         bRet = kCIDLib::True;
 
         // Calc the position of the match
-        c4StartAt = c4CalcBufDiff(pszMatch);
+        c4StartAt = pszMatch - pszBase;
 
         // Replace the substring we found, just cutting if no rep text
         if (c4RepLen)
@@ -2236,18 +1922,13 @@ TString::bSplit(COP     TString&                strSecondHalf
     const tCIDLib::TCard4 c4OurLen = c4Length();
     strSecondHalf.Clear();
 
-    // Find the first divider character
-    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
-    (
-        pszBuffer(), chDivider, 0, bCaseSensitive
-    );
-
-    // If no match, then we are done
+    // Find the first divider character. If none, then we are done
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(pszBuffer(), chDivider, 0, bCaseSensitive);
     if (!pszMatch)
         return kCIDLib::False;
 
     // Calc the offset
-    const tCIDLib::TCard4 c4Ofs = c4CalcBufDiff(pszMatch);
+    const tCIDLib::TCard4 c4Ofs = m_strbData.c4CalcBufDiff(pszMatch);
 
     //
     //  We want to skip over the divider, and we want to make sure we don't
@@ -2279,27 +1960,25 @@ tCIDLib::TBoolean TString::bToBoolean(COP tCIDLib::TBoolean& bToFill) const noex
 {
     tCIDLib::TBoolean bValid = kCIDLib::True;
 
-    if (TRawStr::bCompareStrI(pszBuffer(), L"yes")
-    ||  TRawStr::bCompareStrI(pszBuffer(), L"on")
-    ||  TRawStr::bCompareStrI(pszBuffer(), L"true")
-    ||  TRawStr::bCompareStrI(pszBuffer(), L"1"))
+    const tCIDLib::TCh* pszBuf = m_strbData.pszBuffer();
+    if (TRawStr::bCompareStrI(pszBuf, L"yes")
+    ||  TRawStr::bCompareStrI(pszBuf, L"on")
+    ||  TRawStr::bCompareStrI(pszBuf, L"true")
+    ||  TRawStr::bCompareStrI(pszBuf, L"1"))
     {
         bToFill = kCIDLib::True;
     }
-     else if (TRawStr::bCompareStrI(pszBuffer(), L"no")
-          ||  TRawStr::bCompareStrI(pszBuffer(), L"off")
-          ||  TRawStr::bCompareStrI(pszBuffer(), L"false")
-          ||  TRawStr::bCompareStrI(pszBuffer(), L"0"))
+     else if (TRawStr::bCompareStrI(pszBuf, L"no")
+          ||  TRawStr::bCompareStrI(pszBuf, L"off")
+          ||  TRawStr::bCompareStrI(pszBuf, L"false")
+          ||  TRawStr::bCompareStrI(pszBuf, L"0"))
     {
         bToFill = kCIDLib::False;
     }
      else
     {
         // It might be something like "  1", so try to convert to a number
-        const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary
-        (
-            pszBuffer(), bValid, tCIDLib::ERadices::Dec
-        );
+        const tCIDLib::TInt4 i4Val = TRawStr::i4AsBinary(pszBuf, bValid, tCIDLib::ERadices::Dec);
 
         if (bValid)
         {
@@ -2500,92 +2179,6 @@ tCIDLib::TCard8 TString::c8Val(const tCIDLib::ERadices eRadix) const
 }
 
 
-tCIDLib::TCh TString::chAt(const tCIDLib::TCard4 c4Ind) const
-{
-    if (c4Ind >= m_c4CurEnd)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_IndexError
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-            , TCardinal(c4Ind)
-            , clsThis()
-            , TCardinal(m_c4CurEnd)
-        );
-    }
-
-    // If we have no buffer, then our end is zero and we couldn't get here
-    CIDAssert(m_pszBuffer != nullptr, L"The buffer should not be null here");
-    CIDLib_Suppress(6011)  // We null checked above
-    return m_pszBuffer[c4Ind];
-}
-
-
-tCIDLib::TCh TString::chFirst() const
-{
-    return chAt(0);
-}
-
-tCIDLib::TCh TString::chLast() const noexcept
-{
-    if (!m_c4CurEnd)
-        return kCIDLib::chNull;
-
-    return *pszBufferAt(m_c4CurEnd - 1);
-}
-
-
-tCIDLib::TVoid TString::CapAt(const tCIDLib::TCard4 c4Index)
-{
-    //
-    //  We'll let it be at the current end, which basically becomes a no-op,
-    //  since its already capped there, but it makes things easier for client
-    //  code, so they don't have to special case this.
-    //
-    //  We may not have a buffer. If the index is zero, then we will accept
-    //  it but we don't want to do anything in that case.
-    //
-    //  !!In this case we dont' call the buffer getter method since we don't want
-    //  to fault it in if it's not already there.
-    //
-    if (c4Index <= m_c4CurEnd)
-    {
-        m_c4CurEnd = c4Index;
-        if (m_pszBuffer)
-        {
-            m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-        }
-         else
-        {
-            // If we have no buffer, the current end better be zero
-            CIDAssert(m_c4CurEnd == 0, L"No buffer set but current end is not 0");
-        }
-        return;
-    }
-
-    facCIDLib().ThrowErr
-    (
-        CID_FILE
-        , CID_LINE
-        , kCIDErrs::errcGen_IndexError
-        , tCIDLib::ESeverities::Failed
-        , tCIDLib::EErrClasses::BadParms
-        , TCardinal(c4Index)
-        , clsThis()
-        , TCardinal(m_c4CurEnd)
-    );
-}
-
-tCIDLib::TVoid TString::Clear()
-{
-    *pszBufferW() = kCIDLib::chNull;
-    m_c4CurEnd = 0;
-}
-
-
 tCIDLib::TVoid
 TString::CopyInSubStr(  const   TString&        strSource
                         , const tCIDLib::TCard4 c4Start
@@ -2612,7 +2205,8 @@ TString::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len)
         return;
 
     // We cannot start beyond the end
-    if (c4Start >= m_c4CurEnd)
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
+    if (c4Start >= c4OurLen)
     {
         facCIDLib().ThrowErr
         (
@@ -2623,44 +2217,36 @@ TString::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len)
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4Start)
             , clsThis()
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(m_strbData.c4CurEnd())
         );
     }
 
+    //
+    //  They can pass max card in which case we ur our own length. That effectively
+    //  becomes a cap at, but we don't want to reject such a thing.
+    //
     tCIDLib::TCard4 c4ActualLen = c4Len;
-    if ((c4ActualLen == kCIDLib::c4MaxCard)
-    ||  ((c4Start + c4ActualLen) == m_c4CurEnd))
+    if (c4ActualLen == kCIDLib::c4MaxCard)
+        c4ActualLen = c4OurLen;
+
+    // If the start plus actual length would eat the whole thing, then cap and done
+    if ((c4Start + c4ActualLen) >= c4OurLen)
     {
-        m_c4CurEnd = c4Start;
+        // If this would eat the whole string, then just cap at the start
+        m_strbData.SetEnd(c4Start);
         return;
     }
-     else if ((c4Start + c4ActualLen) > m_c4CurEnd)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_IndexError
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-            , TCardinal(c4Start + c4Len)
-            , clsThis()
-            , TCardinal(m_c4CurEnd)
-        );
-    }
+
 
     // Copy the text at c4Start+c4ActualLen down to c4Start
-    tCIDLib::TCh* pszDest = pszBufferWAt(c4Start);
-    tCIDLib::TCh* pszSrc  = pszBufferWAt(c4Start + c4ActualLen);
-    tCIDLib::TCh* pszEnd  = pszBufferWAt(m_c4CurEnd);
+    tCIDLib::TCh* pszDest = m_strbData.pszBufferAt(c4Start);
+    tCIDLib::TCh* pszSrc  = m_strbData.pszBufferAt(c4Start + c4ActualLen);
+    tCIDLib::TCh* pszEnd  = m_strbData.pszAtEnd();
     while (pszSrc < pszEnd)
         *pszDest++ = *pszSrc++;
 
-    // Adjust the end by the actual length
-    m_c4CurEnd -= c4ActualLen;
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    m_strbData.DecEnd(c4ActualLen);
 }
-
 
 
 //
@@ -2669,109 +2255,64 @@ TString::Cut(const tCIDLib::TCard4 c4Start, const tCIDLib::TCard4 c4Len)
 //
 tCIDLib::TVoid TString::CutUpTo(const tCIDLib::TCh chFind)
 {
-    tCIDLib::TCh* pszMatch = TRawStr::pszFindChar
-    (
-        pszBufferW(), chFind, 0, kCIDLib::True
-    );
-
     // If we got a match, then copy down the remainder
+    tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(m_strbData.pszBuffer(), chFind, 0, kCIDLib::True);
     if (pszMatch)
     {
         //
         //  We end the cut on the found character, so we subtract the two
         //  pointers and add one. Then just call the cut method.
         //
-        Cut(0, c4CalcBufDiff(pszMatch) + 1);
+        Cut(0, m_strbData.c4CalcBufDiff(pszMatch) + 1);
     }
 }
 
 
-// Delete the last character if we have one
-tCIDLib::TVoid TString::DeleteLast()
-{
-    // If already empty, then we are happy
-    if (!m_c4CurEnd)
-        return;
-
-    // Just put a null in the last character and dec the length
-    m_c4CurEnd--;
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
-}
-
-
 // Compares this string to a passed string
-tCIDLib::ESortComps TString::eCompare(const tCIDLib::TCh* const pszToCompare) const
+tCIDLib::ESortComps TString::eCompare(const TStringView& strvSrc) const
 {
-    if (!pszToCompare)
-        return tCIDLib::ESortComps::FirstLess;
-    return TRawStr::eCompareStr(pszBuffer(), pszToCompare);
-}
-
-tCIDLib::ESortComps TString::eCompare(const TString& strToCompare) const
-{
-    return TRawStr::eCompareStr(pszBuffer(), strToCompare.pszBuffer());
+    // If we have the length, use it
+    if (strvSrc.bHaveLength() && (strvSrc.c4Length() != c4Length()))
+    {
+        if (c4Length() < strvSrc.c4Length())
+            return tCIDLib::ESortComps::FirstLess;
+        return tCIDLib::ESortComps::FirstGreater;
+    }
+    return TRawStr::eCompareStr(pszBuffer(), strvSrc.pszBuffer());
 }
 
 
 // Compares N chars of this string to a passed string
 tCIDLib::ESortComps
-TString::eCompareN( const   tCIDLib::TCh* const pszToCompare
-                    , const tCIDLib::TCard4     c4MaxComp) const
-{
-    if (!pszToCompare)
-        return tCIDLib::ESortComps::FirstGreater;
-    if (!c4MaxComp)
-        return tCIDLib::ESortComps::Equal;
-    return TRawStr::eCompareStrN(pszBuffer(), pszToCompare, c4MaxComp);
-}
-
-tCIDLib::ESortComps
-TString::eCompareN(const TString& strToCompare, const tCIDLib::TCard4 c4MaxComp) const
+TString::eCompareN(const TStringView& strvSrc, const tCIDLib::TCard4 c4MaxComp) const
 {
     if (!c4MaxComp)
         return tCIDLib::ESortComps::Equal;
-
-    return TRawStr::eCompareStrN
-    (
-        pszBuffer(), strToCompare.pszBuffer(), c4MaxComp
-    );
+    return TRawStr::eCompareStrN(pszBuffer(), strvSrc.pszBuffer(), c4MaxComp);
 }
 
 
 // Compares this string to a passed string, insensitive to case
-tCIDLib::ESortComps TString::eCompareI(const tCIDLib::TCh* const pszToCompare) const
+tCIDLib::ESortComps TString::eCompareI(const TStringView& strvSrc) const
 {
-    if (!pszToCompare)
-        return tCIDLib::ESortComps::FirstLess;
-
-    return TRawStr::eCompareStrI(pszBuffer(), pszToCompare);
-}
-
-tCIDLib::ESortComps TString::eCompareI(const TString& strToCompare) const
-{
-    return TRawStr::eCompareStrI(pszBuffer(), strToCompare.pszBuffer());
+    // If we have the length, use it
+    if (strvSrc.bHaveLength() && (strvSrc.c4Length() != c4Length()))
+    {
+        if (c4Length() < strvSrc.c4Length())
+            return tCIDLib::ESortComps::FirstLess;
+        return tCIDLib::ESortComps::FirstGreater;
+    }
+    return TRawStr::eCompareStrI(pszBuffer(), strvSrc.pszBuffer());
 }
 
 
 // Compares N chars of this string to a passed string, insensitive to case
 tCIDLib::ESortComps
-TString::eCompareNI(const   tCIDLib::TCh* const pszToCompare
-                    , const tCIDLib::TCard4     c4MaxComp) const
-{
-    if (!pszToCompare)
-        return tCIDLib::ESortComps::FirstGreater;
-    if (!c4MaxComp)
-        return tCIDLib::ESortComps::Equal;
-    return TRawStr::eCompareStrNI(pszBuffer(), pszToCompare, c4MaxComp);
-}
-
-tCIDLib::ESortComps
-TString::eCompareNI(const   TString&        strToCompare
-                    , const tCIDLib::TCard4 c4MaxComp) const
+TString::eCompareNI(const TStringView& strvSrc, const tCIDLib::TCard4 c4MaxComp) const
 {
     if (!c4MaxComp)
         return tCIDLib::ESortComps::Equal;
-    return TRawStr::eCompareStrNI(pszBuffer(), strToCompare.pszBuffer(), c4MaxComp);
+    return TRawStr::eCompareStrNI(pszBuffer(), strvSrc.pszBuffer(), c4MaxComp);
 }
 
 
@@ -2852,7 +2393,7 @@ TString::eReplaceToken(  const  tCIDLib::TCh* const pszVal
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     //
     //  If the field width is zero, then it's just going to be the source
@@ -2926,16 +2467,13 @@ TString::eReplaceToken( const   MFormattable&   fmtblVal
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     //
     //  Format the replacement value to a string, being sure to flush it
     //  so that the cache is forced out to the string buffer.
     //
-    TTextStringOutStream strmTmp
-    (
-        256, TStreamFmt(c4FldWidth, 2, eJustify, chFill)
-    );
+    TTextStringOutStream strmTmp(256, TStreamFmt(c4FldWidth, 2, eJustify, chFill));
     strmTmp << fmtblVal << kCIDLib::FlushIt;
 
     Replace(c4Index, c4Index + (c4Chars - 1), strmTmp.strData().pszBuffer(), c4FldWidth);
@@ -2980,7 +2518,7 @@ TString::eReplaceToken( const   tCIDLib::TBoolean   bVal
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     // Get the value we are going to format out
     const tCIDLib::TCh* pszVal
@@ -3080,7 +2618,7 @@ TString::eReplaceToken( const   tCIDLib::TCard4     c4Val
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr64 szTmp;
     if (!TRawStr::bFormatVal(c4Val, szTmp, 64, eRadix))
@@ -3164,7 +2702,7 @@ TString::eReplaceToken( const   tCIDLib::TCard8     c8Val
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(c8Val, szTmp, 128, eRadix))
@@ -3250,7 +2788,7 @@ TString::eReplaceToken( const   tCIDLib::TFloat8&   f8Val
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128 szTmp;
     if (!TRawStr::bFormatVal(f8Val, szTmp, c1Precision, 128, tCIDLib::ETrailFmts::Zeroes))
@@ -3352,7 +2890,7 @@ TString::eReplaceToken( const   tCIDLib::TInt4      i4Val
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr64 szTmp;
     if (!TRawStr::bFormatVal(i4Val, szTmp, 64, eRadix))
@@ -3437,7 +2975,7 @@ TString::eReplaceToken( const   tCIDLib::TInt8      i8Val
     }
 
     // Calc the index where we found it
-    c4Index = c4CalcBufDiff(pszTmp);
+    c4Index = m_strbData.c4CalcBufDiff(pszTmp);
 
     tCIDLib::TZStr128  szTmp = L"";
     if (!TRawStr::bFormatVal(i8Val, szTmp, 128, eRadix))
@@ -3546,15 +3084,10 @@ TString::FormatToFld(const  TString&                strSrc
         return;
     }
 
-    //
-    //  See if we need to reallocate. If so, it will reallocate up to the
-    //  next realloc block size that is >= the passed actual. The second
-    //  parm says don't bother preserving the text content.
-    //
-    if (c4FldWidth + c4TrailingSp > m_c4BufChars)
-        Reallocate(c4FldWidth + c4TrailingSp, kCIDLib::False);
+    //  See if we need to expand. Don't need to preserve existing content
+    m_strbData.ExpandTo(c4FldWidth + c4TrailingSp, kCIDLib::False);
 
-    if (!TRawStr::bFormatStr(strSrc.pszBuffer(), pszBufferW(), c4FldWidth, chFill, eJustify))
+    if (!TRawStr::bFormatStr(strSrc.pszBuffer(), m_strbData.pszBuffer(), c4FldWidth, chFill, eJustify))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -3567,21 +3100,12 @@ TString::FormatToFld(const  TString&                strSrc
         );
     }
 
-    // Update the current length to the width of the field
-    m_c4CurEnd = c4FldWidth;
+    // Update the current length to the width of the field, plus any trailing spaces
+    m_strbData.SetEnd(c4FldWidth + c4TrailingSp);
 
-    // Make sure we got the expansion right
-    CIDAssert
-    (
-        m_c4CurEnd + c4TrailingSp <= m_c4BufChars, L"Not enough room for trailing spaces"
-    );
-
-    // Add any trailing spaces
-    tCIDLib::TCh* pszTar = pszBufferW();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4TrailingSp; c4Index++)
-        pszTar[m_c4CurEnd++] = kCIDLib::chSpace;
-
-    pszTar[m_c4CurEnd] = kCIDLib::chNull;
+    // Append any trailing spaces. We expanded already so we have room
+    if (c4TrailingSp)
+        Append(kCIDLib::chSpace, c4TrailingSp);
 }
 
 
@@ -3600,44 +3124,15 @@ tCIDLib::TVoid TString::FromShortZStr(const tCIDLib::TSCh* const pszNewValue)
 tCIDLib::TVoid TString::FromZStr(const  tCIDLib::TCh* const pszSrc
                                 , const tCIDLib::TCard4     c4Count)
 {
-    // If the source is a null pointer, then set it to the special value
-    const tCIDLib::TCh* pszActual = pszSrc ? pszSrc : kCIDLib::pszNullStr;
+    // If the source is null, nothing to do
+    if (!pszSrc)
+        return;
 
     // Get the length of the actual source string
-    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszActual);
-
-    // Get the actual count, which if zero means the actual source length
-    tCIDLib::TCard4 c4ActualCount = c4Count ? c4Count : c4SrcLen;
-
-    // If the actual count is longer than the source string, an error
-    if (c4ActualCount > c4SrcLen)
-    {
-        facCIDLib().ThrowErr
-        (
-             CID_FILE
-             , CID_LINE
-             , kCIDErrs::errcStr_CountOverLen
-             , tCIDLib::ESeverities::Failed
-             , tCIDLib::EErrClasses::AppError
-             , TCardinal(c4ActualCount)
-             , TCardinal(c4SrcLen)
-        );
-    }
-
-    //
-    //  If the actual count is bigger than our current buffer, reallocate.
-    //  Tell it not to bother retaining the current contents, since we are
-    //  going to just set a new value below.
-    //
-    if (c4ActualCount > m_c4BufChars)
-        Reallocate(c4ActualCount + 16, kCIDLib::False);
-
-    TRawMem::CopyMemBuf(pszBufferW(), pszActual, c4ActualCount * kCIDLib::c4CharBytes);
-    m_c4CurEnd = c4ActualCount;
-
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    const tCIDLib::TCard4 c4SrcLen = c4Count ? c4Count : TRawStr::c4StrLen(pszSrc);
+    m_strbData.Clear();
+    m_strbData.Append(pszSrc, c4SrcLen);
 }
-
 
 
 // Does a standard hash calcualtion on the contents of this string
@@ -3713,42 +3208,36 @@ tCIDLib::TVoid
 TString::ImportChars(const  tCIDLib::TCh* const pszSrc
                     , const tCIDLib::TCard4     c4SrcCount)
 {
-    //
-    //  If the actual count is bigger than our current buffer, reallocate.
-    //  Tell it not to bother retaining the current contents, since we are
-    //  going to just set a new value below.
-    //
-    if (c4SrcCount > m_c4BufChars)
-        Reallocate(c4SrcCount + 16, kCIDLib::False);
-
-    TRawMem::CopyMemBuf(pszBufferW(), pszSrc, c4SrcCount * kCIDLib::c4CharBytes);
-    m_c4CurEnd = c4SrcCount;
-
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    // Expand if needed, no need to preserve
+    m_strbData.ExpandTo(c4SrcCount, kCIDLib::False);
+    m_strbData.Append(pszSrc, c4SrcCount);
 }
 
 
 // Inserts the indicated character into us at the indicated index
-tCIDLib::TVoid
-TString::Insert(const tCIDLib::TCh chInsert, const tCIDLib::TCard4 c4Ind)
+tCIDLib::TVoid TString::Insert(const tCIDLib::TCh chInsert, const tCIDLib::TCard4 c4Ind)
 {
-    tCIDLib::TCh szTmp[2];
-    szTmp[0] = chInsert;
-    szTmp[1] = kCIDLib::chNull;
+    tCIDLib::TCh szTmp[2] = { chInsert, kCIDLib::chNull };
     Insert(szTmp, c4Ind);
 }
 
 
 tCIDLib::TVoid TString::Insert( const   tCIDLib::TCh* const pszInsert
-                                , const tCIDLib::TCard4     c4Ind)
+                                , const tCIDLib::TCard4     c4Ind
+                                , const tCIDLib::TCard4     c4InsertLen)
 {
+    // If source to insert is null or empty, do nothing
+    if (!pszInsert || (pszInsert[0] == kCIDLib::chNull))
+        return;
+
     //
     //  Make sure that the insert index is valid. Note that, in this case, we
     //  allow it to fall on the terminating null, so that an insert at the end
     //  will be like an append. Otherwise, you could not insert after the last
     //  char, because the index is the 'insert after' index.
     //
-    if (c4Ind > m_c4CurEnd)
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
+    if (c4Ind > c4OurLen)
     {
         facCIDLib().ThrowErr
         (
@@ -3759,117 +3248,40 @@ tCIDLib::TVoid TString::Insert( const   tCIDLib::TCh* const pszInsert
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4Ind)
             , clsThis()
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(c4OurLen)
         );
     }
 
-    // If the source is a null pointer, then set it to the special Null value
-    const tCIDLib::TCh* pszActual = pszInsert ? pszInsert : kCIDLib::pszNullStr;
-
-    // Get the length of the string we are going to insert
-    const tCIDLib::TCard4 c4InsertLen = TRawStr::c4StrLen(pszActual);
-
-    // Do a quick sanity check to see if we need to do anything
-    if (!c4InsertLen)
-        return;
+    const tCIDLib::TCard4 c4SrcLen = c4InsertLen ? c4InsertLen : TRawStr::c4StrLen(pszInsert);
 
     // If the insert point is at the end, then we just append
-    if (c4Ind == m_c4CurEnd)
+    if (c4Ind == c4OurLen)
     {
-        Append(pszActual);
+        m_strbData.Append(pszInsert, c4SrcLen);
         return;
     }
 
     // Extend the string if we are going to need to. Retain current content
-    if (m_c4CurEnd + c4InsertLen > m_c4BufChars)
-        Reallocate(m_c4CurEnd + c4InsertLen, kCIDLib::True);
+    m_strbData.ExpandBy(c4SrcLen, kCIDLib::True);
+
+    //
+    //  Go ahead and move the end of string upwards so the stuff below doesn't have to
+    //  play tricks to avoid end overflow errors.
+    //
+    m_strbData.IncEnd(c4SrcLen);
 
     //
     //  Lets move the text after the insert point upwards to make room for
     //  the insert text.
     //
-    tCIDLib::TCh* pszSrc = pszBufferWAt(m_c4CurEnd - 1);
-    tCIDLib::TCh* pszStop = pszBufferWAt(c4Ind);
-
-    //
-    //  We are playing a trick on this one, since it is beyond the end as it currently
-    //  stands. So we do it directly. That's ok, the calls above insure the buffer
-    //  exists.
-    //
-    tCIDLib::TCh* pszDest = &m_pszBuffer[(m_c4CurEnd - 1) + c4InsertLen];
-    while (pszSrc >= pszStop)
-        *pszDest-- = *pszSrc--;
-
-    //
-    //  And now move the insert text into the section left open and adjust the end
-    //  up by the insert length.
-    //
-    TRawMem::CopyMemBuf(pszStop, pszActual, c4InsertLen * kCIDLib::c4CharBytes);
-    m_c4CurEnd += c4InsertLen;
-
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-}
-
-
-tCIDLib::TVoid TString::Insert(const TString& strSrc, const tCIDLib::TCard4 c4Ind)
-{
-    //
-    //  Make sure that the insert index is valid. Note that, in this case, we
-    //  allow it to fall on the terminating null, so that an insert at the end
-    //  will be like an append. Otherwise, you could not insert after the last
-    //  char, because the index is the 'insert after' index.
-    //
-    if (c4Ind > m_c4CurEnd)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcGen_IndexError
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-            , TCardinal(c4Ind)
-            , clsThis()
-            , TCardinal(m_c4CurEnd)
-        );
-    }
-
-    // Do a quick sanity check to see if we need to do anything
-    if (!strSrc.m_c4CurEnd)
-        return;
-
-    // If the insert point is at the end, then we just append
-    if (c4Ind == m_c4CurEnd)
-    {
-        Append(strSrc);
-        return;
-    }
-
-    // Extend the string if we are going to need to. Retain current content
-    if (m_c4CurEnd + strSrc.m_c4CurEnd > m_c4BufChars)
-        Reallocate(m_c4CurEnd + strSrc.m_c4CurEnd, kCIDLib::True);
-
-    //
-    //  Lets move the text after the insert point upwards to make room for
-    //  the insert text.
-    //
-    tCIDLib::TCh* pszSrc = pszBufferWAt(m_c4CurEnd - 1);
-    tCIDLib::TCh* pszStop = pszBufferWAt(c4Ind);
-
-    //
-    //  We are playing a trick on this one, since it is beyond the end as it currently
-    //  stands. So we do it directly. That's ok, the calls above insure the buffer
-    //  exists.
-    //
-    tCIDLib::TCh* pszDest = &m_pszBuffer[(m_c4CurEnd - 1) + strSrc.m_c4CurEnd];
+    tCIDLib::TCh* pszSrc = m_strbData.pszBufferAt(c4OurLen - 1);
+    tCIDLib::TCh* pszStop = m_strbData.pszBufferAt(c4Ind);
+    tCIDLib::TCh* pszDest = m_strbData.pszBufferAt((c4OurLen - 1) + c4SrcLen);
     while (pszSrc >= pszStop)
         *pszDest-- = *pszSrc--;
 
     // And now move the insert text into the section left open
-    TRawMem::CopyMemBuf(pszStop, strSrc.pszBuffer(), strSrc.m_c4CurEnd * kCIDLib::c4CharBytes);
-    m_c4CurEnd += strSrc.m_c4CurEnd;
-
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    TRawMem::CopyMemBuf(pszStop, pszInsert, c4SrcLen * kCIDLib::c4CharBytes);
 }
 
 
@@ -3928,201 +3340,17 @@ tCIDLib::TVoid TString::Prepend(const tCIDLib::TCh* const pszPrepend)
     Insert(pszPrepend, 0);
 }
 
-tCIDLib::TVoid
-TString::PutAt( const   tCIDLib::TCard4 c4Index
-                 , const tCIDLib::TCh   chToPut)
-{
-    if (c4Index == m_c4CurEnd)
-    {
-        // They are putting it at the end, so just make it an append
-        Append(chToPut);
-    }
-     else if (c4Index < m_c4CurEnd)
-    {
-        //
-        //  If the character is a null, then this is a truncation operation, so we
-        //  must adjust our current end.
-        //
-        if (!chToPut)
-            m_c4CurEnd = c4Index;
-
-        // Stick the character in
-        *pszBufferWAt(c4Index) = chToPut;
-        return;
-    }
-
-    facCIDLib().ThrowErr
-    (
-        CID_FILE
-        , CID_LINE
-        , kCIDErrs::errcGen_IndexError
-        , tCIDLib::ESeverities::Failed
-        , tCIDLib::EErrClasses::BadParms
-        , TCardinal(c4Index)
-        , clsThis()
-        , TCardinal(m_c4CurEnd)
-    );
-}
-
-
-//
-//  This is always called to access the buffer for const access. If it doesn't
-//  exist, it will be faulted in.
-//
-//  We still could get an index error in the ones that access the buffer at a
-//  particular index
-//
-const tCIDLib::TCh* TString::pszBuffer() const
-{
-    if (!m_pszBuffer)
-    {
-        CIDAssert(!m_c4CurEnd && !m_c4BufChars, L"Buffer was null but end/chars ere not null");
-        m_c4BufChars = 1;
-        m_c4CurEnd = 0;
-        m_pszBuffer = new tCIDLib::TCh[2];
-    }
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-    return m_pszBuffer;
-}
-
-const tCIDLib::TCh* TString::pszBufferAt(const tCIDLib::TCard4 c4At) const
-{
-    // Fault in an empty buffer if it's been move daway
-    if (!m_pszBuffer)
-    {
-        CIDAssert(!m_c4CurEnd && !m_c4BufChars, L"Buffer was null but end/chars ere not null");
-        m_c4BufChars = 1;
-        m_c4CurEnd = 0;
-        m_pszBuffer = new tCIDLib::TCh[2];
-    }
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-
-    // We do allow them to point at the null terminator, so its lt or equal
-    if (c4At <= m_c4CurEnd)
-        return &m_pszBuffer[c4At];
-
-    facCIDLib().ThrowErr
-    (
-        CID_FILE
-        , CID_LINE
-        , kCIDErrs::errcGen_IndexError
-        , tCIDLib::ESeverities::Failed
-        , tCIDLib::EErrClasses::BadParms
-        , TCardinal(c4At)
-        , clsThis()
-        , TCardinal(m_c4CurEnd)
-    );
-    return nullptr;
-}
-
 
 tCIDLib::TCh* TString::pszDupBuffer() const
 {
-    // If we don't have one, then just gen up a single character one
-    if (!m_pszBuffer)
-    {
-        tCIDLib::TCh* pszRet = new tCIDLib::TCh[1];
-        *pszRet = kCIDLib::chNull;
-        return pszRet;
-    }
-
     //
     //  We know here we have a buffer, so we can access it directly, be sure to copy
     //  over the null as well!
     //
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-    tCIDLib::TCh* pszRet = new tCIDLib::TCh[m_c4CurEnd + 1];
-    TRawMem::CopyMemBuf(pszRet, m_pszBuffer, (m_c4CurEnd + 1) * kCIDLib::c4CharBytes);
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
+    tCIDLib::TCh* pszRet = new tCIDLib::TCh[c4OurLen + 1];
+    TRawMem::CopyMemBuf(pszRet, m_strbData.pszBuffer(), (c4OurLen + 1) * kCIDLib::c4CharBytes);
     return pszRet;
-}
-
-
-const tCIDLib::TCh* TString::pszEnd() const
-{
-    // If we have no buffer this will fault in an empty string and we return that
-    return pszBufferAt(m_c4CurEnd);
-}
-
-
-//
-//  Reallocate our buffer to at least the new size. We can preserve the old content
-//  if requested, else we toss it and end up with an empty buffer.
-//
-tCIDLib::TVoid
-TString::Reallocate(const   tCIDLib::TCard4     c4NewSize
-                    , const tCIDLib::TBoolean   bPreserve)
-{
-    //
-    //  If the same, then nothing to do unless we have no buffer, in which case
-    //  we have to fault in a buffer at least. That would mean that the new
-    //  size was zero, which is wrong but we don't want to leave an empty buffer
-    //  after this call.
-    //
-    if (c4NewSize == m_c4BufChars)
-    {
-        if (!m_pszBuffer)
-        {
-            m_c4CurEnd = c4NewSize;
-            m_c4BufChars = m_c4CurEnd;
-            m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
-            *m_pszBuffer = kCIDLib::chNull;
-        }
-        return;
-    }
-
-    if (bPreserve && (c4NewSize < m_c4CurEnd))
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcStr_Reallocate
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::AppError
-            , facCIDLib().strMsg(kCIDMsgs::midStr_CantPreserve)
-        );
-    }
-
-    //
-    //  Reallocate the buffer. If the new size is not at least one realloc
-    //  block larger, then make it one realloc block larger anyway.
-    //
-    tCIDLib::TCard4 c4Actual = c4NewSize;
-    if (m_c4BufChars + CIDLib_String::c4ReallocBlock > c4NewSize)
-        c4Actual = m_c4BufChars + CIDLib_String::c4ReallocBlock;
-
-    //
-    //  Save the old buffer pointer and put a janitor on it so that it will
-    //  get cleaned up. Zero the current buffer so we give up control. Our current
-    //  buffer could in theory be null but not really. If it was, we'd have to
-    //  have dealt with in the initial block above.
-    //
-    tCIDLib::TCh* pszOldBuffer = m_pszBuffer;
-    TArrayJanitor<tCIDLib::TCh> janOld(pszOldBuffer);
-    m_pszBuffer = nullptr;
-
-    // Now reallocate the new buffer
-    m_pszBuffer = new tCIDLib::TCh[c4Actual + 1];
-
-    //
-    //  If we are preserving, then copy the old content. Else, just set the
-    //  end to zero.
-    //
-    if (bPreserve && m_c4CurEnd)
-    {
-        CIDAssert(m_pszBuffer != nullptr, L"The buffer should not be null here");
-        TRawMem::CopyMemBuf(m_pszBuffer, pszOldBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
-    }
-     else
-    {
-        m_c4CurEnd = 0;
-    }
-
-    // Save the new current buffer size
-    m_c4BufChars = c4Actual;
-
-    // And cap it off
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
 }
 
 
@@ -4136,10 +3364,7 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
     //  Get the rep text len. If the len is zero, then the caller doesn't know
     //  so we figure it out.
     //
-    const tCIDLib::TCard4 c4ActualLen
-    (
-        c4RepLen ? c4RepLen : TRawStr::c4StrLen(pszRepText)
-    );
+    const tCIDLib::TCard4 c4ActualLen(c4RepLen ? c4RepLen : TRawStr::c4StrLen(pszRepText));
 
     //
     //  Calculate the size of the substring we are replacing. Check for the
@@ -4159,7 +3384,8 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
         );
     }
 
-    if (c4RepEnd > m_c4CurEnd)
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
+    if (c4RepEnd > c4OurLen)
     {
         facCIDLib().ThrowErr
         (
@@ -4170,15 +3396,9 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4RepEnd)
             , clsThis()
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(c4OurLen)
         );
     }
-
-    //
-    //  We should have caught us being empty above, which should have caught us
-    //  not having a buffer.
-    //
-    CIDAssert(m_pszBuffer != nullptr, L"The buffer should not be null here");
 
     //
     //  Lets first test for the optimum scenario, where the replacement token
@@ -4193,32 +3413,35 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
     {
         TRawMem::CopyMemBuf
         (
-            &m_pszBuffer[c4RepStart], pszRepText, c4ActualLen * kCIDLib::c4CharBytes
+            m_strbData.pszBufferAt(c4RepStart), pszRepText, c4ActualLen * kCIDLib::c4CharBytes
         );
     }
      else if (c4TargetLen > c4ActualLen)
     {
         //
         //  The target is bigger that the replacement text. So we can copy
-        //  the replace in, then copy down the remainder.
+        //  the replace in, then copy down the remainder. Get the buffer out and
+        //  use it for any offsets, since calling buffer at will cap at the current
+        //  length, which will mess us up.
         //
+        tCIDLib::TCh* pszBase = m_strbData.pszBuffer();
         TRawMem::CopyMemBuf
         (
-            &m_pszBuffer[c4RepStart], pszRepText, c4ActualLen * kCIDLib::c4CharBytes
+            pszBase + c4RepStart, pszRepText, c4ActualLen * kCIDLib::c4CharBytes
         );
 
         //
         //  Copy down any text from the replacement end point to the end
         //  of the replacement text we just copied in.
         //
-        tCIDLib::TCh* pszTarget = &m_pszBuffer[c4RepStart + c4ActualLen];
-        tCIDLib::TCh* pszSrc = &m_pszBuffer[c4RepStart + c4TargetLen];
-        const tCIDLib::TCh* pszEnd = &m_pszBuffer[m_c4CurEnd];
+        tCIDLib::TCh* pszTarget = pszBase + (c4RepStart + c4ActualLen);
+        tCIDLib::TCh* pszSrc = pszBase + (c4RepStart + c4TargetLen);
+        const tCIDLib::TCh* pszEnd = pszBase + m_strbData.c4CurEnd();
         while (pszSrc < pszEnd)
             *pszTarget++ = *pszSrc++;
 
         // Recalc the length of the string
-        m_c4CurEnd -= c4TargetLen - c4ActualLen;
+        m_strbData.DecEnd(c4TargetLen - c4ActualLen);
     }
      else
     {
@@ -4227,31 +3450,31 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
         //  move up the text from the end to make room for it. We have to
         //  deal with expanding the buffer if it won't hold the text.
         //
-        if ((m_c4CurEnd - c4TargetLen) + c4ActualLen > m_c4BufChars)
+        if ((c4OurLen - c4TargetLen) + c4ActualLen > m_strbData.c4BufSz())
         {
             //
-            //  We do have to expand. So we take advantage of that to just
-            //  steal the current buffer, allocate a new one, then copy over
-            //  form the old to the new.
+            //  We do have to expand. We have to just make a copy of the existing content
+            //  and then expand, destroying previous content.
             //
-            tCIDLib::TCh* pszOld = m_pszBuffer;
-            TArrayJanitor<tCIDLib::TCh> janOld(pszOld);
-            m_c4BufChars = m_c4CurEnd + c4ActualLen;
-            m_pszBuffer = new tCIDLib::TCh[m_c4BufChars + 1];
+            TArrayJanitor<tCIDLib::TCh> janOld(pszDupBuffer());
+            m_strbData.ExpandBy(c4ActualLen, kCIDLib::False);
 
-            TRawMem::CopyMemBuf(m_pszBuffer, pszOld, c4RepStart * kCIDLib::c4CharBytes);
+            tCIDLib::TCh* pszBase = m_strbData.pszBuffer();
+            TRawMem::CopyMemBuf(pszBase, janOld.paThis(), c4RepStart * kCIDLib::c4CharBytes);
             TRawMem::CopyMemBuf
             (
-                &m_pszBuffer[c4RepStart], pszRepText, c4ActualLen * kCIDLib::c4CharBytes
+                pszBase + c4RepStart, pszRepText, c4ActualLen * kCIDLib::c4CharBytes
             );
 
             CIDLib_Suppress(6011 28182)  // We null checked above
             TRawMem::CopyMemBuf
             (
-                &m_pszBuffer[c4RepStart + c4ActualLen]
-                , &pszOld[c4RepEnd + 1]
-                , (m_c4CurEnd - c4RepEnd) * kCIDLib::c4CharBytes
+                pszBase + (c4RepStart + c4ActualLen)
+                , &janOld.paThis()[c4RepEnd + 1]
+                , (c4OurLen - c4RepEnd) * kCIDLib::c4CharBytes
             );
+
+            m_strbData.SetEnd(c4OurLen + (c4ActualLen - c4TargetLen));
         }
          else
         {
@@ -4261,81 +3484,39 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
             //  many chars we have to move it up. Its the rep text length
             //  minus the target length.
             //
+            //  We have to get the buffer out and directly get offets. Calling
+            //  buffer at caps at the current end and will mess us up because we
+            //  are changing the length upwards during this.
+            //
+            tCIDLib::TCh* pszBase = m_strbData.pszBuffer();
             const tCIDLib::TCard4 c4ExpCount = c4ActualLen - c4TargetLen;
-            CIDLib_Suppress(6011)  // We null checked above
-            tCIDLib::TCh* pszTarget = &m_pszBuffer[m_c4CurEnd + c4ExpCount];
-            tCIDLib::TCh* pszSrc = &m_pszBuffer[m_c4CurEnd];
-            while (pszSrc > (m_pszBuffer + c4RepEnd))
+            tCIDLib::TCh* pszTarget = pszBase + (c4OurLen + c4ExpCount);
+            tCIDLib::TCh* pszSrc = pszBase + c4OurLen;
+            while (pszSrc > (pszBase  + c4RepEnd))
                 *pszTarget-- = *pszSrc--;
+
+            // Adjust the length upwards before we copy below, because buffer at will cap at current end
+            m_strbData.IncEnd(c4ActualLen - c4TargetLen);
 
             // Copy the replacement text into place now
             TRawMem::CopyMemBuf
             (
-                &m_pszBuffer[c4RepStart], pszRepText, c4ActualLen * kCIDLib::c4CharBytes
-            );
-        }
-
-        // Recalculate the length
-        m_c4CurEnd += c4ActualLen - c4TargetLen;
-    }
-
-    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-}
-
-
-tCIDLib::TVoid
-TString::Set(const tCIDLib::TCh* const pszSrc, const tCIDLib::TCard4 c4Extra)
-{
-    // If the source string is a null pointer, then set it to the special value
-    const tCIDLib::TCh* pszActual = pszSrc ? pszSrc : kCIDLib::pszNullStr;
-
-    // If the source string is the same address as our buffer, then return
-    if (pszSrc == m_pszBuffer)
-        return;
-
-    // If we we have a buffer, then do some checks
-    if (m_pszBuffer)
-    {
-        // If the source string is within our buffer, then an error
-        if ((pszActual > m_pszBuffer) && (pszActual < m_pszBuffer + m_c4BufChars))
-        {
-            facCIDLib().ThrowErr
-            (
-                CID_FILE
-                , CID_LINE
-                , kCIDErrs::errcStr_SourceInDest
-                , tCIDLib::ESeverities::Failed
-                , tCIDLib::EErrClasses::AppError
+                m_strbData.pszBufferAt(c4RepStart), pszRepText, c4ActualLen * kCIDLib::c4CharBytes
             );
         }
     }
-
-    // Get the new length
-    const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszActual);
-
-    //
-    //  If that plus any requested extra is larger than our current buffer,
-    //  then reallocate. The last parm says don't maintain current content
-    //
-    if (c4SrcLen + c4Extra > m_c4BufChars)
-        Reallocate(c4SrcLen + c4Extra, kCIDLib::False);
-
-    TRawMem::CopyMemBuf(pszBufferW(), pszActual, c4SrcLen * kCIDLib::c4CharBytes);
-
-    // And be sure to update the new end and terminate it
-    m_c4CurEnd = c4SrcLen;
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
 }
 
 
-tCIDLib::TVoid TString::Set(const TString& strSrc, const tCIDLib::TCard4 c4Extra)
+// Set us to a raw string
+tCIDLib::TVoid TString::Set(const   tCIDLib::TCh* const     pszSrc
+                            , const tCIDLib::TCard4         c4Extra)
 {
-    // Reallocate if needed
-    if (strSrc.c4Length() + c4Extra > m_c4BufChars)
-        Reallocate(strSrc.c4Length() + c4Extra, kCIDLib::False);
-
-    CopyInSubStr(strSrc, 0, strSrc.c4Length());
+    m_strbData.Clear();
+    if (pszSrc)
+        m_strbData.Append(pszSrc, TRawStr::c4StrLen(pszSrc), c4Extra);
 }
+
 
 
 //
@@ -4484,33 +3665,27 @@ TString::SetFormatted(  const   tCIDLib::TSInt      iToFmt
 //
 tCIDLib::TVoid TString::SetLast(const tCIDLib::TCh chNew)
 {
-    if (!m_c4CurEnd)
+    if (m_strbData.bIsEmpty())
         return;
 
     // Just put the new char in the last character
-    *pszBufferWAt(m_c4CurEnd - 1) = chNew;
-
-    // If the new character is a null, then adjust the length
-    if (!chNew)
-        m_c4CurEnd--;
+    m_strbData.PutAt(m_strbData.c4CurEnd() - 1, chNew);
 }
 
 tCIDLib::TVoid TString::Strip(  const   tCIDLib::TCh* const     pszStripChars
                                 , const tCIDLib::EStripModes    eMode
                                 , const tCIDLib::TCh            chRepChar)
 {
-    TRawStr::StripStr(pszBufferW(), pszStripChars, eMode, chRepChar);
-    m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    TRawStr::StripStr(m_strbData.pszBuffer(), pszStripChars, eMode, chRepChar);
+    m_strbData.ResetEnd();
 }
 
 tCIDLib::TVoid TString::Strip(  const   TString&                strStripChars
                                 , const tCIDLib::EStripModes    eMode
                                 , const tCIDLib::TCh            chRepChar)
 {
-    TRawStr::StripStr(pszBufferW(), strStripChars.pszBuffer(), eMode, chRepChar);
-    m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
-    *pszBufferWAt(m_c4CurEnd) = kCIDLib::chNull;
+    TRawStr::StripStr(m_strbData.pszBuffer(), strStripChars.pszBuffer(), eMode, chRepChar);
+    m_strbData.ResetEnd();
 }
 
 
@@ -4536,10 +3711,11 @@ tCIDLib::TVoid TString::ToLower(const   tCIDLib::TCard4 c4StartInd
     //  to get to the end of the string.
     //
     c4Actual = c4Len;
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
     if (c4Actual == kCIDLib::c4MaxCard)
     {
         // This can't be right
-        if (c4StartInd > m_c4CurEnd)
+        if (c4StartInd > c4OurLen)
         {
             facCIDLib().ThrowErr
             (
@@ -4549,10 +3725,10 @@ tCIDLib::TVoid TString::ToLower(const   tCIDLib::TCard4 c4StartInd
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::BadParms
                 , TCardinal(c4StartInd)
-                , TCardinal(m_c4CurEnd)
+                , TCardinal(c4OurLen)
             );
         }
-        c4Actual = m_c4CurEnd - c4StartInd;
+        c4Actual = c4OurLen - c4StartInd;
     }
 
     // If no length, then simplify below by just stopping
@@ -4560,7 +3736,7 @@ tCIDLib::TVoid TString::ToLower(const   tCIDLib::TCard4 c4StartInd
         return;
 
     if ((tCIDLib::TCard8(c4StartInd) + tCIDLib::TCard8(c4Actual) > kCIDLib::c4MaxCard)
-    ||  (c4StartInd + c4Actual > m_c4CurEnd))
+    ||  (c4StartInd + c4Actual > c4OurLen))
     {
         //
         // The start plus the length can't go beyond the end. Be sure we don't get
@@ -4575,27 +3751,26 @@ tCIDLib::TVoid TString::ToLower(const   tCIDLib::TCard4 c4StartInd
             , tCIDLib::EErrClasses::OutResource
             , TCardinal(c4StartInd)
             , TCardinal(c4Actual)
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(c4OurLen)
         );
     }
 
-    //
-    //  If the length would take us to the end of the string, then do it directly. Note
-    //  that our buffer not being allocated would have been caught above by an index
-    //  error or the requested count being zero.
-    //
-    if (c4StartInd + c4Actual >= m_c4CurEnd)
+    // If the length would take us to the end of the string, then do it directly
+    if (c4StartInd + c4Actual >= c4OurLen)
     {
-        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-        TRawStr::pszLowerCase(&m_pszBuffer[c4StartInd]);
+        TRawStr::pszLowerCase(m_strbData.pszBufferAt(c4StartInd));
         return;
     }
      else
     {
         // Else, we have to use a loop
-        tCIDLib::TCard4 c4Ind;
-        for (c4Ind = c4StartInd; c4Ind < c4StartInd + c4Actual; c4Ind++)
-            m_pszBuffer[c4Ind] = TRawStr::chLower(m_pszBuffer[c4Ind]);
+        tCIDLib::TCh* pszTar = m_strbData.pszBufferAt(c4StartInd);
+        tCIDLib::TCh* pszEnd = m_strbData.pszBufferAt(c4StartInd + c4Actual);
+        while (pszTar < pszEnd)
+        {
+            *pszTar = TRawStr::chLower(*pszTar);
+            pszTar++;
+        }
     }
 }
 
@@ -4610,10 +3785,11 @@ tCIDLib::TVoid TString::ToUpper(const   tCIDLib::TCard4 c4StartInd
     //  to get to the end of the string.
     //
     c4Actual = c4Len;
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
     if (c4Actual == kCIDLib::c4MaxCard)
     {
         // This can't be right
-        if (c4StartInd > m_c4CurEnd)
+        if (c4StartInd > c4OurLen)
         {
             facCIDLib().ThrowErr
             (
@@ -4623,10 +3799,10 @@ tCIDLib::TVoid TString::ToUpper(const   tCIDLib::TCard4 c4StartInd
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::BadParms
                 , TCardinal(c4StartInd)
-                , TCardinal(m_c4CurEnd)
+                , TCardinal(c4OurLen)
             );
         }
-        c4Actual = m_c4CurEnd - c4StartInd;
+        c4Actual = c4OurLen - c4StartInd;
     }
 
     // If no length, then simplify below by just stopping
@@ -4634,7 +3810,7 @@ tCIDLib::TVoid TString::ToUpper(const   tCIDLib::TCard4 c4StartInd
         return;
 
     if ((tCIDLib::TCard8(c4StartInd) + tCIDLib::TCard8(c4Actual) > kCIDLib::c4MaxCard)
-    ||  (c4StartInd + c4Actual > m_c4CurEnd))
+    ||  (c4StartInd + c4Actual > c4OurLen))
     {
         //
         // The start plus the length can't go beyond the end. Be sure we don't get
@@ -4649,7 +3825,7 @@ tCIDLib::TVoid TString::ToUpper(const   tCIDLib::TCard4 c4StartInd
             , tCIDLib::EErrClasses::OutResource
             , TCardinal(c4StartInd)
             , TCardinal(c4Actual)
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(c4OurLen)
         );
     }
 
@@ -4658,18 +3834,20 @@ tCIDLib::TVoid TString::ToUpper(const   tCIDLib::TCard4 c4StartInd
     //  that our buffer not being allocated would have been caught above by an index
     //  error or the requested count being zero.
     //
-    if (c4StartInd + c4Actual >= m_c4CurEnd)
+    if (c4StartInd + c4Actual >= c4OurLen)
     {
-        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-        TRawStr::pszUpperCase(&m_pszBuffer[c4StartInd]);
+        TRawStr::pszUpperCase(m_strbData.pszBufferAt(c4StartInd));
         return;
     }
      else
     {
-        // Else, we have to use a loop
-        tCIDLib::TCard4 c4Ind;
-        for (c4Ind = c4StartInd; c4Ind < c4StartInd + c4Actual; c4Ind++)
-            m_pszBuffer[c4Ind] = TRawStr::chUpper(m_pszBuffer[c4Ind]);
+        tCIDLib::TCh* pszTar = m_strbData.pszBufferAt(c4StartInd);
+        tCIDLib::TCh* pszEnd = m_strbData.pszBufferAt(c4StartInd + c4Actual);
+        while (pszTar < pszEnd)
+        {
+            *pszTar = TRawStr::chUpper(*pszTar);
+            pszTar++;
+        }
     }
 }
 
@@ -4726,16 +3904,9 @@ tCIDLib::TVoid TString::StreamFrom(CIOP TBinInStream& strmToReadFrom)
 
         //
         //  If the cur buffer size is smaller than the stored one, then we have
-        //  to reallocate. The second parm says  don't preserve current content.
-        //  This will set m_c4BufChars to the new buffer size, and will avoid possibly
-        //  lots of reallocations of the buffer.
+        //  to reallocate, don't have to preserve
         //
-        //  If we don't currently have a buffer, this will either allocate one since
-        //  buf chars will be zero, or no chars were stored and we don't need to
-        //  do anything.
-        //
-        if (c4CharsStored > m_c4BufChars)
-            Reallocate(c4CharsStored, kCIDLib::False);
+        m_strbData.ExpandTo(c4CharsStored, kCIDLib::False);
 
         //
         //  Only stream in new chars if we actually stored any chars during
@@ -4745,17 +3916,13 @@ tCIDLib::TVoid TString::StreamFrom(CIOP TBinInStream& strmToReadFrom)
         //  format to the internal wide char format.
         //
         if (c4CharsStored)
-            strmToReadFrom.ReadArray(m_pszBuffer, c4CharsStored);
+            strmToReadFrom.ReadArray(m_strbData.pszBuffer(), c4CharsStored);
 
         // And it should end with an end object marker
         strmToReadFrom.CheckForEndMarker(CID_FILE, CID_LINE);
 
         // And now update our current char count since it seemed to have worked
-        m_c4CurEnd = c4CharsStored;
-
-        // If we ended up with a buffer, null terminate it
-        if (m_pszBuffer)
-            m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        m_strbData.SetEnd(c4CharsStored);
     }
 
     catch(TError& errToCatch)
@@ -4763,10 +3930,7 @@ tCIDLib::TVoid TString::StreamFrom(CIOP TBinInStream& strmToReadFrom)
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
 
         // Don't leave junk in the string
-        m_c4CurEnd = 0;
-        if (m_pszBuffer)
-            m_pszBuffer[0] = kCIDLib::chNull;
-
+        m_strbData.Clear();
         throw;
     }
 }
@@ -4784,7 +3948,7 @@ tCIDLib::TVoid TString::StreamTo(CIOP TBinOutStream& strmToWriteTo) const
     //
     strmToWriteTo   << tCIDLib::EStreamMarkers::StartObject
                     << CIDLib_String::c1FmtVersion
-                    << m_c4CurEnd;
+                    << m_strbData.c4CurEnd();
 
     //
     //  If any chars to write, then stream them out. The output stream provides
@@ -4794,8 +3958,8 @@ tCIDLib::TVoid TString::StreamTo(CIOP TBinOutStream& strmToWriteTo) const
     //  If we don't have a buffer, then current end is zero and we won't access
     //  it anyway.
     //
-    if (m_c4CurEnd)
-        strmToWriteTo.WriteArray(m_pszBuffer, m_c4CurEnd);
+    if (m_strbData.c4CurEnd())
+        strmToWriteTo.WriteArray(m_strbData.pszBuffer(), m_strbData.c4CurEnd());
 
     // And finish off with an end object marker
     strmToWriteTo << tCIDLib::EStreamMarkers::EndObject;
@@ -4830,9 +3994,13 @@ tCIDLib::TVoid TString::BadHexChar(const tCIDLib::TCh chToXlat)
 //  check for length and reject it immediately if too long.
 //
 tCIDLib::TBoolean
-TString::bCheckPrefix(  const   tCIDLib::TCh* const  pszToCheck
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
+TString::bCheckPrefix(  const   tCIDLib::TCh* const pszToCheck
+                        , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
+    // if the check string is null, just say no
+    if (!pszToCheck)
+        return kCIDLib::False;
+
     const tCIDLib::TCh* pszUs = pszBuffer();
     const tCIDLib::TCh* pszThem = pszToCheck;
 
@@ -4867,18 +4035,17 @@ TString::bCheckPrefix(  const   tCIDLib::TCh* const  pszToCheck
 
 tCIDLib::TBoolean
 TString::bCheckPrefix(  const   TString&            strToCheck
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
+                        , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
-    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_c4CurEnd;
+    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_strbData.c4CurEnd();
 
     // Do the fast check, where this string is shorter
-    if (m_c4CurEnd < c4SrcLen)
+    if (m_strbData.c4CurEnd() < c4SrcLen)
         return kCIDLib::False;
 
     // Oh well, check the strings
-    m_pszBuffer[m_c4CurEnd] = 0;
-    const tCIDLib::TCh* pszUs = pszBuffer();
-    const tCIDLib::TCh* pszThem = strToCheck.pszBuffer();
+    const tCIDLib::TCh* pszUs = m_strbData.pszBuffer();
+    const tCIDLib::TCh* pszThem = strToCheck.m_strbData.pszBuffer();
 
     if (bCaseSensitive)
     {
@@ -4908,8 +4075,12 @@ TString::bCheckPrefix(  const   TString&            strToCheck
 //
 tCIDLib::TBoolean
 TString::bCheckSuffix(  const  tCIDLib::TCh* const  pszToCheck
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
+                        , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
+    // if the check string is null, just say no
+    if (!pszToCheck)
+        return kCIDLib::False;
+
     //
     //  Calc where we need to start comparing in our buffer. And since we
     //  have to do the source length, do the quick check to see if he is
@@ -4917,11 +4088,14 @@ TString::bCheckSuffix(  const  tCIDLib::TCh* const  pszToCheck
     //  the suffix is empty.
     //
     const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszToCheck);
-    if (!c4SrcLen || (m_c4CurEnd < c4SrcLen))
+    if (!c4SrcLen || (m_strbData.c4CurEnd() < c4SrcLen))
         return kCIDLib::False;
 
-    // Set up pointers to run up
-    const tCIDLib::TCh* pszUs = pszBufferAt(m_c4CurEnd - c4SrcLen);
+    //
+    //  Set up pointers to run up. Buffer at could throw, but we are insuring above
+    //  that we won't get past the end.
+    //
+    const tCIDLib::TCh* pszUs = m_strbData.pszAtEnd() - c4SrcLen;
     const tCIDLib::TCh* pszThem = pszToCheck;
 
     // In this case, we had to get the length so we can use a for loop
@@ -4946,19 +4120,19 @@ TString::bCheckSuffix(  const  tCIDLib::TCh* const  pszToCheck
 
 tCIDLib::TBoolean
 TString::bCheckSuffix(  const   TString&            strToCheck
-                        , const tCIDLib::TBoolean   bCaseSensitive) const
+                        , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
-    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_c4CurEnd;
+    const tCIDLib::TCard4 c4SrcLen = strToCheck.m_strbData.c4CurEnd();
 
     //
     //  Do the fast check, where this string is shorter, or the suffix is
     //  empty.
     //
-    if (!c4SrcLen || (m_c4CurEnd < c4SrcLen))
+    if (!c4SrcLen || (m_strbData.c4CurEnd() < c4SrcLen))
         return kCIDLib::False;
 
     // Oh well, check the strings
-    const tCIDLib::TCh* pszUs = pszBufferAt(m_c4CurEnd - c4SrcLen);
+    const tCIDLib::TCh* pszUs = m_strbData.pszAtEnd() - c4SrcLen;
     const tCIDLib::TCh* pszThem = strToCheck.pszBuffer();
 
     if (bCaseSensitive)
@@ -4981,65 +4155,9 @@ TString::bCheckSuffix(  const   TString&            strToCheck
 }
 
 
-//
-//  Just to be safe, we call this to calculate the difference in characters between
-//  two places in our buffer. This insures that they are indeed both within our
-//  buffer if in debug mode, just in case. With buffers being resized or faulted
-//  in there's a danger we could sub from an old pointer or something. We also make
-//  sure neither is null.
-//
-//  We have an inlined second that only takes an upper calls us with our own buffer
-//  as the lower.
-//
-tCIDLib::TCard4
-TString::c4CalcBufDiff( const   tCIDLib::TCh* const pszUpper
-                        , const tCIDLib::TCh* const pszLower) const
-{
-    #if CID_DEBUG_ON
-    const tCIDLib::TCh* const pszEnd = m_pszBuffer + m_c4CurEnd;
-    CIDAssert
-    (
-        (pszUpper != nullptr)
-        && (pszLower != nullptr)
-        && (pszUpper >= pszLower)
-        && (pszUpper >= m_pszBuffer)
-        && (pszUpper <= pszEnd)
-        && (pszLower >= m_pszBuffer)
-        && (pszLower <= pszEnd)
-        , L"There is an issue with one or both string buffer pointers"
-    );
-    #endif
-
-    return pszUpper - pszLower;
-}
-
-
-//
-//  These are internals to get writable access to the buffer, while still handling
-//  faulting in the buffer. So we call the regular version them cast off the const
-//  of the return. They will handle the faulting in.
-//
-tCIDLib::TCh* TString::pszBufferW()
-{
-    return const_cast<tCIDLib::TCh*>(pszBuffer());
-}
-
-tCIDLib::TCh* TString::pszBufferWAt(const tCIDLib::TCard4 c4At)
-{
-    return const_cast<tCIDLib::TCh*>(pszBufferAt(c4At));
-}
-
-
 tCIDLib::TVoid TString::SetFromShort(const tCIDLib::TSCh* const pszSrc)
 {
-    if (m_pszBuffer)
-    {
-        delete [] m_pszBuffer;
-        m_pszBuffer = nullptr;
-    }
-    m_pszBuffer = TRawStr::pszConvert(pszSrc);
-    m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
-    m_c4BufChars = m_c4CurEnd;
+    m_strbData.AdoptBuffer(TRawStr::pszConvert(pszSrc), 0);
 }
 
 
@@ -5060,7 +4178,6 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
                 , const tCIDLib::TCard4     c4StartInd
                 , const tCIDLib::TBoolean   bAddNull) const
 {
-    #if CID_DEBUG_ON
     if (!pszTarget)
     {
         facCIDLib().ThrowErr
@@ -5072,22 +4189,22 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
             , tCIDLib::EErrClasses::BadParms
         );
     }
-    #endif
 
     // Clear the target string
     CIDLib_Suppress(6011)  // We null checked above
     pszTarget[0] = kCIDLib::chNull;
 
     // If no chars in this string, then we are done
-    if (!m_c4CurEnd)
+    if (!m_strbData.bIsEmpty())
         return;
 
     // If start index is at end of string, then we are done
-    if (c4StartInd == m_c4CurEnd)
+    const tCIDLib::TCard4 c4OurLen = m_strbData.c4CurEnd();
+    if (c4StartInd == c4OurLen)
         return;
 
     // If the start index is >= than the length of this string, then an error
-    if (c4StartInd >= m_c4CurEnd)
+    if (c4StartInd >= c4OurLen)
     {
         facCIDLib().ThrowErr
         (
@@ -5098,7 +4215,7 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4StartInd)
             , clsThis()
-            , TCardinal(m_c4CurEnd)
+            , TCardinal(c4OurLen)
         );
     }
 
@@ -5110,11 +4227,684 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
     //
     const tCIDLib::TCard4 c4ToCopy
     (
-        tCIDLib::MinVal(c4MaxChars, m_c4CurEnd - c4StartInd)
+        tCIDLib::MinVal(c4MaxChars, c4OurLen - c4StartInd)
     );
-    TRawMem::CopyMemBuf(pszTarget, pszBufferAt(c4StartInd), c4ToCopy * kCIDLib::c4CharBytes);
+    TRawMem::CopyMemBuf(pszTarget, m_strbData.pszBufferAt(c4StartInd), c4ToCopy * kCIDLib::c4CharBytes);
 
     // Cap off the target appropriately if asked to
     if (bAddNull)
         pszTarget[c4ToCopy] = kCIDLib::chNull;
+}
+
+
+
+// ---------------------------------------------------------------------------
+//   CLASS: TString::TStrBuf
+//  PREFIX: strb
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+//  TString::TStrBuf: Constructors and destructor
+// ---------------------------------------------------------------------------
+
+//
+//  Call this if the init size is larger than small buffer. Nothing will
+//  go wrong if you do otherwise, but the default ctor will handle that
+//  already.
+//
+TString::TStrBuf::TStrBuf(const tCIDLib::TCard4 c4InitSz) :
+
+    m_c4BufSz(c4InitSz)
+    , m_c4CurEnd(0)
+{
+    if (m_c4BufSz < c4SmallBufSz)
+        m_c4BufSz = c4SmallBufSz;
+
+    if (m_c4BufSz > c4SmallBufSz)
+    {
+        m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+    else
+    {
+        m_pszBuffer = m_szSmallBuf;
+    }
+    m_pszBuffer[0] = kCIDLib::chNull;
+}
+
+
+// Construct from an existing string, optionally allocating extra chars for subsequent use
+TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszSrc
+                            , const tCIDLib::TCard4     c4SrcLen
+                            , const tCIDLib::TCard4     c4ExtraChars)
+{
+    if (pszSrc)
+    {
+        // We have a source string. Get the length. If zero, we get the size ourself
+        m_c4CurEnd = c4SrcLen;
+        if (!m_c4CurEnd)
+            m_c4CurEnd = TRawStr::c4StrLen(pszSrc);
+    }
+
+    const tCIDLib::TCard4 c4NewSz = m_c4CurEnd + c4ExtraChars;
+    if (c4NewSz > c4SmallBufSz)
+    {
+        m_c4BufSz = c4NewSz;
+        m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
+        TRawMem::CopyMemBuf(m_pszBuffer, pszSrc, m_c4CurEnd * kCIDLib::c4CharBytes);
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+     else
+    {
+        // We can just copy into the small buffer
+        m_pszBuffer = m_szSmallBuf;
+        m_c4BufSz = c4SmallBufSz;
+        TRawMem::CopyMemBuf(m_pszBuffer, pszSrc, m_c4CurEnd * kCIDLib::c4CharBytes);
+    }
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+// Construct from an existing string, which we may be asked to adopt
+TString::TStrBuf::TStrBuf(          tCIDLib::TCh* const     pszToAdopt
+                            , const tCIDLib::EAdoptOpts     eAdopt)
+{
+    if (!pszToAdopt)
+    {
+        // If null, just set us up as empty in the short string
+        m_pszBuffer = m_szSmallBuf;
+        m_pszBuffer[0] = kCIDLib::chNull;
+        m_c4CurEnd = 0;
+        m_c4BufSz = c4SmallBufSz;
+    }
+     else
+    {
+        m_c4CurEnd = TRawStr::c4StrLen(pszToAdopt);
+
+        if ((eAdopt == tCIDLib::EAdoptOpts::NoAdopt) && (m_c4CurEnd <= c4SmallBufSz))
+        {
+            // Copy to small buffer
+            m_pszBuffer = m_szSmallBuf;
+            TRawMem::CopyMemBuf(m_pszBuffer, pszToAdopt, m_c4CurEnd * kCIDLib::c4CharBytes);
+            m_c4BufSz = c4SmallBufSz;
+            m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+        }
+         else
+        {
+            m_c4BufSz = m_c4CurEnd;
+            if (eAdopt == tCIDLib::EAdoptOpts::Adopt)
+                m_pszBuffer = pszToAdopt;
+            else
+                m_pszBuffer = TRawStr::pszReplicate(pszToAdopt);
+
+            m_szSmallBuf[0] = kCIDLib::chNull;
+        }
+    }
+}
+
+TString::TStrBuf::TStrBuf(const TStrBuf& strbSrc) :
+
+    m_c4BufSz(strbSrc.m_c4BufSz)
+    , m_c4CurEnd(strbSrc.m_c4CurEnd)
+    , m_pszBuffer(nullptr)
+{
+    if (strbSrc.m_pszBuffer == strbSrc.m_szSmallBuf)
+    {
+        CIDAssert(strbSrc.m_c4CurEnd <= c4SmallBufSz, L"Small buffer string is too big");
+
+        // We just copy the small buffer including null
+        m_pszBuffer = m_szSmallBuf;
+        m_c4BufSz = c4SmallBufSz;
+        TRawMem::CopyMemBuf
+        (
+            m_pszBuffer
+            , strbSrc.m_szSmallBuf
+            , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+        );
+    }
+     else
+    {
+        //
+        //  We need to allocate and copy. It's not necessarily null terminated, since
+        //  we only do that on access, so we term our copy.
+        //
+        m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
+        TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+}
+
+// Set up empty small buffer and then call move operator
+TString::TStrBuf::TStrBuf(TStrBuf&& strbSrc) :
+
+    m_c4BufSz(c4SmallBufSz)
+    , m_pszBuffer(m_szSmallBuf)
+{
+    *this = tCIDLib::ForceMove(strbSrc);
+}
+
+TString::TStrBuf::TStrBuf(const TKrnlString& kstrSrc) :
+
+    m_c4BufSz(kstrSrc.c4Length())
+    , m_c4CurEnd(kstrSrc.c4Length())
+{
+    // If it will fit in the small string do that, else allocate
+    if (m_c4BufSz <= c4SmallBufSz)
+    {
+        m_pszBuffer = m_szSmallBuf;
+        m_c4BufSz = c4SmallBufSz;
+    }
+     else
+    {
+        m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+
+    TRawMem::CopyMemBuf(m_pszBuffer, kstrSrc.pszValue(), m_c4CurEnd * kCIDLib::c4CharBytes);
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+// We just steal his buffer
+TString::TStrBuf::TStrBuf(TKrnlString&& kstrSrc)
+{
+    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4BufSz, m_c4CurEnd);
+}
+
+TString::TStrBuf::~TStrBuf()
+{
+    if (m_pszBuffer != m_szSmallBuf)
+    {
+        delete [] m_pszBuffer;
+        m_pszBuffer = nullptr;
+    }
+}
+
+// ---------------------------------------------------------------------------
+//  TString::TStrBuf: Public operators
+// ---------------------------------------------------------------------------
+
+//
+//  These are unusual in that we have to deal with the four variations of
+//  him and us being in small buffer mode or not.
+//
+TString::TStrBuf& TString::TStrBuf::operator=(const TStrBuf& strbSrc)
+{
+    if (&strbSrc != this)
+    {
+        const tCIDLib::TBoolean bSmallSrc = strbSrc.m_pszBuffer == strbSrc.m_szSmallBuf;
+        const tCIDLib::TBoolean bSmallTar = m_pszBuffer == m_szSmallBuf;
+        if (bSmallSrc && bSmallTar)
+        {
+            // We are both small, so just copy his small buffer
+            m_c4CurEnd = strbSrc.m_c4CurEnd;
+            m_c4BufSz = strbSrc.m_c4BufSz;
+            TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
+        }
+         else if (!bSmallSrc && bSmallTar)
+        {
+            // He's not small and we are, so we have to allocate
+            m_c4CurEnd = strbSrc.m_c4CurEnd;
+            m_c4BufSz = strbSrc.m_c4BufSz;
+            m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
+            TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
+
+            m_szSmallBuf[0] = kCIDLib::chNull;
+        }
+         else if (bSmallSrc && !bSmallTar)
+        {
+            // He is small and we are not. we won't bother moving to small mode. Our buffer is big enough
+            m_c4CurEnd = strbSrc.m_c4CurEnd;
+            TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
+        }
+         else
+        {
+            //  Neither is amall, so reallocate if we need to.
+            if (strbSrc.m_c4CurEnd > m_c4BufSz)
+            {
+                delete [] m_pszBuffer;
+                m_pszBuffer = nullptr;
+                m_pszBuffer = new tCIDLib::TCh[strbSrc.m_c4CurEnd + 1];
+            }
+
+            m_c4CurEnd = strbSrc.m_c4CurEnd;
+            m_c4BufSz = m_c4CurEnd;
+            TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
+        }
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    }
+    return *this;
+}
+
+TString::TStrBuf& TString::TStrBuf::operator=(TStrBuf&& strbSrc)
+{
+    if (&strbSrc != this)
+    {
+        const tCIDLib::TBoolean bSmallSrc = strbSrc.m_pszBuffer == strbSrc.m_szSmallBuf;
+        const tCIDLib::TBoolean bSmallTar = m_pszBuffer == m_szSmallBuf;
+
+        if (bSmallSrc && bSmallTar)
+        {
+            // We have to just swap the small buffers, including null
+            tCIDLib::TCh achTmp[c4SmallBufSz + 1];
+            TRawMem::CopyMemBuf
+            (
+                achTmp
+                , m_szSmallBuf
+                , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+            );
+            TRawMem::CopyMemBuf
+            (
+                m_szSmallBuf
+                , strbSrc.m_szSmallBuf
+                , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+            );
+            TRawMem::CopyMemBuf
+            (
+                strbSrc.m_szSmallBuf
+                , achTmp
+                , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+            );
+
+            // Swap current ends, buffers are teh same size already
+            tCIDLib::Swap(m_c4CurEnd, strbSrc.m_c4CurEnd);
+        }
+         else if (!bSmallSrc && bSmallTar)
+        {
+            // Copy our small buffer to his, and steal his buffer
+            TRawMem::CopyMemBuf
+            (
+                strbSrc.m_szSmallBuf
+                , m_szSmallBuf
+                , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+            );
+            m_pszBuffer = strbSrc.m_pszBuffer;
+            m_szSmallBuf[0] = kCIDLib::chNull;
+
+            // Now we can point him at his small buffer
+            strbSrc.m_pszBuffer = strbSrc.m_szSmallBuf;
+
+            // And we can swap the size/end values
+            tCIDLib::Swap(m_c4BufSz, strbSrc.m_c4BufSz);
+            tCIDLib::Swap(m_c4CurEnd, strbSrc.m_c4CurEnd);
+        }
+         else if (bSmallSrc && !bSmallTar)
+        {
+            //
+            //  The opposite of above. Copy his small buffer to ours and give him
+            //  our buffer pointer.
+            //
+            TRawMem::CopyMemBuf
+            (
+                m_szSmallBuf
+                , strbSrc.m_szSmallBuf
+                , tCIDLib::c4ArrayElems(m_szSmallBuf) * kCIDLib::c4CharBytes
+            );
+            strbSrc.m_pszBuffer = m_pszBuffer;
+            strbSrc.m_szSmallBuf[0] = kCIDLib::chNull;
+
+            // Now point us to our small buffer and swap the size/end
+            m_pszBuffer = m_szSmallBuf;
+            tCIDLib::Swap(m_c4BufSz, strbSrc.m_c4BufSz);
+            tCIDLib::Swap(m_c4CurEnd, strbSrc.m_c4CurEnd);
+        }
+        else
+        {
+            // We can just swap buffers
+            tCIDLib::Swap(m_c4BufSz, strbSrc.m_c4BufSz);
+            tCIDLib::Swap(m_c4CurEnd, strbSrc.m_c4CurEnd);
+            tCIDLib::Swap(m_pszBuffer, strbSrc.m_pszBuffer);
+        }
+    }
+    return *this;
+}
+
+TString::TStrBuf& TString::TStrBuf::operator=(const TStringView& strvSrc)
+{
+    if (strvSrc.c4Length() > m_c4BufSz)
+        ExpandTo(strvSrc.c4Length(), kCIDLib::False);
+
+    m_c4CurEnd = strvSrc.c4Length();
+    TRawMem::CopyMemBuf(m_pszBuffer, strvSrc.pszBuffer(), m_c4CurEnd * kCIDLib::c4CharBytes);
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+
+    return *this;
+}
+
+
+//
+//  We just steal his buffer
+//
+TString::TStrBuf& TString::TStrBuf::operator=(TKrnlString&& kstrSrc)
+{
+    if (m_pszBuffer != m_szSmallBuf)
+    {
+        delete [] m_pszBuffer;
+        m_pszBuffer = nullptr;
+    }
+    m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4BufSz, m_c4CurEnd);
+    m_szSmallBuf[0] = kCIDLib::chNull;
+    return *this;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString::TStrBuf: Public, non-virtual methods
+// ---------------------------------------------------------------------------
+
+//
+//  We can be given a buffer to adopt. If length is zero we get the length. If c4Len is zero, the
+//  it damn well better be null terminated.
+//
+tCIDLib::TVoid TString::TStrBuf::AdoptBuffer(tCIDLib::TCh* const pszToAdopt, const tCIDLib::TCard4 c4Len)
+{
+    if (m_pszBuffer != m_szSmallBuf)
+    {
+        delete [] m_pszBuffer;
+        m_pszBuffer = nullptr;
+    }
+
+    if (pszToAdopt == nullptr)
+    {
+        m_pszBuffer = m_szSmallBuf;
+        m_c4CurEnd = 0;
+        m_c4BufSz = c4SmallBufSz;
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+     else
+    {
+        m_pszBuffer = pszToAdopt;
+        m_c4CurEnd = c4Len;
+        if (!m_c4CurEnd)
+            m_c4CurEnd = TRawStr::c4StrLen(pszToAdopt);
+        m_c4BufSz = m_c4CurEnd;
+        m_szSmallBuf[0] = kCIDLib::chNull;
+    }
+}
+
+
+//
+//  If the caller is going to do multiple appends, he should calculate the required
+//  capacity and call Expand() first if he wants to be efficient.
+//
+tCIDLib::TVoid
+TString::TStrBuf::Append(const  tCIDLib::TCh* const     pszSrc
+                        , const tCIDLib::TCard4         c4Count
+                        , const tCIDLib::TCard4         c4Extra)
+{
+    if ((m_c4CurEnd + c4Count + c4Extra) > m_c4BufSz)
+        ExpandBy(c4Count + c4Extra, kCIDLib::True);
+
+    TRawMem::CopyMemBuf(&m_pszBuffer[m_c4CurEnd], pszSrc, c4Count * kCIDLib::c4CharBytes);
+    m_c4CurEnd += c4Count;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+tCIDLib::TCh TString::TStrBuf::chAt(const tCIDLib::TCard4 c4Ind) const
+{
+    if (c4Ind >= m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , TCardinal(c4Ind)
+            , TString(L"TString")
+            , TCardinal(m_c4CurEnd)
+        );
+    }
+    return m_pszBuffer[c4Ind];
+}
+
+
+tCIDLib::TCh TString::TStrBuf::chLast() const noexcept
+{
+    if (m_c4CurEnd == 0)
+        return kCIDLib::chNull;
+    return m_pszBuffer[m_c4CurEnd - 1];
+}
+
+
+//
+//  Just to be safe, we call this to calculate the difference in characters between
+//  two places in our buffer. This insures that they are indeed both within our
+//  buffer if in debug mode, just in case. With buffers being resized or faulted
+//  in there's a danger we could sub from an old pointer or something. We also make
+//  sure neither is null.
+//
+//  We have an inlined second that only takes an upper calls us with our own buffer
+//  as the lower.
+//
+//  We don't do any calls that would use the current length and cap it, since this
+//  may be called by functions that are putting new content in and haven't updated
+//  the end yet.
+//
+tCIDLib::TCard4
+TString::TStrBuf::c4CalcBufDiff(const   tCIDLib::TCh* const pszUpper
+                                , const tCIDLib::TCh* const pszLower) const
+{
+    #if CID_DEBUG_ON
+    const tCIDLib::TCh* const pszEnd = m_pszBuffer + m_c4BufSz;
+    CIDAssert
+    (
+        (pszUpper != nullptr)
+        && (pszLower != nullptr)
+        && (pszUpper >= pszLower)
+        && (pszUpper >= m_pszBuffer)
+        && (pszUpper <= pszEnd)
+        && (pszLower >= m_pszBuffer)
+        && (pszLower <= pszEnd)
+        , L"There is an issue with one or both string buffer pointers"
+    );
+    #endif
+    return pszUpper - pszLower;
+}
+
+
+tCIDLib::TVoid TString::TStrBuf::Clear() noexcept
+{
+    m_c4CurEnd = 0;
+    m_pszBuffer[0] = kCIDLib::chNull;
+}
+
+
+// Decrement  the end by the amount indicated
+tCIDLib::TVoid TString::TStrBuf::DecEnd(const tCIDLib::TCard4 c4DecBy)
+{
+    if (c4DecBy > m_c4CurEnd)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexUnderFlow
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::BadParms
+            , TCardinal(c4DecBy)
+        );
+    }
+
+    m_c4CurEnd -= c4DecBy;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+// Delete the last character if we have one
+tCIDLib::TVoid TString::TStrBuf::DeleteLast() noexcept
+{
+    // If already empty, then we are happy
+    if (!m_c4CurEnd)
+        return;
+
+    // Just put a null in the last character and dec the length
+    m_c4CurEnd--;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+
+//
+//  If the new size is larger than our current size, we'll expand. If we are already
+//  out of small string world, we'll add an extra bit on relative to the current size.
+//
+//  If not preserving, then any existing content is dumped even if we don't reallocate.
+//
+tCIDLib::TVoid
+TString::TStrBuf::ExpandTo(const tCIDLib::TCard4 c4NewSize, const tCIDLib::TBoolean bPreserve)
+{
+    // The new size cannot be less than the current end of the string if preserving
+    if (bPreserve && (c4NewSize < m_c4CurEnd))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStr_Reallocate
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::AppError
+            , facCIDLib().strMsg(kCIDMsgs::midStr_CantPreserve)
+        );
+    }
+
+    // If not preserving, zero current size now to make the below simpler
+    if (!bPreserve)
+        m_c4CurEnd = 0;
+
+    if (c4NewSize > m_c4BufSz)
+    {
+        tCIDLib::TCard4 c4RealNewSz = c4NewSize;
+        if (c4RealNewSz > c4SmallBufSz)
+            c4RealNewSz = c4NewSize + (c4NewSize >> 4);
+        if (m_pszBuffer == m_szSmallBuf)
+        {
+            // We only need to do something if they go beyond the small buffer size
+            if (c4RealNewSz > c4SmallBufSz)
+            {
+                // Allocate a new buffer. Copy over any old content if we have any
+                m_pszBuffer = new tCIDLib::TCh[c4RealNewSz  + 1];
+                if (m_c4CurEnd)
+                    TRawMem::CopyMemBuf(m_pszBuffer, m_szSmallBuf, m_c4CurEnd * kCIDLib::c4CharBytes);
+
+                m_szSmallBuf[0] = kCIDLib::chNull;
+            }
+        }
+        else
+        {
+            // Expand the buffer and copy any old content
+            TArrayJanitor<tCIDLib::TCh> janOld(m_pszBuffer);
+            m_pszBuffer = new tCIDLib::TCh[c4RealNewSz + 1];
+            if (m_c4CurEnd)
+                TRawMem::CopyMemBuf(m_pszBuffer, janOld.paThis(), m_c4CurEnd * kCIDLib::c4CharBytes);
+        }
+
+        // Store the new size
+        m_c4BufSz = c4RealNewSz;
+    }
+
+    // Make sure we are terminated. Even if no realloc, we may have changed the end
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+// Increment  the end by the amount indicated. It can go up to the current end
+tCIDLib::TVoid TString::TStrBuf::IncEnd(const tCIDLib::TCard4 c4IncBy)
+{
+    CheckIndex(CID_FILE, CID_LINE, m_c4CurEnd + c4IncBy, kCIDLib::True);
+    m_c4CurEnd += c4IncBy;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+tCIDLib::TVoid
+TString::TStrBuf::PutAt(const   tCIDLib::TCard4 c4Index
+                        , const tCIDLib::TCh    chToPut)
+{
+    // We let them put it at the end
+    CheckIndex(CID_FILE, CID_LINE, c4Index, kCIDLib::True);
+
+    if (c4Index == m_c4CurEnd)
+    {
+        // They are putting it at the end, so just make it an append
+        tCIDLib::TCh achTmp[2] = { chToPut, kCIDLib::chNull };
+        Append(achTmp, 1);
+    }
+     else if (!chToPut)
+    {
+        // This is really a cap at operation
+        m_c4CurEnd = c4Index;
+        m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+    }
+     else
+    {
+        // Stick the character in
+        m_pszBuffer[c4Index] = chToPut;
+    }
+}
+
+
+//
+//  Called by the string class when it cuts out content in a way where it doesn't
+//  have the new length, but knows it is null terminated. DON"T call anything here
+//  that would use the currently set length of course!
+//
+tCIDLib::TVoid TString::TStrBuf::ResetEnd() noexcept
+{
+    m_c4CurEnd = TRawStr::c4StrLen(m_pszBuffer);
+    CIDAssert(m_c4CurEnd <= m_c4BufSz, L"Null term len > buffer size");
+}
+
+
+// Called by the string class when it change the string end
+tCIDLib::TVoid TString::TStrBuf::SetEnd(const tCIDLib::TCard4 c4At)
+{
+    //  We allow it to be the at the null
+    CheckIndex(CID_FILE, CID_LINE, c4At, kCIDLib::True);
+    m_c4CurEnd = c4At;
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+tCIDLib::TVoid TString::TStrBuf::SetEnd(const tCIDLib::TCh* const pszAt)
+{
+    m_c4CurEnd = c4CalcBufDiff(pszAt);
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+// A helper for the string class to add a termination at the current end
+tCIDLib::TVoid TString::TStrBuf::Terminate()
+{
+    m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
+}
+
+
+// ---------------------------------------------------------------------------
+//  TString::TStrBuf: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid
+TString::TStrBuf::CheckIndex(const  tCIDLib::TCh* const pszFile
+                            , const tCIDLib::TCard4     c4Line
+                            , const tCIDLib::TCard4     c4ToCheck
+                            , const tCIDLib::TBoolean   bEndOk) const
+{
+    const tCIDLib::TBoolean bOk
+    (
+        bEndOk ? (c4ToCheck <= m_c4BufSz) : (c4ToCheck < m_c4BufSz)
+    );
+    if (!bOk)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcGen_IndexError
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::Index
+            , TCardinal(c4ToCheck)
+            , TString(L"TStrBuf")
+            , TCardinal(m_c4BufSz)
+        );
+    }
 }

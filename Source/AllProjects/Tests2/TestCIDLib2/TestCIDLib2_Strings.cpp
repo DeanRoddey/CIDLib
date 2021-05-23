@@ -395,27 +395,27 @@ TTest_String1::eRunTest(TTextStringOutStream&   strmOut
         strmOut << TFWCurLn << L"ToLower() failed on full string\n\n";
     }
 
-    str1 = (tCIDLib::TCh*)0;
+    str1 = static_cast<const tCIDLib::TCh*>(nullptr);
     CheckStrInvariants(str1)
-    if (str1 != kCIDLib::pszNullStr)
+    if (!str1.bIsEmpty())
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Assignment of null pointer failed\n\n";
     }
 
     str1.Clear();
-    str1.Append((tCIDLib::TCh*)0);
+    str1.Append(static_cast<const tCIDLib::TCh*>(nullptr));
     CheckStrInvariants(str1)
-    if (str1 != kCIDLib::pszNullStr)
+    if (!str1.bIsEmpty())
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Append of null pointer failed\n\n";
     }
 
     str1.Clear();
-    str1.FromZStr((tCIDLib::TCh*)0);
+    str1.FromZStr(static_cast<const tCIDLib::TCh*>(nullptr));
     CheckStrInvariants(str1)
-    if (str1 != kCIDLib::pszNullStr)
+    if (!str1.bIsEmpty())
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"FromZStr of null pointer failed\n\n";
@@ -423,9 +423,9 @@ TTest_String1::eRunTest(TTextStringOutStream&   strmOut
 
     str1 = L"12";
     CheckStrInvariants(str1)
-    str1.Insert((tCIDLib::TCh*)0, 1);
+    str1.Insert(static_cast<const tCIDLib::TCh*>(nullptr), 1);
     CheckStrInvariants(str1)
-    if (str1 != L"1<Null>2")
+    if (str1 != L"12")
     {
         eRes = tTestFWLib::ETestRes::Failed;
         strmOut << TFWCurLn << L"Insert of null pointer failed\n\n";

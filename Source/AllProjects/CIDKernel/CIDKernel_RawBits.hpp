@@ -32,7 +32,7 @@ namespace TRawBits
     // -----------------------------------------------------------------------
     //  Bit rotations for various cardinal types
     // -----------------------------------------------------------------------
-    inline constexpr
+    constexpr
     tCIDLib::TCard1 c1RotateLeft(const  tCIDLib::TCard1 c1Value
                                 , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -40,7 +40,7 @@ namespace TRawBits
         return (c1Value << c4Rot) | (c1Value >> (8 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard1 c1RotateRight(  const   tCIDLib::TCard1     c1Value
                                     ,  const tCIDLib::TCard4    c4RotateCount)
     {
@@ -48,7 +48,7 @@ namespace TRawBits
         return (c1Value >> c4Rot) | (c1Value << (8 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard2 c2RotateLeft(const  tCIDLib::TCard2 c2Value
                                 , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -56,7 +56,7 @@ namespace TRawBits
         return (c2Value << c4Rot) | (c2Value >> (16 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard2 c2RotateRight(  const   tCIDLib::TCard2 c2Value
                                     , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -64,7 +64,7 @@ namespace TRawBits
         return (c2Value >> c4Rot) | (c2Value << (16 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard4 c4RotateLeft(const  tCIDLib::TCard4 c4Value
                                 , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -72,7 +72,7 @@ namespace TRawBits
         return (c4Value << c4Rot) | (c4Value >> (32 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard4 c4RotateRight(  const   tCIDLib::TCard4 c4Value
                                     , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -80,7 +80,7 @@ namespace TRawBits
         return (c4Value >> c4Rot) | (c4Value << (32 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard8 c8RotateLeft(const  tCIDLib::TCard8 c8Value
                                 , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -88,7 +88,7 @@ namespace TRawBits
         return (c8Value << c4Rot) | (c8Value >> (64 - c4Rot));
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard8 c8RotateRight(  const   tCIDLib::TCard8 c8Value
                                     , const tCIDLib::TCard4 c4RotateCount)
     {
@@ -100,71 +100,71 @@ namespace TRawBits
     // -----------------------------------------------------------------------
     //  Extracts various fields from a 32 or 16 bit value
     // -----------------------------------------------------------------------
-    inline constexpr tCIDLib::TCard1 c1Low8From16(const tCIDLib::TCard2 c2Val)
+    constexpr tCIDLib::TCard1 c1Low8From16(const tCIDLib::TCard2 c2Val)
     {
         return tCIDLib::TCard1(c2Val & 0xFFUL);
     }
 
-    inline constexpr tCIDLib::TCard1 c1High8From16(const tCIDLib::TCard2 c2Val)
+    constexpr tCIDLib::TCard1 c1High8From16(const tCIDLib::TCard2 c2Val)
     {
         return tCIDLib::TCard1((c2Val & 0xFF00UL) >> 8);
     }
 
-    inline constexpr tCIDLib::TCard2 c2Low16From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard2 c2Low16From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard2(c4Val & 0xFFFFUL);
     }
 
-    inline constexpr tCIDLib::TCard2 c2High16From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard2 c2High16From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard2((c4Val & 0xFFFF0000UL) >> 16);
     }
 
-    inline constexpr tCIDLib::TCard1 c1Low8From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard1 c1Low8From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard1(c4Val & 0xFFUL);
     }
 
-    inline constexpr tCIDLib::TCard1 c1Sec8From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard1 c1Sec8From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard1((c4Val & 0xFF00UL) >> 8);
     }
 
-    inline constexpr tCIDLib::TCard1 c1Third8From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard1 c1Third8From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard1((c4Val & 0xFF0000UL) >> 16);
     }
 
-    inline constexpr tCIDLib::TCard1 c1High8From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TCard1 c1High8From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TCard1((c4Val & 0xFF000000UL) >> 24);
     }
 
-    inline constexpr tCIDLib::TInt1 i1Low8From16(const tCIDLib::TCard2 c2Val)
+    constexpr tCIDLib::TInt1 i1Low8From16(const tCIDLib::TCard2 c2Val)
     {
         return tCIDLib::TInt1(c2Val & 0xFFUL);
     }
 
-    inline constexpr tCIDLib::TInt1 i1High8From16(const tCIDLib::TCard2 c2Val)
+    constexpr tCIDLib::TInt1 i1High8From16(const tCIDLib::TCard2 c2Val)
     {
         return tCIDLib::TInt1((c2Val & 0xFF00UL) >> 8);
     }
-    inline constexpr tCIDLib::TInt2 i2Low16From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TInt2 i2Low16From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TInt2(c4Val & 0xFFFFUL);
     }
 
-    inline constexpr tCIDLib::TInt2 i2High16From32(const tCIDLib::TCard4 c4Val)
+    constexpr tCIDLib::TInt2 i2High16From32(const tCIDLib::TCard4 c4Val)
     {
         return tCIDLib::TInt2((c4Val & 0xFFFF0000UL) >> 16);
     }
 
-    inline constexpr tCIDLib::TCard4 c4Low32From64(const tCIDLib::TCard8& c8Val)
+    constexpr tCIDLib::TCard4 c4Low32From64(const tCIDLib::TCard8& c8Val)
     {
         return tCIDLib::TCard4(c8Val & kCIDLib::c4MaxCard);
     }
 
-    inline constexpr tCIDLib::TCard4 c4High32From64(const tCIDLib::TCard8& c8Val)
+    constexpr tCIDLib::TCard4 c4High32From64(const tCIDLib::TCard8& c8Val)
     {
         return tCIDLib::TCard4(c8Val >> 32);
     }
@@ -174,7 +174,7 @@ namespace TRawBits
     //  Creates a 32 bit value from two 16 bit values or a 16 bit value from
     //  two 8 bit values or a 32 bit value from 4 8 bit values.
     // -----------------------------------------------------------------------
-    inline constexpr
+    constexpr
     tCIDLib::TCard2 c2From8(const tCIDLib::TCard1 c1Low, const tCIDLib::TCard1 c1High)
     {
         return tCIDLib::TCard2
@@ -183,13 +183,13 @@ namespace TRawBits
         );
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard4 c4From16(const tCIDLib::TCard2 c2Low, const tCIDLib::TCard2 c2High)
     {
         return ((tCIDLib::TCard4(c2High) << 16) | c2Low);
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TCard8 c8From32(const tCIDLib::TCard4 c4Low, const tCIDLib::TCard4 c4High)
     {
         tCIDLib::TCard8 c8Ret = c4High;
@@ -198,7 +198,7 @@ namespace TRawBits
         return c8Ret;
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TInt4 i4From16(const tCIDLib::TInt2  i2Low, const tCIDLib::TInt2  i2High)
     {
         tCIDLib::TInt4 i4Ret = i2High;
@@ -207,7 +207,7 @@ namespace TRawBits
         return i4Ret;
     }
 
-    inline constexpr
+    constexpr
     tCIDLib::TInt4 i4From32(const tCIDLib::TInt4  i4Low, const tCIDLib::TInt4  i4High)
     {
         tCIDLib::TInt4 i4Ret = i4High;
@@ -220,12 +220,12 @@ namespace TRawBits
     // -----------------------------------------------------------------------
     //  Swap byte order
     // -----------------------------------------------------------------------
-    inline constexpr tCIDLib::TCard2 c2SwapBytes(const tCIDLib::TCard2 c2ToSwap)
+    constexpr tCIDLib::TCard2 c2SwapBytes(const tCIDLib::TCard2 c2ToSwap)
     {
         return((c2ToSwap << 8) | (c2ToSwap >> 8));
     }
 
-    inline constexpr tCIDLib::TCard4 c4SwapBytes(const tCIDLib::TCard4 c4Swap)
+    constexpr tCIDLib::TCard4 c4SwapBytes(const tCIDLib::TCard4 c4Swap)
     {
         return
         (
@@ -248,17 +248,17 @@ namespace TRawBits
         , const tCIDLib::TBoolean           bIsLittle
     );
 
-    inline constexpr tCIDLib::TInt2 i2SwapBytes(const tCIDLib::TInt2 i2ToSwap)
+    constexpr tCIDLib::TInt2 i2SwapBytes(const tCIDLib::TInt2 i2ToSwap)
     {
         return tCIDLib::TInt2(c2SwapBytes(tCIDLib::TCard2(i2ToSwap)));
     }
 
-    inline constexpr tCIDLib::TInt4 i4SwapBytes(const tCIDLib::TInt4 i4Swap)
+    constexpr tCIDLib::TInt4 i4SwapBytes(const tCIDLib::TInt4 i4Swap)
     {
         return tCIDLib::TInt4(c4SwapBytes(tCIDLib::TCard4(i4Swap)));
     }
 
-    inline constexpr tCIDLib::TCard8 c8SwapBytes(const tCIDLib::TCard8& c8Swap)
+    constexpr tCIDLib::TCard8 c8SwapBytes(const tCIDLib::TCard8& c8Swap)
     {
         return
         (
@@ -273,7 +273,7 @@ namespace TRawBits
         );
     }
 
-    inline constexpr tCIDLib::TInt8 i8SwapBytes(const tCIDLib::TInt8 i8Swap)
+    constexpr tCIDLib::TInt8 i8SwapBytes(const tCIDLib::TInt8 i8Swap)
     {
         return tCIDLib::TInt8(c8SwapBytes(tCIDLib::TCard8(i8Swap)));
     }
@@ -318,7 +318,7 @@ namespace TRawBits
     // -----------------------------------------------------------------------
     //  Do swapping of the value based on our current endianness
     // -----------------------------------------------------------------------
-    inline constexpr tCIDLib::TCard2 c2FromBigEndian(tCIDLib::TCard2 c2ToSwap)
+    constexpr tCIDLib::TCard2 c2FromBigEndian(tCIDLib::TCard2 c2ToSwap)
     {
         #if defined(CIDLIB_BIGENDIAN)
         return c2ToSwap;
@@ -329,7 +329,7 @@ namespace TRawBits
         #endif
     }
 
-    inline constexpr tCIDLib::TCard4 c4FromBigEndian(tCIDLib::TCard4 c4ToSwap)
+    constexpr tCIDLib::TCard4 c4FromBigEndian(tCIDLib::TCard4 c4ToSwap)
     {
         #if defined(CIDLIB_BIGENDIAN)
         return c4ToSwap;
@@ -342,7 +342,7 @@ namespace TRawBits
         #endif
     }
 
-    inline constexpr tCIDLib::TCard2 c2FromLittleEndian(tCIDLib::TCard2 c2ToSwap)
+    constexpr tCIDLib::TCard2 c2FromLittleEndian(tCIDLib::TCard2 c2ToSwap)
     {
         #if defined(CIDLIB_LITTLEENDIAN)
         return c2ToSwap;
@@ -353,7 +353,7 @@ namespace TRawBits
         #endif
     }
 
-    inline constexpr tCIDLib::TCard4 c4FromLittleEndian(tCIDLib::TCard4 c4ToSwap)
+    constexpr tCIDLib::TCard4 c4FromLittleEndian(tCIDLib::TCard4 c4ToSwap)
     {
         #if defined(CIDLIB_LITTLEENDIAN)
         return c4ToSwap;

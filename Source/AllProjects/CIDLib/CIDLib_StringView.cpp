@@ -50,7 +50,7 @@ tCIDLib::TBoolean TStringView::bContainsChar(const tCIDLib::TCh chToFind) const 
 
 
 tCIDLib::TBoolean TStringView::bContainsSubStr( const   TString&            strToFind
-                                                , const tCIDLib::TBoolean   bCaseSensitive) const
+                                                , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
     if (m_pszRaw)
         return TRawStr::pszFindSubStr(m_pszRaw, strToFind.pszBuffer(), 0, bCaseSensitive) != nullptr;
@@ -58,7 +58,7 @@ tCIDLib::TBoolean TStringView::bContainsSubStr( const   TString&            strT
 }
 
 tCIDLib::TBoolean TStringView::bContainsSubStr( const   tCIDLib::TCh* const pszToFind
-                                                , const tCIDLib::TBoolean   bCaseSensitive) const
+                                                , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
     if (m_pszRaw)
         return TRawStr::pszFindSubStr(m_pszRaw, pszToFind, 0, bCaseSensitive) != nullptr;
@@ -67,7 +67,7 @@ tCIDLib::TBoolean TStringView::bContainsSubStr( const   tCIDLib::TCh* const pszT
 
 
 tCIDLib::TBoolean TStringView::bStartsWith( const   TString&            strToFind
-                                            , const tCIDLib::TBoolean   bCaseSensitive) const
+                                            , const tCIDLib::TBoolean   bCaseSensitive) const noexcept
 {
     if (m_pszRaw)
     {
@@ -79,26 +79,6 @@ tCIDLib::TBoolean TStringView::bStartsWith( const   TString&            strToFin
     if (bCaseSensitive)
         return m_pstrObj->bStartsWith(strToFind);
     return  m_pstrObj->bStartsWithI(strToFind);
-}
-
-
-tCIDLib::TCard4 TStringView::c4Length() const noexcept
-{
-    if (m_pszRaw)
-    {
-        if (m_c4RawLen == kCIDLib::c4MaxCard)
-            m_c4RawLen = TRawStr::c4StrLen(m_pszRaw);
-        return m_c4RawLen;
-    }
-    return m_pstrObj->c4Length();
-}
-
-
-const tCIDLib::TCh* TStringView::pszBuffer() const noexcept
-{
-    if (m_pszRaw)
-        return m_pszRaw;
-    return m_pstrObj->pszBuffer();
 }
 
 
@@ -124,19 +104,3 @@ const tCIDLib::TCh* TStringView::pszBufferAt(const tCIDLib::TCard4 c4At) const
     return m_pstrObj->pszBufferAt(c4At);
 }
 
-
-// ---------------------------------------------------------------------------
-//  TStringView: Private, non-virtual methods
-// ---------------------------------------------------------------------------
-tCIDLib::TVoid TStringView::ThrowNull(  const   tCIDLib::TCh* const pszFile
-                                        , const tCIDLib::TCard4     c4Line)
-{
-    facCIDLib().ThrowErr
-    (
-        pszFile
-        , c4Line
-        , kCIDErrs::errcStr_NullSrc
-        , tCIDLib::ESeverities::Failed
-        , tCIDLib::EErrClasses::Index
-    );
-}

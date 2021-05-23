@@ -2990,7 +2990,7 @@ TMacroEngParser::ParseMethodBody(TParserSrc&            psrcClass
                     meopJump.c4Immediate(methToFill.c4CurOffset());
 
                     // And toss this top of stack item
-                    m_colFlowStack.objPop();
+                    m_colFlowStack.TrashTop();
                 }
                  else
                 {
@@ -3007,11 +3007,11 @@ TMacroEngParser::ParseMethodBody(TParserSrc&            psrcClass
                     {
                         TMEngOpCode& meopJump = methToFill[mefciTop.c4Offset1()];
                         meopJump.c4Immediate(methToFill.c4CurOffset());
-                        m_colFlowStack.objPop();
+                        m_colFlowStack.TrashTop();
                     }
                      else if (mefciTop.eType() == tCIDMacroEng::EFlowTypes::Else)
                     {
-                        m_colFlowStack.objPop();
+                        m_colFlowStack.TrashTop();
                     }
 
                     while (kCIDLib::True)

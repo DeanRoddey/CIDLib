@@ -72,10 +72,10 @@ class CIDLIBEXP MFormattable
         //  generated copy and assignment.
         // -------------------------------------------------------------------
         constexpr MFormattable() noexcept {}
-        MFormattable(const MFormattable&) = default;
-        MFormattable(MFormattable&&) = default;
-        MFormattable& operator=(const MFormattable&) = default;
-        MFormattable& operator=(MFormattable&&) = default;
+        constexpr MFormattable(const MFormattable&) = default;
+        constexpr MFormattable(MFormattable&&) = default;
+        constexpr MFormattable& operator=(const MFormattable&) = default;
+        constexpr MFormattable& operator=(MFormattable&&) = default;
 
 
         // -------------------------------------------------------------------
