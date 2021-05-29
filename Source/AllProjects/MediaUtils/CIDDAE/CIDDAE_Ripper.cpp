@@ -41,9 +41,9 @@ RTTIDecls(TCIDDAERipper,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDDAE_Ripper
+namespace
 {
-    namespace
+    namespace CIDDAE_Ripper
     {
         // -----------------------------------------------------------------------
         //  We need to be able to provide unique thread names for our read/write

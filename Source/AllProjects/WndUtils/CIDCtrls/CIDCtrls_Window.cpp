@@ -183,9 +183,9 @@ class TWndMapItemKeyOps
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_Window
+namespace
 {
-    namespace
+    namespace CIDCtrls_Window
     {
         // ------------------------------------------------------------------------
         //  We have to be able to map from window handles (which we get in the window proc) and

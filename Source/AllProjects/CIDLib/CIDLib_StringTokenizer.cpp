@@ -37,16 +37,19 @@
 RTTIDecls(TStringTokenizer,TObject)
 
 
-namespace CIDLib_StringTokenizer
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c4MaxTokenLen
-    //      The maximum length that we can return as a token. This should way
-    //      more than sufficient.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4    c4MaxTokenLen = kCIDLib::c4Sz_64K;
+    namespace CIDLib_StringTokenizer
+    {
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c4MaxTokenLen
+        //      The maximum length that we can return as a token. This should way
+        //      more than sufficient.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4    c4MaxTokenLen = kCIDLib::c4Sz_64K;
+    }
 }
 
 

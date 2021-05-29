@@ -40,9 +40,9 @@ RTTIDecls(TPubSubTopic, TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_PubSub
+namespace
 {
-    namespace
+    namespace CIDLib_PubSub
     {
         using TTopicList    = TKeyedHashSet<TPubSubTopic, TString, TStringKeyOps>;
         using TSubList      = TRefVector<MPubSubscription>;

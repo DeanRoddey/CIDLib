@@ -38,57 +38,60 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDBuild_ToolsDriver_Win32
+namespace
 {
-    //
-    //  These strings make up the leading and trailing parts of the manifest
-    //  resource we have to apply to executables. In between will be a couple
-    //  of lines generated on the fly based on the program name and version.
-    //
-    const tCIDLib::TCh* const pszLeadingManifest =
-    (
-        L"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
-        L"<assembly xmlns=\"urn:schemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">\n"
+    namespace CIDBuild_ToolsDriver_Win32
+    {
+        //
+        //  These strings make up the leading and trailing parts of the manifest
+        //  resource we have to apply to executables. In between will be a couple
+        //  of lines generated on the fly based on the program name and version.
+        //
+        const tCIDLib::TCh* const pszLeadingManifest =
+        (
+            L"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+            L"<assembly xmlns=\"urn:schemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">\n"
 
-        L"<assemblyIdentity type=\"win32\"\n"
-    );
+            L"<assemblyIdentity type=\"win32\"\n"
+        );
 
-    const tCIDLib::TCh* const pszLeadingManifest2 =
-    (
-        L"                  processorArchitecture=\"x86\"\n"
-        L"                  publicKeyToken=\"6595b64144ccf1df\"/>\n\n"
-    );
-
-
-    const tCIDLib::TCh* const pszGUIManifest =
-    (
-        // Force high DPI awareness
-        L"  <asmv3:application xmlns:asmv3=\"urn:schemas-microsoft-com:asm.v3\">\n"
-        L"     <asmv3:windowsSettings xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">\n"
-        L"       <dpiAware>true</dpiAware> \n"
-        L"     </asmv3:windowsSettings>\n"
-        L"  </asmv3:application>\n\n"
-    );
+        const tCIDLib::TCh* const pszLeadingManifest2 =
+        (
+            L"                  processorArchitecture=\"x86\"\n"
+            L"                  publicKeyToken=\"6595b64144ccf1df\"/>\n\n"
+        );
 
 
-    const tCIDLib::TCh* const pszTrailingManifest =
-    (
-        L"  <dependency>\n"
-        L"    <dependentAssembly>\n"
-
-        // Force V6 of the common controls to load, else we'd get 5 and it won't work
-        L"       <assemblyIdentity type=\"win32\"\n"
-        L"                         name=\"Microsoft.Windows.Common-Controls\"\n"
-        L"                         version=\"6.0.0.0\"\n"
-        L"                         processorArchitecture=\"*\"\n"
-        L"                         publicKeyToken=\"6595b64144ccf1df\"\n"
-        L"                         language=\"*\"/>\n"
+        const tCIDLib::TCh* const pszGUIManifest =
+        (
+            // Force high DPI awareness
+            L"  <asmv3:application xmlns:asmv3=\"urn:schemas-microsoft-com:asm.v3\">\n"
+            L"     <asmv3:windowsSettings xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">\n"
+            L"       <dpiAware>true</dpiAware> \n"
+            L"     </asmv3:windowsSettings>\n"
+            L"  </asmv3:application>\n\n"
+        );
 
 
-        L"    </dependentAssembly>\n"
-        L"  </dependency>\n"
-        L"</assembly>\n"
-    );
+        const tCIDLib::TCh* const pszTrailingManifest =
+        (
+            L"  <dependency>\n"
+            L"    <dependentAssembly>\n"
+
+            // Force V6 of the common controls to load, else we'd get 5 and it won't work
+            L"       <assemblyIdentity type=\"win32\"\n"
+            L"                         name=\"Microsoft.Windows.Common-Controls\"\n"
+            L"                         version=\"6.0.0.0\"\n"
+            L"                         processorArchitecture=\"*\"\n"
+            L"                         publicKeyToken=\"6595b64144ccf1df\"\n"
+            L"                         language=\"*\"/>\n"
+
+
+            L"    </dependentAssembly>\n"
+            L"  </dependency>\n"
+            L"</assembly>\n"
+        );
+    }
 }
 
 

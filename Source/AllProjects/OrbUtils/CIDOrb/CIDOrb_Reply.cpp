@@ -38,9 +38,9 @@
 RTTIDecls(TOrbReply, TObject)
 
 
-namespace CIDOrb_Reply
+namespace
 {
-    namespace
+    namespace CIDOrb_Reply
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

@@ -41,9 +41,9 @@ RTTIDecls(TIPEndPoint,TIPAddress)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDSock_IPAddr
+namespace
 {
-    namespace
+    namespace CIDSock_IPAddr
     {
         // -------------------------------------------------------------------
         //  The streaming format version for the IP address class
@@ -63,13 +63,13 @@ namespace CIDSock_IPAddr
         //      And, again, we failed to store the flow info value of an IPV6
         //      address, so that was added as well.
         // -------------------------------------------------------------------
-        const tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
+        constexpr tCIDLib::TCard1   c1IPAddrFmtVersion = 5;
 
 
         // -------------------------------------------------------------------
         //  The straeming format version for the IP end point class
         // -------------------------------------------------------------------
-        const tCIDLib::TCard1   c1EndPntFmtVersion = 1;
+        constexpr tCIDLib::TCard1   c1EndPntFmtVersion = 1;
     }
 }
 

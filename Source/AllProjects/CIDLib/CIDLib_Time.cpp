@@ -37,9 +37,9 @@
 AdvRTTIDecls(TTime,TObject)
 
 
-namespace CIDLib_Time
+namespace
 {
-    namespace
+    namespace CIDLib_Time
     {
         // -----------------------------------------------------------------------
         //  Local data
@@ -1026,9 +1026,9 @@ TTime::TTime() :
 {
 }
 
-TTime::TTime(const tCIDLib::TCh* const pszDefFormat) :
+TTime::TTime(const TStringView& strvDefFormat) :
 
-    m_pstrDefFormat(new TString(pszDefFormat))
+    m_pstrDefFormat(new TString(strvDefFormat))
 {
 }
 
@@ -1343,7 +1343,7 @@ tCIDLib::TBoolean TTime::bInPM() const
 //  comes back as is, since that's what they'd typically want.
 //
 static tCIDLib::TBoolean
-bGetTimeVal(const   TString&            strToParse
+bGetTimeVal(const   TStringView&        strvToParse
             , const tCIDLib::TCard4     c4Count
             ,       tCIDLib::TCard4&    c4Index
             ,       TString&            strTmp
@@ -1355,14 +1355,14 @@ bGetTimeVal(const   TString&            strToParse
     f8DecVal = 0.0;
 
     // Has to be at two digits
-    strToParse.CopyOutSubStr(strTmp, c4Index, 2);
+    strvToParse.CopyOutSubStr(strTmp, c4Index, 2);
     c4Val = strTmp.c4Val(tCIDLib::ERadices::Dec);
     c4Index += 2;
 
     // If the next char is a decimal or comma, we have to deal with that
     if (c4Index < c4Count)
     {
-        tCIDLib::TCh chCur = strToParse[c4Index];
+        tCIDLib::TCh chCur = strvToParse[c4Index];
         bGotDec = (chCur == kCIDLib::chPeriod) || (chCur == kCIDLib::chComma);
         if (bGotDec)
         {
@@ -1372,7 +1372,7 @@ bGetTimeVal(const   TString&            strToParse
             // Pull out decimals until we hit a non-digit
             while (c4Index < c4Count)
             {
-                chCur = strToParse[c4Index];
+                chCur = strvToParse[c4Index];
                 if (!TRawStr::bIsDigit(chCur))
                     break;
 
@@ -1389,7 +1389,7 @@ bGetTimeVal(const   TString&            strToParse
 }
 
 tCIDLib::TBoolean
-TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLocal)
+TTime::bParseFrom8601(const TStringView& strvToParse, const tCIDLib::TBoolean bAsLocal)
 {
     enum class EStates
     {
@@ -1433,14 +1433,14 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
         tCIDLib::TBoolean   bGotYearSep = kCIDLib::False;
         tCIDLib::TBoolean   bNegTZ = kCIDLib::False;
         tCIDLib::TBoolean   bSkippedDay = kCIDLib::True;
-        tCIDLib::TCard4     c4Count = strToParse.c4Length();
+        tCIDLib::TCard4     c4Count = strvToParse.c4Length();
         tCIDLib::TCard4     c4Index = 0;
         tCIDLib::TFloat8    f8DecVal = 0;
         TString             strTmp;
 
         while (c4Index < c4Count)
         {
-            const tCIDLib::TCh chCur = strToParse[c4Index];
+            const tCIDLib::TCh chCur = strvToParse[c4Index];
 
             switch(eState)
             {
@@ -1454,7 +1454,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
                 case EStates::Year :
                     // Has to be four digits
-                    strToParse.CopyOutSubStr(strTmp, c4Index, 4);
+                    strvToParse.CopyOutSubStr(strTmp, c4Index, 4);
                     c4Year = strTmp.c4Val(tCIDLib::ERadices::Dec);
                     c4Index += 4;
 
@@ -1473,7 +1473,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
                 case EStates::Month :
                     // Has to be two digits
-                    strToParse.CopyOutSubStr(strTmp, c4Index, 2);
+                    strvToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Month = strTmp.c4Val(tCIDLib::ERadices::Dec);
                     c4Index += 2;
 
@@ -1514,7 +1514,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
                 case EStates::Day :
                     // Has to be two digits, since we don't support the ordinal or week types
-                    strToParse.CopyOutSubStr(strTmp, c4Index, 2);
+                    strvToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     c4Day = strTmp.c4Val(tCIDLib::ERadices::Dec);
                     c4Index += 2;
 
@@ -1540,7 +1540,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                     break;
 
                 case EStates::Hour :
-                    if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Hour, f8DecVal))
+                    if (bGetTimeVal(strvToParse, c4Count, c4Index, strTmp, c4Hour, f8DecVal))
                     {
                         //
                         //  We won't do any more time, but set the minutes based on
@@ -1589,7 +1589,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
                 case EStates::Min :
                     // Get the minute value
-                    if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Min, f8DecVal))
+                    if (bGetTimeVal(strvToParse, c4Count, c4Index, strTmp, c4Min, f8DecVal))
                     {
                         //
                         //  We won't do any more time, but set the seconds based on
@@ -1637,7 +1637,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
                 case EStates::Sec :
                 {
                     // We'll set up millis if we get a decimal value
-                    if (bGetTimeVal(strToParse, c4Count, c4Index, strTmp, c4Sec, f8DecVal))
+                    if (bGetTimeVal(strvToParse, c4Count, c4Index, strTmp, c4Sec, f8DecVal))
                         c4Millis = tCIDLib::TCard4(1000.0 * f8DecVal);
 
                     // Make sure it's a valid second
@@ -1668,7 +1668,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
                 case EStates::TZHour :
                     // Get the hours part of the offset
-                    strToParse.CopyOutSubStr(strTmp, c4Index, 2);
+                    strvToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs = strTmp.i4Val(tCIDLib::ERadices::Dec) * 60;
                     c4Index += 2;
 
@@ -1683,7 +1683,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 
 
                 case EStates::TZMin :
-                    strToParse.CopyOutSubStr(strTmp, c4Index, 2);
+                    strvToParse.CopyOutSubStr(strTmp, c4Index, 2);
                     i4TZOfs += strTmp.i4Val(tCIDLib::ERadices::Dec);
                     c4Index += 2;
                     eState = EStates::TZEnd;
@@ -1803,7 +1803,7 @@ TTime::bParseFrom8601(const TString& strToParse, const tCIDLib::TBoolean bAsLoca
 //  didn't work, just whether it did or not.
 //
 tCIDLib::TBoolean
-TTime::bParseFromText(  const   TString&        strSrc
+TTime::bParseFromText(  const   TStringView&    strvSrc
                         , const TTimeCompList&  fcolCompList
                         , const tCIDLib::TCh    chDateSep
                         , const tCIDLib::TCh    chTimeSep
@@ -1811,7 +1811,7 @@ TTime::bParseFromText(  const   TString&        strSrc
 {
     try
     {
-        ParseFromText(strSrc, fcolCompList, chDateSep, chTimeSep, chTZSep);
+        ParseFromText(strvSrc, fcolCompList, chDateSep, chTimeSep, chTZSep);
     }
 
     catch(...)
@@ -2594,7 +2594,7 @@ tCIDLib::TVoid TTime::LocalToUTC()
 //  that list and pull those components out one by one.
 //
 tCIDLib::TVoid
-TTime::ParseFromText(const  TString&        strSrc
+TTime::ParseFromText(const  TStringView&    strvSrc
                     , const TTimeCompList&  fcolCompList
                     , const tCIDLib::TCh    chDateSep
                     , const tCIDLib::TCh    chTimeSep
@@ -2643,8 +2643,11 @@ TTime::ParseFromText(const  TString&        strSrc
     if (chActTZSep != kCIDLib::chSpace)
         strSpace.Append(chActTZSep);
 
-    // Set up an input stream on the src string
-    TTextStringInStream strmSrc(&strSrc);
+    //
+    //  Set up an input stream on the src string. If it's a raw string, this will make a copy to
+    //  be adopted by the stream. If a string object, the stream will use it directly.
+    //
+    TTextStringInStream strmSrc(strvSrc);
 
     tCIDLib::TCh    chCur = kCIDLib::chNull;
     tCIDLib::TCard4 c4Count = 0;
@@ -3303,7 +3306,11 @@ tCIDLib::TVoid TTime::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TTime::LazyInit()
 {
-    // The caller already checked once, so just assume we need to lock
+    //
+    //  The caller already checked once, so just assume we need to lock. Here, though
+    //  normally you shouldn't do this, we use the base lock since this is pretty
+    //  fundamental stuff.
+    //
     TBaseLock lockInit;
     if (!CIDLib_Time::atomInitDone)
     {

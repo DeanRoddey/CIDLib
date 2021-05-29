@@ -102,7 +102,7 @@ class CIDLIBEXP TFindBuf :
 
         TFindBuf
         (
-            const   TString&                strDefFormat
+            const   TStringView&            strvDefFormat
         );
 
         TFindBuf
@@ -183,7 +183,7 @@ class CIDLIBEXP TFindBuf :
 
         TPathStr& pathFileName
         (
-            const   TString&                strToSet
+            const   TStringView&            strToSet
         );
 
         tCIDLib::TVoid RemoveAllChildren();
@@ -192,21 +192,21 @@ class CIDLIBEXP TFindBuf :
 
         const TString& strDateFormat
         (
-            const   TString&                strNewDef
+            const   TStringView&            strvNewDef
         );
 
         const TString& strDefFormat() const;
 
         const TString& strDefFormat
         (
-            const   TString&                strNewDef
+            const   TStringView&            strvNewDef
         );
 
         const TString& strTimeFormat() const;
 
         const TString& strTimeFormat
         (
-            const   TString&                strNewDef
+            const   TStringView&            strvNewDef
         );
 
         const TTime& tmCreated() const;
@@ -259,7 +259,7 @@ class CIDLIBEXP TFindBuf :
         tCIDLib::TVoid FromFindBuf
         (
             const   TKrnlFileSys::TRawFileFind& rfndSrc
-            , const TString&                strPath
+            , const TStringView&                strvPath
         );
 
 

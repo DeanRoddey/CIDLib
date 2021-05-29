@@ -41,9 +41,9 @@ RTTIDecls(TSysBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_SysMemBuf
+namespace
 {
-    namespace
+    namespace CIDLib_SysMemBuf
     {
         // -----------------------------------------------------------------------
         //  Our persistent format versions

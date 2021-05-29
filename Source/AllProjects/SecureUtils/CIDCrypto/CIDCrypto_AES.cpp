@@ -60,9 +60,9 @@ RTTIDecls(TAESEncrypter,TBlockEncrypter)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDCrypto_AES
+namespace
 {
-    namespace
+    namespace CIDCrypto_AES
     {
         // Forward S-box
         constexpr tCIDLib::TCard4  ac4FSBox[256] =

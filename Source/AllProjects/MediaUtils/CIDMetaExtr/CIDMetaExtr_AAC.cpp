@@ -40,9 +40,9 @@ RTTIDecls(TCIDMetaExtrAAC,TCIDMetaExtror)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDMetaExtr_AAC
+namespace
 {
-    namespace
+    namespace CIDMetaExtr_AAC
     {
         // Constants for the various box types we care about
         constexpr tCIDLib::TCard4   c4Box_DATA = 0x64617461;

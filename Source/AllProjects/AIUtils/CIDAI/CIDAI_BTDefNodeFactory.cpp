@@ -51,18 +51,21 @@ RTTIDecls(TAIBTDefNodeFact, TAIBTNodeFact)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDAI_BTDefNodeFactory
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  The names of the node types we support
-    // -----------------------------------------------------------------------
-    const TString   strType_Inverter(L"Inverter");
-    const TString   strType_Link(L"Link");
-    const TString   strType_RandChoice(L"RandChoice");
-    const TString   strType_Selector(L"Selector");
-    const TString   strType_Sequence(L"Sequence");
-    const TString   strType_Success(L"Success");
-    const TString   strType_VarTest(L"VarTest");
+    namespace CIDAI_BTDefNodeFactory
+    {
+        // -----------------------------------------------------------------------
+        //  The names of the node types we support
+        // -----------------------------------------------------------------------
+        const TString   strType_Inverter(L"Inverter");
+        const TString   strType_Link(L"Link");
+        const TString   strType_RandChoice(L"RandChoice");
+        const TString   strType_Selector(L"Selector");
+        const TString   strType_Sequence(L"Sequence");
+        const TString   strType_Success(L"Success");
+        const TString   strType_VarTest(L"VarTest");
+    }
 }
 
 

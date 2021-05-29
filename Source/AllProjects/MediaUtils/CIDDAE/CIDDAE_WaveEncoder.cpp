@@ -41,9 +41,9 @@ RTTIDecls(TCIDDAEWaveEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDDAE_WaveEncoder
+namespace
 {
-    namespace
+    namespace CIDDAE_WaveEncoder
     {
         // -----------------------------------------------------------------------
         //  The names we return for our codec and format

@@ -42,9 +42,9 @@ RTTIDecls(TStatsCacheItemInfo,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDLib_StatsCache
+namespace
 {
-    namespace
+    namespace CIDLib_StatsCache
     {
         // -----------------------------------------------------------------------
         //  We just use a simple array of pointers to cache items. It's of fixed

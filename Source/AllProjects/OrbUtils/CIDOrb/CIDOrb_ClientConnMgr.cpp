@@ -40,9 +40,9 @@ RTTIDecls(TOrbClientConnMgr,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDOrb_ClientConnMgr
+namespace
 {
-    namespace
+    namespace CIDOrb_ClientConnMgr
     {
         // -----------------------------------------------------------------------
         //  The maximum number of worker threads we can have.

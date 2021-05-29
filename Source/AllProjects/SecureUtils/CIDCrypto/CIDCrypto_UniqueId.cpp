@@ -31,9 +31,9 @@
 #include    "CIDCrypto_.hpp"
 
 
-namespace CIDCrypto_UniqueId
+namespace
 {
-    namespace
+    namespace CIDCrypto_UniqueId
     {
         // -----------------------------------------------------------------------
         //  Local constants

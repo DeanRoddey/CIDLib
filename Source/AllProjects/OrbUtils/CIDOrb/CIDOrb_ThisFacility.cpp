@@ -34,9 +34,9 @@
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDOrb_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDOrb_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  The timeout period for the name server object id cache. We set it

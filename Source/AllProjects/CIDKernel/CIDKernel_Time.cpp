@@ -36,9 +36,9 @@
 
 
 
-namespace CIDKernel_Time
+namespace
 {
-    namespace
+    namespace CIDKernel_Time
     {
         // -----------------------------------------------------------------------
         //  Local constant values

@@ -42,13 +42,16 @@ RTTIDecls(TSocket,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDSock_Socket
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  Some stats cache items we maintain
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomInitDone;
-    TStatsCacheItem     sciSockCnt;
+    namespace CIDSock_Socket
+    {
+        // -----------------------------------------------------------------------
+        //  Some stats cache items we maintain
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomInitDone;
+        TStatsCacheItem     sciSockCnt;
+    }
 }
 
 

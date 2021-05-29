@@ -58,32 +58,32 @@ namespace TProcEnvironment
     // -----------------------------------------------------------------------
     CIDLIBEXP tCIDLib::TVoid Add
     (
-        const   TString&                strKey
-        , const TString&                strNewValue
+        const   TStringView&            strvKey
+        , const TStringView&            strvNewValue
     );
 
     CIDLIBEXP tCIDLib::TBoolean bAddOrUpdate
     (
-        const   TString&                strKey
-        , const TString&                strNewValue
+        const   TStringView&            strvKey
+        , const TStringView&            strvNewValue
     );
 
     CIDLIBEXP tCIDLib::TVoid AddToExePath
     (
-        const   TString&                strNewValue
+        const   TStringView&            strvNewValue
         , const tCIDLib::EStartEnd      eWhere = tCIDLib::EStartEnd::End
     );
 
     CIDLIBEXP tCIDLib::TVoid AddToLibPath
     (
-        const   TString&                strNewValue
+        const   TStringView&            strNewValue
         , const tCIDLib::EStartEnd      eWhere = tCIDLib::EStartEnd::End
     );
 
     CIDLIBEXP tCIDLib::TBoolean bFind
     (
-        const   TString&                strKey
-        ,       TString&                strToFill
+        const   TStringView&            strvKey
+        ,       TString&                strvToFill
     );
 
     CIDLIBEXP tCIDLib::TBoolean bFindExePath
@@ -98,25 +98,25 @@ namespace TProcEnvironment
 
     CIDLIBEXP tCIDLib::TBoolean bFindTempPath
     (
-                TString&                strToFill
+                TString&                strvToFill
     );
 
     CIDLIBEXP tCIDLib::TCard4 c4Entries();
 
     CIDLIBEXP tCIDLib::TCard4 c4CharsInValue
     (
-        const   TString&                strKey
+        const   TStringView&            strvKey
     );
 
     CIDLIBEXP TString strFind
     (
-        const   TString&                strKey
+        const   TStringView&            strvKey
     );
 
     CIDLIBEXP tCIDLib::TVoid Update
     (
-        const   TString&                strKey
-        , const TString&                strNewValue
+        const   TStringView&            strvKey
+        , const TStringView&            strvNewValue
     );
 }
 

@@ -43,25 +43,28 @@ RTTIDecls(TAIBehaviorTree, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDAI_BehaviorTree
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  The format version of our overall binary representation of a tree
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1FmtVersion = 1;
+    namespace CIDAI_BehaviorTree
+    {
+        // -----------------------------------------------------------------------
+        //  The format version of our overall binary representation of a tree
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard1   c1FmtVersion = 1;
 
 
-    // -----------------------------------------------------------------------
-    //  The format version of the per-tree part of our binary representation
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1FmtSlotVersion = 1;
+        // -----------------------------------------------------------------------
+        //  The format version of the per-tree part of our binary representation
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard1   c1FmtSlotVersion = 1;
 
 
-    // -----------------------------------------------------------------------
-    //  Some marker bytes we put into the header section of the binary file format
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard1   c1Marker1 = 0xC9;
-    const tCIDLib::TCard1   c1Marker2 = 0xD7;
+        // -----------------------------------------------------------------------
+        //  Some marker bytes we put into the header section of the binary file format
+        // -----------------------------------------------------------------------
+        const tCIDLib::TCard1   c1Marker1 = 0xC9;
+        const tCIDLib::TCard1   c1Marker2 = 0xD7;
+    }
 }
 
 

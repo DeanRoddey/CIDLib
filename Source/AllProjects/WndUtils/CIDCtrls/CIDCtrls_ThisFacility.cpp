@@ -44,9 +44,9 @@ RTTIDecls(TFacCIDCtrls, TGUIFacility)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDCtrls_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  This is used to fault in the special text file when/if it is required.

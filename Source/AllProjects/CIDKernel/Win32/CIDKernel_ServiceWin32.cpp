@@ -43,9 +43,9 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDKernel_SvcWin32
+namespace
 {
-    namespace
+    namespace CIDKernel_SvcWin32
     {
         // -----------------------------------------------------------------------
         //  We can be started in debug mode, which is useful for debugging the

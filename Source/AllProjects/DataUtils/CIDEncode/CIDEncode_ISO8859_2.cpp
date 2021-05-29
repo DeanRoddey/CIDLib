@@ -40,9 +40,9 @@
 AdvRTTIDecls(TLatin2Converter,TMode1EncodingBase)
 
 
-namespace CIDEncode_ISO8859_2
+namespace
 {
-    namespace
+    namespace CIDEncode_ISO8859_2
     {
         // -----------------------------------------------------------------------
         //  Local const data
@@ -67,7 +67,7 @@ namespace CIDEncode_ISO8859_2
         //      more than one Unicode value that maps to a particular external
         //      code point, its not just a 256 entry table.
         // -----------------------------------------------------------------------
-        const tCIDLib::TCh achFromMap[256] =
+        constexpr tCIDLib::TCh achFromMap[256] =
         {
               0x0000 , 0x0001 , 0x0002 , 0x0003 , 0x0004 , 0x0005 , 0x0006 , 0x0007
             , 0x0008 , 0x0009 , 0x000A , 0x000B , 0x000C , 0x000D , 0x000E , 0x000F
@@ -102,7 +102,7 @@ namespace CIDEncode_ISO8859_2
             , 0x0111 , 0x0144 , 0x0148 , 0x00F3 , 0x00F4 , 0x0151 , 0x00F6 , 0x00F7
             , 0x0159 , 0x016F , 0x00FA , 0x0171 , 0x00FC , 0x00FD , 0x0163 , 0x02D9
         };
-        const tCIDEncode::TCharMap acmToMap[] =
+        constexpr tCIDEncode::TCharMap acmToMap[] =
         {
               { 0x0000, 0x00 } , { 0x0001, 0x01 } , { 0x0002, 0x02 } , { 0x0003, 0x03 }
             , { 0x0004, 0x04 } , { 0x0005, 0x05 } , { 0x0006, 0x06 } , { 0x0007, 0x07 }
@@ -193,8 +193,8 @@ namespace CIDEncode_ISO8859_2
             , { 0xFF59, 0x79 } , { 0xFF5A, 0x7A } , { 0xFF5B, 0x7B } , { 0xFF5C, 0x7C }
             , { 0xFF5D, 0x7D } , { 0xFF5E, 0x7E }
         };
-        const tCIDLib::TCard1 c1RepChar = 0x20;
-        const tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
+        constexpr tCIDLib::TCard1 c1RepChar = 0x20;
+        constexpr tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
     }
 }
 

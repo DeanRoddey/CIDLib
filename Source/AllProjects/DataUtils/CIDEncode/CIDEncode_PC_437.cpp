@@ -39,10 +39,9 @@
 // ---------------------------------------------------------------------------
 AdvRTTIDecls(TPC437Converter,TMode1EncodingBase)
 
-
-namespace CIDEncode_PC437
+namespace
 {
-    namespace
+    namespace CIDEncode_PC437
     {
         // -----------------------------------------------------------------------
         //  Local const data
@@ -67,7 +66,7 @@ namespace CIDEncode_PC437
         //      more than one Unicode value that maps to a particular external
         //      code point, its not just a 256 entry table.
         // ---------------------------------------------------------------------------
-        const tCIDLib::TCh achFromMap[256] =
+        constexpr tCIDLib::TCh achFromMap[256] =
         {
               0x0000 , 0x0001 , 0x0002 , 0x0003 , 0x0004 , 0x0005 , 0x0006 , 0x0007
             , 0x0008 , 0x0009 , 0x000A , 0x000B , 0x000C , 0x000D , 0x000E , 0x000F
@@ -102,7 +101,7 @@ namespace CIDEncode_PC437
             , 0x2261 , 0x00B1 , 0x2265 , 0x2264 , 0x2320 , 0x2321 , 0x00F7 , 0x2248
             , 0x00B0 , 0x2219 , 0x00B7 , 0x221A , 0x207F , 0x00B2 , 0x25A0 , 0x00A0
         };
-        const tCIDEncode::TCharMap acmToMap[] =
+        constexpr tCIDEncode::TCharMap acmToMap[] =
         {
               { 0x0000, 0x00 } , { 0x0001, 0x01 } , { 0x0002, 0x02 } , { 0x0003, 0x03 }
             , { 0x0004, 0x04 } , { 0x0005, 0x05 } , { 0x0006, 0x06 } , { 0x0007, 0x07 }
@@ -203,8 +202,8 @@ namespace CIDEncode_PC437
             , { 0xFFEA, 0x18 } , { 0xFFEB, 0x1A } , { 0xFFEC, 0x19 } , { 0xFFED, 0xFE }
             , { 0xFFEE, 0x09 }
         };
-        const tCIDLib::TCard1 c1RepChar = 0x20;
-        const tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
+        constexpr tCIDLib::TCard1 c1RepChar = 0x20;
+        constexpr tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
     }
 }
 

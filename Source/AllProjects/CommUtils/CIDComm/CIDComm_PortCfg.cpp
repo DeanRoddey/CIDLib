@@ -40,11 +40,11 @@ RTTIDecls(TCommPortCfg,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDComm_PortCfg
+namespace
 {
-    namespace
+    namespace CIDComm_PortCfg
     {
-        const tCIDLib::TCard2   c2FmtVersion = 1;
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }
 }
 

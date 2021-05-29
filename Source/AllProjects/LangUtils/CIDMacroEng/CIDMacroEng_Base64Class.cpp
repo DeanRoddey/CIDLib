@@ -43,9 +43,9 @@ RTTIDecls(TMEngBase64Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_Base64
+namespace
 {
-    namespace
+    namespace CIDMacroEng_Base64
     {
         // -----------------------------------------------------------------------
         //  The names of our classes

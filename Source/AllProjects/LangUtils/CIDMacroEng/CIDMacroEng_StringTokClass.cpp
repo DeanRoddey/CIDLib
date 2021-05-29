@@ -43,9 +43,9 @@ RTTIDecls(TMEngStringTokVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_StringTokClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_StringTokClass
     {
         const TString   strClassPath(L"MEng.System.Runtime.StringTokenizer");
         const TString   strName(L"StringTokenizer");

@@ -41,9 +41,9 @@ RTTIDecls(TFacCIDGraphDev,TFacility)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDGraphDev_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDGraphDev_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  This is the map that we load up the bitmaps into. This is done lazily

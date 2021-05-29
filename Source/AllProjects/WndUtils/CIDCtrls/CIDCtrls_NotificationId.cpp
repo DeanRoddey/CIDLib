@@ -41,9 +41,9 @@
 RTTIDecls(TNotificationId,TObject)
 
 
-namespace CIDCtrls_NotificationId
+namespace
 {
-    namespace
+    namespace CIDCtrls_NotificationId
     {
         // -----------------------------------------------------------------------
         //  Local const data

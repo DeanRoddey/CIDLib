@@ -327,7 +327,7 @@ TFacCIDEncode::GetAllEncodingNames(tCIDLib::TStrCollect& colToFill) const
 //  the former and puts the pointer in a managed pointer object.
 //
 TTextConverter*
-TFacCIDEncode::ptcvtMake(const  TString&            strName
+TFacCIDEncode::ptcvtMake(const  TStringView&        strvName
                         , const tCIDLib::TBoolean   bThrowIfNot) const
 {
     //
@@ -337,7 +337,7 @@ TFacCIDEncode::ptcvtMake(const  TString&            strName
     TString strClassName;
     {
         TLocker lockrMap(m_pcolMap);
-        TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
+        TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(TString(strvName));
         if (pkvalFound)
             strClassName = pkvalFound->strValue();
     }
@@ -354,7 +354,7 @@ TFacCIDEncode::ptcvtMake(const  TString&            strName
                 , kEncErrs::errcName_NotFound
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::NotFound
-                , strName
+                , TString(strvName)
             );
         }
         return nullptr;
@@ -365,21 +365,21 @@ TFacCIDEncode::ptcvtMake(const  TString&            strName
 }
 
 TTextConverter*
-TFacCIDEncode::ptcvtMake(const  TString&            strName
+TFacCIDEncode::ptcvtMake(const  TStringView&        strvName
                         , const tCIDLib::ETCvtActs  eErrAction
                         , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    TTextConverter* ptcvtRet = ptcvtMake(strName, bThrowIfNot);
+    TTextConverter* ptcvtRet = ptcvtMake(strvName, bThrowIfNot);
     if (ptcvtRet)
         ptcvtRet->eErrorAction(eErrAction);
     return ptcvtRet;
 }
 
 TTextConverter*
-TFacCIDEncode::ptcvtMake(const  TString&        strName
+TFacCIDEncode::ptcvtMake(const  TStringView&    strvName
                         , const tCIDLib::TCh    chRepCar) const
 {
-    TTextConverter* ptcvtRet = ptcvtMake(strName, tCIDLib::ETCvtActs::Replace);
+    TTextConverter* ptcvtRet = ptcvtMake(strvName, tCIDLib::ETCvtActs::Replace);
     if (ptcvtRet)
         ptcvtRet->chRepChar(chRepCar);
     return ptcvtRet;
@@ -387,25 +387,25 @@ TFacCIDEncode::ptcvtMake(const  TString&        strName
 
 
 tCIDEncode::TTCvtPtr
-TFacCIDEncode::cptrMake(const   TString&            strName
+TFacCIDEncode::cptrMake(const   TStringView&        strvName
                         , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, bThrowIfNot));
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strvName, bThrowIfNot));
 }
 
 tCIDEncode::TTCvtPtr
-TFacCIDEncode::cptrMake(const   TString&            strName
+TFacCIDEncode::cptrMake(const   TStringView&        strvName
                         , const tCIDLib::ETCvtActs  eErrAction
                         , const tCIDLib::TBoolean   bThrowIfNot) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, eErrAction, bThrowIfNot));
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strvName, eErrAction, bThrowIfNot));
 }
 
 tCIDEncode::TTCvtPtr
-TFacCIDEncode::cptrMake(const   TString&        strName
+TFacCIDEncode::cptrMake(const   TStringView&    strvName
                         , const tCIDLib::TCh    chRepChar) const
 {
-    return tCIDEncode::TTCvtPtr(ptcvtMake(strName, chRepChar));
+    return tCIDEncode::TTCvtPtr(ptcvtMake(strvName, chRepChar));
 }
 
 
@@ -413,11 +413,11 @@ TFacCIDEncode::cptrMake(const   TString&        strName
 //  Because this class needs to be thread safe, we can't return a reference
 //  to the string, we have to return it by value.
 //
-TString TFacCIDEncode::strBaseNameFor(const TString& strName) const
+TString TFacCIDEncode::strBaseNameFor(const TStringView& strvName) const
 {
     TLocker lockrMap(m_pcolMap);
 
-    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(strName);
+    TKeyValuePair* pkvalFound = m_pcolMap->pobjFindByKey(TString(strvName));
     if (!pkvalFound)
     {
         facCIDEncode().ThrowErr
@@ -427,7 +427,7 @@ TString TFacCIDEncode::strBaseNameFor(const TString& strName) const
             , kEncErrs::errcName_NotFound
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotFound
-            , strName
+            , TString(strvName)
         );
     }
     return pkvalFound->strValue();

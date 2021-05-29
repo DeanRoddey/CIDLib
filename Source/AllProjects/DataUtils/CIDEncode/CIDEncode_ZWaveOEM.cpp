@@ -39,10 +39,9 @@
 AdvRTTIDecls(TZWaveOEMConverter,TMode1EncodingBase)
 
 
-
-namespace CIDEncode_ZWaveOEM
+namespace
 {
-    namespace
+    namespace CIDEncode_ZWaveOEM
     {
         // -----------------------------------------------------------------------
         //  Local const data
@@ -67,7 +66,7 @@ namespace CIDEncode_ZWaveOEM
         //      more than one Unicode value that maps to a particular external
         //      code point, its not just a 256 entry table.
         // ---------------------------------------------------------------------------
-        const tCIDLib::TCh achFromMap[256] =
+        constexpr tCIDLib::TCh achFromMap[256] =
         {
             // The same as ASCII, so just literally map value to value
             0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007
@@ -107,7 +106,7 @@ namespace CIDEncode_ZWaveOEM
           , 0x00F0, 0x00F1, 0x00F2, 0x00F3, 0x00F4, 0x00F5, 0x00F6, 0x00F7
           , 0x00F8, 0x00F9, 0x00FA, 0x00FB, 0x00FC, 0x00FD, 0x00FE, 0x00FF
         };
-        const tCIDEncode::TCharMap acmToMap[] =
+        constexpr tCIDEncode::TCharMap acmToMap[] =
         {
             // The first 80 are just direct mappings
             { 0x0000, 0x00 }, { 0x0001, 0x01 }, { 0x0002, 0x02 }, { 0x0003, 0x03 }
@@ -168,8 +167,8 @@ namespace CIDEncode_ZWaveOEM
           , { 0x064C, 0xEC }, { 0x064D, 0xED }, { 0x064E, 0xEE }, { 0x064F, 0xEF }
           , { 0x0650, 0xF0 }, { 0x0651, 0xF1 }, { 0x0652, 0xF2 }
         };
-        const tCIDLib::TCard1 c1RepChar = 0x20;
-        const tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
+        constexpr tCIDLib::TCard1 c1RepChar = 0x20;
+        constexpr tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
     }
 }
 

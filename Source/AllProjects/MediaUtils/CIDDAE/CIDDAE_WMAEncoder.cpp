@@ -60,9 +60,9 @@ RTTIDecls(TCIDDAEWMAEnc,TCIDDAEEncoder)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDDAE_WMAEncoder
+namespace
 {
-    namespace
+    namespace CIDDAE_WMAEncoder
     {
         // -----------------------------------------------------------------------
         //  We use an internal structure to hold the WMA specific info for the

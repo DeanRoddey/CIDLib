@@ -38,9 +38,9 @@ AdvRTTIDecls(TVolumeInfo,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_VolumeInfo
+namespace
 {
-    namespace
+    namespace CIDLib_VolumeInfo
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

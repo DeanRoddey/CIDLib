@@ -35,9 +35,9 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_ParserSrc
+namespace
 {
-    namespace
+    namespace CIDMacroEng_ParserSrc
     {
         //
         //  The list of special chars that always, if not in a quoted string,
@@ -72,7 +72,7 @@ namespace CIDMacroEng_ParserSrc
         };
 
         // Used to do the one time calc of the hashes of the lookup table
-        TAtomicFlag                 atomInitDone;
+        TAtomicFlag atomInitDone;
 
         // The modulus that we use for hashing the strings
         constexpr tCIDLib::TCard4   c4Modulus = 19;

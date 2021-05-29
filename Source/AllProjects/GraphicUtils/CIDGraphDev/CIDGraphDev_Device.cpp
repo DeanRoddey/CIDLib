@@ -84,9 +84,9 @@ RTTIDecls(TGraphDrawDev,TGraphicDevice)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDGraphDev_Device
+namespace
 {
-    namespace
+    namespace CIDGraphDev_Device
     {
         // -----------------------------------------------------------------------
         //  We may fault in a DD object if the client code invokes any of our

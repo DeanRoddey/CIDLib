@@ -47,9 +47,12 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDKernel
+namespace
 {
-    tCIDLib::TBoolean   bServiceMode = kCIDLib::False;
+    namespace CIDKernel
+    {
+        tCIDLib::TBoolean   bServiceMode = kCIDLib::False;
+    }
 }
 
 

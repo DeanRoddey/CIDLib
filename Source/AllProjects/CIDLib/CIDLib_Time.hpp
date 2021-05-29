@@ -268,7 +268,7 @@ class CIDLIBEXP TTime :
 
         TTime
         (
-            const   tCIDLib::TCh* const     pszDefFormat
+            const   TStringView&            strvDefFormat
         );
 
         TTime
@@ -387,14 +387,14 @@ class CIDLIBEXP TTime :
 
         tCIDLib::TBoolean bParseFrom8601
         (
-            const   TString&                strToParse
+            const   TStringView&            strvToParse
             , const tCIDLib::TBoolean       bAsLocal = kCIDLib::False
         );
 
         tCIDLib::TBoolean bParseFromText
         (
-            const   TString&                strSrc
-            , const TTimeCompList&              fcolCompList
+            const   TStringView&            strvSrc
+            , const TTimeCompList&          fcolCompList
             , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTZSep = kCIDLib::chNull
@@ -525,8 +525,8 @@ class CIDLIBEXP TTime :
 
         tCIDLib::TVoid ParseFromText
         (
-            const   TString&                strSrc
-            , const TTimeCompList&              fcolCompList
+            const   TStringView&            strSrc
+            , const TTimeCompList&          fcolCompList
             , const tCIDLib::TCh            chDateSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTimeSep = kCIDLib::chNull
             , const tCIDLib::TCh            chTZSep = kCIDLib::chNull

@@ -50,9 +50,9 @@ RTTIDecls(TMEngTextXCoderInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_StringClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_StringClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

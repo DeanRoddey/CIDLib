@@ -34,9 +34,9 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDImage_PixelArrayImpl
+namespace
 {
-    namespace
+    namespace CIDImage_PixelArrayImpl
     {
         // -----------------------------------------------------------------------
         //  Our persistent format version

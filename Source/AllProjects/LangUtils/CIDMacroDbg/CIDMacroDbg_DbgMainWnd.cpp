@@ -44,9 +44,9 @@ RTTIDecls(TMacroDbgMainWnd,TFrameWindow)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroDbg_DbgMainWnd
+namespace
 {
-    namespace
+    namespace CIDMacroDbg_DbgMainWnd
     {
         // -----------------------------------------------------------------------
         //  Some ids that the callbacks from the macro execution thread post to

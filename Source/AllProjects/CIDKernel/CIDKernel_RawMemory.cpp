@@ -38,13 +38,16 @@
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDKernel_RawMemory
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  We fault in the CRC table for the 3309 CRC algorithm, upon first use
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4     ac43309Table[256];
-    TAtomicFlag         atomInit;
+    namespace CIDKernel_RawMemory
+    {
+        // -----------------------------------------------------------------------
+        //  We fault in the CRC table for the 3309 CRC algorithm, upon first use
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard4     ac43309Table[256];
+        TAtomicFlag         atomInit;
+    }
 }
 
 

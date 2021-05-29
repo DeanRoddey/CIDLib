@@ -42,12 +42,12 @@ RTTIDecls(TCIDPackHdr,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDPack_Ctrl
+namespace
 {
-    namespace
+    namespace CIDPack_Ctrl
     {
-        const tCIDLib::TCard1   c1HdrFmtVersion = 1;
-        const tCIDLib::TCard1   c1FlFmtVersion = 1;
+        constexpr tCIDLib::TCard1   c1HdrFmtVersion = 1;
+        constexpr tCIDLib::TCard1   c1FlFmtVersion = 1;
     }
 };
 

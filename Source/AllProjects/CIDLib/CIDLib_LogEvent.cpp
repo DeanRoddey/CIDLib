@@ -48,9 +48,9 @@ AdvRTTIAlias(TLogEvent,TError)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_LogEvent
+namespace
 {
-    namespace
+    namespace CIDLib_LogEvent
     {
         // -----------------------------------------------------------------------
         //  Streaming stuff.

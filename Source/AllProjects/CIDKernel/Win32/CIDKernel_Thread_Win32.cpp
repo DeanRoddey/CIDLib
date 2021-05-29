@@ -58,9 +58,9 @@ struct TStartUpData
 };
 
 
-namespace CIDKernel_Thread_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_Thread_Win32
     {
         // -----------------------------------------------------------------------
         //  Local data

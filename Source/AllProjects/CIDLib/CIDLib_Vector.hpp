@@ -1885,10 +1885,9 @@ operator>>(TBinInStream& strmIn, TVector<TElem, TIndex>& colToStream)
     // If there were any elements, then stream them in
     if (c4Count)
     {
-        TElem objTmp;
-
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
+            TElem objTmp;
             strmIn >> objTmp;
             colToStream.objAdd(objTmp);
         }

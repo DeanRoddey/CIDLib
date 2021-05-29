@@ -42,9 +42,9 @@ RTTIDecls(TMEngSpeechInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_SpeechClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_SpeechClass
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

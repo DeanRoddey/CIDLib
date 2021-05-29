@@ -37,8 +37,6 @@
 RTTIDecls(TCIDLibTestApp,TTestFWApp)
 
 
-
-
 // ---------------------------------------------------------------------------
 //  CLASS: TCIDLibTestApp
 // PREFIX: tfwapp
@@ -195,7 +193,6 @@ tCIDLib::TVoid TCIDLibTestApp::PostTest(const TTestFWTest&)
 
 tCIDLib::TVoid TCIDLibTestApp::PreTest(const TTestFWTest&)
 {
-    // Nothing to do
 }
 
 tCIDLib::TVoid TCIDLibTestApp::Terminate()

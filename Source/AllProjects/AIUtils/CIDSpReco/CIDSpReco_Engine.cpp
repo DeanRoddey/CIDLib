@@ -45,10 +45,13 @@ RTTIDecls(TCIDSpReco, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDSpReco_Engine
+namespace
 {
-    // Max event queue entries we'll queue up before we start complaining
-    const tCIDLib::TCard4   c4MaxEvQSize = 128;
+    namespace CIDSpReco_Engine
+    {
+        // Max event queue entries we'll queue up before we start complaining
+        const tCIDLib::TCard4   c4MaxEvQSize = 128;
+    }
 }
 
 

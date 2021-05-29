@@ -43,9 +43,9 @@ AdvRTTIDecls(TUTF16LEConverter,TUTFConverter)
 AdvRTTIDecls(TUTF8Converter,TUTFConverter)
 
 
-namespace CIDLib_UTFConverter
+namespace
 {
-    namespace
+    namespace CIDLib_UTFConverter
     {
         // -----------------------------------------------------------------------
         //  Local data

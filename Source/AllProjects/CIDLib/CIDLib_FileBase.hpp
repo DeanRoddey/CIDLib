@@ -49,15 +49,12 @@ class CIDLIBEXP TFileBase : public TObject
 
         TFileBase
         (
-            const   TString&                strFileName
+            const   TStringView&            strvFileName
         );
 
-        TFileBase
-        (
-            const   tCIDLib::TCh* const     pszFileName
-        );
 
         TFileBase(const TFileBase&) = delete;
+        TFileBase(TFileBase&&) = delete;
 
         ~TFileBase();
 
@@ -66,6 +63,7 @@ class CIDLIBEXP TFileBase : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         TFileBase& operator=(const TFileBase&) = delete;
+        TFileBase& operator=(TFileBase&&) = delete;
 
 
         // -------------------------------------------------------------------

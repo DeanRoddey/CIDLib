@@ -40,9 +40,9 @@ RTTIDecls(TMsgHash,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDCrypto_MsgHash
+namespace
 {
-    namespace
+    namespace CIDCrypto_MsgHash
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

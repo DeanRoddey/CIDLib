@@ -52,8 +52,7 @@ static const tCIDLib::TCh* pszBool(const tCIDLib::TBoolean bVal)
         TBaseLock lockInit;
         if (!atomInitDone)
         {
-            const tCIDLib::TCh* pszTmp;
-            pszTmp = facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
+            const tCIDLib::TCh* pszTmp = facCIDLib().pszLoadCIDMsg(kCIDMsgs::midGen_False);
             if (pszTmp)
                 pszFalse = pszTmp;
 

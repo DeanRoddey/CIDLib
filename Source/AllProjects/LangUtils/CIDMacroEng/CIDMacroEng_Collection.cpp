@@ -43,9 +43,9 @@ RTTIDecls(TMEngColBaseInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_Collection
+namespace
 {
-    namespace
+    namespace CIDMacroEng_Collection
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

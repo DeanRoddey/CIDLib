@@ -44,9 +44,9 @@ RTTIDecls(TUPnPGrpMgmtService, TUPnPService)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDUPnP_SonosServices
+namespace
 {
-    namespace
+    namespace CIDUPnP_SonosServices
     {
         // -------------------------------------------------------------------
         //  The commands we use

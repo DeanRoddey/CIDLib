@@ -46,10 +46,10 @@ RTTIDecls(TFacCIDXML,TFacility)
 // ---------------------------------------------------------------------------
 //  TFacCIDXML: Public, static methods
 // ---------------------------------------------------------------------------
-tCIDLib::TBoolean TFacCIDXML::bIsAllSpaces(const TString& strToTest)
+tCIDLib::TBoolean TFacCIDXML::bIsAllSpaces(const TStringView& strvToTest)
 {
-    const tCIDLib::TCh*     pszBuf = strToTest.pszBuffer();
-    const tCIDLib::TCard4   c4Len  = strToTest.c4Length();
+    const tCIDLib::TCh*     pszBuf = strvToTest.pszBuffer();
+    const tCIDLib::TCard4   c4Len  = strvToTest.c4Length();
 
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Len; c4Index++)
     {
@@ -122,7 +122,7 @@ TFacCIDXML::~TFacCIDXML()
 //  formatted in.
 //
 tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
+TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TTextOutStream&     strmOut
                         , const tCIDXML::EEscTypes  eType)
 {
@@ -130,7 +130,8 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
     //  Loop through the in text and for each character, either move it over
     //  to the output or escape it, according to the escape type.
     //
-    const tCIDLib::TCard4 c4SrcCount = TRawStr::c4StrLen(pszInText);
+    const tCIDLib::TCard4 c4SrcCount = strvInText.c4Length();
+    const tCIDLib::TCh* const pszInText = strvInText.pszBuffer();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcCount; c4Index++)
     {
         const tCIDLib::TCh chCur = pszInText[c4Index];
@@ -176,24 +177,7 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
 
 
 tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   TString&            strInText
-                        ,       TTextOutStream&     strmOut
-                        , const tCIDXML::EEscTypes  eType)
-{
-    EscapeFor(strInText.pszBuffer(), strmOut, eType);
-}
-
-tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   TString&            strInText
-                        ,       TString&            strOutText
-                        , const tCIDXML::EEscTypes  eType)
-{
-    EscapeFor(strInText.pszBuffer(), strOutText, eType);
-}
-
-
-tCIDLib::TVoid
-TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
+TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TString&            strOutText
                         , const tCIDXML::EEscTypes  eType)
 {
@@ -203,7 +187,7 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszInText
     //
     TTextStringOutStream strmOut(&strOutText);
     strmOut.Reset();
-    EscapeFor(pszInText, strmOut, eType);
+    EscapeFor(strvInText, strmOut, eType);
 }
 
 
@@ -258,28 +242,15 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh        chInText
 //  size and the quoted and escaped value.
 //
 tCIDLib::TVoid
-TFacCIDXML::FormatAttr(         TTextOutStream&     strmOut
-                        , const tCIDLib::TCh* const pszName
-                        , const TString&            strValue
-                        , const tCIDLib::TBoolean   bSpaceBefore)
-{
-    if (bSpaceBefore)
-        strmOut << L' ';
-    strmOut << pszName << L"=\"";
-    EscapeFor(strValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
-    strmOut << L"\"";
-}
-
-tCIDLib::TVoid
 TFacCIDXML::FormatAttr(          TTextOutStream&    strmOut
-                        , const TString&            strName
-                        , const TString&            strValue
+                        , const TStringView&        strvName
+                        , const TStringView&        strvValue
                         , const tCIDLib::TBoolean   bSpaceBefore)
 {
     if (bSpaceBefore)
         strmOut << L' ';
-    strmOut << strName << L"=\"";
-    EscapeFor(strValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
+    strmOut << strvName << L"=\"";
+    EscapeFor(strvValue, strmOut, tCIDXML::EEscTypes::Attribute);
     strmOut << L"\"";
 }
 
@@ -290,27 +261,14 @@ TFacCIDXML::FormatAttr(          TTextOutStream&    strmOut
 //
 tCIDLib::TVoid
 TFacCIDXML::FormatAttrNL(       TTextOutStream&     strmOut
-                        , const tCIDLib::TCh* const pszName
-                        , const TString&            strValue
-                        , const tCIDLib::TBoolean   bSpaceBefore)
-{
-    // Call the other version
-    FormatAttr(strmOut, pszName, strValue, bSpaceBefore);
-
-    // And the put out a new line
-    strmOut << kCIDLib::NewLn;
-}
-
-tCIDLib::TVoid
-TFacCIDXML::FormatAttrNL(       TTextOutStream&     strmOut
-                        , const TString&            strName
-                        , const TString&            strValue
+                        , const TStringView&        strvName
+                        , const TStringView&        strvValue
                         , const tCIDLib::TBoolean   bSpaceBefore)
 {
     if (bSpaceBefore)
         strmOut << L' ';
-    strmOut << strName << L"=\"";
-    EscapeFor(strValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
+    strmOut << strvName << L"=\"";
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
     strmOut << L"\"";
 
     // And the put out a new line
@@ -320,31 +278,15 @@ TFacCIDXML::FormatAttrNL(       TTextOutStream&     strmOut
 
 tCIDLib::TVoid
 TFacCIDXML::NLFormatAttr(       TTextOutStream&     strmOut
-                        , const tCIDLib::TCh* const pszName
-                        , const TString&            strValue
+                        , const TStringView&        strvName
+                        , const TStringView&        strvValue
                         , const tCIDLib::TBoolean   bSpaceAfter)
 {
     // Put out a new line
     strmOut << kCIDLib::NewLn;
 
-    // Call the other version
-    FormatAttr(strmOut, pszName, strValue);
-
-    if (bSpaceAfter)
-        strmOut << L' ';
-}
-
-tCIDLib::TVoid
-TFacCIDXML::NLFormatAttr(       TTextOutStream&     strmOut
-                        , const TString&            strName
-                        , const TString&            strValue
-                        , const tCIDLib::TBoolean   bSpaceAfter)
-{
-    // Put out a new line
-    strmOut << kCIDLib::NewLn;
-
-    strmOut << strName << L"=\"";
-    EscapeFor(strValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
+    strmOut << strvName << L"=\"";
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
     strmOut << L"\"";
 
     if (bSpaceAfter)
@@ -358,11 +300,11 @@ TFacCIDXML::NLFormatAttr(       TTextOutStream&     strmOut
 //
 tCIDLib::TVoid
 TFacCIDXML::FormatTextElem(         TTextOutStream&     strmOut
-                            , const TString&            strElemName
-                            , const TString&            strElemText)
+                            , const TStringView&        strvElemName
+                            , const TStringView&        strvElemText)
 {
-    strmOut << L'<' << strElemName << L'>';
-    EscapeFor(strElemText, strmOut, tCIDXML::EEscTypes::ElemText);
-    strmOut << L"</" << strElemName << L'>';
+    strmOut << L'<' << strvElemName << L'>';
+    EscapeFor(strvElemText, strmOut, tCIDXML::EEscTypes::ElemText);
+    strmOut << L"</" << strvElemName << L'>';
 }
 

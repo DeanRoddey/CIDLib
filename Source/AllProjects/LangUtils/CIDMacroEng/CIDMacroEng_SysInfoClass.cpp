@@ -43,9 +43,12 @@ RTTIDecls(TMEngSysInfoInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_SysInfoClass
+namespace
 {
-};
+    namespace CIDMacroEng_SysInfoClass
+    {
+    }
+}
 
 
 

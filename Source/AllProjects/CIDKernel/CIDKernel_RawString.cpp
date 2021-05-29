@@ -56,13 +56,16 @@
 //      A list of characters used during conversion from a binary to text
 //      formats.
 // ---------------------------------------------------------------------------
-namespace CIDKernel_RawString
+namespace
 {
-    constexpr tCIDLib::TCh achList[16] =
+    namespace CIDKernel_RawString
     {
-          L'0'  , L'1'  , L'2'  , L'3'  , L'4'  , L'5'  , L'6'  , L'7'
-        , L'8'  , L'9'  , L'A'  , L'B'  , L'C'  , L'D'  , L'E'  , L'F'
-    };
+        constexpr tCIDLib::TCh achList[16] =
+        {
+            L'0'  , L'1'  , L'2'  , L'3'  , L'4'  , L'5'  , L'6'  , L'7'
+            , L'8'  , L'9'  , L'A'  , L'B'  , L'C'  , L'D'  , L'E'  , L'F'
+        };
+    }
 }
 
 

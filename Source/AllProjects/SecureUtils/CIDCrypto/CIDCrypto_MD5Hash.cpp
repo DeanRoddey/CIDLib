@@ -37,9 +37,9 @@
 RTTIDecls(TMD5Hash,TObject)
 
 
-namespace CIDCrypto_MD5Hash
+namespace
 {
-    namespace
+    namespace CIDCrypto_MD5Hash
     {
         // -----------------------------------------------------------------------
         //  Local constants

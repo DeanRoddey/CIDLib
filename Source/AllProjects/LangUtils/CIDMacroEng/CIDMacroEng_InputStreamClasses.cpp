@@ -47,9 +47,9 @@ RTTIDecls(TMEngStringInStreamInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_InputStreamClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_InputStreamClasses
     {
         const TString   strTextInStreamClassPath(L"MEng.System.Runtime.TextInStream");
         const TString   strConsoleInStreamClassPath(L"MEng.System.Runtime.ConsoleInStream");

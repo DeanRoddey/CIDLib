@@ -69,6 +69,11 @@ class CIDLIBEXP TTextStringInStream : public TTextInStream
 
         TTextStringInStream
         (
+            const   TStringView&            pstrData
+        );
+
+        TTextStringInStream
+        (
                     TString&&               strToTake
         );
 

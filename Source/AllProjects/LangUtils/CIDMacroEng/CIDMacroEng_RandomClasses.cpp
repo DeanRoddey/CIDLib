@@ -43,9 +43,9 @@ RTTIDecls(TMEngRandomNumInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_RandomClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_RandomClass
     {
         // -----------------------------------------------------------------------
         //  The names of our classes and their paths.

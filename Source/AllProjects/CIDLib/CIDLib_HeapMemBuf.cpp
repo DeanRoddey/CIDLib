@@ -41,9 +41,9 @@ RTTIDecls(THeapBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 //  Local data and types
 // ---------------------------------------------------------------------------
-namespace CIDLib_HeapMemBuf
+namespace
 {
-    namespace
+    namespace CIDLib_HeapMemBuf
     {
         // -----------------------------------------------------------------------
         //  Some internal constants we use

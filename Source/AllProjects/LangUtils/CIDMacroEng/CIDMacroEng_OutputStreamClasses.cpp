@@ -48,10 +48,13 @@ RTTIDecls(TMEngStringOutStreamInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_OuptutStreamClasses
+namespace
 {
-    static const TString strTextOutPath(L"MEng.System.Runtime.TextOutStream");
-    static const TString strStringOutPath(L"MEng.System.Runtime.StringOutStream");
+    namespace CIDMacroEng_OuptutStreamClasses
+    {
+        static const TString strTextOutPath(L"MEng.System.Runtime.TextOutStream");
+        static const TString strStringOutPath(L"MEng.System.Runtime.StringOutStream");
+    }
 }
 
 

@@ -41,9 +41,9 @@ RTTIDecls(TCIDMacroEngine,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_Engine
+namespace
 {
-    namespace
+    namespace CIDMacroEng_Engine
     {
         // -----------------------------------------------------------------------
         //  A flag to handle local lazy init

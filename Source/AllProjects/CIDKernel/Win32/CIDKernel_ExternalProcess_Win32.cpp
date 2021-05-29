@@ -57,9 +57,9 @@ struct TKrnlExtProcess::TPlatData
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDKernel_ExternalProcess_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_ExternalProcess_Win32
     {
         // -----------------------------------------------------------------------
         //  We support the 'reattachment' to processes by persisting a platform

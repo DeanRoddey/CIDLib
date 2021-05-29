@@ -41,9 +41,9 @@ RTTIDecls(TAttrData, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDMData_AttrData
+namespace
 {
-    namespace
+    namespace CIDMData_AttrData
     {
         //
         //  Version 2 -

@@ -44,9 +44,9 @@ RTTIDecls(TMEngDBStmtVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_DBaseClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_DBaseClasses
     {
         const TString   strConnClassPath(L"MEng.System.Runtime.DBConnect");
         const TString   strConnName(L"DBConnect");

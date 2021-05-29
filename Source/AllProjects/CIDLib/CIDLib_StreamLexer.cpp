@@ -39,9 +39,9 @@
 RTTIDecls(TStreamLexer,TObject)
 
 
-namespace CIDLib_StreamLexer
+namespace
 {
-    namespace
+    namespace CIDLib_StreamLexer
     {
         // -----------------------------------------------------------------------
         //  Local constant data

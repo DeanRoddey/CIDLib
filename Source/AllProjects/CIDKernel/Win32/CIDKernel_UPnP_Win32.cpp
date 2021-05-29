@@ -40,9 +40,9 @@
 #pragma     warning(pop)
 
 
-namespace CIDKernel_UPnP_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_UPnP_Win32
     {
         // -----------------------------------------------------------------------
         //  Windows puts a prefix on the unique ids of devices. But we have to
@@ -52,7 +52,7 @@ namespace CIDKernel_UPnP_Win32
         //  prone, but we have to do it. Otherwise when portable code used a
         //  device id as a parameter to some action, it wouldn't work.
         // -----------------------------------------------------------------------
-        const tCIDLib::TCh* const   pszDevIDPref = L"uuid:";
+        constexpr tCIDLib::TCh      pszDevIDPref[] = L"uuid:";
         constexpr tCIDLib::TCard4   c4DevIdPrefLen = 5;
     }
 }

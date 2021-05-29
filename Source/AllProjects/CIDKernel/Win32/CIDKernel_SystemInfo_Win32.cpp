@@ -125,10 +125,9 @@ struct TCachedInfo
 };
 
 
-
-namespace CIDKernel_SystemInfo_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_SystemInfo_Win32
     {
         // -----------------------------------------------------------------------
         //  Local data

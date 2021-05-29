@@ -51,6 +51,8 @@
 
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
+class TBoolean;
+
 // ---------------------------------------------------------------------------
 //   CLASS: TKeyValuePair
 //  PREFIX: kval
@@ -106,97 +108,86 @@ class CIDLIBEXP TKeyValuePair
 
         TKeyValuePair
         (
-            const   TString&                strKey
-            , const TString&                strValue
+            const   TStringView&            strvKey
+            , const TStringView&            strvValue
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
-            , const tCIDLib::TCh* const     pszValue
-        );
-
-        TKeyValuePair
-        (
-            const   tCIDLib::TCh* const     pszKey
-            , const tCIDLib::TCh* const     pszValue
-        );
-
-        TKeyValuePair
-        (
-            const   TString&                strKey
-            , const tCIDLib::TBoolean       bValue
-        );
-
-        TKeyValuePair
-        (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TCh            chValue
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
+            , const TBoolean                bValue
+            , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
+        );
+
+        TKeyValuePair
+        (
+            const   TStringView&            strvKey
             , const tCIDLib::TCard1         c1Value
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TCard2         c2Value
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TCard4         c4Value
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TCard8         c8Value
             , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Dec
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TFloat4        f4Value
             , const tCIDLib::TCard4         c4DecDigs = 2
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strKey
             , const tCIDLib::TFloat8        f8Value
             , const tCIDLib::TCard4         c4DecDigs = 2
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TInt1          i1Value
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TInt2          i2Value
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TInt4          i4Value
         );
 
         TKeyValuePair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TInt8          i8Value
         );
 
@@ -243,7 +234,7 @@ class CIDLIBEXP TKeyValuePair
 
         const TString& strKey
         (
-            const   TString&                strNewKey
+            const   TStringView&            strvNewKey
         );
 
         TString& strValue();
@@ -252,13 +243,13 @@ class CIDLIBEXP TKeyValuePair
 
         const TString& strValue
         (
-            const   TString&                strNewValue
+            const   TStringView&            strvNewValue
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strNewValue
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvNewValue
         );
 
 
@@ -355,22 +346,8 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
 
         TKeyValFPair
         (
-            const   TString&                strKey
-            , const TString&                strValue
-            , const tCIDLib::TBoolean       bFlag = kCIDLib::False
-        );
-
-        TKeyValFPair
-        (
-            const   TString&                strKey
-            , const tCIDLib::TCh* const     pszValue
-            , const tCIDLib::TBoolean       bFlag = kCIDLib::False
-        );
-
-        TKeyValFPair
-        (
-            const   tCIDLib::TCh* const     pszKey
-            , const tCIDLib::TCh* const     pszValue
+            const   TStringView&            strvKey
+            , const TStringView&            strvValue
             , const tCIDLib::TBoolean       bFlag = kCIDLib::False
         );
 
@@ -413,14 +390,14 @@ class CIDLIBEXP TKeyValFPair : public TKeyValuePair
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strNewValue
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvNewValue
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strNewValue
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvNewValue
             , const tCIDLib::TBoolean       bFlag
         );
 
@@ -509,15 +486,15 @@ class CIDLIBEXP TKeyNumPair
 
         TKeyNumPair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TFloat4        f4Value
         );
 
         TKeyNumPair
         (
-            const   TString&                strKey
+            const   TStringView&            strvKey
             , const tCIDLib::TFloat4        f4Value
-            , const TString&                strValue
+            , const TStringView&            strValue
         );
 
         TKeyNumPair(const TKeyNumPair&) = default;
@@ -562,7 +539,7 @@ class CIDLIBEXP TKeyNumPair
 
         const TString& strKey
         (
-            const   TString&                strNewKey
+            const   TStringView&            strvNewKey
         );
 
         tCIDLib::TFloat4 f4Value() const;
@@ -576,20 +553,20 @@ class CIDLIBEXP TKeyNumPair
 
         const TString& strValue
         (
-            const   TString&                strToSet
+            const   TStringView&            strvToSet
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
+            const   TStringView&            strvNewKey
             , const tCIDLib::TFloat4        f4Value
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
+            const   TStringView&            strvNewKey
             , const tCIDLib::TFloat4        f4Value
-            , const TString&                strValue
+            , const TStringView&            strvValue
         );
 
     protected :
@@ -690,39 +667,23 @@ class CIDLIBEXP TKeyValues
 
         TKeyValues
         (
-            const   TString&                strKey
-            , const TString&                strVal1
+            const   TStringView&                strvKey
+            , const TStringView&                strvVal1
         );
 
         TKeyValues
         (
-            const   TString&                strKey
-            , const TString&                strVal1
-            , const TString&                strVal2
+            const   TStringView&                strvKey
+            , const TStringView&                strvVal1
+            , const TStringView&                strvVal2
         );
 
         TKeyValues
         (
-            const   TString&                strKey
-            , const TString&                strVal1
-            , const TString&                strVal2
-            , const TString&                strVal3
-        );
-
-        TKeyValues
-        (
-            const   TString&                strKey
-            , const tCIDLib::TCh* const     pszVal1
-            , const tCIDLib::TCh* const     pszVal2 = L""
-            , const tCIDLib::TCh* const     pszVal3 = L""
-        );
-
-        TKeyValues
-        (
-            const   tCIDLib::TCh* const     pszKey
-            , const tCIDLib::TCh* const     pszVal1
-            , const tCIDLib::TCh* const     pszVal2 = L""
-            , const tCIDLib::TCh* const     pszVal3 = L""
+            const   TStringView&                strvKey
+            , const TStringView&                strvVal1
+            , const TStringView&                strvVal2
+            , const TStringView&                strvVal3
         );
 
         TKeyValues(const TKeyValues&) = default;
@@ -767,67 +728,50 @@ class CIDLIBEXP TKeyValues
 
         const TString& strKey
         (
-            const   TString&                strNewKey
+            const   TStringView&            strvNewKey
         );
 
         const TString& strVal1() const;
 
         const TString& strVal1
         (
-            const   TString&                strNewValue
+            const   TStringView&            strvNewValue
         );
 
         const TString& strVal2() const;
 
         const TString& strVal2
         (
-            const   TString&                strNewValue
+            const   TStringView&            strvNewValue
         );
 
         const TString& strVal3() const;
 
         const TString& strVal3
         (
-            const   TString&                strNewValue
+            const   TStringView&            strvNewValue
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strVal1
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvVal1
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strVal1
-            , const TString&                strVal2
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvVal1
+            , const TStringView&            strvVal2
         );
 
         tCIDLib::TVoid Set
         (
-            const   TString&                strNewKey
-            , const TString&                strVal1
-            , const TString&                strVal2
-            , const TString&                strVal3
+            const   TStringView&            strvNewKey
+            , const TStringView&            strvVal1
+            , const TStringView&            strvVal2
+            , const TStringView&            strvVal3
         );
-
-        tCIDLib::TVoid Set
-        (
-            const   TString&                strNewKey
-            , const tCIDLib::TCh* const     pszVal1
-            , const tCIDLib::TCh* const     pszVal2 = L""
-            , const tCIDLib::TCh* const     pszVal3 = L""
-        );
-
-        tCIDLib::TVoid Set
-        (
-            const   tCIDLib::TCh* const     pszKey
-            , const tCIDLib::TCh* const     pszVal1
-            , const tCIDLib::TCh* const     pszVal2 = L""
-            , const tCIDLib::TCh* const     pszVal3 = L""
-        );
-
 
     protected :
         // -------------------------------------------------------------------

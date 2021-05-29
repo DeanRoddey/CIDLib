@@ -39,10 +39,9 @@ RTTIDecls(TProcEnvLocker,TObject)
 RTTIDecls(TEnvironment,TObject)
 
 
-
-namespace CIDLib_Environment
+namespace
 {
-    namespace
+    namespace CIDLib_Environment
     {
         // -----------------------------------------------------------------------
         //  Local, const data
@@ -68,9 +67,9 @@ static const TString& strGetKey(const TKeyValuePair& elemData)
 //  NAMESPACE: TProcEnvironment
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TProcEnvironment::Add(const TString& strKey, const TString& strNewValue)
+TProcEnvironment::Add(const TStringView& strvKey, const TStringView& strvNewValue)
 {
-    if (!TKrnlEnvironment::bAdd(strKey.pszBuffer(), strNewValue.pszBuffer()))
+    if (!TKrnlEnvironment::bAdd(strvKey.pszBuffer(), strvNewValue.pszBuffer()))
     {
         tCIDLib::TErrCode errcToThrow = kCIDErrs::errcEnv_AddError;
         tCIDLib::EErrClasses eClass = tCIDLib::EErrClasses::CantDo;
@@ -90,18 +89,18 @@ TProcEnvironment::Add(const TString& strKey, const TString& strNewValue)
             , kerrRes
             , tCIDLib::ESeverities::Failed
             , eClass
-            , strKey
+            , TString(strvKey)
         );
     }
 }
 
 
 tCIDLib::TBoolean
-TProcEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
+TProcEnvironment::bAddOrUpdate(const TStringView& strvKey, const TStringView& strvNewValue)
 {
     tCIDLib::TBoolean   bAdded;
-    if (!TKrnlEnvironment::bAddOrUpdate(strKey.pszBuffer()
-                                        , strNewValue.pszBuffer()
+    if (!TKrnlEnvironment::bAddOrUpdate(strvKey.pszBuffer()
+                                        , strvNewValue.pszBuffer()
                                         , bAdded))
     {
         facCIDLib().ThrowKrnlErr
@@ -112,7 +111,7 @@ TProcEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
-            , strKey
+            , TString(strvKey)
         );
     }
     return bAdded;
@@ -120,10 +119,10 @@ TProcEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue
 
 
 tCIDLib::TVoid
-TProcEnvironment::AddToExePath( const   TString&            strNewValue
+TProcEnvironment::AddToExePath( const   TStringView&        strvNewValue
                                 , const tCIDLib::EStartEnd  eWhere)
 {
-    if (!TKrnlEnvironment::bAddToExePath(strNewValue.pszBuffer(), eWhere))
+    if (!TKrnlEnvironment::bAddToExePath(strvNewValue.pszBuffer(), eWhere))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -139,7 +138,7 @@ TProcEnvironment::AddToExePath( const   TString&            strNewValue
 
 
 tCIDLib::TVoid
-TProcEnvironment::AddToLibPath( const   TString&            strNewValue
+TProcEnvironment::AddToLibPath( const   TStringView&        strNewValue
                                 , const tCIDLib::EStartEnd  eWhere)
 {
     if (!TKrnlEnvironment::bAddToLibPath(strNewValue.pszBuffer(), eWhere))
@@ -158,11 +157,11 @@ TProcEnvironment::AddToLibPath( const   TString&            strNewValue
 
 
 tCIDLib::TBoolean
-TProcEnvironment::bFind(const TString& strKey, TString& strToFill)
+TProcEnvironment::bFind(const TStringView& strvKey, TString& strToFill)
 {
     TProcEnvLocker lockEnv;
 
-    const tCIDLib::TCh* pszValue = TKrnlEnvironment::pszFind(strKey.pszBuffer());
+    const tCIDLib::TCh* pszValue = TKrnlEnvironment::pszFind(strvKey.pszBuffer());
     if (!pszValue)
         return kCIDLib::False;
 
@@ -210,10 +209,10 @@ tCIDLib::TCard4 TProcEnvironment::c4Entries()
 }
 
 
-tCIDLib::TCard4 TProcEnvironment::c4CharsInValue(const TString& strKey)
+tCIDLib::TCard4 TProcEnvironment::c4CharsInValue(const TStringView& strvKey)
 {
     tCIDLib::TCard4 c4Chars;
-    if (!TKrnlEnvironment::bCharsInValue(strKey.pszBuffer(), c4Chars))
+    if (!TKrnlEnvironment::bCharsInValue(strvKey.pszBuffer(), c4Chars))
     {
         tCIDLib::TErrCode errcToThrow = kCIDErrs::errcEnv_FindError;
         tCIDLib::EErrClasses eClass = tCIDLib::EErrClasses::CantDo;
@@ -233,18 +232,18 @@ tCIDLib::TCard4 TProcEnvironment::c4CharsInValue(const TString& strKey)
             , kerrRes
             , tCIDLib::ESeverities::Failed
             , eClass
-            , strKey
+            , TString(strvKey)
         );
     }
     return c4Chars;
 }
 
 
-TString TProcEnvironment::strFind(const TString& strKey)
+TString TProcEnvironment::strFind(const TStringView& strvKey)
 {
     TProcEnvLocker lockEnv;
 
-    const tCIDLib::TCh* pszValue = TKrnlEnvironment::pszFind(strKey.pszBuffer());
+    const tCIDLib::TCh* pszValue = TKrnlEnvironment::pszFind(strvKey.pszBuffer());
     if (!pszValue)
     {
         facCIDLib().ThrowErr
@@ -254,7 +253,7 @@ TString TProcEnvironment::strFind(const TString& strKey)
             , kCIDErrs::errcEnv_KeyNotFound
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotFound
-            , strKey
+            , TString(strvKey)
         );
     }
     return TString(pszValue);
@@ -262,10 +261,10 @@ TString TProcEnvironment::strFind(const TString& strKey)
 
 
 tCIDLib::TVoid
-TProcEnvironment::Update(   const   TString&    strKey
-                            , const TString&    strNewValue)
+TProcEnvironment::Update(   const   TStringView&    strvKey
+                            , const TStringView&    strvNewValue)
 {
-    if (!TKrnlEnvironment::bUpdate(strKey.pszBuffer(), strNewValue.pszBuffer()))
+    if (!TKrnlEnvironment::bUpdate(strvKey.pszBuffer(), strvNewValue.pszBuffer()))
     {
         tCIDLib::TErrCode errcToThrow = kCIDErrs::errcEnv_UpdateError;
         tCIDLib::EErrClasses eClass = tCIDLib::EErrClasses::CantDo;
@@ -285,7 +284,7 @@ TProcEnvironment::Update(   const   TString&    strKey
             , kerrRes
             , tCIDLib::ESeverities::Failed
             , eClass
-            , strKey
+            , TString(strvKey)
         );
     }
 }

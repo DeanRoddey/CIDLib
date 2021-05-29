@@ -41,9 +41,9 @@ RTTIDecls(TSMTPClient,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDNet_SMTPClient
+namespace
 {
-    namespace
+    namespace CIDNet_SMTPClient
     {
         // The separator we use for attachments
         const TString   strAttachSep(L"5_3333_yaf44_7454_miofe");

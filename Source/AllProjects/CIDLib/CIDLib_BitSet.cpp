@@ -42,9 +42,9 @@ RTTIDecls(TBitset,TBitsetBase)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_BitSet
+namespace
 {
-    namespace
+    namespace CIDLib_BitSet
     {
         //
         //  Format version for the base class

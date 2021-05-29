@@ -520,6 +520,9 @@ ERRORS=
     errcStr_NotValidUnicode     3270    The string is not a valid Unicode string
     errcStr_NotInStr            3271    The passed pointer is not within the string buffer
 
+    ; String view errors
+    errcStrV_NoObject          3200     The string view does not hold a string object
+
     ; String tokenizer errors
     errcSTok_NullSource         3320    The string to tokenize cannot be a null pointer
 

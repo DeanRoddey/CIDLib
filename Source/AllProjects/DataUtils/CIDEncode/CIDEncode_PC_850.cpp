@@ -40,9 +40,9 @@
 AdvRTTIDecls(TPC850Converter,TMode1EncodingBase)
 
 
-namespace CIDEncode_PC850
+namespace
 {
-    namespace
+    namespace CIDEncode_PC850
     {
         // -----------------------------------------------------------------------
         //  Local const data
@@ -67,7 +67,7 @@ namespace CIDEncode_PC850
         //      more than one Unicode value that maps to a particular external
         //      code point, its not just a 256 entry table.
         // -----------------------------------------------------------------------
-        static const tCIDLib::TCh achFromMap[256] =
+        constexpr tCIDLib::TCh achFromMap[256] =
         {
               0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007
             , 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F
@@ -102,7 +102,7 @@ namespace CIDEncode_PC850
             , 0x00AD, 0x00B1, 0x2017, 0x00BE, 0x00B6, 0x00A7, 0x00F7, 0x00B8
             , 0x00B0, 0x00A8, 0x00B7, 0x00B9, 0x00B3, 0x00B2, 0x25A0, 0x00A0
         };
-        const tCIDEncode::TCharMap acmToMap[] =
+        constexpr tCIDEncode::TCharMap acmToMap[] =
         {
               { 0x0000, 0x00 }, { 0x0001, 0x01 }, { 0x0002, 0x02 }, { 0x0003, 0x03 }
             , { 0x0004, 0x04 }, { 0x0005, 0x05 }, { 0x0006, 0x06 }, { 0x0007, 0x07 }
@@ -169,8 +169,8 @@ namespace CIDEncode_PC850
             , { 0x256C, 0xCE }, { 0x2580, 0xDF }, { 0x2584, 0xDC }, { 0x2588, 0xDB }
             , { 0x2591, 0xB0 }, { 0x2592, 0xB1 }, { 0x2593, 0xB2 }, { 0x25A0, 0xFE }
         };
-        const tCIDLib::TCard1 c1RepChar = 0x20;
-        const tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
+        constexpr tCIDLib::TCard1 c1RepChar = 0x20;
+        constexpr tCIDLib::TCard4 c4ToMapSize = tCIDLib::c4ArrayElems(acmToMap);
     }
 }
 

@@ -30,10 +30,9 @@
 // ---------------------------------------------------------------------------
 #include    "CIDLib_.hpp"
 
-
-namespace CIDLib_Locale
+namespace
 {
-    namespace
+    namespace CIDLib_Locale
     {
         // ---------------------------------------------------------------------------
         //  Local types

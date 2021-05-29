@@ -46,9 +46,9 @@ RTTIDecls(TChunkedTextOutStream,TTextOutStream)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDLib_ChunkedMemStream
+namespace
 {
-    namespace
+    namespace CIDLib_ChunkedMemStream
     {
         //
         //  The size of our memory chunks. We grow by 1MB chunks.

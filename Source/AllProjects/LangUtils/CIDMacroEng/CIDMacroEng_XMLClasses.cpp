@@ -50,9 +50,9 @@ RTTIDecls(TMEngXMLTreeParserInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_XMLTreeParserClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_XMLTreeParserClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the classes that we support here. Each derivative has to

@@ -52,12 +52,7 @@ class CIDLIBEXP TBinaryFile : public TFileBase
 
         TBinaryFile
         (
-            const   TString&                strFileName
-        );
-
-        explicit TBinaryFile
-        (
-            const   tCIDLib::TCh* const     pszFileName
+            const   TStringView&            strvFileName
         );
 
         TBinaryFile(const TBinaryFile&) = delete;

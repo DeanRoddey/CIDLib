@@ -45,9 +45,9 @@
 AdvRTTIDecls(TString,TObject)
 
 
-namespace CIDLib_String
+namespace
 {
-    namespace
+    namespace CIDLib_String
     {
         // -----------------------------------------------------------------------
         //  c1FmtVersion
@@ -815,6 +815,12 @@ tCIDLib::TBoolean TString::operator>(const tCIDLib::TCh* const pszSrc) const noe
 // ---------------------------------------------------------------------------
 //  TString: Public, non-virtual methods
 // ---------------------------------------------------------------------------
+
+tCIDLib::TVoid TString::Append(const TStringView& strvSrc)
+{
+    m_strbData.Append(strvSrc.pszBuffer(), strvSrc.c4Length());
+}
+
 
 // Append a count of characters
 tCIDLib::TVoid TString::Append(const tCIDLib::TCh chSrc, const tCIDLib::TCard4 c4Count)
@@ -2271,13 +2277,6 @@ tCIDLib::TVoid TString::CutUpTo(const tCIDLib::TCh chFind)
 // Compares this string to a passed string
 tCIDLib::ESortComps TString::eCompare(const TStringView& strvSrc) const
 {
-    // If we have the length, use it
-    if (strvSrc.bHaveLength() && (strvSrc.c4Length() != c4Length()))
-    {
-        if (c4Length() < strvSrc.c4Length())
-            return tCIDLib::ESortComps::FirstLess;
-        return tCIDLib::ESortComps::FirstGreater;
-    }
     return TRawStr::eCompareStr(pszBuffer(), strvSrc.pszBuffer());
 }
 
@@ -2295,13 +2294,6 @@ TString::eCompareN(const TStringView& strvSrc, const tCIDLib::TCard4 c4MaxComp) 
 // Compares this string to a passed string, insensitive to case
 tCIDLib::ESortComps TString::eCompareI(const TStringView& strvSrc) const
 {
-    // If we have the length, use it
-    if (strvSrc.bHaveLength() && (strvSrc.c4Length() != c4Length()))
-    {
-        if (c4Length() < strvSrc.c4Length())
-            return tCIDLib::ESortComps::FirstLess;
-        return tCIDLib::ESortComps::FirstGreater;
-    }
     return TRawStr::eCompareStrI(pszBuffer(), strvSrc.pszBuffer());
 }
 
@@ -3068,7 +3060,7 @@ tCIDLib::TVoid TString::ExportChars(        tCIDLib::TCh* const pszTarget
 //  stores the result as our contents.
 //
 tCIDLib::TVoid
-TString::FormatToFld(const  TString&                strSrc
+TString::FormatToFld(const  TStringView&            strvSrc
                     , const tCIDLib::TCard4         c4FldWidth
                     , const tCIDLib::EHJustify      eJustify
                     , const tCIDLib::TCh            chFill
@@ -3080,14 +3072,14 @@ TString::FormatToFld(const  TString&                strSrc
     //
     if (!c4FldWidth)
     {
-        Set(strSrc);
+        Set(strvSrc);
         return;
     }
 
     //  See if we need to expand. Don't need to preserve existing content
     m_strbData.ExpandTo(c4FldWidth + c4TrailingSp, kCIDLib::False);
 
-    if (!TRawStr::bFormatStr(strSrc.pszBuffer(), m_strbData.pszBuffer(), c4FldWidth, chFill, eJustify))
+    if (!TRawStr::bFormatStr(strvSrc.pszBuffer(), m_strbData.pszBuffer(), c4FldWidth, chFill, eJustify))
     {
         facCIDLib().ThrowKrnlErr
         (
@@ -3265,23 +3257,20 @@ tCIDLib::TVoid TString::Insert( const   tCIDLib::TCh* const pszInsert
     m_strbData.ExpandBy(c4SrcLen, kCIDLib::True);
 
     //
-    //  Go ahead and move the end of string upwards so the stuff below doesn't have to
-    //  play tricks to avoid end overflow errors.
-    //
-    m_strbData.IncEnd(c4SrcLen);
-
-    //
     //  Lets move the text after the insert point upwards to make room for
     //  the insert text.
     //
-    tCIDLib::TCh* pszSrc = m_strbData.pszBufferAt(c4OurLen - 1);
-    tCIDLib::TCh* pszStop = m_strbData.pszBufferAt(c4Ind);
-    tCIDLib::TCh* pszDest = m_strbData.pszBufferAt((c4OurLen - 1) + c4SrcLen);
+    tCIDLib::TCh* pszSrc = m_strbData.pszBufferAt(c4OurLen - 1, kCIDLib::False);
+    tCIDLib::TCh* pszStop = m_strbData.pszBufferAt(c4Ind, kCIDLib::False);
+    tCIDLib::TCh* pszDest = m_strbData.pszBufferAt((c4OurLen - 1) + c4SrcLen, kCIDLib::False);
     while (pszSrc >= pszStop)
         *pszDest-- = *pszSrc--;
 
     // And now move the insert text into the section left open
     TRawMem::CopyMemBuf(pszStop, pszInsert, c4SrcLen * kCIDLib::c4CharBytes);
+
+    // And move the end up by the length we inserted
+    m_strbData.IncEnd(c4SrcLen);
 }
 
 
@@ -3484,39 +3473,33 @@ TString::Replace(const  tCIDLib::TCard4     c4RepStart
             //  many chars we have to move it up. Its the rep text length
             //  minus the target length.
             //
-            //  We have to get the buffer out and directly get offets. Calling
-            //  buffer at caps at the current end and will mess us up because we
-            //  are changing the length upwards during this.
-            //
-            tCIDLib::TCh* pszBase = m_strbData.pszBuffer();
+            tCIDLib::TCh* pszBase = m_strbData.pszBuffer(kCIDLib::False);
             const tCIDLib::TCard4 c4ExpCount = c4ActualLen - c4TargetLen;
             tCIDLib::TCh* pszTarget = pszBase + (c4OurLen + c4ExpCount);
             tCIDLib::TCh* pszSrc = pszBase + c4OurLen;
             while (pszSrc > (pszBase  + c4RepEnd))
                 *pszTarget-- = *pszSrc--;
 
-            // Adjust the length upwards before we copy below, because buffer at will cap at current end
-            m_strbData.IncEnd(c4ActualLen - c4TargetLen);
-
             // Copy the replacement text into place now
             TRawMem::CopyMemBuf
             (
-                m_strbData.pszBufferAt(c4RepStart), pszRepText, c4ActualLen * kCIDLib::c4CharBytes
+                m_strbData.pszBufferAt(c4RepStart, kCIDLib::False)
+                , pszRepText
+                , c4ActualLen * kCIDLib::c4CharBytes
             );
+
+            m_strbData.IncEnd(c4ActualLen - c4TargetLen);
         }
     }
 }
 
 
-// Set us to a raw string
-tCIDLib::TVoid TString::Set(const   tCIDLib::TCh* const     pszSrc
-                            , const tCIDLib::TCard4         c4Extra)
+// Can't be inline because TStringView isn't complete there
+tCIDLib::TVoid TString::Set(const TStringView& strvSrc, const tCIDLib::TCard4 c4Extra)
 {
     m_strbData.Clear();
-    if (pszSrc)
-        m_strbData.Append(pszSrc, TRawStr::c4StrLen(pszSrc), c4Extra);
+    m_strbData.Append(strvSrc.pszBuffer(), strvSrc.c4Length(), c4Extra);
 }
-
 
 
 //

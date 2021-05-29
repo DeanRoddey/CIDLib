@@ -123,6 +123,19 @@ class CIDLIBEXP TStringView
             return TRawStr::bCompareStr(m_pszRaw, strSrc.pszBuffer());
         }
 
+        tCIDLib::TCh operator[](const tCIDLib::TCard4 c4At) const
+        {
+            if (m_pszRaw)
+            {
+                if (m_c4RawLen == kCIDLib::c4MajVersion)
+                    m_c4RawLen = TRawStr::c4StrLen(m_pszRaw);
+
+                if (c4At >= m_c4RawLen)
+                    ThrowIndexErr(CID_FILE, CID_LINE, c4At);
+            }
+            return m_pstrObj->chAt(c4At);
+        }
+
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
@@ -184,12 +197,34 @@ class CIDLIBEXP TStringView
             return m_pstrObj->c4Length();
         }
 
+        // Will not fault in raw strijng length if not gotten already. Returns max card if not
+        [[nodiscard]] constexpr tCIDLib::TCard4 c4LengthOrNot() const noexcept
+        {
+            if (m_pszRaw)
+                return m_c4RawLen;
+            return m_pstrObj->c4Length();
+        }
+
         // Null if the string is empty
         [[nodiscard]] constexpr tCIDLib::TCh chFirst() const
         {
             if (m_pstrObj)
                 return m_pstrObj->chFirst();
             return m_pszRaw[0];
+        }
+
+        tCIDLib::TVoid CopyOutSubStr
+        (
+            COP     TString&                strTarget
+            , const tCIDLib::TCard4         c4Start
+            , const tCIDLib::TCard4         c4Len
+        )   const;
+
+        [[nodiscard]] constexpr tCIDLib::THashVal hshCalcHash(const tCIDLib::TCard4 c4Modulus) const
+        {
+            if (m_pszRaw)
+                return TRawStr::hshHashStr(m_pszRaw, c4Modulus);
+            return m_pstrObj->hshCalcHash(c4Modulus);
         }
 
         [[nodiscard]] constexpr const tCIDLib::TCh* pszBuffer() const noexcept
@@ -204,8 +239,21 @@ class CIDLIBEXP TStringView
             const   tCIDLib::TCard4         c4At
         )   const;
 
+        [[nodiscard]] const TString* pstrObj() const;
+
 
     private :
+        // -------------------------------------------------------------------
+        //  Private, non-virtual methods
+        // -------------------------------------------------------------------
+        [[noreturn]] tCIDLib::TVoid ThrowIndexErr
+        (
+            const   tCIDLib::TCh* const     pszFile
+            , const tCIDLib::TCard4         c4Line
+            , const tCIDLib::TCard4         c4At
+        )   const;
+
+
         // -------------------------------------------------------------------
         //  Private data members
         //

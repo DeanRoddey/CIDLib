@@ -40,9 +40,9 @@ AdvRTTIDecls(TScrollArea, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_ScrollArea
+namespace
 {
-    namespace
+    namespace CIDCtrls_ScrollArea
     {
         constexpr tCIDLib::TInt4 i4LnSz = 16;
     }

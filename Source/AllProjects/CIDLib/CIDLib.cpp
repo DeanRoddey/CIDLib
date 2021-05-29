@@ -290,6 +290,8 @@ static tCIDLib::TVoid DummyFunc()
 
 //    TMemberPtr<TArea> mbptrTest;
 
+    TKeyValuePair kvalBool(L"Key", TBoolean(kCIDLib::False));
+
     TVector<TString> colOne;
     TVector<TString> colTwo;
     if (tCIDLib::bCompareElems(colOne, colTwo)
@@ -355,7 +357,6 @@ static tCIDLib::TVoid DummyFunc()
 
     TBag<TKeyValuePair> colBag;
     colBag.objPlace(L"Key", L"Value");
-
 
     tCIDLib::TKVHashSet col1(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);
     tCIDLib::TKVHashSet col2(7, TStringKeyOps(kCIDLib::False), TKeyValuePair::strExtractKey);

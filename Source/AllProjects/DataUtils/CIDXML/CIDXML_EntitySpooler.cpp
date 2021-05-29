@@ -46,10 +46,9 @@
 RTTIDecls(TXMLEntSpooler,TObject)
 
 
-
-namespace CIDXML_EntitySpooler
+namespace
 {
-    namespace
+    namespace CIDXML_EntitySpooler
     {
         // ---------------------------------------------------------------------------
         //  Local const data
@@ -112,7 +111,6 @@ namespace CIDXML_EntitySpooler
         {
             24, 12, 24, 12, 6, 6
         };
-
 
         const TString astrEncodingVals[] =
         {

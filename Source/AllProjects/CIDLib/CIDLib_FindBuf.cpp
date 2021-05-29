@@ -40,9 +40,9 @@ AdvRTTIDecls(TFindBuf,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_FindBuf
+namespace
 {
-    namespace
+    namespace CIDLib_FindBuf
     {
         // -----------------------------------------------------------------------
         //  Local const data
@@ -135,7 +135,7 @@ TFindBuf::TFindBuf() :
 {
 }
 
-TFindBuf::TFindBuf(const TString& strDefFormat) :
+TFindBuf::TFindBuf(const TStringView& strvDefFormat) :
 
     m_c8Size(0)
     , m_eFlags(tCIDLib::EFileInfoFlags::None)
@@ -145,7 +145,7 @@ TFindBuf::TFindBuf(const TString& strDefFormat) :
     , m_pstrDefFormat(nullptr)
     , m_pstrTimeFormat(nullptr)
 {
-    m_pstrDefFormat = new TString(strDefFormat);
+    m_pstrDefFormat = new TString(strvDefFormat);
 }
 
 TFindBuf::TFindBuf(const TFindBuf& fndbSrc) :
@@ -563,9 +563,9 @@ TPathStr& TFindBuf::pathFileName()
 
 
 
-TPathStr& TFindBuf::pathFileName(const TString& strToSet)
+TPathStr& TFindBuf::pathFileName(const TStringView& strvToSet)
 {
-    m_pathFileName = strToSet;
+    m_pathFileName = strvToSet;
     return m_pathFileName;
 }
 
@@ -585,12 +585,12 @@ const TString& TFindBuf::strDateFormat() const
     return *m_pstrDateFormat;
 }
 
-const TString& TFindBuf::strDateFormat(const TString& strNewDef)
+const TString& TFindBuf::strDateFormat(const TStringView& strvNewDef)
 {
     if (!m_pstrDateFormat)
-        m_pstrDateFormat = new TString(strNewDef);
+        m_pstrDateFormat = new TString(strvNewDef);
     else
-        *m_pstrDateFormat = strNewDef;
+        *m_pstrDateFormat = strvNewDef;
     return *m_pstrDateFormat;
 }
 
@@ -602,12 +602,12 @@ const TString& TFindBuf::strDefFormat() const
     return *m_pstrDefFormat;
 }
 
-const TString& TFindBuf::strDefFormat(const TString& strNewDef)
+const TString& TFindBuf::strDefFormat(const TStringView& strvNewDef)
 {
     if (!m_pstrDefFormat)
-        m_pstrDefFormat = new TString(strNewDef);
+        m_pstrDefFormat = new TString(strvNewDef);
     else
-        *m_pstrDefFormat = strNewDef;
+        *m_pstrDefFormat = strvNewDef;
     return *m_pstrDefFormat;
 }
 
@@ -619,12 +619,12 @@ const TString& TFindBuf::strTimeFormat() const
     return *m_pstrTimeFormat;
 }
 
-const TString& TFindBuf::strTimeFormat(const TString& strNewDef)
+const TString& TFindBuf::strTimeFormat(const TStringView& strvNewDef)
 {
     if (!m_pstrTimeFormat)
-        m_pstrTimeFormat = new TString(strNewDef);
+        m_pstrTimeFormat = new TString(strvNewDef);
     else
-        *m_pstrTimeFormat = strNewDef;
+        *m_pstrTimeFormat = strvNewDef;
     return *m_pstrTimeFormat;
 }
 
@@ -863,12 +863,12 @@ tCIDLib::TVoid TFindBuf::StreamTo(TBinOutStream& strmToWriteTo) const
 //
 tCIDLib::TVoid
 TFindBuf::FromFindBuf(  const   TKrnlFileSys::TRawFileFind& FindBuf
-                        , const TString&                    strPath)
+                        , const TStringView&                strvPath)
 {
     // Copy over the data
     m_c8Size        = FindBuf.c8FileSize;
     m_eFlags        = FindBuf.eInfoFlags;
-    m_pathFileName  = strPath;
+    m_pathFileName  = strvPath;
     m_pathFileName.AddLevel(TPathStr(FindBuf.szName));
     m_tmCreated    = FindBuf.enctCreationTime;
     m_tmLastAccess  = FindBuf.enctLastAccessTime;

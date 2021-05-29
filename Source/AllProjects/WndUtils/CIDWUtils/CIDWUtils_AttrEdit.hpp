@@ -538,6 +538,7 @@ class CIDWUTILSEXP TAttrEditWnd : public TMultiColListBox
         //  m_strTmpFmt
         //      For temporary formatting of attribute values
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean       m_bSuppressCRD;
         tCIDLib::TCard8         m_c8UserId;
         tCIDMData::TAttrList    m_colOrgVals;
         tCIDMData::TAttrList    m_colVals;

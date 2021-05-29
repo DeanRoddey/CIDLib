@@ -218,13 +218,24 @@ TKrnlFile::TKrnlFile() :
 {
 }
 
-TKrnlFile::TKrnlFile(const tCIDLib::TCh* const pszName) :
+TKrnlFile::TKrnlFile(const tCIDLib::TCh* const pszName, const tCIDLib::TCard4 c4Len) :
 
     m_pszName(nullptr)
 {
     // If they provided a name, then replicate it to our member
     if (pszName)
-        m_pszName = TRawStr::pszReplicate(pszName);
+    {
+        if (c4Len != kCIDLib::c4MaxCard)
+        {
+            m_pszName = new tCIDLib::TCh[c4Len + 1];
+            TRawMem::CopyMemBuf(m_pszName, pszName, c4Len * kCIDLib::c4CharBytes);
+            m_pszName[c4Len] = kCIDLib::chNull;
+        }
+        else
+        {
+            m_pszName = TRawStr::pszReplicate(pszName);
+        }
+    }
 }
 
 TKrnlFile::~TKrnlFile()

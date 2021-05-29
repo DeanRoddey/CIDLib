@@ -63,20 +63,22 @@ if (xtn.strQName() != nam) \
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDXML_StdCatalog
+namespace
 {
-    namespace
+    namespace CIDXML_StdCatalog
     {
         // -----------------------------------------------------------------------
         //  Our fixed DTD that we fault into all standard catalogs being parsed
         // -----------------------------------------------------------------------
-        const tCIDLib::TCh* const   pszFixedDTD =
-                            L"<?xml encoding='$NativeWideChar$'?>\n"
-                            L"<!ELEMENT CIDStdCat:Catalog (CIDStdCat:MapItem*)>\n"
-                            L"<!ELEMENT CIDStdCat:MapItem EMPTY>\n"
-                            L"<!ATTLIST CIDStdCat:MapItem\n"
-                            L"          CIDStdCat:PublicId CDATA #REQUIRED\n"
-                            L"          CIDStdCat:MapTo CDATA #REQUIRED>\n";
+        constexpr tCIDLib::TCh pszFixedDTD[] =
+        (
+            L"<?xml encoding='$NativeWideChar$'?>\n"
+            L"<!ELEMENT CIDStdCat:Catalog (CIDStdCat:MapItem*)>\n"
+            L"<!ELEMENT CIDStdCat:MapItem EMPTY>\n"
+            L"<!ATTLIST CIDStdCat:MapItem\n"
+            L"          CIDStdCat:PublicId CDATA #REQUIRED\n"
+            L"          CIDStdCat:MapTo CDATA #REQUIRED>\n"
+        );
     }
 }
 

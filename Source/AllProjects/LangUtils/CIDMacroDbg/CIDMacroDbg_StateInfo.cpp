@@ -41,9 +41,9 @@ RTTIDecls(TMacroDbgStateInfo,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroDbg_StateInfo
+namespace
 {
-    namespace
+    namespace CIDMacroDbg_StateInfo
     {
         // Our current persistent format version
         constexpr   tCIDLib::TCard2     c2FmtVersion = 1;

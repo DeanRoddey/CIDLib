@@ -49,27 +49,30 @@
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDAudStream_WaveInSrcStream_Win32
+namespace
 {
-    //
-    //  Constants related to our most common audio format, which is 16K at 16 bits
-    //  per sample PCM, mono. For now, it's the only format supported. This stuff needs
-    //  to be expanded to support format setting from the outside.
-    //
-    constexpr tCIDLib::TCard4   c4Channels      = 1;
+    namespace CIDAudStream_WaveInSrcStream_Win32
+    {
+        //
+        //  Constants related to our most common audio format, which is 16K at 16 bits
+        //  per sample PCM, mono. For now, it's the only format supported. This stuff needs
+        //  to be expanded to support format setting from the outside.
+        //
+        constexpr tCIDLib::TCard4   c4Channels      = 1;
 
-    // 16000 samples per second, two bytes per sample
-    constexpr tCIDLib::TCard4   c4SampleRate    = 16000;
-    constexpr tCIDLib::TCard4   c4SampleBytes   = 2;
+        // 16000 samples per second, two bytes per sample
+        constexpr tCIDLib::TCard4   c4SampleRate    = 16000;
+        constexpr tCIDLib::TCard4   c4SampleBytes   = 2;
 
-    // An 16th of a second of audio samples
-    constexpr tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
+        // An 16th of a second of audio samples
+        constexpr tCIDLib::TCard4   c4BufSamples    = (c4SampleRate / 16);
 
-    // Bytes required to hold that number of samples
-    constexpr tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
+        // Bytes required to hold that number of samples
+        constexpr tCIDLib::TCard4   c4BufBytes      = c4BufSamples * c4SampleBytes;
 
-    // Number of buffers we have (which will get us three seconds of buffering)
-    constexpr tCIDLib::TCard4   c4BufCount      = 48;
+        // Number of buffers we have (which will get us three seconds of buffering)
+        constexpr tCIDLib::TCard4   c4BufCount      = 48;
+    }
 }
 
 

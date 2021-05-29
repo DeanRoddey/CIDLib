@@ -40,9 +40,9 @@ RTTIDecls(TXorBlockEncrypter,TBlockEncrypter)
 RTTIDecls(TXorStreamEncrypter,TStreamEncrypter)
 
 
-namespace CIDCrypto_Xor
+namespace
 {
-    namespace
+    namespace CIDCrypto_Xor
     {
         // -----------------------------------------------------------------------
         //  Local, constant data

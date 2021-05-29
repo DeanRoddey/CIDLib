@@ -148,12 +148,6 @@ TKrnlMutex::TKrnlMutex(const tCIDLib::TCh* const pszName) :
 
 TKrnlMutex::~TKrnlMutex()
 {
-    if (m_pszName)
-    {
-        delete [] m_pszName;
-        m_pszName = nullptr;
-    }
-
     if (!bClose())
     {
         //
@@ -169,6 +163,12 @@ TKrnlMutex::~TKrnlMutex()
             , kmodCIDKernel.pszLoadCIDFacMsg(kKrnlErrs::errcGen_CloseHandle)
         );
         #endif
+    }
+
+    if (m_pszName)
+    {
+        delete [] m_pszName;
+        m_pszName = nullptr;
     }
 }
 

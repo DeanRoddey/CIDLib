@@ -586,7 +586,7 @@ namespace TRawStr
     //  These we can do ourself as inlines, to avoid the overhead of an RTL
     //  call or out of line code for such trivial ops.
     //
-    [[nodiscard]] inline tCIDLib::TBoolean
+    inline tCIDLib::TBoolean
     bFormatVal( const   tCIDLib::TCard1     c1Val
                 ,       tCIDLib::TCh* const pszBuf
                 , const tCIDLib::TCard4     c4MaxChars

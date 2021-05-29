@@ -38,9 +38,10 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TFacility,TObject)
 
-namespace CIDLib_Facility
+
+namespace
 {
-    namespace
+    namespace CIDLib_Facility
     {
         // -----------------------------------------------------------------------
         //  Local types

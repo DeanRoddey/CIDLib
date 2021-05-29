@@ -123,9 +123,9 @@ class TIPLookupItem
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDSock_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDSock_ThisFacility
     {
         // -------------------------------------------------------------------
         //  We implement a name to IP address cache. We use a keyed has set. We
@@ -142,7 +142,7 @@ namespace CIDSock_ThisFacility
         //  also do a pass to remove out of date entries.
         // -------------------------------------------------------------------
         using TIPCache = TKeyedHashSet<TIPLookupItem, TString, TStringKeyOps>;
-        const tCIDLib::TCard4 c4MaxCacheItems = 2048;
+        constexpr tCIDLib::TCard4 c4MaxCacheItems = 2048;
         TString strKeyTemp;
         tCIDLib::TEncodedTime enctFlushPass = 0;
 

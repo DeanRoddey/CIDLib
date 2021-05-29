@@ -45,17 +45,10 @@ RTTIDecls(TFileBase,TObject)
 // ---------------------------------------------------------------------------
 //  TFileBase: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TFileBase::TFileBase(const TString& strFileName) :
+TFileBase::TFileBase(const TStringView& strvFileName) :
 
-    m_strName(strFileName)
-    , m_kflThis(strFileName.pszBuffer())
-{
-}
-
-TFileBase::TFileBase(const tCIDLib::TCh* const pszFileName) :
-
-    m_strName(pszFileName)
-    , m_kflThis(pszFileName)
+    m_strName(strvFileName)
+    , m_kflThis(strvFileName.pszBuffer(), strvFileName.c4LengthOrNot())
 {
 }
 

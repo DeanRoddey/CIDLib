@@ -40,108 +40,110 @@
 RTTIDecls(TURL,TObject)
 
 
-
-namespace CIDSock_URL
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  Local const data
-    //
-    //  c2XXXMask
-    //      We use an array of 16 bit values to store character attributes.
-    //      Each bit in a character's entry indicates some attribute of that
-    //      character. These attributes are driven by the RFC that specifies
-    //      URIs. These constants are used to make the bits more self
-    //      describing.
-    //
-    //  c4MaxChar
-    //      This is the size of the ac2CharTable, which means the maximum
-    //      value of a legal URL char. Its the US_ASCII char set so 0x7F is
-    //      the biggest valid char.
-    //
-    //  achProtoChars
-    //      The list of characters (other than alphanumerics) that can be
-    //      a part of a protocol name.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard2   c2DigitMask       = 0x0001;
-    constexpr tCIDLib::TCard2   c2AlphaMask       = 0x0002;
-    constexpr tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
-    constexpr tCIDLib::TCard2   c2ProtoMask       = 0x0008;
-    constexpr tCIDLib::TCard2   c2IllegalMask     = 0x0010;
-    constexpr tCIDLib::TCard2   c2HostMask        = 0x0020;
-    constexpr tCIDLib::TCh      chMaxChar = 0x7F;
-    constexpr tCIDLib::TCh      achProtoChars[] =
+    namespace CIDSock_URL
     {
-        L'+', L'.', L'-', kCIDLib::chNull
-    };
+        // -----------------------------------------------------------------------
+        //  Local const data
+        //
+        //  c2XXXMask
+        //      We use an array of 16 bit values to store character attributes.
+        //      Each bit in a character's entry indicates some attribute of that
+        //      character. These attributes are driven by the RFC that specifies
+        //      URIs. These constants are used to make the bits more self
+        //      describing.
+        //
+        //  c4MaxChar
+        //      This is the size of the ac2CharTable, which means the maximum
+        //      value of a legal URL char. Its the US_ASCII char set so 0x7F is
+        //      the biggest valid char.
+        //
+        //  achProtoChars
+        //      The list of characters (other than alphanumerics) that can be
+        //      a part of a protocol name.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard2   c2DigitMask       = 0x0001;
+        constexpr tCIDLib::TCard2   c2AlphaMask       = 0x0002;
+        constexpr tCIDLib::TCard2   c2HexDigitMask    = 0x0004;
+        constexpr tCIDLib::TCard2   c2ProtoMask       = 0x0008;
+        constexpr tCIDLib::TCard2   c2IllegalMask     = 0x0010;
+        constexpr tCIDLib::TCard2   c2HostMask        = 0x0020;
+        constexpr tCIDLib::TCh      chMaxChar = 0x7F;
+        constexpr tCIDLib::TCh      achProtoChars[] =
+        {
+            L'+', L'.', L'-', kCIDLib::chNull
+        };
 
 
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  atomTableLoaded
-    //  ac2CharTable
-    //      This is the character attributes table. Each ASCII char (all that
-    //      are allowed directly in URIs) can be used to index this table and
-    //      see what attributes it has.
-    // -----------------------------------------------------------------------
-    TAtomicFlag         atomTableLoaded;
-    tCIDLib::TCard2     ac2CharTable[chMaxChar + 1];
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  atomTableLoaded
+        //  ac2CharTable
+        //      This is the character attributes table. Each ASCII char (all that
+        //      are allowed directly in URIs) can be used to index this table and
+        //      see what attributes it has.
+        // -----------------------------------------------------------------------
+        TAtomicFlag         atomTableLoaded;
+        tCIDLib::TCard2     ac2CharTable[chMaxChar + 1];
 
 
-    // -----------------------------------------------------------------------
-    //  Local static data
-    //
-    //  ac4DefPorts
-    //      This is an array of default ports for each protocol. If a protocol
-    //      does not support ports, then its set to zero. Note that it is in
-    //      the same order as the EProtos type, so that enum can be used to
-    //      index this array.
-    //
-    //  aeSockProtos
-    //      This is an array of socket protocol types for each protocol. We
-    //      have to know this in order to create a socket for the protocol.
-    //
-    //  c2FmtVersion
-    //      A format version we write out when streamed, to allow for later
-    //      upgrade of the format.
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4 ac4PortVals[] =
-    {
-        0       // None
-        , 0     // File
-        , 80    // HTTP
-        , 21    // FTP
-        , 25    // Mailto
-        , 119   // News
-        , 443   // HTTPS
-        , 554   // RTSP
-        , 322   // RTSPS
-        , 5060  // SIP
-        , 80    // WS
-        , 443   // SS
-    };
-    const TEArray<tCIDLib::TCard4, tCIDSock::EProtos, tCIDSock::EProtos::Count>
-    ac4DefPorts(ac4PortVals);
+        // -----------------------------------------------------------------------
+        //  Local static data
+        //
+        //  ac4DefPorts
+        //      This is an array of default ports for each protocol. If a protocol
+        //      does not support ports, then its set to zero. Note that it is in
+        //      the same order as the EProtos type, so that enum can be used to
+        //      index this array.
+        //
+        //  aeSockProtos
+        //      This is an array of socket protocol types for each protocol. We
+        //      have to know this in order to create a socket for the protocol.
+        //
+        //  c2FmtVersion
+        //      A format version we write out when streamed, to allow for later
+        //      upgrade of the format.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 ac4PortVals[] =
+        {
+            0       // None
+            , 0     // File
+            , 80    // HTTP
+            , 21    // FTP
+            , 25    // Mailto
+            , 119   // News
+            , 443   // HTTPS
+            , 554   // RTSP
+            , 322   // RTSPS
+            , 5060  // SIP
+            , 80    // WS
+            , 443   // SS
+        };
+        const TEArray<tCIDLib::TCard4, tCIDSock::EProtos, tCIDSock::EProtos::Count>
+        ac4DefPorts(ac4PortVals);
 
-    const tCIDSock::ESockProtos aeProtoVals[] =
-    {
-        tCIDSock::ESockProtos::IP       // Place holder
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-        , tCIDSock::ESockProtos::TCP
-    };
-    const TEArray<tCIDSock::ESockProtos, tCIDSock::EProtos, tCIDSock::EProtos::Count>
-    aeSockProtos(aeProtoVals);
+        const tCIDSock::ESockProtos aeProtoVals[] =
+        {
+            tCIDSock::ESockProtos::IP       // Place holder
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+            , tCIDSock::ESockProtos::TCP
+        };
+        const TEArray<tCIDSock::ESockProtos, tCIDSock::EProtos, tCIDSock::EProtos::Count>
+        aeSockProtos(aeProtoVals);
 
-    const tCIDLib::TCard2   c2FmtVersion = 1;
+        constexpr tCIDLib::TCard2   c2FmtVersion = 1;
+    }
 }
 
 

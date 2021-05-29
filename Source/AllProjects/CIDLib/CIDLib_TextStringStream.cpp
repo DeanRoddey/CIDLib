@@ -68,6 +68,28 @@ TTextStringInStream::TTextStringInStream(const  TString* const      pstrToUse
     AdoptStream(new TBinInStream(m_pstrmiIn));
 }
 
+TTextStringInStream::TTextStringInStream(const TStringView& strvSrc) :
+
+    TTextInStream(new TNativeWCConverter)
+    , m_pstrmiIn(nullptr)
+{
+    //
+    //  Create an impl object for the passed string and store it. If we have a string object we
+    //  we can pass that along. Else we have to create a string from the raw buffer and let him
+    //  adopt it.
+    //
+    if (strvSrc.bIsString())
+        m_pstrmiIn = new TStringInStreamImpl(strvSrc.pstrObj(), tCIDLib::EAdoptOpts::NoAdopt);
+    else
+        m_pstrmiIn = new TStringInStreamImpl(new TString(strvSrc), tCIDLib::EAdoptOpts::Adopt);
+
+    //
+    //  Create a binary stream and give it the input string stream impl to
+    //  own. Give the new stream to our parent to own.
+    //
+    AdoptStream(new TBinInStream(m_pstrmiIn));
+}
+
 TTextStringInStream::TTextStringInStream(TString&& strToTake) :
 
     TTextInStream(new TNativeWCConverter)

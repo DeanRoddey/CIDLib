@@ -36,9 +36,9 @@
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDKernel_Process_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_Process_Win32
     {
         struct TFindWndFiltered
         {

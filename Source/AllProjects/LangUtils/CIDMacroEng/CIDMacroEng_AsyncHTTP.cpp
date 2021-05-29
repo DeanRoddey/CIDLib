@@ -43,9 +43,9 @@ RTTIDecls(TMEngAsyncHTTPClInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_NetClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_NetClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

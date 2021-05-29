@@ -40,9 +40,9 @@ RTTIDecls(TFrameWnd, TWindow)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_FrameWnd
+namespace
 {
-    namespace
+    namespace CIDCtrls_FrameWnd
     {
         const tCIDLib::TCh* pszClass = L"CIDCtrlsStdFrame";
         const tCIDLib::TCh* pszClassHV = L"CIDCtrlsStdHVFrame";

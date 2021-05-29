@@ -40,9 +40,9 @@ AdvRTTIDecls(TNSRebindInfo, TNameServerInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDOrbUC_NSInfo
+namespace
 {
-    namespace
+    namespace CIDOrbUC_NSInfo
     {
         // -----------------------------------------------------------------------
         //  Our NS info persistent format version number. We aren't actually ever

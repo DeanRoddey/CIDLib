@@ -38,9 +38,9 @@
 RTTIDecls(TModule,TObject)
 
 
-namespace CIDLib_Module
+namespace
 {
-    namespace
+    namespace CIDLib_Module
     {
         // -----------------------------------------------------------------------
         //  Local static data

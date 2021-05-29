@@ -390,15 +390,11 @@ TKrnlCommPort::TKrnlCommPort(TKrnlCommPort&& kcommSrc) :
 
 TKrnlCommPort::~TKrnlCommPort()
 {
-    // Clean up our extra data
-    delete m_pExtra;
-
-    //
-    //  We don't use the extra data, so we don't have to clean it up here.
-    //  We just need to close the handle if open.
-    //
     if (m_hcommThis.m_phcommiThis->hComm)
         ::CloseHandle(m_hcommThis.m_phcommiThis->hComm);
+
+    // Clean up our extra data
+    delete m_pExtra;
 }
 
 

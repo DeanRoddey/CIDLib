@@ -45,9 +45,9 @@ RTTIDecls(TMEngFileSysVal,TMEngClassVal)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_FileSysClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_FileSysClass
     {
         // The path and name for the directory iteration class
         const TString   strDirIterClassPath(L"MEng.System.Runtime.DirIter");

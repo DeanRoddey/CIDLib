@@ -298,14 +298,14 @@ class CIDLIBEXP TString :
             const   tCIDLib::TSCh* const    pszInitValue
         );
 
-        TString
+        explicit TString
         (
             const   TStringView&            strvSrc
             , const tCIDLib::TCard4         c4ExtraChars = 0
         );
 
-        TString(const   tCIDLib::TCh* const     pszInitValue
-                , const tCIDLib::TCard4         c4ExtraChars = 0) :
+        TString(const   tCIDLib::TCh* const pszInitValue
+                , const tCIDLib::TCard4     c4ExtraChars = 0) :
 
             m_strbData(pszInitValue, 0, c4ExtraChars)
         {
@@ -430,7 +430,8 @@ class CIDLIBEXP TString :
 
         TString& operator=(const tCIDLib::TCh* const pszSrc)
         {
-            Set(pszSrc);
+            m_strbData.Clear();
+            m_strbData.Append(pszSrc, TRawStr::c4StrLen(pszSrc));
             return *this;
         }
 
@@ -542,6 +543,8 @@ class CIDLIBEXP TString :
         {
             m_strbData.Append(strSrc.pszBuffer(), strSrc.c4Length());
         }
+
+        tCIDLib::TVoid Append(const TStringView& strvSrc);
 
         tCIDLib::TVoid Append(const TString& strSrc1, const TString& strSrc2)
         {
@@ -1131,7 +1134,7 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid FormatToFld
         (
-            const   TString&                strToFormat
+            const   TStringView&            strvToFormat
             , const tCIDLib::TCard4         c4FldWidth  = 0
             , const tCIDLib::EHJustify      eJustify = tCIDLib::EHJustify::Left
             , const tCIDLib::TCh            chFill = kCIDLib::chSpace
@@ -1277,15 +1280,9 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid Set
         (
-            const   tCIDLib::TCh* const     pszSrc
+            const   TStringView&            strvSrc
             , const tCIDLib::TCard4         c4Extra = 0
         );
-
-        tCIDLib::TVoid Set(const TString& strSrc, const tCIDLib::TCard4 c4Extra = 0)
-        {
-            m_strbData.Clear();
-            m_strbData.Append(strSrc.pszBuffer(), strSrc.c4Length(), c4Extra);
-        }
 
         //
         //  The precision parameter is a dummy parameter that is not used. This
@@ -1446,7 +1443,7 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         //  Private class constants
         // -------------------------------------------------------------------
-        static constexpr tCIDLib::TCard4 c4SmallBufSz = 15;
+        static constexpr tCIDLib::TCard4 c4SmallBufSz = 7;
 
 
         // -------------------------------------------------------------------
@@ -1598,6 +1595,10 @@ class CIDLIBEXP TString :
                     , const tCIDLib::TBoolean   bPreserve
                 );
 
+                //
+                //  If the CURRENT LENGTH plus the increment would exceed the buffer size, then
+                //  expand to current end
+                //
                 tCIDLib::TVoid ExpandBy(const   tCIDLib::TCard4     c4Increment
                                         , const tCIDLib::TBoolean   bPreserve)
                 {

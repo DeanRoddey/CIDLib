@@ -42,7 +42,7 @@ class CIDXMLEXP TFacCIDXML : public TFacility
         // -------------------------------------------------------------------
         static tCIDLib::TBoolean bIsAllSpaces
         (
-            const   TString&                strToTest
+            const   TStringView&            strvToTest
         );
 
         static tCIDXML::EErrTypes eTypeOfError
@@ -74,28 +74,14 @@ class CIDXMLEXP TFacCIDXML : public TFacility
         // -------------------------------------------------------------------
         tCIDLib::TVoid EscapeFor
         (
-            const   tCIDLib::TCh* const     pszInText
+            const   TStringView&            strvInText
             ,       TTextOutStream&         strmOut
             , const tCIDXML::EEscTypes      eType
         );
 
         tCIDLib::TVoid EscapeFor
         (
-            const   TString&                strInText
-            ,       TTextOutStream&         strmOut
-            , const tCIDXML::EEscTypes      eType
-        );
-
-        tCIDLib::TVoid EscapeFor
-        (
-            const   tCIDLib::TCh* const     pszInText
-            ,       TString&                strOutText
-            , const tCIDXML::EEscTypes      eType
-        );
-
-        tCIDLib::TVoid EscapeFor
-        (
-            const   TString&                strInText
+            const   TStringView&            strvInText
             ,       TString&                strOutText
             , const tCIDXML::EEscTypes      eType
         );
@@ -110,56 +96,32 @@ class CIDXMLEXP TFacCIDXML : public TFacility
         tCIDLib::TVoid FormatAttr
         (
                     TTextOutStream&         strmOut
-            , const tCIDLib::TCh* const     pszName
-            , const TString&                strValue
-            , const tCIDLib::TBoolean       bSpaceBefore = kCIDLib::False
-        );
-
-        tCIDLib::TVoid FormatAttr
-        (
-                    TTextOutStream&         strmOut
-            , const TString&                strName
-            , const TString&                strValue
+            , const TStringView&            strvName
+            , const TStringView&            strvValue
             , const tCIDLib::TBoolean       bSpaceBefore = kCIDLib::False
         );
 
         tCIDLib::TVoid FormatAttrNL
         (
                     TTextOutStream&         strmOut
-            , const tCIDLib::TCh* const     pszName
-            , const TString&                strValue
-            , const tCIDLib::TBoolean       bSpaceBefore = kCIDLib::False
-        );
-
-        tCIDLib::TVoid FormatAttrNL
-        (
-                    TTextOutStream&         strmOut
-            , const TString&                strName
-            , const TString&                strValue
+            , const TStringView&            strName
+            , const TStringView&            strValue
             , const tCIDLib::TBoolean       bSpaceBefore = kCIDLib::False
         );
 
         tCIDLib::TVoid NLFormatAttr
         (
                     TTextOutStream&         strmOut
-            , const tCIDLib::TCh* const     pszName
-            , const TString&                strValue
-            , const tCIDLib::TBoolean       bSpaceAfter = kCIDLib::False
-        );
-
-        tCIDLib::TVoid NLFormatAttr
-        (
-                    TTextOutStream&         strmOut
-            , const TString&                strName
-            , const TString&                strValue
+            , const TStringView&            strvName
+            , const TStringView&            strvValue
             , const tCIDLib::TBoolean       bSpaceAfter = kCIDLib::False
         );
 
         tCIDLib::TVoid FormatTextElem
         (
                     TTextOutStream&         strmOut
-            , const TString&                strElemName
-            , const TString&                strElemText
+            , const TStringView&            strElemName
+            , const TStringView&            strElemText
         );
 
 

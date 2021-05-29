@@ -39,32 +39,34 @@
 #pragma     warning(pop)
 
 
-
-namespace CIDKernel_Socket_Win32
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  Socket constants
-    // -----------------------------------------------------------------------
-    constexpr tCIDLib::TCard4   hInvalid = tCIDLib::TCard4(-1);
-
-
-    // -----------------------------------------------------------------------
-    //  A mapping array to map from our socket protocol enum to the actual
-    //  system value for that protocol.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4       ac4ProtoMaps[] =
+    namespace CIDKernel_Socket_Win32
     {
-        0       // IP
-        , 1     // ICMP
-        , 2     // IGMP
-        , 6     // TCP
-        , 12    // PUP
-        , 17    // UDP
-        , 22    // IDP
-        , 255   // RawIP
-        , 58    // ICMP6
-    };
-    constexpr tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
+        // -----------------------------------------------------------------------
+        //  Socket constants
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   hInvalid = tCIDLib::TCard4(-1);
+
+
+        // -----------------------------------------------------------------------
+        //  A mapping array to map from our socket protocol enum to the actual
+        //  system value for that protocol.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4       ac4ProtoMaps[] =
+        {
+            0       // IP
+            , 1     // ICMP
+            , 2     // IGMP
+            , 6     // TCP
+            , 12    // PUP
+            , 17    // UDP
+            , 22    // IDP
+            , 255   // RawIP
+            , 58    // ICMP6
+        };
+        constexpr tCIDLib::TCard4   c4ProtoCnt = tCIDLib::c4ArrayElems(ac4ProtoMaps);
+    }
 }
 
 

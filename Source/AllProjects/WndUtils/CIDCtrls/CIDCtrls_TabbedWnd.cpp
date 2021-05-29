@@ -42,9 +42,9 @@ AdvRTTIDecls(TTabbedWnd, TCtrlWnd)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_TabbedWnd
+namespace
 {
-    namespace
+    namespace CIDCtrls_TabbedWnd
     {
         // Pseudo menu command ids for use in our accelerator table
         constexpr tCIDLib::TResId ridMenu_Close     = 100;

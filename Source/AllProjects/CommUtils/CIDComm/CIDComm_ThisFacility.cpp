@@ -40,9 +40,9 @@ RTTIDecls(TFacCIDComm,TFacility)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDComm_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDComm_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  This is our port factory list

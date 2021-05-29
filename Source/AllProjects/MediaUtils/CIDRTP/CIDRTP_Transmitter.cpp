@@ -40,9 +40,9 @@ RTTIDecls(TCIDRTPTrans,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDRTP_Transmitter
+namespace
 {
-    namespace
+    namespace CIDRTP_Transmitter
     {
         const tCIDLib::TCard4 c4MaxFreeMQSz = 256;
     }

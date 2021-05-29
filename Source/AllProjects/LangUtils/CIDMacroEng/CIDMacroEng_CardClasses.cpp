@@ -49,9 +49,9 @@ RTTIDecls(TMEngCard8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_CardClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_CardClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

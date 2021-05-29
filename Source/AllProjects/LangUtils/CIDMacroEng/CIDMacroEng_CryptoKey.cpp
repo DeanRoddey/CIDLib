@@ -43,9 +43,9 @@ RTTIDecls(TMEngCryptoKeyInfo,TMacroEngClass)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_CryptoKey
+namespace
 {
-    namespace
+    namespace CIDMacroEng_CryptoKey
     {
         // -----------------------------------------------------------------------
         //  The names of our classes

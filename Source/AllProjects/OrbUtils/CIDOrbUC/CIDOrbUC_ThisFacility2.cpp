@@ -36,22 +36,22 @@
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDOrbUC_ThisFacility
+namespace
 {
-    namespace
+    namespace CIDOrbUC_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  If a binding fails this many times in a row, we just remove it because
         //  it's clearly bad.
         // -----------------------------------------------------------------------
-        const tCIDLib::TCard4       c4MaxBindFails = 10;
+        constexpr tCIDLib::TCard4 c4MaxBindFails = 10;
 
 
         // -----------------------------------------------------------------------
         //  If we haven't had to talk to the NS for other reasons in this period
         //  of time, we'll do an active ping.
         // -----------------------------------------------------------------------
-        const tCIDLib::TEncodedTime enctPingTime(kCIDLib::enctOneSecond * 15);
+        constexpr tCIDLib::TEncodedTime enctPingTime(kCIDLib::enctOneSecond * 15);
     }
 }
 

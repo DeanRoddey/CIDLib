@@ -61,6 +61,7 @@ class KRNLEXPORT TKrnlFile
         TKrnlFile
         (
             const   tCIDLib::TCh* const     pszName
+            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         );
 
         TKrnlFile(const TKrnlFile&) = delete;

@@ -166,14 +166,14 @@ typedef struct _GET_CONFIGURATION_IOCTL_INPUT
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDKernel_RemMedia
+namespace
 {
-    namespace
+    namespace CIDKernel_RemMedia
     {
         // -----------------------------------------------------------------------
         //  A template for the device path we need to open a drive.
         // -----------------------------------------------------------------------
-        const tCIDLib::TCh* const aszPathTmpl = L"\\\\.\\ :";
+        constexpr tCIDLib::TCh const aszPathTmpl[] = L"\\\\.\\ :";
     }
 }
 

@@ -43,9 +43,9 @@ RTTIDecls(TVolFailureInfo, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDLib_FileSys
+namespace
 {
-    namespace
+    namespace CIDLib_FileSys
     {
         // -----------------------------------------------------------------------
         //  Our persistent format versions

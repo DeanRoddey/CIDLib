@@ -43,16 +43,18 @@ RTTIDecls(TMEngNamedValMapInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_NamedValMapClass
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    static const TString   strNamedValMap(L"NamedValMap");
-    static const TString   strNamedValMapClassPath(L"MEng.System.Runtime.NamedValMap");
+    namespace CIDMacroEng_NamedValMapClass
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strNamedValMap(L"NamedValMap");
+        const TString   strNamedValMapClassPath(L"MEng.System.Runtime.NamedValMap");
+    }
 }
-
 
 
 

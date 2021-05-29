@@ -159,21 +159,24 @@ struct icmpv6_echohdr
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDKernel_SockPinger_Win32
+namespace
 {
-    //
-    //  The bytes we subtract from the received data to get the count of actual
-    //  echo data bytes we received. There's no ip header included in the response
-    //  under V6.
-    //
-    constexpr tCIDLib::TCard4 c4V4NonData(sizeof(ip_hdr) + sizeof(icmp_echohdr));
-    constexpr tCIDLib::TCard4 c4V6NonData(sizeof(icmpv6_echohdr));
+    namespace CIDKernel_SockPinger_Win32
+    {
+        //
+        //  The bytes we subtract from the received data to get the count of actual
+        //  echo data bytes we received. There's no ip header included in the response
+        //  under V6.
+        //
+        constexpr tCIDLib::TCard4 c4V4NonData(sizeof(ip_hdr) + sizeof(icmp_echohdr));
+        constexpr tCIDLib::TCard4 c4V6NonData(sizeof(icmpv6_echohdr));
 
-    // The number of payload bytes we send in the ping
-    constexpr tCIDLib::TCard4 c4PLBytes(32);
+        // The number of payload bytes we send in the ping
+        constexpr tCIDLib::TCard4 c4PLBytes(32);
 
-    // The fill byte we set the echo payload bytes to
-    constexpr tCIDLib::TCard1 c1PLData(0x45);
+        // The fill byte we set the echo payload bytes to
+        constexpr tCIDLib::TCard1 c1PLData(0x45);
+    }
 }
 
 

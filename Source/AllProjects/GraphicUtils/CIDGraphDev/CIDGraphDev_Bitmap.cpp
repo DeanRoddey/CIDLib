@@ -39,10 +39,9 @@
 RTTIDecls(TBitmap,TObject)
 RTTIDecls(TSysBitmapInfo,TObject)
 
-
-namespace CIDGraphDev_Bitmap
+namespace
 {
-    namespace
+    namespace CIDGraphDev_Bitmap
     {
         // ---------------------------------------------------------------------------
         //  A little array of mapping structures that let us turn our generic system
@@ -55,7 +54,7 @@ namespace CIDGraphDev_Bitmap
             const tCIDLib::TCh*     pszName;
         };
 
-        static TBmpMap  amapVals[] =
+        TBmpMap  amapVals[] =
         {
             // These are Win32 bitmaps
                 { tCIDGraphDev::ESysBmps::None         , 0                            , L"None" }
@@ -96,7 +95,7 @@ namespace CIDGraphDev_Bitmap
             ,   { tCIDGraphDev::ESysBmps::Halftone9    , kCIDGraphDev::ridBmp_Halftone9 , L"Halftone9" }
         };
 
-        static TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
+        TEArray<TBmpMap, tCIDGraphDev::ESysBmps, tCIDGraphDev::ESysBmps::Count> amapList
         (
             amapVals
         );

@@ -40,9 +40,9 @@ RTTIDecls(TOrbObjId,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDOrb_ObjId
+namespace
 {
-    namespace
+    namespace CIDOrb_ObjId
     {
         // -----------------------------------------------------------------------
         //  Our persistent format version.

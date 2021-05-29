@@ -44,9 +44,9 @@ RTTIDecls(TRandomNum,TObject)
 // ---------------------------------------------------------------------------
 //  Local constants
 // ---------------------------------------------------------------------------
-namespace CIDLib_Random
+namespace
 {
-    namespace
+    namespace CIDLib_Random
     {
         constexpr tCIDLib::TCard2 c2RandSeed0    = 0x330E;
         constexpr tCIDLib::TCard2 c2RandSeed1    = 0xABCD;

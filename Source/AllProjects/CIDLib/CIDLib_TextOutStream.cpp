@@ -513,6 +513,22 @@ TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh chToWrite)
 }
 
 
+TTextOutStream& TTextOutStream::operator<<(const TStringView& strvToWrite)
+{
+    if (m_c4Width)
+    {
+        TString  strFmt(m_c4Width + m_c4TrailingSp);
+        strFmt.FormatToFld(strvToWrite, m_c4Width, m_eJustification, m_chFill, m_c4TrailingSp);
+        WriteChars(strFmt.pszBuffer(), strFmt.c4Length());
+    }
+     else
+    {
+        WriteChars(strvToWrite.pszBuffer(), strvToWrite.c4Length());
+    }
+    return *this;
+}
+
+
 TTextOutStream& TTextOutStream::operator<<(const tCIDLib::TCh* const pszToWrite)
 {
     //  If the passed buffer pointer is null, then do nothing
@@ -551,6 +567,7 @@ TTextOutStream& TTextOutStream::operator<<(const TString& strToWrite)
     }
     return *this;
 }
+
 
 TTextOutStream& TTextOutStream::operator<<(const Spaces SpacesToWrite)
 {

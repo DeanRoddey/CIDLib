@@ -49,9 +49,9 @@ RTTIDecls(TKeyValues,TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDLib_KeyValuePair
+namespace
 {
-    namespace
+    namespace CIDLib_KeyValuePair
     {
         // The persistent format version for the key/value/flag class
         constexpr tCIDLib::TCard1       c1KVPFFmtVersion = 1;
@@ -69,46 +69,33 @@ namespace CIDLib_KeyValuePair
 // ---------------------------------------------------------------------------
 //  TKeyValuePair: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TKeyValuePair::TKeyValuePair(const  TString&    strKey
-                            , const TString&    strValue) :
-    m_strKey(strKey)
-    , m_strValue(strValue)
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
+                            , const TStringView&    strvValue) :
+    m_strKey(strvKey)
+    , m_strValue(strvValue)
 {
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
-                            , const tCIDLib::TCh* const pszValue) :
-    m_strKey(strKey)
-    , m_strValue(pszValue)
-{
-}
-
-TKeyValuePair::TKeyValuePair(const  tCIDLib::TCh* const pszKey
-                            , const tCIDLib::TCh* const pszValue) :
-    m_strKey(pszKey)
-    , m_strValue(pszValue)
-{
-}
-
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
-                            , const tCIDLib::TBoolean   bValue) :
-    m_strKey(strKey)
-    , m_strValue(bValue ? L"Yes" : L"No")
-{
-}
-
-TKeyValuePair::TKeyValuePair(const  TString&        strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
                             , const tCIDLib::TCh    chValue) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(1UL)
 {
     m_strValue.Append(chValue);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
+                            , const TBoolean            bValue
+                            , const tCIDLib::ERadices   eRadix) :
+    m_strKey(strvKey)
+    , m_strValue(bValue.bVal() ? L"Yes" : L"No")
+{
+}
+
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TCard1     c1Value
                             , const tCIDLib::ERadices   eRadix) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(6UL)
 {
     if (eRadix == tCIDLib::ERadices::Hex)
@@ -116,10 +103,10 @@ TKeyValuePair::TKeyValuePair(const  TString&            strKey
     m_strValue.AppendFormatted(c1Value, eRadix);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TCard2     c2Value
                             , const tCIDLib::ERadices   eRadix) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(7UL)
 {
     if (eRadix == tCIDLib::ERadices::Hex)
@@ -127,10 +114,10 @@ TKeyValuePair::TKeyValuePair(const  TString&            strKey
     m_strValue.AppendFormatted(c2Value, eRadix);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TCard4     c4Value
                             , const tCIDLib::ERadices   eRadix) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(12UL)
 {
     if (eRadix == tCIDLib::ERadices::Hex)
@@ -138,10 +125,10 @@ TKeyValuePair::TKeyValuePair(const  TString&            strKey
     m_strValue.AppendFormatted(c4Value, eRadix);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TCard8     c8Value
                             , const tCIDLib::ERadices   eRadix) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(20UL)
 {
     if (eRadix == tCIDLib::ERadices::Hex)
@@ -149,51 +136,51 @@ TKeyValuePair::TKeyValuePair(const  TString&            strKey
     m_strValue.AppendFormatted(c8Value, eRadix);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TFloat4    f4Value
                             , const tCIDLib::TCard4     c4DecDigs) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(12UL)
 {
     m_strValue.AppendFormatted(f4Value, c4DecDigs);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&            strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&        strvKey
                             , const tCIDLib::TFloat8    f8Value
                             , const tCIDLib::TCard4     c4DecDigs) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(18UL)
 {
     m_strValue.AppendFormatted(f8Value, c4DecDigs);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&        strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
                             , const tCIDLib::TInt1  i1Value) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(5UL)
 {
     m_strValue.AppendFormatted(i1Value);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&        strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
                             , const tCIDLib::TInt2  i2Value) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(8UL)
 {
     m_strValue.AppendFormatted(i2Value);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&        strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
                             , const tCIDLib::TInt4  i4Value) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(11UL)
 {
     m_strValue.AppendFormatted(i4Value);
 }
 
-TKeyValuePair::TKeyValuePair(const  TString&        strKey
+TKeyValuePair::TKeyValuePair(const  TStringView&    strvKey
                             , const tCIDLib::TInt8  i8Value) :
-    m_strKey(strKey)
+    m_strKey(strvKey)
     , m_strValue(18UL)
 {
     m_strValue.AppendFormatted(i8Value);
@@ -247,9 +234,9 @@ const TString& TKeyValuePair::strKey() const
     return m_strKey;
 }
 
-const TString& TKeyValuePair::strKey(const TString& strNewKey)
+const TString& TKeyValuePair::strKey(const TStringView& strvNewKey)
 {
-    m_strKey = strNewKey;
+    m_strKey = strvNewKey;
     return m_strKey;
 }
 
@@ -265,19 +252,19 @@ const TString& TKeyValuePair::strValue() const
     return m_strValue;
 }
 
-const TString& TKeyValuePair::strValue(const TString& strNewValue)
+const TString& TKeyValuePair::strValue(const TStringView& strvNewValue)
 {
-    m_strValue = strNewValue;
+    m_strValue = strvNewValue;
     return m_strValue;
 }
 
 
 // Set the key and value directly
-tCIDLib::TVoid TKeyValuePair::Set(  const   TString&    strNewKey
-                                    , const TString&    strNewValue)
+tCIDLib::TVoid TKeyValuePair::Set(  const   TStringView&    strvNewKey
+                                    , const TStringView&    strvNewValue)
 {
-    m_strKey = strNewKey;
-    m_strValue = strNewValue;
+    m_strKey = strvNewKey;
+    m_strValue = strvNewValue;
 }
 
 
@@ -315,29 +302,11 @@ TKeyValFPair::TKeyValFPair(const tCIDLib::TBoolean bFlag) :
 {
 }
 
-TKeyValFPair::TKeyValFPair( const   TString&            strKey
-                            , const TString&            strValue
+TKeyValFPair::TKeyValFPair( const   TStringView&        strvKey
+                            , const TStringView&        strvValue
                             , const tCIDLib::TBoolean   bFlag) :
 
-    TParent(strKey, strValue)
-    , m_bFlag(bFlag)
-{
-}
-
-TKeyValFPair::TKeyValFPair( const   TString&                strKey
-                            , const tCIDLib::TCh* const     pszValue
-                            , const tCIDLib::TBoolean       bFlag) :
-
-    TParent(strKey, pszValue)
-    , m_bFlag(bFlag)
-{
-}
-
-TKeyValFPair::TKeyValFPair( const   tCIDLib::TCh* const     pszKey
-                            , const tCIDLib::TCh* const     pszValue
-                            , const tCIDLib::TBoolean       bFlag) :
-
-    TParent(pszKey, pszValue)
+    TParent(strvKey, strvValue)
     , m_bFlag(bFlag)
 {
 }
@@ -374,17 +343,17 @@ tCIDLib::TBoolean TKeyValFPair::operator!=(const TKeyValFPair& kvalfSrc) const
 // ---------------------------------------------------------------------------
 
 // Ours hides the parent's version, so we have to provide a passthrough
-tCIDLib::TVoid TKeyValFPair::Set(const  TString& strNewKey, const TString& strNewValue)
+tCIDLib::TVoid TKeyValFPair::Set(const  TStringView& strvNewKey, const TStringView& strvNewValue)
 {
-    TParent::Set(strNewKey, strNewValue);
+    TParent::Set(strvNewKey, strvNewValue);
     m_bFlag = kCIDLib::False;
 }
 
-tCIDLib::TVoid TKeyValFPair::Set(const  TString&            strNewKey
-                                , const TString&            strNewValue
+tCIDLib::TVoid TKeyValFPair::Set(const  TStringView&        strvNewKey
+                                , const TStringView&        strvNewValue
                                 , const tCIDLib::TBoolean   bFlag)
 {
-    TParent::Set(strNewKey, strNewValue);
+    TParent::Set(strvNewKey, strvNewValue);
     m_bFlag = bFlag;
 }
 
@@ -449,19 +418,19 @@ tCIDLib::TVoid TKeyValFPair::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TKeyNumPair: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TKeyNumPair::TKeyNumPair(const  TString&            strKey
+TKeyNumPair::TKeyNumPair(const  TStringView&        strvKey
                         , const tCIDLib::TFloat4    f4Value) :
     m_f4Value(f4Value)
-    , m_strKey(strKey)
+    , m_strKey(strvKey)
 {
 }
 
-TKeyNumPair::TKeyNumPair(const  TString&            strKey
+TKeyNumPair::TKeyNumPair(const  TStringView&        strvKey
                         , const tCIDLib::TFloat4    f4Value
-                        , const TString&            strValue) :
+                        , const TStringView&        strvValue) :
     m_f4Value(f4Value)
-    , m_strKey(strKey)
-    , m_strValue(strValue)
+    , m_strKey(strvKey)
+    , m_strValue(strvValue)
 {
 }
 
@@ -528,9 +497,9 @@ const TString& TKeyNumPair::strKey() const
     return m_strKey;
 }
 
-const TString& TKeyNumPair::strKey(const TString& strNewKey)
+const TString& TKeyNumPair::strKey(const TStringView& strvNewKey)
 {
-    m_strKey = strNewKey;
+    m_strKey = strvNewKey;
     return m_strKey;
 }
 
@@ -541,9 +510,9 @@ const TString& TKeyNumPair::strValue() const
     return m_strValue;
 }
 
-const TString& TKeyNumPair::strValue(const TString& strToSet)
+const TString& TKeyNumPair::strValue(const TStringView& strvToSet)
 {
-    m_strValue = strToSet;
+    m_strValue = strvToSet;
     return m_strValue;
 }
 
@@ -551,22 +520,22 @@ const TString& TKeyNumPair::strValue(const TString& strToSet)
 
 // Set the key and values after the face
 tCIDLib::TVoid
-TKeyNumPair::Set(const  TString&            strNewKey
+TKeyNumPair::Set(const  TStringView&        strvNewKey
                 , const tCIDLib::TFloat4    f4Value)
 {
     m_f4Value = f4Value;
-    m_strKey = strNewKey;
+    m_strKey = strvNewKey;
     m_strValue.Clear();
 }
 
 tCIDLib::TVoid
-TKeyNumPair::Set(const  TString&            strNewKey
+TKeyNumPair::Set(const  TStringView&        strvNewKey
                 , const tCIDLib::TFloat4    f4Value
-                , const TString&            strValue)
+                , const TStringView&        strvValue)
 {
     m_f4Value = f4Value;
-    m_strKey = strNewKey;
-    m_strValue = strValue;
+    m_strKey = strvNewKey;
+    m_strValue = strvValue;
 }
 
 // ---------------------------------------------------------------------------
@@ -604,52 +573,30 @@ tCIDLib::TVoid TKeyNumPair::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TKeyValues: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TKeyValues::TKeyValues( const   TString&    strKey
-                        , const TString&    strVal1) :
-    m_strKey(strKey)
-    , m_strVal1(strVal1)
+TKeyValues::TKeyValues( const   TStringView&    strvKey
+                        , const TStringView&    strvVal1) :
+    m_strKey(strvKey)
+    , m_strVal1(strvVal1)
 {
 }
 
-TKeyValues::TKeyValues( const   TString&    strKey
-                        , const TString&    strVal1
-                        , const TString&    strVal2) :
-    m_strKey(strKey)
-    , m_strVal1(strVal1)
-    , m_strVal2(strVal2)
+TKeyValues::TKeyValues( const   TStringView&    strvKey
+                        , const TStringView&    strvVal1
+                        , const TStringView&    strvVal2) :
+    m_strKey(strvKey)
+    , m_strVal1(strvVal1)
+    , m_strVal2(strvVal2)
 {
 }
 
-TKeyValues::TKeyValues( const  TString&     strKey
-                        , const TString&    strVal1
-                        , const TString&    strVal2
-                        , const TString&    strVal3) :
-    m_strKey(strKey)
-    , m_strVal1(strVal1)
-    , m_strVal2(strVal2)
-    , m_strVal3(strVal3)
-{
-}
-
-TKeyValues::TKeyValues( const   TString&            strKey
-                        , const tCIDLib::TCh* const pszVal1
-                        , const tCIDLib::TCh* const pszVal2
-                        , const tCIDLib::TCh* const pszVal3) :
-    m_strKey(strKey)
-    , m_strVal1(pszVal1)
-    , m_strVal2(pszVal2)
-    , m_strVal3(pszVal3)
-{
-}
-
-TKeyValues::TKeyValues( const   tCIDLib::TCh* const pszKey
-                        , const tCIDLib::TCh* const pszVal1
-                        , const tCIDLib::TCh* const pszVal2
-                        , const tCIDLib::TCh* const pszVal3) :
-    m_strKey(pszKey)
-    , m_strVal1(pszVal1)
-    , m_strVal2(pszVal2)
-    , m_strVal3(pszVal3)
+TKeyValues::TKeyValues( const   TStringView&    strvKey
+                        , const TStringView&    strvVal1
+                        , const TStringView&    strvVal2
+                        , const TStringView&    strvVal3) :
+    m_strKey(strvKey)
+    , m_strVal1(strvVal1)
+    , m_strVal2(strvVal2)
+    , m_strVal3(strvVal3)
 {
 }
 
@@ -706,9 +653,9 @@ const TString& TKeyValues::strKey() const
     return m_strKey;
 }
 
-const TString& TKeyValues::strKey(const TString& strNewKey)
+const TString& TKeyValues::strKey(const TStringView& strvNewKey)
 {
-    m_strKey = strNewKey;
+    m_strKey = strvNewKey;
     return m_strKey;
 }
 
@@ -719,9 +666,9 @@ const TString& TKeyValues::strVal1() const
     return m_strVal1;
 }
 
-const TString& TKeyValues::strVal1(const TString& strNewValue)
+const TString& TKeyValues::strVal1(const TStringView& strvNewValue)
 {
-    m_strVal1 = strNewValue;
+    m_strVal1 = strvNewValue;
     return m_strVal1;
 }
 
@@ -730,9 +677,9 @@ const TString& TKeyValues::strVal2() const
     return m_strVal2;
 }
 
-const TString& TKeyValues::strVal2(const TString& strNewValue)
+const TString& TKeyValues::strVal2(const TStringView& strvNewValue)
 {
-    m_strVal2 = strNewValue;
+    m_strVal2 = strvNewValue;
     return m_strVal2;
 }
 
@@ -742,71 +689,44 @@ const TString& TKeyValues::strVal3() const
     return m_strVal3;
 }
 
-const TString& TKeyValues::strVal3(const TString& strNewValue)
+const TString& TKeyValues::strVal3(const TStringView& strvNewValue)
 {
-    m_strVal3 = strNewValue;
+    m_strVal3 = strvNewValue;
     return m_strVal3;
 }
 
 
 // Set the key and values together
-tCIDLib::TVoid TKeyValues::Set( const   TString&    strNewKey
-                                , const TString&    strVal1)
+tCIDLib::TVoid TKeyValues::Set( const   TStringView&    strvNewKey
+                                , const TStringView&    strvVal1)
 {
-    m_strKey = strNewKey;
-    m_strVal1 = strVal1;
+    m_strKey = strvNewKey;
+    m_strVal1 = strvVal1;
 
     m_strVal2.Clear();
     m_strVal3.Clear();
 }
 
-tCIDLib::TVoid TKeyValues::Set( const   TString&    strNewKey
-                                , const TString&    strVal1
-                                , const TString&    strVal2)
+tCIDLib::TVoid TKeyValues::Set( const   TStringView&    strvNewKey
+                                , const TStringView&    strvVal1
+                                , const TStringView&    strvVal2)
 {
-    m_strKey = strNewKey;
-    m_strVal1 = strVal1;
-    m_strVal2 = strVal2;
+    m_strKey = strvNewKey;
+    m_strVal1 = strvVal1;
+    m_strVal2 = strvVal2;
 
     m_strVal3.Clear();
 }
 
-tCIDLib::TVoid TKeyValues::Set( const   TString&    strNewKey
-                                , const TString&    strVal1
-                                , const TString&    strVal2
-                                , const TString&    strVal3)
+tCIDLib::TVoid TKeyValues::Set( const   TStringView&    strvNewKey
+                                , const TStringView&    strvVal1
+                                , const TStringView&    strvVal2
+                                , const TStringView&    strvVal3)
 {
-    m_strKey = strNewKey;
-    m_strVal1 = strVal1;
-    m_strVal2 = strVal2;
-    m_strVal3 = strVal3;
-}
-
-tCIDLib::TVoid TKeyValues::Set( const   TString&            strNewKey
-                                , const tCIDLib::TCh* const pszVal1
-                                , const tCIDLib::TCh* const pszVal2
-                                , const tCIDLib::TCh* const pszVal3)
-{
-    m_strKey = strNewKey;
-    if (pszVal1)
-        m_strVal1 = pszVal1;
-
-    if (pszVal2)
-        m_strVal2 = pszVal2;
-
-    if (pszVal3)
-        m_strVal3 = pszVal3;
-}
-
-tCIDLib::TVoid TKeyValues::Set( const   tCIDLib::TCh* const pszNewKey
-                                , const tCIDLib::TCh* const pszVal1
-                                , const tCIDLib::TCh* const pszVal2
-                                , const tCIDLib::TCh* const pszVal3)
-{
-    m_strKey = pszNewKey;
-    m_strVal1 = pszVal1;
-    m_strVal2 = pszVal2;
-    m_strVal3 = pszVal3;
+    m_strKey = strvNewKey;
+    m_strVal1 = strvVal1;
+    m_strVal2 = strvVal2;
+    m_strVal3 = strvVal3;
 }
 
 

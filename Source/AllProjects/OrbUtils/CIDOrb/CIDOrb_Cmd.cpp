@@ -43,9 +43,9 @@ RTTIDecls(TOrbCmd,TOrbReply)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDOrb_Cmd
+namespace
 {
-    namespace
+    namespace CIDOrb_Cmd
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

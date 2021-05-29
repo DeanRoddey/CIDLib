@@ -40,11 +40,14 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDKernel_Time_Win32
+namespace
 {
-    tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
-    tCIDLib::TCard4     c4MinUSecs;
-    tCIDLib::TInt8      i8TicksPerUSec;
+    namespace CIDKernel_Time_Win32
+    {
+        tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
+        tCIDLib::TCard4     c4MinUSecs;
+        tCIDLib::TInt8      i8TicksPerUSec;
+    }
 }
 
 

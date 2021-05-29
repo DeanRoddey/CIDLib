@@ -815,16 +815,6 @@ template <typename TElem, class TKeyOps> class THashSet : public TCollection<TEl
             return *this;
         }
 
-        const TElem& operator[](const TString& strToFind) const
-        {
-            return this->objFind(strToFind);
-        }
-
-        TElem& operator[](const TString& strToFind)
-        {
-            return this->objFind(strToFind);
-        }
-
 
         // -------------------------------------------------------------------
         //  Public, inherited methods

@@ -40,9 +40,9 @@ RTTIDecls(TGUIClipboard,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_Clipboard
+namespace
 {
-    namespace
+    namespace CIDCtrls_Clipboard
     {
         // -----------------------------------------------------------------------
         //  We have to fault in the registration of our custom types

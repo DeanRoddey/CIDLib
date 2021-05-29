@@ -51,9 +51,9 @@ RTTIDecls(TMEngSockPingerInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_SockClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_SockClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

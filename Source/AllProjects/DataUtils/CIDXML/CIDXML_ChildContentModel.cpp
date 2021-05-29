@@ -31,10 +31,9 @@
 #include    "CIDXML_.hpp"
 #include    "CIDXML_CMNodes_.hpp"
 
-
-namespace CIDXML_ChildCM
+namespace
 {
-    namespace
+    namespace CIDXML_ChildCM
     {
         // -----------------------------------------------------------------------
         //  Local static data

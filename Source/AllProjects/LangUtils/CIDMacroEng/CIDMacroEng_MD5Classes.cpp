@@ -45,9 +45,9 @@ RTTIDecls(TMEngMD5Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_MD5Class
+namespace
 {
-    namespace
+    namespace CIDMacroEng_MD5Class
     {
         // -----------------------------------------------------------------------
         //  The names of our classes

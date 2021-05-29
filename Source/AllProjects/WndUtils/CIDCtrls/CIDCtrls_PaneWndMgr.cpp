@@ -41,9 +41,9 @@ RTTIDecls(TPaneWndCont, TWindow)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_PaneWndMgr
+namespace
 {
-    namespace
+    namespace CIDCtrls_PaneWndMgr
     {
         // The pixels between panes (where the resizing is done)
         constexpr tCIDLib::TCard4 c4DivMargin = 4;

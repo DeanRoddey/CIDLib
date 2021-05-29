@@ -43,14 +43,17 @@ RTTIDecls(TMEngKVPairInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_KVPairClass
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strKVPair(L"KVPair");
-    const TString   strKVPairClassPath(L"MEng.System.Runtime.KVPair");
+    namespace CIDMacroEng_KVPairClass
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strKVPair(L"KVPair");
+        const TString   strKVPairClassPath(L"MEng.System.Runtime.KVPair");
+    }
 }
 
 

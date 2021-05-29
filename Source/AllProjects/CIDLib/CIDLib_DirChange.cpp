@@ -39,9 +39,9 @@ RTTIDecls(TDirChangeInfo, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDLib_DirChange
+namespace
 {
-    namespace
+    namespace CIDLib_DirChange
     {
         //
         //  The max changes we will accumulate at a time. If the client doesn't read

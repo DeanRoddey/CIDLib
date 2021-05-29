@@ -37,9 +37,9 @@
 #pragma     warning(pop)
 
 
-namespace CIDKernel_Error_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_Error_Win32
     {
         // -----------------------------------------------------------------------
         //  Local, const data

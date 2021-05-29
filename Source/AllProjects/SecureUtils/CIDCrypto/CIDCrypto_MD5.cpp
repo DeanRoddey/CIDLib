@@ -31,9 +31,9 @@
 #include    "CIDCrypto_.hpp"
 
 
-namespace CIDCrypto_MD5
+namespace
 {
-    namespace
+    namespace CIDCrypto_MD5
     {
         // -------------------------------------------------------------------
         //  Local constant data

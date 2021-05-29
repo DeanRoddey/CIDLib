@@ -101,12 +101,6 @@ TKrnlEvent::TKrnlEvent(TKrnlEvent&& kevSrc) :
 
 TKrnlEvent::~TKrnlEvent()
 {
-    if (m_pszName)
-    {
-        delete [] m_pszName;
-        m_pszName = nullptr;
-    }
-
     if (!bClose())
     {
         //
@@ -124,8 +118,14 @@ TKrnlEvent::~TKrnlEvent()
         #endif
     }
 
-    delete m_pData;
+    if (m_pszName)
+    {
+        delete [] m_pszName;
+        m_pszName = nullptr;
+    }
+
     m_pData->m_hEvent = nullptr;
+    delete m_pData;
 }
 
 

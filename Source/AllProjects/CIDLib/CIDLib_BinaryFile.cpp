@@ -51,15 +51,9 @@ TBinaryFile::TBinaryFile()
 {
 }
 
-TBinaryFile::TBinaryFile(const TString& strFileName) :
+TBinaryFile::TBinaryFile(const TStringView& strvFileName) :
 
-    TFileBase(strFileName)
-{
-}
-
-TBinaryFile::TBinaryFile(const tCIDLib::TCh* const pszFileName) :
-
-    TFileBase(pszFileName)
+    TFileBase(strvFileName)
 {
 }
 

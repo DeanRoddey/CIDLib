@@ -47,23 +47,28 @@ struct TListNode
 };
 
 
-
-namespace CIDKernel_Signals
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  Local data
-    //
-    //  pnodeTail
-    //      This is the tail of the reversed linked list of signal handlers.
-    //      If its zero, then the list is empty.
-    //
-    //  c4CurId
-    //      A counter used to issue handlers ids when new handlers are
-    //      installed.
-    // -----------------------------------------------------------------------
-    tCIDLib::TCard4  c4CurId = 1;
-    TKrnlCritSec*    pkcrsLock = nullptr;
-    TListNode*       pnodeTail = nullptr;
+    namespace CIDKernel_Signals
+    {
+        // -----------------------------------------------------------------------
+        //  Local data
+        //
+        //  c4CurId
+        //      A counter used to issue handlers ids when new handlers are
+        //      installed.
+        //
+        //  pkcrsLock
+        //      A kernel level critical section to protect the list and id counter.
+        //
+        //  pnodeTail
+        //      This is the tail of the reversed linked list of signal handlers.
+        //      If its zero, then the list is empty.
+        // -----------------------------------------------------------------------
+        tCIDLib::TCard4  c4CurId = 1;
+        TKrnlCritSec*    pkcrsLock = nullptr;
+        TListNode*       pnodeTail = nullptr;
+    }
 }
 
 

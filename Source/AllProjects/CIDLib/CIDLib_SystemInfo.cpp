@@ -35,9 +35,9 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_SystemInfo
+namespace
 {
-    namespace
+    namespace CIDLib_SystemInfo
     {
         // An atomic flag to support faulting in system info pub first use
         TAtomicFlag atomInitDone;

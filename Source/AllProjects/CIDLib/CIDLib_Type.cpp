@@ -44,9 +44,9 @@
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_Type
+namespace
 {
-    namespace
+    namespace CIDLib_Type
     {
         // -----------------------------------------------------------------------
         //  The arrays of message ids and hard coded text for respectively loading

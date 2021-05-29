@@ -49,49 +49,52 @@ const tCIDLib::TInt4 i4FakeJitter = -512;
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDDAE_Ripper
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  We need to be able to provide unique thread names for our read/write
-    //  threads.
-    // -----------------------------------------------------------------------
-    TUniqueName unamInstance(L"CQCDAEThread%(1)");
+    namespace CIDDAE_Ripper
+    {
+        // -----------------------------------------------------------------------
+        //  We need to be able to provide unique thread names for our read/write
+        //  threads.
+        // -----------------------------------------------------------------------
+        TUniqueName unamInstance(L"CQCDAEThread%(1)");
 
 
-    // -----------------------------------------------------------------------
-    //  The maximum number of buffers we can have outstanding at once. This
-    //  is how many buffers the buffer pool objects are set up for. The read
-    //  thread will stop and wait for the write thread to catch up.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4MaxBufs(8);
+        // -----------------------------------------------------------------------
+        //  The maximum number of buffers we can have outstanding at once. This
+        //  is how many buffers the buffer pool objects are set up for. The read
+        //  thread will stop and wait for the write thread to catch up.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4MaxBufs = 8;
 
 
-    // -----------------------------------------------------------------------
-    //  The number of sectors we read per pass. We may actually read more if
-    //  jitter is enabled. The buffer size below is big enough to adjust for
-    //  the jitter overlap.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4SectorsPerRead(22);
+        // -----------------------------------------------------------------------
+        //  The number of sectors we read per pass. We may actually read more if
+        //  jitter is enabled. The buffer size below is big enough to adjust for
+        //  the jitter overlap.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4SectorsPerRead = 22;
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes we try to read per pass, and the size of the buffers. We
-    //  make the buffer size larger by the jitter overlap we do.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4BytesPerRead(c4SectorsPerRead * TKrnlCDROM::c4RawSectorSz);
-    const tCIDLib::TCard4   c4BufSz((c4SectorsPerRead + 3) * TKrnlCDROM::c4RawSectorSz);
+        // -----------------------------------------------------------------------
+        //  The bytes we try to read per pass, and the size of the buffers. We
+        //  make the buffer size larger by the jitter overlap we do.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4BytesPerRead = c4SectorsPerRead * TKrnlCDROM::c4RawSectorSz;
+        constexpr tCIDLib::TCard4   c4BufSz = (c4SectorsPerRead + 3) * TKrnlCDROM::c4RawSectorSz;
 
 
-    // -----------------------------------------------------------------------
-    //  The bytes in our overlap area.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4 c4OverlapBytes(TKrnlCDROM::c4RawSectorSz * 2);
+        // -----------------------------------------------------------------------
+        //  The bytes in our overlap area.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4 c4OverlapBytes = TKrnlCDROM::c4RawSectorSz * 2;
 
 
-    // -----------------------------------------------------------------------
-    //  The number of blocks we overlap during jitter correction mode.
-    // -----------------------------------------------------------------------
-    const tCIDLib::TCard4   c4OverlapBlocks(2);
+        // -----------------------------------------------------------------------
+        //  The number of blocks we overlap during jitter correction mode.
+        // -----------------------------------------------------------------------
+        constexpr tCIDLib::TCard4   c4OverlapBlocks = 2;
+    }
 }
 
 

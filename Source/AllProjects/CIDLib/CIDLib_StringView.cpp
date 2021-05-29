@@ -82,6 +82,51 @@ tCIDLib::TBoolean TStringView::bStartsWith( const   TString&            strToFin
 }
 
 
+tCIDLib::TVoid TStringView::CopyOutSubStr(          TString&            strTarget
+                                            , const tCIDLib::TCard4     c4Start
+                                            , const tCIDLib::TCard4     c4Len) const
+{
+    if (m_pstrObj)
+    {
+        m_pstrObj->CopyOutSubStr(strTarget, c4Start, c4Len);
+    }
+     else
+    {
+        if (c4Start > c4Length())
+            ThrowIndexErr(CID_FILE, CID_LINE, c4Start);
+
+        //
+        //  If we would go beyond the end, then clip it back. We could pass max card
+        //  for the real lenght, but we already did the work to get the length, and don't
+        //  want to do it again.
+        //
+        tCIDLib::TCard4 c4RealLen = c4Len;
+        if (c4Start + c4Len > c4Length())
+            c4RealLen = c4Length() - c4Start;;
+
+        strTarget.Clear();
+        strTarget.AppendSubStr(m_pszRaw, c4Start, c4RealLen);
+    }
+}
+
+
+const TString* TStringView::pstrObj() const
+{
+    if (m_pstrObj == nullptr)
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcStrV_NoObject
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::TypeMatch
+        );
+    }
+    return m_pstrObj;
+}
+
+
 const tCIDLib::TCh* TStringView::pszBufferAt(const tCIDLib::TCard4 c4At) const
 {
     if (c4At >= c4Length())
@@ -104,3 +149,23 @@ const tCIDLib::TCh* TStringView::pszBufferAt(const tCIDLib::TCard4 c4At) const
     return m_pstrObj->pszBufferAt(c4At);
 }
 
+
+// ---------------------------------------------------------------------------
+//  TStringView: Private, non-virtual methods
+// ---------------------------------------------------------------------------
+tCIDLib::TVoid TStringView::ThrowIndexErr(  const   tCIDLib::TCh* const     pszFile
+                                            , const tCIDLib::TCard4         c4Line
+                                            , const tCIDLib::TCard4         c4At) const
+{
+    facCIDLib().ThrowErr
+    (
+        pszFile
+        , c4Line
+        , kCIDErrs::errcGen_IndexError
+        , tCIDLib::ESeverities::Failed
+        , tCIDLib::EErrClasses::Index
+        , TCardinal(c4At)
+        , TString(L"TStringView")
+        , TCardinal(c4Length())
+    );
+}

@@ -52,9 +52,9 @@ struct TErrorMap
 };
 
 
-namespace CIDKernel_IP_WIN32
+namespace
 {
-    namespace
+    namespace CIDKernel_IP_WIN32
     {
         // -----------------------------------------------------------------------
         //  Local const data

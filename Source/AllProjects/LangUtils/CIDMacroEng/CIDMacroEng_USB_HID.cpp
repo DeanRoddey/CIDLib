@@ -43,9 +43,9 @@ RTTIDecls(TMEngUSBHIDInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_USBHIDClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_USBHIDClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

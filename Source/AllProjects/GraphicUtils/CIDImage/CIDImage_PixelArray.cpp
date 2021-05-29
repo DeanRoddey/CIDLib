@@ -40,9 +40,9 @@ RTTIDecls(TPixelArray,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDImage_PixelArray
+namespace
 {
-    namespace
+    namespace CIDImage_PixelArray
     {
         // -----------------------------------------------------------------------
         //  Our persistent format version

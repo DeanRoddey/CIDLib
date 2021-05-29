@@ -94,9 +94,9 @@ class TWorkQItemPool : public TSimplePool<TWorkQItem>
 //  gotten via the work queue item pointer class, so we can keep this all internal
 //  here.
 //
-namespace CIDOrb_WorkQItem
+namespace
 {
-    namespace
+    namespace CIDOrb_WorkQItem
     {
         TWorkQItemPool& splWorkQPool()
         {

@@ -54,9 +54,9 @@ RTTIDecls(TThreadPrioJan,TObject)
 RTTIDecls(TThreadSyncJan,TObject)
 
 
-namespace CIDLib_Thread
+namespace
 {
-    namespace
+    namespace CIDLib_Thread
     {
         // ---------------------------------------------------------------------------
         //  An array of these is use to keep track of all of the running threads.

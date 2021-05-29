@@ -49,9 +49,9 @@ RTTIDecls(TMEngVoidInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_MiscClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_MiscClasses
     {
         // -----------------------------------------------------------------------
         //  Make the FormatTo() method id available statically as an optimization,

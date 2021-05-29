@@ -43,9 +43,9 @@ RTTIDecls(TMEngBooleanInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_BooleanClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_BooleanClass
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

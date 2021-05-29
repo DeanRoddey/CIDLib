@@ -43,9 +43,9 @@ RTTIDecls(TGUIFacility,TFacility)
 // ---------------------------------------------------------------------------
 //  Local types and data
 // ---------------------------------------------------------------------------
-namespace CIDCtrls_GUIFacility
+namespace
 {
-    namespace
+    namespace CIDCtrls_GUIFacility
     {
         //
         //  Our cache for bitmaps. It is thread safe, so we use it for locking

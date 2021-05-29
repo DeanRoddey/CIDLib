@@ -42,9 +42,9 @@ RTTIDecls(TSharedMemBuf,TMemBuf)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_SharedMemory
+namespace
 {
-    namespace
+    namespace CIDLib_SharedMemory
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

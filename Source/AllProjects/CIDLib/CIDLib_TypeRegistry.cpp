@@ -44,10 +44,9 @@
 // ---------------------------------------------------------------------------
 class   TRegNode;
 
-
-namespace CIDLib_TypeRegistry
+namespace
 {
-    namespace
+    namespace CIDLib_TypeRegistry
     {
         // ---------------------------------------------------------------------------
         //  Local, static data

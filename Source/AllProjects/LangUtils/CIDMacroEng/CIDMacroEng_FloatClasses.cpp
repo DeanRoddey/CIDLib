@@ -45,9 +45,9 @@ RTTIDecls(TMEngFloat8Info,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_FloatClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_FloatClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

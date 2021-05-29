@@ -49,9 +49,9 @@ RTTIDecls(TBlowfishEncrypter,TBlockEncrypter)
 
 
 
-namespace CIDCrypto_Blowfish
+namespace
 {
-    namespace
+    namespace CIDCrypto_Blowfish
     {
         // -------------------------------------------------------------------
         //  Local, const data

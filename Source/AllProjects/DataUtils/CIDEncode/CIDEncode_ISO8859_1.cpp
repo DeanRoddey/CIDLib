@@ -39,10 +39,9 @@
 // ---------------------------------------------------------------------------
 AdvRTTIDecls(TLatin1Converter,TTextConverter)
 
-
-namespace CIDEncode_ISO8859_1
+namespace
 {
-    namespace
+    namespace CIDEncode_ISO8859_1
     {
         // -------------------------------------------------------------------
         //  Local const data
@@ -53,7 +52,7 @@ namespace CIDEncode_ISO8859_1
         //      are the same values. We can just look up a flag here and, if its
         //      non-zero, the code point value is valid for both Unicode and 8859.
         // -------------------------------------------------------------------
-        const tCIDLib::TCard1 ac1Map[] =
+        constexpr tCIDLib::TCard1 ac1Map[] =
         {
             1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 0 , 0 , 1 , 0 , 0
             , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0

@@ -43,9 +43,9 @@ RTTIDecls(TMEngASCIIInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_ASCIIClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_ASCIIClass
     {
         const TString   strName(L"ASCII");
         const TString   strClassPath(L"MEng.System.Runtime.ASCII");

@@ -40,9 +40,9 @@ RTTIDecls(TFacCIDMacroEng,TFacility)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace kCIDMacroEng_ThisFacility
+namespace
 {
-    namespace
+    namespace kCIDMacroEng_ThisFacility
     {
         // -----------------------------------------------------------------------
         //  A simple default class that is inserted when a new class is created.
@@ -96,17 +96,19 @@ class TMEngRTClassLoader : public MMEngExtClassLoader
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TMEngRTClassLoader();
+        TMEngRTClassLoader() = default;
 
-        TMEngRTClassLoader(const TMEngRTClassLoader&);
+        TMEngRTClassLoader(const TMEngRTClassLoader&) = delete;
+        TMEngRTClassLoader(TMEngRTClassLoader&&) = delete;
 
-        ~TMEngRTClassLoader();
+        ~TMEngRTClassLoader() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
         TMEngRTClassLoader& operator=(const TMEngRTClassLoader&) = delete;
+        TMEngRTClassLoader& operator=(TMEngRTClassLoader&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -119,13 +121,6 @@ class TMEngRTClassLoader : public MMEngExtClassLoader
         );
 };
 
-TMEngRTClassLoader::TMEngRTClassLoader()
-{
-}
-
-TMEngRTClassLoader::~TMEngRTClassLoader()
-{
-}
 
 TMEngClassInfo*
 TMEngRTClassLoader::pmeciLoadClass(         TCIDMacroEngine&    meTarget
@@ -140,7 +135,7 @@ TMEngRTClassLoader::pmeciLoadClass(         TCIDMacroEngine&    meTarget
     //          by the engine itself so we don't load them here. Mostly they
     //          are the tricky ones that have special needs.
     //
-    TMEngClassInfo* pmeciRet = 0;
+    TMEngClassInfo* pmeciRet = nullptr;
     if (strClassPath == TMEngAsyncHTTPClInfo::strPath())
         pmeciRet = new TMEngAsyncHTTPClInfo(meTarget);
     else if (strClassPath == TMEngAudioInfo::strPath())

@@ -42,9 +42,9 @@ RTTIDecls(TMEngArrayInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_ArrayClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_ArrayClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

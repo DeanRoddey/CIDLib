@@ -43,9 +43,9 @@ RTTIDecls(TMEngMemBufInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_MemBufClass
+namespace
 {
-    namespace
+    namespace CIDMacroEng_MemBufClass
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

@@ -211,7 +211,8 @@ const TNotificationId TAttrEditWnd::nidChange(L"AttrEditChangeEvent");
 // ---------------------------------------------------------------------------
 TAttrEditWnd::TAttrEditWnd() :
 
-    m_pipeiToUse(nullptr)
+    m_bSuppressCRD(kCIDLib::False)
+    , m_pipeiToUse(nullptr)
 {
 }
 
@@ -1498,6 +1499,8 @@ TAttrEditWnd::bInPlaceEdit(TAttrData& adatEdit, const TArea& areaCell)
     //  storage. We set the current row on the IPE object first, so that it's available
     //  in the callbacks.
     //
+    TBoolJanitor janSuppress(&m_bSuppressCRD, kCIDLib::True);
+
     m_pipeiToUse->c4IPERow(c4CurItem());
     TInPlaceEdit ipeVal;
     return ipeVal.bProcess(*this, areaCell, adatEdit, *m_pipeiToUse, m_c8UserId);

@@ -43,6 +43,7 @@ class TFacTestFW : public TFacility
         TFacTestFW();
 
         TFacTestFW(const TFacTestFW&) = delete;
+        TFacTestFW(TFacTestFW&&) = delete;
 
         ~TFacTestFW();
 
@@ -51,6 +52,7 @@ class TFacTestFW : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacTestFW& operator=(const TFacTestFW&) = delete;
+        TFacTestFW& operator=(TFacTestFW&&) = delete;
 
 
         // -------------------------------------------------------------------

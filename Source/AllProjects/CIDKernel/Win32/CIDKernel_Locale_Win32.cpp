@@ -61,9 +61,9 @@ struct TLangXlat
 };
 
 
-namespace CIDKernel_Locale_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_Locale_Win32
     {
         // ---------------------------------------------------------------------------
         //  Local, static data
@@ -77,7 +77,7 @@ namespace CIDKernel_Locale_Win32
         //      The locale id of the user locale that we load up info about. Its
         //      set up during module init.
         // ---------------------------------------------------------------------------
-        static TLangXlat alxlTable[] =
+        constexpr TLangXlat alxlTable[] =
         {
                 { tCIDLib::ELanguages::Afrikaans  , 0x36 }
             ,   { tCIDLib::ELanguages::Albanian   , 0x1c }
@@ -120,8 +120,8 @@ namespace CIDKernel_Locale_Win32
             ,   { tCIDLib::ELanguages::Ukrainian  , 0x22 }
             ,   { tCIDLib::ELanguages::Vietnamese , 0x2a }
         };
-        static tCIDLib::TCard4  c4LangXlatCount = tCIDLib::c4ArrayElems(alxlTable);
-        static LCID             lcidUser;
+        constexpr  tCIDLib::TCard4  c4LangXlatCount = tCIDLib::c4ArrayElems(alxlTable);
+        LCID             lcidUser;
     }
 }
 

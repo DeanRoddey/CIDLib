@@ -40,9 +40,9 @@ RTTIDecls(TOrbServerBase,TObject)
 // ---------------------------------------------------------------------------
 //  Local static data
 // ---------------------------------------------------------------------------
-namespace CIDOrb_ServerBase
+namespace
 {
-    namespace
+    namespace CIDOrb_ServerBase
     {
         //
         //  For now there's nothing we need to do in order to initialize the server

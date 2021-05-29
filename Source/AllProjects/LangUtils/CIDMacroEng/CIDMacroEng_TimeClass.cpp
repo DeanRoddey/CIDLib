@@ -43,9 +43,9 @@ RTTIDecls(TMEngTimeInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_TimeClasses
+namespace
 {
-    namespace
+    namespace CIDMacroEng_TimeClasses
     {
         // -----------------------------------------------------------------------
         //  The names for the types that we support here. Each derivative has to

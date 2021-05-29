@@ -45,9 +45,9 @@ RTTIDecls(TSrcEditor, TStdCtrlWnd)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDWUtils_SrcEditor
+namespace
 {
-    namespace
+    namespace CIDWUtils_SrcEditor
     {
         //
         //  The Scintilla marker ids we use. Order is important, since they overlay

@@ -42,9 +42,9 @@ using TOrbCmdItemCache = TRefVector<TCmdQItem>;
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDOrb_ClientBase
+namespace
 {
-    namespace
+    namespace CIDOrb_ClientBase
     {
         //
         //  This is a structure to hold our state info. It's a bit less convenient

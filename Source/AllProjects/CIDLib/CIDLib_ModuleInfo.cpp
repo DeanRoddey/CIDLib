@@ -40,9 +40,9 @@ RTTIDecls(TCIDModuleInfo,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_ModuleInfo
+namespace
 {
-    namespace
+    namespace CIDLib_ModuleInfo
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

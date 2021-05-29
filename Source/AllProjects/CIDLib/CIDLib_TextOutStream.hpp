@@ -351,12 +351,17 @@ class CIDLIBEXP TTextOutStream : public TObject
 
         TTextOutStream& operator<<
         (
-            const   tCIDLib::TCh* const     pszToWrite
+            const   TStringView&            strvToWrite
         );
 
         TTextOutStream& operator<<
         (
             const   TString&                strToWrite
+        );
+
+        TTextOutStream& operator<<
+        (
+            const   tCIDLib::TCh* const     pszToWrite
         );
 
         TTextOutStream& operator<<

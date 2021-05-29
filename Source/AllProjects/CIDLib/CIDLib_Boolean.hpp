@@ -45,7 +45,7 @@ class CIDLIBEXP TBoolean :
         // -------------------------------------------------------------------
         TBoolean() = default;
 
-        TBoolean
+        explicit TBoolean
         (
             const   tCIDLib::TBoolean       bVal
         )   noexcept;

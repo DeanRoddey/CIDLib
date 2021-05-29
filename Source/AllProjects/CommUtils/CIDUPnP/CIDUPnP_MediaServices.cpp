@@ -44,9 +44,9 @@ RTTIDecls(TUPnPTrackItem, TObject)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDUPnP_MediaServices
+namespace
 {
-    namespace
+    namespace CIDUPnP_MediaServices
     {
         // -------------------------------------------------------------------
         //  This is some standard metadata that we just do some search and replace

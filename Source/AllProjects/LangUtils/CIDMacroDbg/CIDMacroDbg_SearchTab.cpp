@@ -41,9 +41,9 @@ RTTIDecls(TSearchTab, TTabWindow)
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDMacroDbg_SearchTab
+namespace
 {
-    namespace
+    namespace CIDMacroDbg_SearchTab
     {
         // Faux menu items for use with our accel table
         constexpr tCIDLib::TCard4   c4Menu_FindNext = 1000;

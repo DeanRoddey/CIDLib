@@ -37,9 +37,9 @@
 // ---------------------------------------------------------------------------
 RTTIDecls(TRegEx,TObject)
 
-namespace CIDRegX_Engine
+namespace
 {
-    namespace
+    namespace CIDRegX_Engine
     {
         // -----------------------------------------------------------------------
         //  Local, const data

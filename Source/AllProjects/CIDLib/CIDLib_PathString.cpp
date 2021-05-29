@@ -120,7 +120,7 @@ tCIDLib::TVoid TPathStr::AddLevel(const TStringView& strvNewLevel)
                 Append(kCIDLib::chBackSlash);
         }
     }
-    Append(strvNewLevel);
+    TString::Append(strvNewLevel);
 }
 
 

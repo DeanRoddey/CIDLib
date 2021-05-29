@@ -41,9 +41,9 @@ RTTIDecls(TResourceName,TObject)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDLib_ResourceName
+namespace
 {
-    namespace
+    namespace CIDLib_ResourceName
     {
         constexpr tCIDLib::TCard2   c2FmtVersion = 1;
     }

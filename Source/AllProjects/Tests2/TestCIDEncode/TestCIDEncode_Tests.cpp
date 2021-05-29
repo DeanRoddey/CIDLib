@@ -173,7 +173,7 @@ TTest_Convert::eRunTest(TTextStringOutStream&   strmOut
 
     // ASCII
     {
-        const tCIDLib::TCard1 ac1Data[] =
+        constexpr tCIDLib::TCard1 ac1Data[] =
         {
             0x61, 0x62, 0x20, 0x63, 0x64
         };
@@ -189,7 +189,7 @@ TTest_Convert::eRunTest(TTextStringOutStream&   strmOut
 
     // UTF-8
     {
-        const tCIDLib::TCard1 ac1Data[] =
+        constexpr tCIDLib::TCard1 ac1Data[] =
         {
             0x41, 0x42, 0x20, 0x43, 0x44
         };
@@ -205,7 +205,7 @@ TTest_Convert::eRunTest(TTextStringOutStream&   strmOut
 
     // Do a representative table based mode 1 converter
     {
-        const tCIDLib::TCard1 ac1Data[] =
+        constexpr tCIDLib::TCard1 ac1Data[] =
         {
             0x41, 0x42, 0x20, 0x43, 0x44
         };
@@ -222,7 +222,7 @@ TTest_Convert::eRunTest(TTextStringOutStream&   strmOut
 
     // Do Latin1 which is an odd man out
     {
-        const tCIDLib::TCard1 ac1Data[] =
+        constexpr tCIDLib::TCard1 ac1Data[] =
         {
             0x61, 0x62, 0x20, 0x63, 0x64
         };
@@ -238,7 +238,7 @@ TTest_Convert::eRunTest(TTextStringOutStream&   strmOut
 
     // Test a Unicode to 1251 conversion
     {
-        const tCIDLib::TCh achData[] =
+        constexpr tCIDLib::TCh achData[] =
         {
               42,   83,   49,   68,  73,  83,  80,  76,   73, 78
           ,   69,   49,   34,  115, 100, 102, 1089, 32, 1076, 1092

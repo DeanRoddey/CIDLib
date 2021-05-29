@@ -39,9 +39,9 @@ RTTIDecls(TDlgItem,TObject)
 RTTIDecls(TDlgDesc,TObject)
 
 
-namespace CIDCtrls_DlgDesc
+namespace
 {
-    namespace
+    namespace CIDCtrls_DlgDesc
     {
         // -----------------------------------------------------------------------
         //  Local const data

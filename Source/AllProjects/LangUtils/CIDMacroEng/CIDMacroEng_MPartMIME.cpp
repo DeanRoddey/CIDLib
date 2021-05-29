@@ -42,14 +42,17 @@ RTTIDecls(TMEngMPartMIMEInfo,TMEngClassInfo)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_MPartMIME
+namespace
 {
-    // -----------------------------------------------------------------------
-    //  The names for the types that we support here. Each derivative has to
-    //  be able to return strings that contain its name and full name.
-    // -----------------------------------------------------------------------
-    const TString   strMPartMIME(L"MPartMIME");
-    const TString   strMPartMIMEPath(L"MEng.System.Runtime.MPartMIME");
+    namespace CIDMacroEng_MPartMIME
+    {
+        // -----------------------------------------------------------------------
+        //  The names for the types that we support here. Each derivative has to
+        //  be able to return strings that contain its name and full name.
+        // -----------------------------------------------------------------------
+        const TString   strMPartMIME(L"MPartMIME");
+        const TString   strMPartMIMEPath(L"MEng.System.Runtime.MPartMIME");
+    }
 }
 
 

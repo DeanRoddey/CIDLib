@@ -47,9 +47,9 @@
 // ---------------------------------------------------------------------------
 //  Local types and constants
 // ---------------------------------------------------------------------------
-namespace CIDKernel_FileSystem
+namespace
 {
-    namespace
+    namespace CIDKernel_FileSystem
     {
         //
         //  We need a critical section to protect our list of volumes, which

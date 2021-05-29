@@ -69,9 +69,9 @@ struct TNibbleBufInfo
 };
 
 
-namespace CIDImage_BitmapImage
+namespace
 {
-    namespace
+    namespace CIDImage_BitmapImage
     {
         // -----------------------------------------------------------------------
         //  Local, const data
@@ -95,7 +95,7 @@ namespace CIDImage_BitmapImage
         //      This is the number of bytes of padding required for a bitmap's
         //      pixel data.
         // -----------------------------------------------------------------------
-        const TBitmapImage::TBmpHdrInfo   bhiDefault =
+        constexpr TBitmapImage::TBmpHdrInfo   bhiDefault =
         {
             tCIDImage::EBmpTypes::Win_1x
             , tCIDImage::EBmpComp::None

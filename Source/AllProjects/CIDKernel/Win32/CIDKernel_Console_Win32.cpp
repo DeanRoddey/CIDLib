@@ -43,10 +43,9 @@
 #include    <wchar.h>
 #pragma     warning(pop)
 
-
-namespace CIDKernel_Console
+namespace
 {
-    namespace
+    namespace CIDKernel_Console
     {
         // -----------------------------------------------------------------------
         //  Local const data

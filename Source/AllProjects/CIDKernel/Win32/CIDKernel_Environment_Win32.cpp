@@ -32,10 +32,9 @@
 #include    "CIDKernel_.hpp"
 #include    "CIDKernel_InternalHelpers_.hpp"
 
-
-namespace CIDKernel_Environment_Win32
+namespace
 {
-    namespace
+    namespace CIDKernel_Environment_Win32
     {
         // -----------------------------------------------------------------------
         //  Local const data

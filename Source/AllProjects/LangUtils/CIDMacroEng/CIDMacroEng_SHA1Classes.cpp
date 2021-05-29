@@ -45,9 +45,9 @@ RTTIDecls(TMEngSHA1Info,TMacroEngClass)
 // ---------------------------------------------------------------------------
 //  Local data
 // ---------------------------------------------------------------------------
-namespace CIDMacroEng_SHA1Class
+namespace
 {
-    namespace
+    namespace CIDMacroEng_SHA1Class
     {
         // -----------------------------------------------------------------------
         //  The names of our classes
