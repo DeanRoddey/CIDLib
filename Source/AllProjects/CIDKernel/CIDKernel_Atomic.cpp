@@ -49,12 +49,12 @@ static TKrnlCritSec* pkcrsBaseLock() noexcept
 // ---------------------------------------------------------------------------
 //  TBaseLock: Contructors and Destructor
 // ---------------------------------------------------------------------------
-TBaseLock::TBaseLock()
+TBaseLock::TBaseLock() noexcept
 {
     pkcrsBaseLock()->Enter();
 }
 
-TBaseLock::~TBaseLock()
+TBaseLock::~TBaseLock() noexcept
 {
     pkcrsBaseLock()->Exit();
 }

@@ -582,6 +582,12 @@ const TString& TString::strEmpty() noexcept
     return strEmpty;
 }
 
+const TStringView& TString::strvEmpty() noexcept
+{
+    static TStringView strvEmpty(strEmpty());
+    return strvEmpty;
+}
+
 TString& TString::Nul_TString() noexcept
 {
     static TString strNull;
@@ -623,10 +629,8 @@ TString::TString(const tCIDLib::TCh chInit) :
 
     m_strbData(1UL)
 {
-    tCIDLib::TCh achTmp[2];
-    achTmp[0] = chInit;
-    achTmp[1] = kCIDLib::chNull;
-    m_strbData.Append(achTmp, 2);
+    tCIDLib::TCh achTmp[2] = { chInit, kCIDLib::chNull };
+    m_strbData.Append(achTmp, 1);
 }
 
 TString::TString(const TStringView& strvSrc, const tCIDLib::TCard4 c4ExtraChars) :
@@ -1176,23 +1180,23 @@ tCIDLib::TVoid TString::AppendFormatted(const MFormattable& fmtblSrc, const tCID
 
 
 tCIDLib::TVoid
-TString::AppendSubStr( const   TString&         strSrc
+TString::AppendSubStr( const   TStringView&     strvSrc
                         , const tCIDLib::TCard4 c4Start
                         , const tCIDLib::TCard4 c4Len)
 {
     // Is the source string is empty, then just return cause nothing to do
-    if (strSrc.bIsEmpty())
+    if (strvSrc.bIsEmpty())
         return;
 
     // Make sure the start is within the current length of the source
-    if (c4Start >= strSrc.c4Length())
+    if (c4Start >= strvSrc.c4Length())
     {
         //
         //  If it'as at the end, and the length is max card, just do nothing, since basically
         //  they are just telling us to copy what's available, and that's just nothing in
         //  this case. Else throw.
         //
-        if ((c4Start == strSrc.c4Length()) && (c4Len == kCIDLib::c4MaxCard))
+        if ((c4Start == strvSrc.c4Length()) && (c4Len == kCIDLib::c4MaxCard))
             return;
 
         facCIDLib().ThrowErr
@@ -1204,7 +1208,7 @@ TString::AppendSubStr( const   TString&         strSrc
             , tCIDLib::EErrClasses::BadParms
             , TCardinal(c4Start)
             , clsThis()
-            , TCardinal(strSrc.c4Length())
+            , TCardinal(strvSrc.c4Length())
         );
     }
 
@@ -1215,11 +1219,11 @@ TString::AppendSubStr( const   TString&         strSrc
     tCIDLib::TCard4 c4ActualLen = c4Len;
     if (c4ActualLen == kCIDLib::c4MaxCard)
     {
-        c4ActualLen = strSrc.c4Length() - c4Start;
+        c4ActualLen = strvSrc.c4Length() - c4Start;
     }
      else
     {
-        if (c4Start + c4ActualLen > strSrc.c4Length())
+        if (c4Start + c4ActualLen > strvSrc.c4Length())
         {
             facCIDLib().ThrowErr
             (
@@ -1230,7 +1234,7 @@ TString::AppendSubStr( const   TString&         strSrc
                 , tCIDLib::EErrClasses::BadParms
                 , TCardinal(c4Start + c4Len)
                 , clsThis()
-                , TCardinal(strSrc.c4Length())
+                , TCardinal(strvSrc.c4Length())
             );
         }
     }
@@ -1239,45 +1243,7 @@ TString::AppendSubStr( const   TString&         strSrc
     if (!c4ActualLen)
         return;
 
-    m_strbData.Append(strSrc.pszBufferAt(c4Start), c4ActualLen);
-}
-
-
-tCIDLib::TVoid
-TString::AppendSubStr(  const   tCIDLib::TCh* const pszAppend
-                        , const tCIDLib::TCard4     c4Start
-                        , const tCIDLib::TCard4     c4Len)
-{
-    // This shouldn't happen, so throw
-    if (!pszAppend)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcStr_NullSrc
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::BadParms
-        );
-    }
-
-    //
-    //  If the len is c4MaxCard, then set to exactly the rest of the source
-    //  string.
-    //
-    tCIDLib::TCard4 c4ActualLen = c4Len;
-    if (c4ActualLen == kCIDLib::c4MaxCard)
-    {
-        // Get the length of the text we are appending from
-        const tCIDLib::TCard4 c4SrcLen = TRawStr::c4StrLen(pszAppend);
-        c4ActualLen = c4SrcLen - c4Start;
-    }
-
-    // If we ended up with nothing to do, then return
-    if (!c4ActualLen)
-        return;
-
-    m_strbData.Append(&pszAppend[c4Start], c4ActualLen);
+    m_strbData.Append(strvSrc.pszBufferAt(c4Start), c4ActualLen);
 }
 
 
@@ -1477,7 +1443,7 @@ tCIDLib::TBoolean TString::bFindTokenList(COP TString& strToFill) const
 tCIDLib::TBoolean
 TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
                             , COP   tCIDLib::TCard4&        c4Pos
-                            , const tCIDLib::TBoolean       bCaseSensitive) const
+                            , const tCIDLib::TBoolean       bCaseSensitive) const noexcept
 {
     //
     //  See if there is a match.
@@ -1495,7 +1461,7 @@ TString::bFirstOccurrence(  const   tCIDLib::TCh            chTarget
     }
 
     // Calc the position
-    c4Pos = m_strbData.c4CalcBufDiff(pszMatch);
+    c4Pos = pszMatch - m_strbData.pszBuffer();
     return kCIDLib::True;
 }
 
@@ -2186,12 +2152,12 @@ tCIDLib::TCard8 TString::c8Val(const tCIDLib::ERadices eRadix) const
 
 
 tCIDLib::TVoid
-TString::CopyInSubStr(  const   TString&        strSource
+TString::CopyInSubStr(  const   TStringView&    strvSource
                         , const tCIDLib::TCard4 c4Start
                         , const tCIDLib::TCard4 c4Len)
 {
     Clear();
-    AppendSubStr(strSource, c4Start, c4Len);
+    AppendSubStr(strvSource, c4Start, c4Len);
 }
 
 tCIDLib::TVoid

@@ -648,7 +648,7 @@ TFrameWnd& TWindow::wndDesktop()
             (
                 ::GetDesktopWindow(), kCIDLib::False, kCIDLib::False
             );
-            TAtomic::FencedSet<TFrameWnd>(&m_pwndDesktop, pwndNew);
+            TAtomic::pFencedSet<TFrameWnd>(&m_pwndDesktop, pwndNew);
         }
     }
     return *m_pwndDesktop;

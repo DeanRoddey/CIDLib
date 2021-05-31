@@ -164,6 +164,20 @@ class CIDLIBEXP TStringView
             return m_pszRaw[0] == kCIDLib::chNull;
         }
 
+        [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
+        (
+            const   tCIDLib::TCh            chToFind
+            , COP   tCIDLib::TCard4&        c4Pos
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
+        )   const noexcept;
+
+        [[nodiscard]] tCIDLib::TBoolean bLastOccurrence
+        (
+            const   tCIDLib::TCh            chToFind
+            , COP   tCIDLib::TCard4&        c4Pos
+            , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
+        )   const noexcept;
+
         [[nodiscard]] constexpr tCIDLib::TBoolean bHaveLength() const
         {
             return (m_pstrObj != nullptr) || (m_c4RawLen != kCIDLib::c4MaxCard);
@@ -238,6 +252,15 @@ class CIDLIBEXP TStringView
         (
             const   tCIDLib::TCard4         c4At
         )   const;
+
+        [[nodiscard]] constexpr const tCIDLib::TCh* pszEnd() const noexcept
+        {
+            if (m_pszRaw)
+            {
+                return &m_pszRaw[c4Length()];
+            }
+            return m_pstrObj->pszEnd();
+        }
 
         [[nodiscard]] const TString* pstrObj() const;
 

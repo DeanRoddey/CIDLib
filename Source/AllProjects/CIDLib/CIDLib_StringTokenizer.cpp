@@ -69,7 +69,7 @@ namespace
 //  them unless they are escaped (with a slash, i.e. \").
 //
 tCIDLib::TBoolean TStringTokenizer::
-bParseQuotedCommaList(  const   TString&                strText
+bParseQuotedCommaList(  const   TStringView&            strvText
                         ,       tCIDLib::TStrCollect&   colToFill
                         ,       tCIDLib::TCard4&        c4ErrIndex)
 {
@@ -93,8 +93,8 @@ bParseQuotedCommaList(  const   TString&                strText
     // Clear the incoming just in case
     colToFill.RemoveAll();
 
-    const tCIDLib::TCh* pszSrc = strText.pszBuffer();
-    const tCIDLib::TCh* pszEnd = strText.pszEnd();
+    const tCIDLib::TCh* pszSrc = strvText.pszBuffer();
+    const tCIDLib::TCh* pszEnd = strvText.pszEnd();
 
     EStates eCurState = EStates::StartQ;
     TString strAccum;
@@ -120,7 +120,7 @@ bParseQuotedCommaList(  const   TString&                strText
                  else if (!TRawStr::bIsSpace(chCur))
                 {
                     // It's bad
-                    c4ErrIndex = (pszSrc - strText.pszBuffer());
+                    c4ErrIndex = (pszSrc - strvText.pszBuffer());
                     return kCIDLib::False;
                 }
                 break;
@@ -161,7 +161,7 @@ bParseQuotedCommaList(  const   TString&                strText
                         }
                          else
                         {
-                           c4ErrIndex = (pszSrc - strText.pszBuffer());
+                            c4ErrIndex = (pszSrc - strvText.pszBuffer());
                             return kCIDLib::False;
                         }
                     }
@@ -184,7 +184,7 @@ bParseQuotedCommaList(  const   TString&                strText
                  else if (!TRawStr::bIsSpace(chCur))
                 {
                     // It's bad
-                    c4ErrIndex = (pszSrc - strText.pszBuffer());
+                    c4ErrIndex = (pszSrc - strvText.pszBuffer());
                     return kCIDLib::False;
                 }
 
@@ -198,7 +198,7 @@ bParseQuotedCommaList(  const   TString&                strText
     // We have to end up on StartQ or Comma
     if ((eCurState != EStates::StartQ) && (eCurState != EStates::Comma))
     {
-        c4ErrIndex = (pszSrc - strText.pszBuffer());
+        c4ErrIndex = (pszSrc - strvText.pszBuffer());
         return kCIDLib::False;
     }
     return kCIDLib::True;
@@ -211,7 +211,7 @@ bParseQuotedCommaList(  const   TString&                strText
 //  be quoted. The values cannot have commas inside of them.
 //
 tCIDLib::TBoolean
-TStringTokenizer::bParseCSVLine(const   TString&                strText
+TStringTokenizer::bParseCSVLine(const   TStringView&            strvText
                                 ,       tCIDLib::TStrCollect&   colToFill
                                 ,       tCIDLib::TCard4&        c4ErrIndex)
 {
@@ -250,8 +250,8 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     // Clear the incoming just in case
     colToFill.RemoveAll();
 
-    const tCIDLib::TCh* pszSrc = strText.pszBuffer();
-    const tCIDLib::TCh* pszEnd = pszSrc + strText.c4Length();
+    const tCIDLib::TCh* pszSrc = strvText.pszBuffer();
+    const tCIDLib::TCh* pszEnd = strvText.pszEnd();
 
     EStates eCurState = EStates::WaitToken;
     TString strAccum;
@@ -348,7 +348,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
                  else if (!TRawStr::bIsSpace(chCur))
                 {
                     // It's bad
-                    c4ErrIndex = (pszSrc - strText.pszBuffer());
+                    c4ErrIndex = (pszSrc - strvText.pszBuffer());
                     return kCIDLib::False;
                 }
                 break;
@@ -364,7 +364,7 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
     //
     if (eCurState == EStates::WaitTermQ)
     {
-        c4ErrIndex = (pszSrc - strText.pszBuffer());
+        c4ErrIndex = (pszSrc - strvText.pszBuffer());
         return kCIDLib::False;
     }
 
@@ -384,21 +384,21 @@ TStringTokenizer::bParseCSVLine(const   TString&                strText
 //  append strings to the collection or reset it first, defaults to reset.
 //
 tCIDLib::TBoolean
-TStringTokenizer::bParseSpacedTokens(const  TString&                strText
+TStringTokenizer::bParseSpacedTokens(const  TStringView&            strvText
                                     ,       tCIDLib::TStrCollect&   colToFill
                                     , const tCIDLib::TBoolean       bAppend)
 {
     if (!bAppend)
         colToFill.RemoveAll();
-    if (strText.bIsEmpty())
+    if (strvText.bIsEmpty())
         return kCIDLib::True;
 
-    tCIDLib::TBoolean bInWS = TRawStr::bIsSpace(strText[0]);
+    tCIDLib::TBoolean bInWS = TRawStr::bIsSpace(strvText[0]);
     TString strTmp;
-    const tCIDLib::TCard4 c4Len = strText.c4Length();
+    const tCIDLib::TCard4 c4Len = strvText.c4Length();
     for (tCIDLib::TCard4 c4Ind = 0; c4Ind < c4Len; c4Ind++)
     {
-        const tCIDLib::TCh chCur = strText[c4Ind];
+        const tCIDLib::TCh chCur = strvText[c4Ind];
         if (bInWS)
         {
             // Move forward till we hit a non-space
@@ -442,8 +442,8 @@ TStringTokenizer::bParseSpacedTokens(const  TString&                strText
 //  escape those as well, with a double \\.
 //
 tCIDLib::TVoid
-TStringTokenizer::BuildQuotedCommaList( const   TString&    strToAdd
-                                        ,       TString&    strAccum)
+TStringTokenizer::BuildQuotedCommaList( const   TStringView&    strvToAdd
+                                        ,       TString&        strAccum)
 {
     // If not the first value, then append a command to the end
     if (!strAccum.bIsEmpty())
@@ -453,8 +453,8 @@ TStringTokenizer::BuildQuotedCommaList( const   TString&    strToAdd
     strAccum.Append(kCIDLib::chQuotation);
 
     // How run through the src chars, copying over and escaping quotes
-    const tCIDLib::TCh* pszSrc = strToAdd.pszBuffer();
-    const tCIDLib::TCh* pszEnd = strToAdd.pszEnd();
+    const tCIDLib::TCh* pszSrc = strvToAdd.pszBuffer();
+    const tCIDLib::TCh* pszEnd = strvToAdd.pszEnd();
     while (pszSrc < pszEnd)
     {
         const tCIDLib::TCh chCur = *pszSrc++;
@@ -492,31 +492,31 @@ TStringTokenizer::TStringTokenizer() :
     m_c4CurOffset(0)
     , m_c4CurToken(0)
     , m_c4SourceLen(0)
-    , m_pstrSrc(&TString::strEmpty())
+    , m_strvSrc(TString::strvEmpty())
     , m_strWhitespace(kCIDLib::szWhitespace)
 {
     Reset();
 }
 
-TStringTokenizer::TStringTokenizer( const   TString* const  pstrToTokenize
-                                    , const TString&        strWhitespace) :
+TStringTokenizer::TStringTokenizer( const   TStringView     strvToTokenize
+                                    , const TStringView&    strvWhitespace) :
 
     m_c4CurOffset(0)
     , m_c4CurToken(0)
     , m_c4SourceLen(0)
-    , m_pstrSrc(pstrToTokenize)
-    , m_strWhitespace(strWhitespace)
+    , m_strWhitespace(strvWhitespace)
+    , m_strvSrc(strvToTokenize)
 {
     Reset();
 }
 
-TStringTokenizer::TStringTokenizer( const   TString* const      pstrToTokenize
+TStringTokenizer::TStringTokenizer( const   TStringView         strvToTokenize
                                     , const tCIDLib::TCh* const pszWhitespace) :
     m_c4CurOffset(0)
     , m_c4CurToken(0)
     , m_c4SourceLen(0)
-    , m_pstrSrc(pstrToTokenize)
     , m_strWhitespace(pszWhitespace)
+    , m_strvSrc(strvToTokenize)
 {
     Reset();
 }
@@ -594,7 +594,7 @@ tCIDLib::TBoolean TStringTokenizer::bGetNextToken(TString& strToFill)
      else
     {
         // Copy this token text to caller's string
-        strToFill.CopyInSubStr(*m_pstrSrc, m_c4CurOffset, c4TokenLen);
+        strToFill.CopyInSubStr(m_strvSrc, m_c4CurOffset, c4TokenLen);
     }
 
     //
@@ -626,7 +626,7 @@ tCIDLib::TBoolean TStringTokenizer::bGetRestOfLine(TString& strToFill)
     }
 
     // Otherwise, just copy the rest of the source string to the token
-    strToFill.CopyInSubStr(*m_pstrSrc, m_c4CurOffset);
+    strToFill.CopyInSubStr(m_strvSrc, m_c4CurOffset);
 
     // And set our position to the end of the string
     m_c4CurOffset = m_c4SourceLen;
@@ -638,7 +638,7 @@ tCIDLib::TBoolean TStringTokenizer::bGetRestOfLine(TString& strToFill)
 tCIDLib::TBoolean TStringTokenizer::bMoreTokens() const
 {
     #if CID_DEBUG_ON
-    if (m_pstrSrc->c4Length() != m_c4SourceLen)
+    if (m_strvSrc.c4Length() != m_c4SourceLen)
     {
         facCIDLib().ThrowErr
         (
@@ -679,7 +679,7 @@ tCIDLib::TBoolean TStringTokenizer::bPeekNextToken(TString& strToFill) const
      else
     {
         // Copy this token text to caller's string
-        strToFill.CopyInSubStr(*m_pstrSrc, m_c4CurOffset, c4TokenLen);
+        strToFill.CopyInSubStr(m_strvSrc, m_c4CurOffset, c4TokenLen);
     }
     return kCIDLib::True;
 }
@@ -696,7 +696,7 @@ tCIDLib::TBoolean TStringTokenizer::bPeekRestOfLine(TString& strToFill) const
     }
 
     // Otherwise, just copy the rest of the source string to the token
-    strToFill.CopyInSubStr(*m_pstrSrc, m_c4CurOffset);
+    strToFill.CopyInSubStr(m_strvSrc, m_c4CurOffset);
     return kCIDLib::True;
 }
 
@@ -728,60 +728,45 @@ tCIDLib::TCard4 TStringTokenizer::c4CurToken() const
 // Resets us on the original input string, to start tokeninizing it again
 tCIDLib::TVoid TStringTokenizer::Reset()
 {
-    // Make sure the string is not a null pointer
-    if (!m_pstrSrc)
-    {
-        facCIDLib().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kCIDErrs::errcSTok_NullSource
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::AppError
-        );
-    }
-     else
-    {
-        // Reset our two counters
-        m_c4CurOffset = 0;
-        m_c4CurToken = 0;
+    // Reset our two counters
+    m_c4CurOffset = 0;
+    m_c4CurToken = 0;
 
-        // Reset the length of the string
-        m_c4SourceLen = m_pstrSrc->c4Length();
+    // Reset the length of the string
+    m_c4SourceLen = m_strvSrc.c4Length();
 
-        //
-        //  And find the next token. This will get the internal state ready
-        //  return the first token available.
-        //
-        FindNext();
-    }
+    //
+    //  And find the next token. This will get the internal state ready
+    //  return the first token available.
+    //
+    FindNext();
 }
 
 
 // Same as above but allows a new whitespace list ot be set in the process
 tCIDLib::TVoid
-TStringTokenizer::Reset(const   TString* const  pstrToTokenize
-                        , const TString&        strWhitespace)
+TStringTokenizer::Reset(const   TStringView strvToTokenize
+                        , const TString&    strWhitespace)
 {
-    m_pstrSrc = pstrToTokenize;
+    m_strvSrc = strvToTokenize;
     m_strWhitespace = strWhitespace;
     Reset();
 }
 
 tCIDLib::TVoid
-TStringTokenizer::Reset(const   TString* const      pstrToTokenize
+TStringTokenizer::Reset(const   TStringView         strvToTokenize
                         , const tCIDLib::TCh* const pszWhitespace)
 {
-    m_pstrSrc = pstrToTokenize;
+    m_strvSrc = strvToTokenize;
     m_strWhitespace = pszWhitespace;
     Reset();
 }
 
 
 // Returns a ref to the original text we are tokenizing
-const TString& TStringTokenizer::strSrcText() const
+const TStringView& TStringTokenizer::strvSrcText() const
 {
-    return *m_pstrSrc;
+    return m_strvSrc;
 }
 
 
@@ -791,9 +776,9 @@ const TString& TStringTokenizer::strWhitespace() const
     return m_strWhitespace;
 }
 
-const TString& TStringTokenizer::strWhitespace(const TString& strToSet)
+const TString& TStringTokenizer::strWhitespace(const TStringView& strvToSet)
 {
-    m_strWhitespace = strToSet;
+    m_strWhitespace = strvToSet;
     return m_strWhitespace;
 }
 
@@ -808,24 +793,13 @@ tCIDLib::TCard4 TStringTokenizer::c4CurTokenLen() const
     //  whitespace character. The difference is the length of the current
     //  token.
     //
-    const tCIDLib::TCh* const pszSrc = m_pstrSrc->pszBuffer();
-    const tCIDLib::TCh* const pszWS = m_strWhitespace.pszBuffer();
+    const tCIDLib::TCh* const pszSrc = m_strvSrc.pszBuffer();
 
     tCIDLib::TCard4 c4EndInd = m_c4CurOffset;
     while (c4EndInd < m_c4SourceLen)
     {
-        // See if the current character is in the whitespace
-        const tCIDLib::TCh* const pszAt = TRawStr::pszFindChar
-        (
-            pszWS
-            , pszSrc[c4EndInd]
-        );
-
-        // If so, then its a whitespace char, so break out
-        if (pszAt)
+        if (m_strWhitespace.bContainsChar(pszSrc[c4EndInd]))
             break;
-
-        // Otherwise, lets check the next character
         c4EndInd++;
     }
 
@@ -841,24 +815,13 @@ tCIDLib::TCard4 TStringTokenizer::c4CurTokenLen() const
 tCIDLib::TVoid TStringTokenizer::FindNext()
 {
     // Get fast access to raw string buffers
-    const tCIDLib::TCh* const pszSrc = m_pstrSrc->pszBuffer();
-    const tCIDLib::TCh* const pszWS = m_strWhitespace.pszBuffer();
+    const tCIDLib::TCh* const pszSrc = m_strvSrc.pszBuffer();
 
     // Move up to the first non-whitespace character
     while (m_c4CurOffset < m_c4SourceLen)
     {
-        // See if the current character is in the whitespace
-        const tCIDLib::TCh* const pszAt = TRawStr::pszFindChar
-        (
-            pszWS
-            , pszSrc[m_c4CurOffset]
-        );
-
-        // If not, then its not a whitespace char, so break out
-        if (!pszAt)
+        if (!m_strWhitespace.bContainsChar(pszSrc[m_c4CurOffset]))
             break;
-
-        // Otherwise, lets check the next character
         m_c4CurOffset++;
     }
 }

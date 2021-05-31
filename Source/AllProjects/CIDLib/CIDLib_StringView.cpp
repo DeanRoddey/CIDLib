@@ -65,6 +65,42 @@ tCIDLib::TBoolean TStringView::bContainsSubStr( const   tCIDLib::TCh* const pszT
     return m_pstrObj->bContainsSubStr(pszToFind, bCaseSensitive);
 }
 
+tCIDLib::TBoolean
+TStringView::bFirstOccurrence(  const   tCIDLib::TCh            chToFind
+                                , COP   tCIDLib::TCard4&        c4Pos
+                                , const tCIDLib::TBoolean       bCaseSensitive) const noexcept
+{
+    if (m_pstrObj)
+        return m_pstrObj->bFirstOccurrence(chToFind, c4Pos, bCaseSensitive);
+
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindChar(pszBuffer(), chToFind, 0, bCaseSensitive);
+    if (pszMatch == nullptr)
+    {
+        c4Pos = 0;
+        return kCIDLib::False;
+    }
+    c4Pos = pszMatch - m_pszRaw;
+    return kCIDLib::True;
+}
+
+tCIDLib::TBoolean
+TStringView::bLastOccurrence(   const   tCIDLib::TCh            chToFind
+                                , COP   tCIDLib::TCard4&        c4Pos
+                                , const tCIDLib::TBoolean       bCaseSensitive) const noexcept
+{
+    if (m_pstrObj)
+        return m_pstrObj->bLastOccurrence(chToFind, c4Pos, bCaseSensitive);
+
+    const tCIDLib::TCh* pszMatch = TRawStr::pszFindLastChar(pszBuffer(), chToFind, bCaseSensitive);
+    if (pszMatch == nullptr)
+    {
+        c4Pos = 0;
+        return kCIDLib::False;
+    }
+    c4Pos = pszMatch - m_pszRaw;
+    return kCIDLib::True;
+}
+
 
 tCIDLib::TBoolean TStringView::bStartsWith( const   TString&            strToFind
                                             , const tCIDLib::TBoolean   bCaseSensitive) const noexcept

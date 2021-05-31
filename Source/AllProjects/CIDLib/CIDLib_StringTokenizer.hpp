@@ -53,28 +53,28 @@ class CIDLIBEXP TStringTokenizer : public TObject
         // -------------------------------------------------------------------
         static tCIDLib::TBoolean bParseQuotedCommaList
         (
-            const   TString&                strText
+            const   TStringView&            strvText
             ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
         static tCIDLib::TBoolean bParseCSVLine
         (
-            const   TString&                strText
+            const   TStringView&            strvText
             ,       TCollection<TString>&   colToFill
             ,       tCIDLib::TCard4&        c4ErrIndex
         );
 
         static tCIDLib::TBoolean bParseSpacedTokens
         (
-            const   TString&                strText
+            const   TStringView&            strvText
             ,       TCollection<TString>&   colToFill
             , const tCIDLib::TBoolean       bAppend = kCIDLib::False
         );
 
         static tCIDLib::TVoid BuildQuotedCommaList
         (
-            const   TString&                strToAdd
+            const   TStringView&            strvToAdd
             ,       TString&                strAccum
         );
 
@@ -92,13 +92,13 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         TStringTokenizer
         (
-            const   TString* const          pstrToTokenize
-            , const TString&                strWhitespace
+            const   TStringView             strToTokenize
+            , const TStringView&            strWhitespace
         );
 
         TStringTokenizer
         (
-            const   TString* const          pstrToTokenize
+            const   TStringView             strvToTokenize
             , const tCIDLib::TCh* const     pszWhitespace
         );
 
@@ -153,23 +153,23 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         tCIDLib::TVoid Reset
         (
-            const   TString* const          pstrToTokenize
+            const   TStringView             strvToTokenize
             , const TString&                strWhitespace
         );
 
         tCIDLib::TVoid Reset
         (
-            const   TString* const          pstrToTokenize
+            const   TStringView             strvToTokenize
             , const tCIDLib::TCh* const     pszWhitespace
         );
 
-        const TString& strSrcText() const;
+        const TStringView& strvSrcText() const;
 
         const TString& strWhitespace() const;
 
         const TString& strWhitespace
         (
-            const   TString&                strToSet
+            const   TStringView&            strvToSet
         );
 
 
@@ -200,19 +200,18 @@ class CIDLIBEXP TStringTokenizer : public TObject
         //      string cannot be modified while tokenizing, this should
         //      remain correct. Debug build will confirm this.
         //
-        //  m_pstrSrc
-        //      This is the string that we are tokenizing. It is a const
-        //      pointer since we only read the string.
-        //
         //  m_strWhitespace
         //      The characters that make up the whitespace that divides the
         //      tokens.
+        //
+        //  m_strvSrc
+        //      A view of the string we are tokenizng
         // -------------------------------------------------------------------
-        tCIDLib::TCard4 m_c4CurOffset;
-        tCIDLib::TCard4 m_c4CurToken;
-        tCIDLib::TCard4 m_c4SourceLen;
-        const TString*  m_pstrSrc;
-        TString         m_strWhitespace;
+        tCIDLib::TCard4     m_c4CurOffset;
+        tCIDLib::TCard4     m_c4CurToken;
+        tCIDLib::TCard4     m_c4SourceLen;
+        TString             m_strWhitespace;
+         TStringView        m_strvSrc;
 
 
         // -------------------------------------------------------------------

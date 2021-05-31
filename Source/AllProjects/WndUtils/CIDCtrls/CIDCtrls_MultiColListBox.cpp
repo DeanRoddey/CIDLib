@@ -335,7 +335,7 @@ TMultiColListBox::InitFromDesc( const   TWindow&                wndParent
     tCIDCtrls::EMCLBStyles eMCLBStyles = tCIDCtrls::EMCLBStyles::FullRowSel;
     tCIDCtrls::EWndStyles eStyles = tCIDCtrls::EWndStyles
     (
-        tCIDCtrls::EWndStyles::VisChild
+        tCIDCtrls::EWndStyles::VisChild | tCIDCtrls::EWndStyles::ClipChildren
     );
     tCIDCtrls::EExWndStyles eExStyles = tCIDCtrls::EExWndStyles::None;
     tCIDLib::TStrList colColTitles;
@@ -1165,7 +1165,8 @@ TMultiColListBox::CreateMCLB(const  TWindow&                wndParent
 
     //
     //  Create us. Make sure we don't have the tab stop or group styles. We'll apply
-    //  those to the nested control and set the control parent on us.
+    //  those to the nested control and set the control parent on us. And we have to clip
+    //  children or we'll get into an infinite loop without IPE.
     //
     CreateWnd
     (

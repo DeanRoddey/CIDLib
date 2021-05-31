@@ -130,10 +130,12 @@ namespace
         };
 
         //
-        //  A pointer to our state. We can use this as a 'ready' flag and we
-        //  can also atomically swap it in when we are initialized.
+        //  A pointer to our state, and a flag for whether we have faulted it in
+        //  yet or not. For race conditions reasons we don't use the pointer itself
+        //  as the flag.
         //
-        TStateInfo*     m_pState = nullptr;
+        TAtomicFlag         m_bStateReady;
+        TStateInfo*         m_pState = nullptr;
     }
 }
 
@@ -1160,13 +1162,12 @@ TOrbClientBase::psrvtFindServer(const   TIPEndPoint&        ipepServer
 // Called to iniitalize the client side of the ORB interface.
 tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
 {
-    if (!TAtomic::pFencedGet(&CIDOrb_ClientBase::m_pState))
+    if (!CIDOrb_ClientBase::m_bStateReady)
     {
         TBaseLock lockBase;
-        if (!TAtomic::pFencedGet(&CIDOrb_ClientBase::m_pState))
+        if (!CIDOrb_ClientBase::m_bStateReady)
         {
-            CIDOrb_ClientBase::TStateInfo* pNewState = new CIDOrb_ClientBase::TStateInfo();
-            TJanitor<CIDOrb_ClientBase::TStateInfo> janState(pNewState);
+            CIDOrb_ClientBase::m_pState = new CIDOrb_ClientBase::TStateInfo();
 
             //
             //  Force our stats cache items into the cache so that from here on out
@@ -1178,39 +1179,40 @@ tCIDLib::TVoid TOrbClientBase::InitializeOrbClient()
             (
                 kCIDOrb::pszStat_Cl_CmdCache
                 , tCIDLib::EStatItemTypes::Counter
-                , pNewState->sciCmdCache
+                , CIDOrb_ClientBase::m_pState->sciCmdCache
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_SrvCache
                 , tCIDLib::EStatItemTypes::Counter
-                , pNewState->sciSrvCache
+                , CIDOrb_ClientBase::m_pState->sciSrvCache
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_SrvTargets
                 , tCIDLib::EStatItemTypes::Counter
-                , pNewState->sciSrvTargets
+                , CIDOrb_ClientBase::m_pState->sciSrvTargets
             );
 
             TStatsCache::RegisterItem
             (
                 kCIDOrb::pszStat_Cl_WaitList
                 , tCIDLib::EStatItemTypes::Counter
-                , pNewState->sciWaitList
+                , CIDOrb_ClientBase::m_pState->sciWaitList
             );
 
-            // And now atomically swap in the state pointer
-            TAtomic::FencedSet(&CIDOrb_ClientBase::m_pState, janState.pobjOrphan());
 
-            // Create and spin up the cache thread
+            // Create and spin up the scavenger thread
             CIDOrb_ClientBase::m_pState->pthrCacheScavenger = new TThread
             (
                 L"CIDOrbClientScavengerThread", &eCacheScavengerThread
             );
             CIDOrb_ClientBase::m_pState->pthrCacheScavenger->Start();
+
+            // And finally we can set our ready flag
+            CIDOrb_ClientBase::m_bStateReady = kCIDLib::True;
         }
     }
 }

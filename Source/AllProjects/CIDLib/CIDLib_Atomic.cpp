@@ -68,3 +68,4 @@ tCIDLib::TCard4 TAtomic::c4SafeRelease(tCIDLib::TCard4& c4Target)
     }
     return c4Ret;
 }
+

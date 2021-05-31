@@ -90,7 +90,13 @@ TTest_Atomics::eRunTest(TTextStringOutStream&   strmOut
             return tTestFWLib::ETestRes::Failed;
         }
 
-        TAtomic::FencedSet<tCIDLib::TCard4>(&pc4Val1, pc4Val2);
+        // This should store the new and return the old
+        const tCIDLib::TCard4* pc4OldPtr = pc4Val1;
+        if (TAtomic::pFencedSet<tCIDLib::TCard4>(&pc4Val1, pc4Val2) != pc4OldPtr)
+        {
+            strmOut << TFWCurLn << L"Fenced set did not return the old pointer value\n\n";
+            return tTestFWLib::ETestRes::Failed;
+        }
 
         if (*pc4Val1 != c4Val2)
         {

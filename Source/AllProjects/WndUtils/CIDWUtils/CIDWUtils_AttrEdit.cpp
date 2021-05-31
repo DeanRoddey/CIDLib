@@ -235,7 +235,7 @@ TAttrEditWnd::InitFromDesc( const   TWindow&                wndParent
 {
     tCIDCtrls::EWndStyles eStyles = tCIDCtrls::EWndStyles
     (
-        tCIDCtrls::EWndStyles::VisTabChild
+        tCIDCtrls::EWndStyles::VisTabChild | tCIDCtrls::EWndStyles::ClipChildren
     );
     tCIDCtrls::EExWndStyles eExStyles = tCIDCtrls::EExWndStyles::None;
 
@@ -466,7 +466,7 @@ TAttrEditWnd::CreateAttrEd( const   TWindow&                wndParent
         , areaInit
         , colTitles
         , 0
-        , tCIDCtrls::EWndStyles(eStyles)
+        , tCIDCtrls::EWndStyles(eStyles) | tCIDCtrls::EWndStyles::ClipChildren
         , tCIDCtrls::EMCLBStyles
           (
             tCIDCtrls::EMCLBStyles::FullRowSel
@@ -1334,7 +1334,7 @@ TAttrEditWnd::CellClicked(  const   tCIDLib::TCard4     c4Row
         if (c4CurItem() == c4Row)
         {
             //
-            //  We only care about columsn 2 or 3. 2 is the actual value, which
+            //  We only care about columns 2 or 3. 2 is the actual value, which
             //  we do an inplace edit on.
             //
             if (c4Column == 2)
@@ -1362,55 +1362,35 @@ TAttrEditWnd::eCustomDraw(          TGraphDrawDev&      gdevTar
     tCIDCtrls::EMCLBCustRets eRet = tCIDCtrls::EMCLBCustRets::None;
     if (bPost)
     {
-        if ((c4Row == kCIDLib::c4MaxCard) && (c4Column == kCIDLib::c4MaxCard))
+        //
+        //  NOTE: Though it would be more efficient to wait till fully post and draw vertical
+        //  cell separators from top to bottom all at once, this will cause a recursive drawing
+        //  freakout for some reason. So we draw vertical cell separators on a per-row basis
+        //  instead.
+        //
+        if ((c4Row != kCIDLib::c4MaxCard) && (c4Column == kCIDLib::c4MaxCard))
         {
             //
-            //  Its the final post draw, so draw our vertical separators. We get the
-            //  area of the 2nd and 3rd cells, and those provide the right sides
-            //  of the lines. And we get the area of the last row, and that provides
-            //  the bottom of the line. If it's off the end of the window, we just
-            //  let windows clip it.
-            //
-            const tCIDLib::TCard4 c4Count = c4ItemCount();
-            if (c4Count)
-            {
-                TArea areaName;
-                TArea areaVal;
-                QueryColArea(0, 1, areaName);
-                QueryColArea(0, 2, areaVal);
-
-                TArea areaLast;
-                QueryRowArea(c4Count - 1, areaLast);
-
-                //
-                //  Because we are drawing lines here and not areas, we need to adjust
-                //  for the exclusive nature of the bottom/right points.
-                //
-                TPoint pntTop(areaName.i4Right() - 1, areaName.i4Y());
-                TPoint pntBottom(pntTop.i4X(), areaLast.i4Bottom() - 1);
-                gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
-
-                pntTop.i4X(areaVal.i4Right() - 1);
-                pntBottom.i4X(pntTop.i4X());
-                gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
-            }
-        }
-         else if ((c4Row != kCIDLib::c4MaxCard) && (c4Column == kCIDLib::c4MaxCard))
-        {
-            //
-            //  It's post row, so we draw a line under our row. Because we are drawing
-            //  a line here, we have to adjust for the exclusive nature of the bottom
-            //  and right sides of the area points.
+            //  It's post row, so we draw a line under our row, and vertical separators
+            //  to the right of the name and value columns.
             //
             TArea areaRow;
             QueryRowArea(c4Row, areaRow);
             areaRow.AdjustSize(-1, -1);
-            gdevTar.DrawLine
-            (
-                areaRow.pntLL()
-                , areaRow.pntLR()
-                , facCIDGraphDev().rgbPaleGrey
-            );
+            gdevTar.DrawLine(areaRow.pntLL(), areaRow.pntLR(), facCIDGraphDev().rgbPaleGrey);
+
+            TArea areaName;
+            TArea areaVal;
+            QueryColArea(c4Row, 1, areaName);
+            QueryColArea(c4Row, 2, areaVal);
+
+            TPoint pntTop(areaName.i4Right(), areaName.i4Y());
+            TPoint pntBottom(pntTop.i4X(), areaName.i4Bottom() - 1);
+            gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
+
+            pntTop.i4X(areaVal.i4Right());
+            pntBottom.i4X(pntTop.i4X());
+            gdevTar.DrawLine(pntTop, pntBottom, facCIDGraphDev().rgbPaleGrey);
         }
     }
      else
@@ -1435,7 +1415,7 @@ TAttrEditWnd::eCustomDraw(          TGraphDrawDev&      gdevTar
         }
          else
         {
-            // For columns 1 dn 3, set bold font, else for a valid column set normal
+            // For columns 1 and 3, set bold font, else for a valid column set normal
             if ((c4Column == 1) || (c4Column == 3))
             {
                 gdevTar.hfontSetFont(TGUIFacility::gfontDefBold());
@@ -1486,8 +1466,8 @@ TAttrData& TAttrEditWnd::adatById(const TString& strId)
 
 
 //
-//  Where possible EditValue() will just present a simple drop down to set a value,
-//  and some application specific types (processed via a virtual callback) will
+//  If there's no type specific editing scheme, then this is called to do an in place
+//  edit.
 //
 tCIDLib::TBoolean
 TAttrEditWnd::bInPlaceEdit(TAttrData& adatEdit, const TArea& areaCell)

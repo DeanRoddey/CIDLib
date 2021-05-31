@@ -209,20 +209,20 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
         // -------------------------------------------------------------------
         tCIDLib::TVoid Add
         (
-            const   TString&                strKey
-            , const TString&                strNewValue
+            const   TStringView&            strvKey
+            , const TStringView&            strvNewValue
         );
 
         tCIDLib::TBoolean bAddIfNew
         (
             const   TString&                strKey
-            , const TString&                strValue
+            , const TStringView&            strvValue
         );
 
         tCIDLib::TBoolean bAddOrUpdate
         (
             const   TString&                strKey
-            , const TString&                strNewValue
+            , const TStringView&            strvNewValue
         );
 
         tCIDLib::TBoolean bKeyExists
@@ -233,7 +233,7 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
         tCIDLib::TBoolean bFind
         (
             const   TString&                strKey
-            ,       TString&                strToFill
+            ,       TString&                strvToFill
         )   const;
 
         tCIDLib::TCard4 c4Entries() const;
@@ -255,7 +255,7 @@ class CIDLIBEXP TEnvironment : public TObject, public MDuplicable
         tCIDLib::TVoid Update
         (
             const   TString&                strKey
-            , const TString&                strNewValue
+            , const TStringView&            strvNewValue
         );
 
 

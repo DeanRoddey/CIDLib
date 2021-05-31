@@ -62,7 +62,7 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TVoid BuildModName
         (
-            const   TString&                strBaseName
+            const   TStringView&            strvBaseName
             , const tCIDLib::TCard4         c4MajVersion
             , const tCIDLib::TCard4         c4MinVersion
             , const tCIDLib::EModTypes      eModType
@@ -79,7 +79,7 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TVoid BuildModName
         (
-            const   TString&                strBaseName
+            const   TStringView&            strvBaseName
             , const tCIDLib::TCard4         c4MajVersion
             , const tCIDLib::TCard4         c4MinVersion
             , const tCIDLib::EModTypes      eModType
@@ -100,7 +100,7 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TVoid BuildModName
         (
-            const   TString&                strBaseName
+            const   TStringView&            strvBaseName
             , const tCIDLib::TCard4         c4MajVersion
             , const tCIDLib::TCard4         c4MinVersion
             , const tCIDLib::EModTypes      eModType
@@ -127,7 +127,7 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TCard8 c8ParseVersionStr
         (
-            const   TString&                strToParse
+            const   TStringView&            strvToParse
             , const tCIDLib::TBoolean       bFullFormat
         );
 
@@ -157,14 +157,14 @@ class CIDLIBEXP TModule : public TObject
 
         static tCIDLib::TVoid ParseVersionStr
         (
-            const   TString&                strToParse
+            const   TStringView&            strvToParse
             ,       tCIDLib::TCard4&        c4MajVer
             ,       tCIDLib::TCard4&        c4MinVer
         );
 
         static tCIDLib::TVoid ParseVersionStr
         (
-            const   TString&                strToParse
+            const   TStringView&            strvToParse
             ,       tCIDLib::TCard4&        c4MajVer
             ,       tCIDLib::TCard4&        c4MinVer
             ,       tCIDLib::TCard4&        c4Revision
@@ -178,7 +178,7 @@ class CIDLIBEXP TModule : public TObject
 
         TModule
         (
-            const   TString&                strName
+            const   TStringView&            strvName
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
@@ -188,8 +188,8 @@ class CIDLIBEXP TModule : public TObject
 
         TModule
         (
-            const   TString&                strName
-            , const TString&                strFromPath
+            const   TStringView&            strvName
+            , const TStringView&            strvFromPath
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
@@ -204,7 +204,7 @@ class CIDLIBEXP TModule : public TObject
 
         TModule
         (
-            const   TString&                strPath
+            const   TStringView&            strvPath
             , const tCIDLib::TBoolean       bLoad = kCIDLib::False
         );
 
@@ -546,20 +546,20 @@ class CIDLIBEXP TModule : public TObject
         // -------------------------------------------------------------------
         tCIDLib::TVoid DoInit
         (
-            const   TString&                strBaseName
+            const   TStringView&            strvBaseName
             , const tCIDLib::TCard4         c4MajVer
             , const tCIDLib::TCard4         c4MinVer
             , const tCIDLib::EModTypes      eModType
             , const tCIDLib::EModFlags      eFlags
             , const tCIDLib::TBoolean       bLoad
-            , const TString* const          pstrSrcPath
+            , const TStringView* const      pstrSrcPath
         );
 
         tCIDLib::TVoid InitStats();
 
         tCIDLib::TVoid LoadRes
         (
-            const   TString&                strResFilePath
+            const   TStringView&            strvResFilePath
         );
 
 

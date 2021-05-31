@@ -123,7 +123,7 @@ class CIDLIBEXP TString :
 
         [[nodiscard]] static ETokenFind eFindToken
         (
-            const   tCIDLib::TCh*&          pszStart
+            const    tCIDLib::TCh*&         pszStart
             , COP    tCIDLib::TCh&          chToken
             , COP    tCIDLib::EHJustify&    eJustify
             , COP    tCIDLib::TCard4&       c4FldWidth
@@ -159,6 +159,7 @@ class CIDLIBEXP TString :
         );
 
         static const TString& strEmpty() noexcept;
+        static const TStringView& strvEmpty() noexcept;
 
 
         //
@@ -671,14 +672,7 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid AppendSubStr
         (
-            const   TString&                strSrc
-            , const tCIDLib::TCard4         c4Start
-            , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
-        );
-
-        tCIDLib::TVoid AppendSubStr
-        (
-            const   tCIDLib::TCh* const     pszSrc
+            const   TStringView&            strvSrc
             , const tCIDLib::TCard4         c4Start
             , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         );
@@ -762,7 +756,7 @@ class CIDLIBEXP TString :
             const   tCIDLib::TCh            chToFind
             , COP   tCIDLib::TCard4&        c4Pos
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::True
-        )   const;
+        )   const noexcept;
 
         [[nodiscard]] tCIDLib::TBoolean bFirstOccurrence
         (
@@ -983,14 +977,14 @@ class CIDLIBEXP TString :
 
         tCIDLib::TVoid CopyInSubStr
         (
-            const   TString&                strSource
+            const   TStringView&            strSource
             , const tCIDLib::TCard4         c4Start
             , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         );
 
         tCIDLib::TVoid CopyOutSubStr
         (
-            COP     TString&               strTarget
+            COP     TString&                strTarget
             , const tCIDLib::TCard4         c4Start
             , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         )   const;
@@ -1570,7 +1564,8 @@ class CIDLIBEXP TString :
                     , const tCIDLib::TCh* const     pszLower
                 )   const;
 
-                [[nodiscard]] tCIDLib::TCard4 c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const
+                [[nodiscard]] tCIDLib::TCard4
+                c4CalcBufDiff(const tCIDLib::TCh* const pszUpper) const noexcept
                 {
                     return c4CalcBufDiff(pszUpper, m_pszBuffer);
                 }
@@ -1610,14 +1605,14 @@ class CIDLIBEXP TString :
                     const   tCIDLib::TCard4     c4IncBy
                 );
 
-                const tCIDLib::TCh* pszBuffer(const tCIDLib::TBoolean bNullTerm = kCIDLib::True) const
+                const tCIDLib::TCh* pszBuffer(const tCIDLib::TBoolean bNullTerm = kCIDLib::True) const noexcept
                 {
                     if (bNullTerm)
                         m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
                     return m_pszBuffer;
                 }
 
-                tCIDLib::TCh* pszBuffer(const tCIDLib::TBoolean bNullTerm = kCIDLib::True)
+                tCIDLib::TCh* pszBuffer(const tCIDLib::TBoolean bNullTerm = kCIDLib::True) noexcept
                 {
                     if (bNullTerm)
                         m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
@@ -1645,12 +1640,12 @@ class CIDLIBEXP TString :
                     return &m_pszBuffer[c4At];
                 }
 
-                const tCIDLib::TCh* pszAtEnd() const
+                const tCIDLib::TCh* pszAtEnd() const noexcept
                 {
                     return &m_pszBuffer[m_c4CurEnd];
                 }
 
-                tCIDLib::TCh* pszAtEnd()
+                tCIDLib::TCh* pszAtEnd() noexcept
                 {
                     return &m_pszBuffer[m_c4CurEnd];
                 }

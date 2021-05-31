@@ -694,7 +694,7 @@ TTextOutStream& TSysInfo::strmErr()
             else
                 pstrmSet = &strmOut();
 
-            TAtomic::FencedSet(&s_pstrmErr, pstrmSet);
+            TAtomic::pFencedSet(&s_pstrmErr, pstrmSet);
         }
     }
     return *s_pstrmErr;
@@ -715,7 +715,7 @@ TTextInStream& TSysInfo::strmIn()
             else
                 pstrmSet = new TInConsole;
 
-            TAtomic::FencedSet(&s_pstrmIn, pstrmSet);
+            TAtomic::pFencedSet(&s_pstrmIn, pstrmSet);
         }
     }
     return *s_pstrmIn;
@@ -736,7 +736,7 @@ TTextOutStream& TSysInfo::strmOut()
             else
                 pstrmSet = new TOutConsole;
 
-            TAtomic::FencedSet(&s_pstrmOut, pstrmSet);
+            TAtomic::pFencedSet(&s_pstrmOut, pstrmSet);
         }
     }
 

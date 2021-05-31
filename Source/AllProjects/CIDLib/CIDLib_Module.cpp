@@ -749,7 +749,7 @@ TModule::bLoadOSMsg(const tCIDLib::TOSErrCode errcId, TString& strMsgBuf)
 
 
 tCIDLib::TVoid
-TModule::BuildModName(  const   TString&            strBaseName
+TModule::BuildModName(  const   TStringView&        strvBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
@@ -763,7 +763,7 @@ TModule::BuildModName(  const   TString&            strBaseName
     TKrnlString kstrPortable;
     TKrnlString kstrLoadable;
 
-    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+    if (!TKrnlModule::bBuildModNames(strvBaseName.pszBuffer()
                                     , kstrPortable
                                     , kstrLoadable
                                     , c4MajVersion
@@ -777,7 +777,7 @@ TModule::BuildModName(  const   TString&            strBaseName
             , kCIDErrs::errcMod_CantBuildName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
-            , strBaseName
+            , TString(strvBaseName)
         );
     }
 
@@ -821,7 +821,7 @@ TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
 
 
 tCIDLib::TVoid
-TModule::BuildModName(  const   TString&            strBaseName
+TModule::BuildModName(  const   TStringView&        strvBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
@@ -836,7 +836,7 @@ TModule::BuildModName(  const   TString&            strBaseName
     //
     TKrnlString kstrPortable;
     TKrnlString kstrLoadable;
-    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+    if (!TKrnlModule::bBuildModNames(strvBaseName.pszBuffer()
                                     , kstrPortable
                                     , kstrLoadable
                                     , c4MajVersion
@@ -850,7 +850,7 @@ TModule::BuildModName(  const   TString&            strBaseName
             , kCIDErrs::errcMod_CantBuildName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
-            , strBaseName
+            , TString(strvBaseName)
         );
     }
 
@@ -900,7 +900,7 @@ TModule::BuildModName(  const   TCIDModuleInfo& modiSrc
 }
 
 tCIDLib::TVoid
-TModule::BuildModName(  const   TString&            strBaseName
+TModule::BuildModName(  const   TStringView&        strvBaseName
                         , const tCIDLib::TCard4     c4MajVersion
                         , const tCIDLib::TCard4     c4MinVersion
                         , const tCIDLib::EModTypes  eModType
@@ -918,7 +918,7 @@ TModule::BuildModName(  const   TString&            strBaseName
     //
     TKrnlString kstrPortable;
     TKrnlString kstrLoadable;
-    if (!TKrnlModule::bBuildModNames(strBaseName.pszBuffer()
+    if (!TKrnlModule::bBuildModNames(strvBaseName.pszBuffer()
                                     , kstrPortable
                                     , kstrLoadable
                                     , c4MajVersion
@@ -932,7 +932,7 @@ TModule::BuildModName(  const   TString&            strBaseName
             , kCIDErrs::errcMod_CantBuildName
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::CantDo
-            , strBaseName
+            , TString(strvBaseName)
         );
     }
 
@@ -997,7 +997,7 @@ TModule::BuildModName(  const   TCIDModuleInfo&     modiSrc
 
 
 tCIDLib::TCard8
-TModule::c8ParseVersionStr( const   TString&            strToParse
+TModule::c8ParseVersionStr( const   TStringView&        strvToParse
                             , const tCIDLib::TBoolean   bFullFormat)
 {
     // Call the other version to get the values out
@@ -1005,9 +1005,9 @@ TModule::c8ParseVersionStr( const   TString&            strToParse
     tCIDLib::TCard4 c4Min = 0;
     tCIDLib::TCard4 c4Revision = 0;
     if (bFullFormat)
-        ParseVersionStr(strToParse, c4Maj, c4Min, c4Revision);
+        ParseVersionStr(strvToParse, c4Maj, c4Min, c4Revision);
      else
-        ParseVersionStr(strToParse, c4Maj, c4Min);
+        ParseVersionStr(strvToParse, c4Maj, c4Min);
 
     tCIDLib::TCard8 c8Ver = c4Maj;
     c8Ver <<= 16;
@@ -1136,13 +1136,13 @@ tCIDLib::TVoid TModule::LogEventObjs(TCollection<TLogEvent>& colToLog)
 }
 
 
-tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
+tCIDLib::TVoid TModule::ParseVersionStr(const   TStringView&        strvToParse
                                         ,       tCIDLib::TCard4&    c4MajVer
                                         ,       tCIDLib::TCard4&    c4MinVer)
 {
     // Find the period, which separates the two parts
     tCIDLib::TCard4 c4Ofs;
-    if (!strToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs))
+    if (!strvToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs))
     {
         facCIDLib().ThrowErr
         (
@@ -1151,7 +1151,7 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
             , kCIDErrs::errcMod_BadVersionStr
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Format
-            , strToParse
+            , TString(strvToParse)
         );
     }
 
@@ -1159,9 +1159,9 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
     try
     {
         TString strTmp;
-        strToParse.CopyOutSubStr(strTmp, 0, c4Ofs);
+        strvToParse.CopyOutSubStr(strTmp, 0, c4Ofs);
         c4MajVer = strTmp.c4Val();
-        strToParse.CopyOutSubStr(strTmp, c4Ofs + 1);
+        strvToParse.CopyOutSubStr(strTmp, c4Ofs + 1, kCIDLib::c4MaxCard);
         c4MinVer = strTmp.c4Val();
     }
 
@@ -1174,12 +1174,12 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
             , kCIDErrs::errcMod_BadVersionStr
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Format
-            , strToParse
+            , TString(strvToParse)
         );
     }
 }
 
-tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
+tCIDLib::TVoid TModule::ParseVersionStr(const   TStringView&        strvToParse
                                         ,       tCIDLib::TCard4&    c4MajVer
                                         ,       tCIDLib::TCard4&    c4MinVer
                                         ,       tCIDLib::TCard4&    c4Revision)
@@ -1187,8 +1187,8 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
     // Find the periods, which separates the threeparts
     tCIDLib::TCard4 c4Ofs1 = 0;
     tCIDLib::TCard4 c4Ofs2 = 0;
-    if (!strToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs1)
-    ||  !strToParse.bLastOccurrence(kCIDLib::chPeriod, c4Ofs2)
+    if (!strvToParse.bFirstOccurrence(kCIDLib::chPeriod, c4Ofs1)
+    ||  !strvToParse.bLastOccurrence(kCIDLib::chPeriod, c4Ofs2)
     ||  ((c4Ofs2 - c4Ofs1) < 1))
     {
         facCIDLib().ThrowErr
@@ -1198,7 +1198,7 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
             , kCIDErrs::errcMod_BadVersionStr2
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Format
-            , strToParse
+            , TString(strvToParse)
         );
     }
 
@@ -1206,11 +1206,11 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
     try
     {
         TString strTmp;
-        strToParse.CopyOutSubStr(strTmp, 0, c4Ofs1);
+        strvToParse.CopyOutSubStr(strTmp, 0, c4Ofs1);
         c4MajVer = strTmp.c4Val();
-        strToParse.CopyOutSubStr(strTmp, c4Ofs1 + 1, (c4Ofs2 - c4Ofs1) - 1);
+        strvToParse.CopyOutSubStr(strTmp, c4Ofs1 + 1, (c4Ofs2 - c4Ofs1) - 1);
         c4MinVer = strTmp.c4Val();
-        strToParse.CopyOutSubStr(strTmp, c4Ofs2 + 1);
+        strvToParse.CopyOutSubStr(strTmp, c4Ofs2 + 1, kCIDLib::c4MaxCard);
         c4Revision= strTmp.c4Val();
     }
 
@@ -1223,7 +1223,7 @@ tCIDLib::TVoid TModule::ParseVersionStr(const   TString&            strToParse
             , kCIDErrs::errcMod_BadVersionStr2
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Format
-            , strToParse
+            , TString(strvToParse)
         );
     }
 }
@@ -1251,7 +1251,7 @@ TModule::TModule(const  TCIDModuleInfo&     modiSrc
     );
 }
 
-TModule::TModule(   const   TString&            strName
+TModule::TModule(   const   TStringView&        strvName
                     , const tCIDLib::EModTypes  eModType
                     , const tCIDLib::TCard4     c4MajVer
                     , const tCIDLib::TCard4     c4MinVer
@@ -1261,11 +1261,11 @@ TModule::TModule(   const   TString&            strName
     m_kmodThis()
     , m_pc1Res(nullptr)
 {
-    DoInit(strName, c4MajVer, c4MinVer, eModType, eFlags, bLoad, nullptr);
+    DoInit(strvName, c4MajVer, c4MinVer, eModType, eFlags, bLoad, nullptr);
 }
 
-TModule::TModule(   const   TString&            strName
-                    , const TString&            strFromPath
+TModule::TModule(   const   TStringView&        strvName
+                    , const TStringView&        strFromPath
                     , const tCIDLib::EModTypes  eModType
                     , const tCIDLib::TCard4     c4MajVer
                     , const tCIDLib::TCard4     c4MinVer
@@ -1277,7 +1277,7 @@ TModule::TModule(   const   TString&            strName
     // Create our other names, then do common init. This is always a load
     DoInit
     (
-        strName, c4MajVer, c4MinVer, eModType, eFlags, kCIDLib::True, &strFromPath
+        strvName, c4MajVer, c4MinVer, eModType, eFlags, kCIDLib::True, &strFromPath
     );
 }
 
@@ -1287,7 +1287,7 @@ TModule::TModule(   const   TString&            strName
 //  but to load other modules that we may need to mess with. They can pass just the
 //  name or the full path, as required.
 //
-TModule::TModule(const  TString&            strPath
+TModule::TModule(const  TStringView&        strvPath
                 , const tCIDLib::TBoolean   bLoad) :
 
     m_kmodThis()
@@ -1299,9 +1299,9 @@ TModule::TModule(const  TString&            strPath
     // Load or query from the original full path
     tCIDLib::TBoolean bRes = kCIDLib::False;
     if (bLoad)
-        bRes = m_kmodThis.bLoadExternal(strPath.pszBuffer());
+        bRes = m_kmodThis.bLoadExternal(strvPath.pszBuffer());
     else
-        bRes = m_kmodThis.bQueryExternal(strPath.pszBuffer());
+        bRes = m_kmodThis.bQueryExternal(strvPath.pszBuffer());
 
     if (!bRes)
     {
@@ -1313,7 +1313,7 @@ TModule::TModule(const  TString&            strPath
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , strPath
+            , TString(strvPath)
         );
     }
 }
@@ -2557,13 +2557,13 @@ tCIDLib::TVoid TModule::ShowLogFailure(const TLogEvent& logevShow)
 //  ctors. We have all the names and any path stored at this point.
 //
 tCIDLib::TVoid
-TModule::DoInit(const   TString&            strBaseName
+TModule::DoInit(const   TStringView&        strvBaseName
                 , const tCIDLib::TCard4     c4MajVer
                 , const tCIDLib::TCard4     c4MinVer
                 , const tCIDLib::EModTypes  eModType
                 , const tCIDLib::EModFlags  eFlags
                 , const tCIDLib::TBoolean   bLoad
-                , const TString* const      pstrSrcPath)
+                , const TStringView* const  pstrSrcPath)
 {
     tCIDLib::TBoolean bRes = kCIDLib::False;
 
@@ -2580,7 +2580,7 @@ TModule::DoInit(const   TString&            strBaseName
         {
             bRes = m_kmodThis.bLoadFromPath
             (
-                strBaseName.pszBuffer()
+                strvBaseName.pszBuffer()
                 , c4MajVer
                 , c4MinVer
                 , pstrSrcPath->pszBuffer()
@@ -2592,7 +2592,7 @@ TModule::DoInit(const   TString&            strBaseName
         {
             bRes = m_kmodThis.bLoadFromName
             (
-                strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
+                strvBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
             );
         }
     }
@@ -2601,7 +2601,7 @@ TModule::DoInit(const   TString&            strBaseName
         // This only uses the name since we are querying something already loaded
         bRes = m_kmodThis.bQueryFromName
         (
-            strBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
+            strvBaseName.pszBuffer(), c4MajVer, c4MinVer, eModType, eFlags
         );
     }
 
@@ -2615,7 +2615,7 @@ TModule::DoInit(const   TString&            strBaseName
             , TKrnlError::kerrLast()
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::Unknown
-            , strBaseName
+            , TString(strvBaseName)
         );
     }
 
@@ -2623,7 +2623,7 @@ TModule::DoInit(const   TString&            strBaseName
     //  It worked, so store away the base name. We store our own copy of this because
     //  we use it a lot.
     //
-    m_strName = strBaseName;
+    m_strName = strvBaseName;
 
     //
     //  Ok, lets try to load up the local strings that are preloaded and
@@ -2633,7 +2633,7 @@ TModule::DoInit(const   TString&            strBaseName
     //
     if (!CIDLib_Module::atomInitMsgs)
     {
-        if (strBaseName == L"CIDLib")
+        if (strvBaseName == L"CIDLib")
             InitMsgs(*this);
     }
 
@@ -2703,13 +2703,13 @@ tCIDLib::TVoid TModule::InitStats()
 //  Loads up the passed resource file and stores a pointer to the allocated
 //  buffer.
 //
-tCIDLib::TVoid TModule::LoadRes(const TString& strResFile)
+tCIDLib::TVoid TModule::LoadRes(const TStringView& strvResFile)
 {
     TCritSecLocker lockSync(&m_crsSync);
     if (!m_pc1Res)
     {
         // Open a binary file for the resource file
-        TBinaryFile flRes(strResFile);
+        TBinaryFile flRes(strvResFile);
         flRes.Open
         (
             tCIDLib::EAccessModes::Multi_Read
@@ -2729,7 +2729,7 @@ tCIDLib::TVoid TModule::LoadRes(const TString& strResFile)
                 , kCIDErrs::errcMod_NoResFile
                 , tCIDLib::ESeverities::Failed
                 , tCIDLib::EErrClasses::NotFound
-                , strResFile
+                , TString(strvResFile)
             );
         }
     }

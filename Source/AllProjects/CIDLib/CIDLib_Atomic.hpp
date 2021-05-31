@@ -84,6 +84,10 @@ namespace TAtomic
     }
 
 
+    //
+    //  These play a trick with compare and exchange, so that we attomically read the value
+    //  if it is set, else we store a null, replacing the null that was already there.
+    //
     template <typename T> T* pFencedGet(T** pToGet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
@@ -110,11 +114,13 @@ namespace TAtomic
         );
     }
 
-    template <typename T> tCIDLib::TVoid FencedSet(T** pTarget, T* const pToSet)
+    //
+    //  Atomically swap in a new value to the target. Returns the previous value
+    template <typename T> T* pFencedSet(T** pTarget, T* const pToSet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
         CIDLib_Suppress(26471)
-        reinterpret_cast<T*>
+        return reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr
             (
@@ -123,11 +129,11 @@ namespace TAtomic
         );
     }
 
-    template <typename T> tCIDLib::TVoid FencedSet(const T** pTarget, T* const pToSet)
+    template <typename T> T* pFencedSet(const T** pTarget, T* const pToSet)
     {
         // Sometimes the value is a void pointer which causes an unnecessary reinterpret warning
         CIDLib_Suppress(26471)
-        reinterpret_cast<T*>
+        return reinterpret_cast<T*>
         (
             TRawMem::pExchangeRawPtr
             (
@@ -171,41 +177,30 @@ template <typename T> class TSingleton
         // -------------------------------------------------------------------
         const T* operator->() const
         {
-            // If alreayd set, we are done
-            if (m_ptInstance)
-                return m_ptInstance;
-
-            FaultIn();
+            if (!TAtomic::pFencedGet(&m_ptInstance))
+                FaultIn();
             return m_ptInstance;
         }
 
         T* operator->()
         {
-            // If alreayd set, we are done
-            if (m_ptInstance)
-                return m_ptInstance;
-
-            FaultIn();
+            if (!TAtomic::pFencedGet(&m_ptInstance))
+                FaultIn();
             return m_ptInstance;
         }
 
         const T& operator*() const
         {
-            // If alreayd set, we are done
-            if (m_ptInstance)
-                return *m_ptInstance;
-
-            FaultIn();
+            if (!TAtomic::pFencedGet(&m_ptInstance))
+                FaultIn();
             return *m_ptInstance;
         }
 
         T& operator*()
         {
             // If alreayd set, we are done
-            if (m_ptInstance)
-                return *m_ptInstance;
-
-            FaultIn();
+            if (!TAtomic::pFencedGet(&m_ptInstance))
+                FaultIn();
             return *m_ptInstance;
         }
 
@@ -218,7 +213,7 @@ template <typename T> class TSingleton
         // If not overridden, then just default construct a T
         virtual T* ptMakeIt()
         {
-            return new T();
+            return new T{};
         }
 
 
@@ -226,13 +221,34 @@ template <typename T> class TSingleton
         // -------------------------------------------------------------------
         //  Private, non-virtual methods
         // -------------------------------------------------------------------
+
+        //
+        //  We lock our sync section, then check again if it exists. If not, then
+        //  default construct one and store it.
+        //
         tCIDLib::TVoid FaultIn()
         {
+            TKrnlCritSecLocker kcrslSync(pkcrsGetLock());
             if (!TAtomic::pFencedGet(&m_ptInstance))
+                TAtomic::pFencedSet(&m_ptInstance, this->ptMakeIt());
+        }
+
+
+        //
+        //  We have to have a way to sync the faulting in of the object because it may
+        //  not be kosher to create more than one and a lockless scheme would require
+        //  speculative creation of an object that might not end up being usuable. This
+        //  at least we fault in a lockless way to provide a bootstrapping mechanism.
+        //
+        static TKrnlCritSec* pkcrsGetLock()
+        {
+            if (!TAtomic::pFencedGet(&s_pkcrsLock))
             {
-                TBaseLock lockInit;
-                if (!TAtomic::pFencedGet(&m_ptInstance))
-                    TAtomic::FencedSet(&m_ptInstance, this->ptMakeIt());
+                TKrnlCritSec* pkcrsNew = new TKrnlCritSec;
+
+                // If someone else beat us to it, destroy ours
+                if ( TRawMem::pCompareAndExchangePtr(&s_pkcrsLock, pkcrsNew, nullptr) != nullptr);
+                    delete pkcrsNew;
             }
         }
 
@@ -245,5 +261,13 @@ template <typename T> class TSingleton
         //      aligned. Has to be mutable so we can fault it in from const methods.
         // -------------------------------------------------------------------
         mutable T* alignas(kCIDLib::c4CacheAlign) m_ptInstance;
+
+        // -------------------------------------------------------------------
+        //  Private, static data members
+        //
+        //  s_pkcrsLock
+        //      See the comments on pkcrsGetLock() above.
+        // -------------------------------------------------------------------
+        static TKrnlCritSec*    s_pkcrsLock;
 };
 

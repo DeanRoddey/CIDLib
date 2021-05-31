@@ -34,7 +34,6 @@
 #include    "CIDLib_.hpp"
 
 
-
 // ---------------------------------------------------------------------------
 //  Do some RTTI macros for classes that are all inline (i.e. they don't
 //  have a Cpp file to do it in.)

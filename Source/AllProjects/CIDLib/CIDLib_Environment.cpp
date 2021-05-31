@@ -444,17 +444,17 @@ TEnvironment& TEnvironment::operator=(TEnvironment&& envSrc)
 //  TEnvironment: Public non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TEnvironment::Add(const TString& strKey, const TString& strNewValue)
+TEnvironment::Add(const TStringView& strvKey, const TStringView& strvNewValue)
 {
     if (!m_pcolEnv)
         FaultInList();
 
-    m_pcolEnv->objPlace(strKey, strNewValue);
+    m_pcolEnv->objPlace(strvKey, strvNewValue);
 }
 
 
 tCIDLib::TBoolean
-TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
+TEnvironment::bAddIfNew(const TString& strKey, const TStringView& strvValue)
 {
     if (!m_pcolEnv)
         FaultInList();
@@ -463,7 +463,7 @@ TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
     if (!pkvalTmp)
     {
         // It's not there currently, so add it
-        m_pcolEnv->objPlace(strKey, strValue);
+        m_pcolEnv->objPlace(strKey, strvValue);
         return kCIDLib::True;
     }
     return kCIDLib::False;
@@ -471,7 +471,7 @@ TEnvironment::bAddIfNew(const TString& strKey, const TString& strValue)
 
 
 tCIDLib::TBoolean
-TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
+TEnvironment::bAddOrUpdate(const TString& strKey, const TStringView& strvNewValue)
 {
     if (!m_pcolEnv)
         FaultInList();
@@ -479,11 +479,11 @@ TEnvironment::bAddOrUpdate(const TString& strKey, const TString& strNewValue)
     TKeyValuePair* pkvalTmp = m_pcolEnv->pobjFindByKey(strKey);
     if (pkvalTmp)
     {
-        pkvalTmp->strValue(strNewValue);
+        pkvalTmp->strValue(strvNewValue);
         return kCIDLib::False;
     }
 
-    m_pcolEnv->objPlace(strKey, strNewValue);
+    m_pcolEnv->objPlace(strKey, strvNewValue);
     return kCIDLib::True;
 }
 
@@ -570,14 +570,14 @@ const TString& TEnvironment::strFind(const TString& strKey) const
 }
 
 
-tCIDLib::TVoid TEnvironment::Update(const   TString&    strKey
-                                    , const TString&    strNewValue)
+tCIDLib::TVoid TEnvironment::Update(const   TString&        strKey
+                                    , const TStringView&    strvNewValue)
 {
     if (!m_pcolEnv)
         FaultInList();
 
     TKeyValuePair& kvalFind = m_pcolEnv->objFindByKey(strKey);
-    kvalFind.strValue(strNewValue);
+    kvalFind.strValue(strvNewValue);
 }
 
 

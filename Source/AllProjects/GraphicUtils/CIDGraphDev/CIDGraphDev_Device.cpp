@@ -3539,7 +3539,7 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
         , c4Rounding
     );
 
-    // If we can't do that, clip the hold region if any and throw
+    // If we can't do that, clean up the old region and throw
     if (!hrgnTmp)
     {
         TKrnlError::SetLastHostError(::GetLastError());
@@ -3559,9 +3559,6 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , strMsg
         );
-
-        // Won't happen, but makes analyzer happy
-        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Now set it on us
@@ -3584,9 +3581,6 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             , tCIDLib::EErrClasses::CantDo
             , TString(L"Region")
         );
-
-        // Won't happen, but makes analyzer happy
-        return kCIDGraphDev::hrgnInvalid;
     }
 
     // Clean up the temp region now that it's set
