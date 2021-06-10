@@ -159,7 +159,7 @@ TTextConverter::c4ConvertFrom(  const   tCIDLib::TCard1* const  pc1Src
 
         // If we did any chars, then put those in the target
         if (c4CurChars)
-            strToFill.AppendSubStr(achBuf, 0, c4CurChars);
+            strToFill.Append(TStringView(achBuf, c4CurChars));
 
         // If we got no chars or we were asked to stop, then break out
         if (!c4CurChars || bStop)

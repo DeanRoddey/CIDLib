@@ -466,15 +466,7 @@ class CIDLIBEXP TString :
             return !operator==(strvSrc);
         }
 
-        tCIDLib::TVoid operator+=(const TString& strSrc)
-        {
-            Append(strSrc);
-        }
-
-        tCIDLib::TVoid operator+=(const tCIDLib::TCh* const pszSrc)
-        {
-            Append(pszSrc);
-        }
+        tCIDLib::TVoid operator+=(const TStringView& strvSrc);
 
         tCIDLib::TVoid operator+=(const tCIDLib::TCh chSrc)
         {
@@ -540,24 +532,22 @@ class CIDLIBEXP TString :
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Append(const TString& strSrc)
-        {
-            m_strbData.Append(strSrc.pszBuffer(), strSrc.c4Length());
-        }
-
-        tCIDLib::TVoid Append(const TStringView& strvSrc);
-
-        tCIDLib::TVoid Append(const TString& strSrc1, const TString& strSrc2)
-        {
-            Append(strSrc1);
-            Append(strSrc2);
-        }
+        tCIDLib::TVoid Append
+        (
+            const   TStringView&            strvSrc
+        );
 
         tCIDLib::TVoid Append
         (
-            const   tCIDLib::TCh* const     pszSrc
-            , const tCIDLib::TCh* const     pszSrc2 = nullptr
-            , const tCIDLib::TCh* const     pszSrc3 = nullptr
+            const   TStringView&            strvSrc1
+            , const TStringView&            strvSrc2
+        );
+
+        tCIDLib::TVoid Append
+        (
+            const   TStringView&            strvSrc1
+            , const TStringView&            strvSrc2
+            , const TStringView&            strvSrc3
         );
 
         tCIDLib::TVoid Append
@@ -1884,9 +1874,4 @@ extern template TString TString::strConcat(const tCIDLib::TCh&, const TString&);
 // ---------------------------------------------------------------------------
 //  Global operators
 // ---------------------------------------------------------------------------
-inline TString operator+(const TString& str1, const TString& str2)
-{
-    TString strRet(str1, str2.c4Length());
-    strRet.Append(str2);
-    return strRet;
-}
+extern CIDLIBEXP TString operator+(const TStringView& strv1, const TStringView& strv2);

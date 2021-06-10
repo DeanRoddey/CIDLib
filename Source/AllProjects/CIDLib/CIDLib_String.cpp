@@ -64,6 +64,18 @@ namespace
 
 
 
+// ---------------------------------------------------------------------------
+//  Global operators
+// ---------------------------------------------------------------------------
+
+// Concatenate two strings and return the result
+TString operator+(const TStringView& strv1, const TStringView& strv2)
+{
+    TString strRet(strv1, strv2.c4Length());
+    strRet.Append(strv2);
+    return strRet;
+}
+
 
 // ---------------------------------------------------------------------------
 //   CLASS: TString
@@ -815,16 +827,16 @@ tCIDLib::TBoolean TString::operator>(const tCIDLib::TCh* const pszSrc) const noe
     return TRawStr::eCompareStr(pszBuffer(), pszSrc) == tCIDLib::ESortComps::FirstGreater;
 }
 
-
-// ---------------------------------------------------------------------------
-//  TString: Public, non-virtual methods
-// ---------------------------------------------------------------------------
-
-tCIDLib::TVoid TString::Append(const TStringView& strvSrc)
+tCIDLib::TVoid TString::operator+=(const TStringView& strvSrc)
 {
     m_strbData.Append(strvSrc.pszBuffer(), strvSrc.c4Length());
 }
 
+
+
+// ---------------------------------------------------------------------------
+//  TString: Public, non-virtual methods
+// ---------------------------------------------------------------------------
 
 // Append a count of characters
 tCIDLib::TVoid TString::Append(const tCIDLib::TCh chSrc, const tCIDLib::TCard4 c4Count)
@@ -843,26 +855,31 @@ tCIDLib::TVoid TString::Append(const tCIDLib::TCh chSrc, const tCIDLib::TCard4 c
 }
 
 
-tCIDLib::TVoid
-TString::Append(const   tCIDLib::TCh* const psz1
-                , const tCIDLib::TCh* const psz2
-                , const tCIDLib::TCh* const psz3)
+tCIDLib::TVoid TString::Append(const TStringView& strvSrc)
 {
-    // Get the length of the strings to append and our length
-    const tCIDLib::TCard4 c4Len1 = psz1 ? TRawStr::c4StrLen(psz1) : 0;
-    const tCIDLib::TCard4 c4Len2 = psz2 ? TRawStr::c4StrLen(psz2) : 0;
-    const tCIDLib::TCard4 c4Len3 = psz3 ? TRawStr::c4StrLen(psz3) : 0;
+    m_strbData.Append(strvSrc.pszBuffer(), strvSrc.c4Length());
+}
 
-    // Expand if need be, preserving existing content
-    const tCIDLib::TCard4 c4TotalNew = c4Len1 + c4Len2 + c4Len3;
-    m_strbData.ExpandBy(c4TotalNew, kCIDLib::True);
+tCIDLib::TVoid TString::Append(const TStringView& strvSrc1, const TStringView& strvSrc2)
+{
+    const tCIDLib::TCard4 c4SrcLen = strvSrc1.c4Length() + strvSrc2.c4Length();
+    m_strbData.ExpandBy(c4SrcLen, kCIDLib::True);
+    m_strbData.Append(strvSrc1.pszBuffer(), strvSrc1.c4Length());
+    m_strbData.Append(strvSrc2.pszBuffer(), strvSrc2.c4Length());
+}
 
-    if (psz1)
-        m_strbData.Append(psz1, c4Len1);
-    if (psz2)
-        m_strbData.Append(psz2, c4Len2);
-    if (psz3)
-        m_strbData.Append(psz3, c4Len3);
+tCIDLib::TVoid TString::Append( const   TStringView& strvSrc1
+                                , const TStringView& strvSrc2
+                                , const TStringView& strvSrc3)
+{
+    const tCIDLib::TCard4 c4SrcLen
+    (
+        strvSrc1.c4Length() + strvSrc2.c4Length() + strvSrc3.c4Length()
+    );
+    m_strbData.ExpandBy(c4SrcLen, kCIDLib::True);
+    m_strbData.Append(strvSrc1.pszBuffer(), strvSrc1.c4Length());
+    m_strbData.Append(strvSrc2.pszBuffer(), strvSrc2.c4Length());
+    m_strbData.Append(strvSrc3.pszBuffer(), strvSrc3.c4Length());
 }
 
 
@@ -1188,8 +1205,8 @@ TString::AppendSubStr( const   TStringView&     strvSrc
     if (strvSrc.bIsEmpty())
         return;
 
-    // Make sure the start is within the current length of the source
-    if (c4Start >= strvSrc.c4Length())
+    // Make sure the start is within the current length of the source if not zero
+    if (c4Start && (c4Start >= strvSrc.c4Length()))
     {
         //
         //  If it'as at the end, and the length is max card, just do nothing, since basically

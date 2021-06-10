@@ -56,12 +56,12 @@ namespace tCIDColAlgo
     //
     //  These are first becasue some others below can make use of these.
     //
-    template<typename   TCol
+        template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
             , typename  TElem = TCol::TMyElemType>
-    typename TCol::TCursor cursFind(const   TCol&       colSrc
-                                    , const TElem&      objToFind
-                                    ,       TComp       pfnComp = TComp())
+    constexpr typename TCol::TCursor cursFind(  const   TCol&       colSrc
+                                                , const TElem&      objToFind
+                                                ,       TComp       pfnComp = TComp())
     {
         typename TCol::TCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
@@ -75,9 +75,9 @@ namespace tCIDColAlgo
     template<typename   TCol
             , typename  TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>
             , typename  TElem = TCol::TMyElemType>
-    typename TCol::TNCCursor cursFindNC(        TCol&       colSrc
-                                        , const TElem&      objToFind
-                                        ,       TComp       pfnComp = TComp())
+    constexpr typename TCol::TNCCursor cursFindNC(          TCol&       colSrc
+                                                    , const TElem&      objToFind
+                                                    ,       TComp       pfnComp = TComp())
     {
         typename TCol::TNCCursor cursSrc(&colSrc);
         for (; cursSrc; ++cursSrc)
@@ -126,7 +126,8 @@ namespace tCIDColAlgo
     template<typename  TCol
             , typename TElem = TCol::TMyElemType
             , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
-    tCIDLib::TBoolean bContains(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
+    constexpr tCIDLib::TBoolean
+    bContains(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
     {
         typename TCol::TCursor cursContains(&colContains);
         for (; cursContains; ++cursContains)
@@ -149,7 +150,8 @@ namespace tCIDColAlgo
     template<typename  TCol
             , typename TElem = TCol::TMyElemType
             , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
-    tCIDLib::TBoolean bContainsAll(const TCol& colContains, const TCol& colTest, TComp pfnComp = TComp())
+    constexpr tCIDLib::TBoolean
+    bContainsAll(const TCol& colContains, const TCol& colTest, TComp pfnComp = TComp())
     {
         typename TCol::TCursor cursTest(&colTest);
         typename TCol::TCursor cursContains(&colContains);
@@ -249,7 +251,7 @@ namespace tCIDColAlgo
     template<typename  TCol
             , typename TElem = TCol::TMyElemType
             , typename TComp = tCIDLib::TDefEqComp<typename TCol::TMyElemType>>
-    tCIDLib::TCard4 c4Count(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
+    constexpr tCIDLib::TCard4 c4Count(const TCol& colContains, const TElem& tFind, TComp pfnComp = TComp())
     {
         typename TCol::TCursor cursContains(&colContains);
         tCIDLib::TCard4 c4Ret = 0;

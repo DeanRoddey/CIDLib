@@ -85,6 +85,7 @@ template class CIDLIBEXP THashSet<TString,TStringKeyOps>;
 
 template class CIDLIBEXP TQueue<TLogEvent>;
 
+template class CIDLIBEXP TVector<TFindBuf>;
 template class CIDLIBEXP TVector<TString>;
 template class CIDLIBEXP TVector<TStringId>;
 template class CIDLIBEXP TVector<TKeyValuePair>;

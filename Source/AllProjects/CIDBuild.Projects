@@ -2241,9 +2241,22 @@ PROJECT=XMLDemo1
     END DEPENDENTS
 END PROJECT
 
+
 PROJECT=XMLDemo2
     SETTINGS
         DIRECTORY   = Samples\Basic\XMLDemo2
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDXML
+    END DEPENDENTS
+END PROJECT
+
+
+PROJECT=XMLFormat
+    SETTINGS
+        DIRECTORY   = Samples\Intermediate\XMLFormat
         SAMPLE      = Yes
     END SETTINGS
 

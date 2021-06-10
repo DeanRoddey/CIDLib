@@ -333,6 +333,8 @@ namespace tCIDLib
     using TKValsCollect     = TCollection<TKeyValues>;
     using TStrList          = TVector<TString>;
     using TStrIdList        = TVector<TStringId>;
+    using TFFindList        = TVector<TFindBuf>;
+    using TFFindCollect     = TCollection<TFindBuf>;
     using TKVPList          = TVector<TKeyValuePair>;
     using TKVPFList         = TVector<TKeyValFPair>;
     using TKValsList        = TVector<TKeyValues>;
@@ -423,6 +425,7 @@ extern template class TKeyedHashSet<TCIDGenCacheItem, TString, TStringKeyOps>;
 
 extern template class THashSet<TString,TStringKeyOps>;
 
+extern template class TVector<TFindBuf>;
 extern template class TVector<TString>;
 extern template class TVector<TStringId>;
 extern template class TVector<TKeyValuePair>;

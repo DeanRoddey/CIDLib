@@ -327,7 +327,7 @@ TStringOutStreamImpl::c4WriteBytes( const   tCIDLib::TVoid* const pToWrite
     //  Calc the actual bytes to write and copy the text into the string
     //  object's raw buffer.
     //
-    m_pstrOut->AppendSubStr(static_cast<const tCIDLib::TCh*>(pToWrite), 0, c4ActualChars);
+    m_pstrOut->Append(TStringView(static_cast<const tCIDLib::TCh*>(pToWrite), c4ActualChars));
 
     // Bump up the current position by the chars written
     m_c4CurPos += c4ActualChars;

@@ -219,6 +219,19 @@ namespace tCIDXML
 
 
     // -----------------------------------------------------------------------
+    //  Usec by the PrintTo() method of the tree classes.
+    // -----------------------------------------------------------------------
+    enum class EPrintFmts
+    {
+        Unknown
+        , Pretty
+        , Flat
+
+        , Count
+    };
+
+
+    // -----------------------------------------------------------------------
     //  Used in the facility class' EscapeFor() to indicate what rules should
     //  apply in the escapement processing.
     // -----------------------------------------------------------------------

@@ -230,6 +230,8 @@ class CIDXMLEXP TXMLTreeParser :
 
         const TXMLCatalog& xcatMappings() const;
 
+        const TXMLTreeDecl& xtdeclThis() const;
+
         const TXMLTreeDocument& xtdocThis() const;
 
         const TXMLTreeElement& xtnodeFindPath

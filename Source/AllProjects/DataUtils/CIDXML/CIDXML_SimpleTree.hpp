@@ -213,6 +213,7 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const = 0;
 
 
@@ -294,6 +295,7 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
@@ -375,17 +377,27 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
         // -------------------------------------------------------------------
         //  Public, non-virtual methods
         // -------------------------------------------------------------------
-        const TString& strVersion() const;
+        TString strVersion() const
+        {
+            return m_strVersion;
+        }
 
-        const TString& strEncoding() const;
+        TString strEncoding() const
+        {
+            return m_strEncoding;
+        }
 
-        const TString& strStandalone() const;
+        TString strStandalone() const
+        {
+            return m_strStandalone;
+        }
 
 
     protected :
@@ -467,6 +479,7 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
@@ -557,6 +570,7 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
@@ -963,6 +977,7 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
@@ -1052,6 +1067,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const final;
 
 
@@ -1164,9 +1180,12 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
             , const tCIDLib::TBoolean       bEscape = kCIDLib::False
+            , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
         )   const;
 
         tCIDLib::TVoid Reset();
+
+        const TXMLTreeDecl& xtnodeDecl() const;
 
         const TXMLTreeElement& xtnodeRoot() const;
 

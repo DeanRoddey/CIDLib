@@ -79,6 +79,15 @@ class CIDLIBEXP TStringView
                 m_pszRaw = kCIDLib::pszEmptyZStr;
         }
 
+        constexpr TStringView(const tCIDLib::TCh* const pszRaw, const tCIDLib::TCard4 c4Len) :
+
+            m_c4RawLen(c4Len)
+            , m_pszRaw(pszRaw)
+        {
+            if (pszRaw == nullptr)
+                m_pszRaw = kCIDLib::pszEmptyZStr;
+        }
+
         constexpr TStringView(const TString& strObj) :
 
             m_pstrObj(&strObj)
@@ -93,11 +102,6 @@ class CIDLIBEXP TStringView
         {
             if (m_pstrObj == nullptr)
                 m_pstrObj = &TString::strEmpty();
-        }
-
-        template <tCIDLib::TCard4 c4Sz> constexpr TStringView(const tCIDLib::TCh(&aChars)[c4Sz])
-        {
-            m_pszRaw = aChars;
         }
 
         TStringView(const TStringView&) = default;

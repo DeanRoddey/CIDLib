@@ -3547,7 +3547,7 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
             ::DeleteObject(hrgnOld);
 
         TString strMsg(L"rounded rect region (");
-        strMsg.Append(areaToSet);
+        strMsg.AppendFormatted(areaToSet);
         strMsg.Append(L")");
         facCIDGraphDev().ThrowKrnlErr
         (

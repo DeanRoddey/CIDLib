@@ -935,10 +935,20 @@ class TVector : public TCollection<TElem>
         }
 
 
-        tCIDLib::TCard4 c4CurAlloc() const
+        [[nodiscard]] tCIDLib::TCard4 c4CurAlloc() const
         {
             TLocker lockrCol(this);
             return m_c4CurAlloc;
+        }
+
+        [[nodiscard]] TCursor cursThis() const
+        {
+            return TCursor(this);
+        }
+
+        [[nodiscard]] TNCCursor cursThisNC()
+        {
+            return TNCCursor(this);
         }
 
         tCIDLib::TVoid CheckExpansion(const tCIDLib::TCard4 c4NewElems)
