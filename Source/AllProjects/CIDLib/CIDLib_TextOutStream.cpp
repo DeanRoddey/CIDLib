@@ -1078,6 +1078,27 @@ TTextOutStream::WriteChars( const   tCIDLib::TCh* const pszToWrite
 }
 
 
+//
+//  Finds the body of the text, inside any leading/trailing text, and writes those character
+//  out. Doesn't honor formatting.
+//
+tCIDLib::TVoid TTextOutStream::WriteTextBody(const TStringView& strvSrc)
+{
+    tCIDLib::TCard4 c4Start;
+    tCIDLib::TCard4 c4End;
+    const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody
+    (
+        strvSrc.pszBuffer(), c4Start, c4End, strvSrc.bHaveLength() ? strvSrc.c4Length() : kCIDLib::c4MaxCard
+    );
+
+    if (bRes)
+    {
+        // There is some actual text, so call WriteChars to write it out
+        WriteChars(strvSrc.pszBufferAt(c4Start), c4End - c4Start);
+    }
+}
+
+
 
 // ---------------------------------------------------------------------------
 //  TTextOutStream: Hidden constructors

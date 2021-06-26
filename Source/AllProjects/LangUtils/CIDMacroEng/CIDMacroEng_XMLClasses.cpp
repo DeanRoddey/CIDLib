@@ -1250,7 +1250,13 @@ TMEngXMLTreeParserInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
             // Get the stream value object
             TMEngTextOutStreamVal& mecvTarget
                     = meOwner.mecvStackAtAs<TMEngTextOutStreamVal>(c4FirstInd + 1);
-            xtnodeTar.PrintTo(mecvTarget.strmTarget(meOwner), 4, kCIDLib::True);
+            xtnodeTar.PrintTo
+            (
+                mecvTarget.strmTarget(meOwner)
+                , 4
+                , tCIDXML::EPrintFmts::Pretty
+                , tCIDXML::EPrintOpts::Escape
+            );
         }
 
         catch(TError& errToCatch)

@@ -537,6 +537,11 @@ class CIDLIBEXP TTextOutStream : public TObject
             , const tCIDLib::TCard4         c4Len = 0
         );
 
+        tCIDLib::TVoid WriteTextBody
+        (
+            const   TStringView&            strvSrc
+        );
+
 
     protected :
         // -------------------------------------------------------------------

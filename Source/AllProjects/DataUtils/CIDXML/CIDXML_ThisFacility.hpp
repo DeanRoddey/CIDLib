@@ -77,6 +77,15 @@ class CIDXMLEXP TFacCIDXML : public TFacility
             const   TStringView&            strvInText
             ,       TTextOutStream&         strmOut
             , const tCIDXML::EEscTypes      eType
+            , const tCIDLib::TBoolean       bSkipLTSpace = kCIDLib::False
+        );
+
+        tCIDLib::TVoid EscapeFor
+        (
+            const   tCIDLib::TCh* const     pszStart
+            , const tCIDLib::TCard4         c4Count
+            ,       TTextOutStream&         strmOut
+            , const tCIDXML::EEscTypes      eType
         );
 
         tCIDLib::TVoid EscapeFor
@@ -84,6 +93,7 @@ class CIDXMLEXP TFacCIDXML : public TFacility
             const   TStringView&            strvInText
             ,       TString&                strOutText
             , const tCIDXML::EEscTypes      eType
+            , const tCIDLib::TBoolean       bSkipLTSpace = kCIDLib::False
         );
 
         tCIDLib::TVoid EscapeFor

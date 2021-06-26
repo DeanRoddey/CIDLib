@@ -76,9 +76,12 @@ static tCIDLib::TVoid ShowUsage()
                L"          /IgnoreBadChars\n"
                L"          /Encoding=xxx\n"
                L"          /Validate\n"
-               L"          /IgnoreDTD\n\n"
+               L"          /IgnoreDTD\n"
+               L"          /IgnoreLTSpace\n\n"
                L"   If no output file, output is to the console\n"
-               L"   Encoding is only used if outputing to a file"
+               L"   Encoding is only used if outputing to a file\n\n"
+               L"   IgnoreLTSpace ignores leading/trailing white space\n"
+               L"   in text nodes for output, which is often useful.\n\n"
             << kCIDLib::NewEndLn;
 }
 
@@ -91,7 +94,8 @@ static tCIDLib::TVoid ShowUsage()
 //
 static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
                                 , const TString&            strFile
-                                , const tCIDXML::EParseOpts eOpts
+                                , const tCIDXML::EParseOpts eParseOpts
+                                , const tCIDXML::EPrintOpts ePrintOpts
                                 ,       TTextOutStream&     strmOut)
 {
     try
@@ -103,14 +107,12 @@ static tCIDLib::TVoid DoParse(          TXMLTreeParser&     xtprsToUse
         //  here we are writing it back out so we want it all.
         //
         if (xtprsToUse.bParseRootEntity(strFile
-                                        , eOpts
+                                        , eParseOpts
                                         , tCIDXML::EParseFlags::All))
         {
-            //
-            //  It worked, so format it back out to the output passed output stream, We
-            //  just dump the top level document and it all recursively formats out.
-            //
-            strmOut << xtprsToUse.xtdocThis() << kCIDLib::NewEndLn;
+            //  It worked, so format it back out to the output passed output stream,
+            xtprsToUse.xtdocThis().PrintTo(strmOut, 0, tCIDXML::EPrintFmts::Pretty, ePrintOpts);
+            strmOut << kCIDLib::NewEndLn;
         }
          else
         {
@@ -148,7 +150,8 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
 
     // Parse our parameters, some are defaulted
     tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
-    tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
+    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::Escape;
+    tCIDXML::EParseOpts eParseOpts = tCIDXML::EParseOpts::None;
     TString             strInFileParm;
     TString             strOutFileParm;
     TString             strEncoding;
@@ -175,11 +178,13 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
         //  since our enums are IDL generated and support that.
         //
         if (cmdlLoad.bFindOption(L"IgnoreBadChars"))
-            eOptsToUse |= tCIDXML::EParseOpts::IgnoreBadChars;
+            eParseOpts |= tCIDXML::EParseOpts::IgnoreBadChars;
         if (cmdlLoad.bFindOption(L"IgnoreDTD"))
-            eOptsToUse |= tCIDXML::EParseOpts::IgnoreDTD;
+            eParseOpts |= tCIDXML::EParseOpts::IgnoreDTD;
         if (cmdlLoad.bFindOption(L"Validate"))
-            eOptsToUse |= tCIDXML::EParseOpts::Validate;
+            eParseOpts |= tCIDXML::EParseOpts::Validate;
+        if (cmdlLoad.bFindOption(L"IgnoreLTSpace"))
+            ePrintOpts |= tCIDXML::EPrintOpts::StripLTSpace;
 
         // If any left, they are unknown ones
         if (!cmdlLoad.bIsEmpty())
@@ -222,7 +227,7 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
 
     // And do the parse and output, passing along options and target stream
     TXMLTreeParser xtprsToUse;
-    DoParse(xtprsToUse, strInFileParm, eOptsToUse, *pstrmOut);
+    DoParse(xtprsToUse, strInFileParm, eParseOpts, ePrintOpts, *pstrmOut);
 
     return tCIDLib::EExitCodes::Normal;
 }

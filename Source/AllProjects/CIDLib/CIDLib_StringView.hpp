@@ -161,6 +161,12 @@ class CIDLIBEXP TStringView
             , const tCIDLib::TBoolean       bCaseSensitive = kCIDLib::False
         )   const noexcept;
 
+        [[nodiscard]] tCIDLib::TBoolean bFindTextBody
+        (
+            const   tCIDLib::TCh*&          pszStart
+            , const tCIDLib::TCh*&          pszEnd
+        )   const;
+
         [[nodiscard]] constexpr tCIDLib::TBoolean bIsEmpty() const
         {
             if (m_pstrObj)

@@ -37,7 +37,6 @@
 RTTIDecls(TFacCIDXML,TFacility)
 
 
-
 // ---------------------------------------------------------------------------
 //   CLASS: TFacCIDXML
 //  PREFIX: fac
@@ -124,54 +123,89 @@ TFacCIDXML::~TFacCIDXML()
 tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TTextOutStream&     strmOut
-                        , const tCIDXML::EEscTypes  eType)
+                        , const tCIDXML::EEscTypes  eType
+                        , const tCIDLib::TBoolean   bSkipLTSpace)
 {
     //
-    //  Loop through the in text and for each character, either move it over
-    //  to the output or escape it, according to the escape type.
+    //  Get the start/end pointers. If skipping leading/trailing space we have to probe
+    //  the source text for those points.
     //
-    const tCIDLib::TCard4 c4SrcCount = strvInText.c4Length();
-    const tCIDLib::TCh* const pszInText = strvInText.pszBuffer();
-    for (tCIDLib::TCard4 c4Index = 0; c4Index < c4SrcCount; c4Index++)
+    const tCIDLib::TCh* pszStart = nullptr;
+    tCIDLib::TCard4 c4Count = kCIDLib::c4MaxCard;
+    if (bSkipLTSpace)
     {
-        const tCIDLib::TCh chCur = pszInText[c4Index];
+        //  If there is no non-space text, we are done
+        const tCIDLib::TCh* pszEnd = nullptr;
+        if (!strvInText.bFindTextBody(pszStart, pszEnd))
+            return;
 
+        c4Count = pszEnd - pszStart;
+    }
+    else
+    {
+        pszStart = strvInText.pszBuffer();
+
+        //
+        //  If we have the length already, get the end, else leave null and we will just
+        //  break out on the null.
+        //
+        if (strvInText.bHaveLength())
+            c4Count = strvInText.c4Length();
+    }
+
+    EscapeFor(pszStart, c4Count, strmOut, eType);
+}
+
+
+// Count can be max card and we'll just look for the null
+tCIDLib::TVoid
+TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszStart
+                        , const tCIDLib::TCard4     c4Count
+                        ,       TTextOutStream&     strmOut
+                        , const tCIDXML::EEscTypes  eType)
+{
+    const tCIDLib::TCh* pszCur = pszStart;
+    const tCIDLib::TCh* pszEnd = (c4Count == kCIDLib::c4MaxCard) ? nullptr : pszStart + c4Count;
+
+    // Loop at worst till we hit the null (or break out below at the end)
+    while (*pszCur)
+    {
+        const tCIDLib::TCh chCur = *pszCur++;
+
+        tCIDLib::TCard4 c4EscLen = 0;
         const tCIDLib::TCh* pszEsc = nullptr;
-        switch(eType)
-        {
-            case tCIDXML::EEscTypes::Attribute :
-            {
-                if (chCur == kCIDLib::chApostrophe)
-                    pszEsc = L"&apos;";
-                else if (chCur == kCIDLib::chQuotation)
-                    pszEsc = L"&quot;";
-                else if (chCur == kCIDLib::chAmpersand)
-                    pszEsc = L"&amp;";
-                else if (chCur == kCIDLib::chLessThan)
-                    pszEsc = L"&lt;";
-                break;
-            }
 
-            case tCIDXML::EEscTypes::ElemText :
-            {
-                if (chCur == kCIDLib::chLessThan)
-                    pszEsc = L"&lt;";
-                else if (chCur == kCIDLib::chAmpersand)
-                    pszEsc = L"&amp;";
+        switch(chCur)
+        {
+            case kCIDLib::chApostrophe :
+                pszEsc = L"&apos;";
                 break;
-            }
+
+            case kCIDLib::chQuotation :
+                pszEsc = L"&quot;";
+                break;
+
+            case kCIDLib::chAmpersand :
+                pszEsc = L"&amp;";
+                break;
+
+            case kCIDLib::chLessThan :
+                pszEsc = L"&lt;";
+                break;
 
             default :
-            {
-                // <TBD> Throw something
                 break;
-            }
         };
 
+        // If we got an escape, write that out, else write out the character
         if (pszEsc)
-            strmOut << pszEsc;
+            strmOut.WriteChars(pszEsc, c4EscLen);
         else
             strmOut << chCur;
+
+        // If we have an end and have reached it, we are done
+        if (pszEnd && (pszCur >= pszEnd))
+            break;
     }
 }
 
@@ -179,7 +213,8 @@ TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
 tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TString&            strOutText
-                        , const tCIDXML::EEscTypes  eType)
+                        , const tCIDXML::EEscTypes  eType
+                        , const tCIDLib::TBoolean   bSkipLTSpace)
 {
     //
     //  Set up an output stream on the output text, and call the other
@@ -187,7 +222,7 @@ TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
     //
     TTextStringOutStream strmOut(&strOutText);
     strmOut.Reset();
-    EscapeFor(strvInText, strmOut, eType);
+    EscapeFor(strvInText, strmOut, eType, bSkipLTSpace);
 }
 
 
@@ -218,6 +253,8 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh        chInText
                 pszEsc = L"&lt;";
             else if (chInText == kCIDLib::chAmpersand)
                 pszEsc = L"&amp;";
+            else if (chInText == kCIDLib::chQuotation)
+                pszEsc = L"&quot;";
             break;
         }
 
@@ -250,7 +287,7 @@ TFacCIDXML::FormatAttr(          TTextOutStream&    strmOut
     if (bSpaceBefore)
         strmOut << L' ';
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue, strmOut, tCIDXML::EEscTypes::Attribute);
+    EscapeFor(strvValue, strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
     strmOut << L"\"";
 }
 
@@ -268,7 +305,7 @@ TFacCIDXML::FormatAttrNL(       TTextOutStream&     strmOut
     if (bSpaceBefore)
         strmOut << L' ';
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
     strmOut << L"\"";
 
     // And the put out a new line
@@ -286,7 +323,7 @@ TFacCIDXML::NLFormatAttr(       TTextOutStream&     strmOut
     strmOut << kCIDLib::NewLn;
 
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute);
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
     strmOut << L"\"";
 
     if (bSpaceAfter)
@@ -304,7 +341,7 @@ TFacCIDXML::FormatTextElem(         TTextOutStream&     strmOut
                             , const TStringView&        strvElemText)
 {
     strmOut << L'<' << strvElemName << L'>';
-    EscapeFor(strvElemText, strmOut, tCIDXML::EEscTypes::ElemText);
+    EscapeFor(strvElemText, strmOut, tCIDXML::EEscTypes::ElemText, kCIDLib::False);
     strmOut << L"</" << strvElemName << L'>';
 }
 

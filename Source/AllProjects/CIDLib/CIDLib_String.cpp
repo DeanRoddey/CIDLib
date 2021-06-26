@@ -1414,6 +1414,32 @@ TString::bExtractNthToken(  const   tCIDLib::TCard4     c4TokInd
 
 
 //
+//  Returns pointers to the text inside any leading/trailing text. If none, then returns False,
+//  else returns true and sets the pointers.
+//
+tCIDLib::TBoolean TString::bFindTextBody(const  tCIDLib::TCh*&  pszStart
+                                        , const tCIDLib::TCh*&  pszEnd) const
+{
+    tCIDLib::TCard4 c4Start;
+    tCIDLib::TCard4 c4End;
+    const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody(pszBuffer(), c4Start, c4End, c4Length());
+
+    if (bRes)
+    {
+        pszStart = pszBufferAt(c4Start);
+        pszEnd = pszBufferAt(c4End);
+    }
+     else
+    {
+        pszStart = nullptr;
+        pszEnd = nullptr;
+    }
+    return bRes;
+}
+
+
+
+//
 //  This method will return a list of all of the token characters found
 //  in the passed source string. It returns a string of the characters
 //  found. If a token is found more than once, it's in the list more than
@@ -4676,6 +4702,46 @@ tCIDLib::TVoid TString::TStrBuf::Clear() noexcept
 {
     m_c4CurEnd = 0;
     m_pszBuffer[0] = kCIDLib::chNull;
+}
+
+
+//
+//  Copy in the source content without any leading or trailing space. This can be
+//  an append or overwrite.
+//
+tCIDLib::TVoid TString::TStrBuf::CopyWithoutSpace(  const   TStringView&        strvSrc
+                                                    , const tCIDLib::TBoolean   bAppend)
+{
+    // if not appending, then clear our contents no matter what
+    if (!bAppend)
+        Clear();
+
+    // Find the start and end indicies
+    tCIDLib::TCard4 c4Start, c4End;
+    const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody
+    (
+        strvSrc.pszBuffer(), c4Start, c4End, strvSrc.bHaveLength() ? strvSrc.c4Length() : kCIDLib::c4MaxCard
+    );
+
+    if (bRes)
+    {
+        // Make sure we have the needed capacity, keeping any previous content
+        const tCIDLib::TCard4 c4AddedCnt = c4End - c4Start;
+        ExpandBy(c4AddedCnt, kCIDLib::True);
+
+        // We start out at the end of our content
+        tCIDLib::TCh* pszTar = pszAtEnd();
+        const tCIDLib::TCh* pszStart = strvSrc.pszBufferAt(c4Start);
+        const tCIDLib::TCh* pszEnd = strvSrc.pszBufferAt(c4End);
+        while (pszStart < pszEnd)
+            *pszTar++ = *pszStart++;
+
+        // Cap it off again
+        *pszTar = kCIDLib::chNull;
+
+        // And bump our current end
+        m_c4CurEnd += c4AddedCnt;
+    }
 }
 
 

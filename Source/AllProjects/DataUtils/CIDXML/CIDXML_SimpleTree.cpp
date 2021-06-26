@@ -84,7 +84,7 @@ TXMLTreeNode::TXMLTreeNode(const tCIDXML::ENodeTypes eType) :
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TXMLTreeNode::FormatTo(TTextOutStream& strmDest) const
 {
-    PrintTo(strmDest, 0, kCIDLib::True);
+    PrintTo(strmDest, 0, tCIDXML::EPrintFmts::Pretty, tCIDXML::EPrintOpts::Escape);
 }
 
 
@@ -409,8 +409,8 @@ const TString& TXMLTreeComment::strText() const
 tCIDLib::TVoid
 TXMLTreeComment::PrintTo(       TTextOutStream&     strmTarget
                         , const tCIDLib::TCard4     c4Indent
-                        , const tCIDLib::TBoolean
-                        , const tCIDXML::EPrintFmts eFormat) const
+                        , const tCIDXML::EPrintFmts eFormat
+                        , const tCIDXML::EPrintOpts) const
 {
     const tCIDLib::TCard4 c4RealInd = (eFormat == tCIDXML::EPrintFmts::Pretty) ? c4Indent : 0;
     strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4)
@@ -459,23 +459,23 @@ TXMLTreeDecl::~TXMLTreeDecl()
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TXMLTreeDecl::PrintTo(       TTextOutStream&     strmTarget
                                     , const tCIDLib::TCard4     c4Indent
-                                    , const tCIDLib::TBoolean
-                                    , const tCIDXML::EPrintFmts eFormat) const
+                                    , const tCIDXML::EPrintFmts eFormat
+                                    , const tCIDXML::EPrintOpts) const
 {
     const tCIDLib::TCard4 c4RealInd = (eFormat == tCIDXML::EPrintFmts::Pretty) ? c4Indent : 0;
     strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4)
-                << L"<?xml version='" << m_strVersion << L"'";
+                << L"<?xml version=\"" << m_strVersion << L'"';
 
     //
     //  Note that we don't use the encoding in the original decl. We use the
     //  encoding set on the passed stream because that insures what we put
     //  out matches reality.
     //
-    strmTarget << L" encoding='" << strmTarget.strEncodingName() << L"'";
+    strmTarget << L" encoding=\"" << strmTarget.strEncodingName() << L'"';
 
     if (!m_strStandalone.bIsEmpty())
-        strmTarget << L" standalone='" << m_strStandalone << L"'";
-    strmTarget << L" ?>";
+        strmTarget << L" standalone=\"" << m_strStandalone << L'"';
+    strmTarget << L"?>";
 
     if (eFormat == tCIDXML::EPrintFmts::Pretty)
         strmTarget << kCIDLib::NewLn;
@@ -546,8 +546,8 @@ const TString& TXMLTreeDTD::strSystemId() const
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid TXMLTreeDTD::PrintTo(        TTextOutStream&     strmTarget
                                     , const tCIDLib::TCard4     c4Indent
-                                    , const tCIDLib::TBoolean
-                                    , const tCIDXML::EPrintFmts eFormat) const
+                                    , const tCIDXML::EPrintFmts eFormat
+                                    , const tCIDXML::EPrintOpts) const
 {
     // <TBD> We should be honoring the escape flag here?
     const tCIDLib::TCard4 c4RealInd = (eFormat == tCIDXML::EPrintFmts::Pretty) ? c4Indent : 0;
@@ -560,13 +560,13 @@ tCIDLib::TVoid TXMLTreeDTD::PrintTo(        TTextOutStream&     strmTarget
     {
         if (bPubId)
         {
-            strmTarget << L" PUBLIC '" << m_strPublicId << L"'";
+            strmTarget << L" PUBLIC \"" << m_strPublicId << L'"';
             if (bSysId)
-                strmTarget << L" '" << m_strSystemId << L"'";
+                strmTarget << L" \"" << m_strSystemId << L'"';
         }
          else
         {
-            strmTarget << L" SYSTEM '" << m_strSystemId << L"'";
+            strmTarget << L" SYSTEM \"" << m_strSystemId << L'"';
         }
     }
     strmTarget << L">";
@@ -628,8 +628,8 @@ TXMLTreeElement::~TXMLTreeElement()
 tCIDLib::TVoid
 TXMLTreeElement::PrintTo(       TTextOutStream&     strmTarget
                         , const tCIDLib::TCard4     c4Indent
-                        , const tCIDLib::TBoolean   bEscape
-                        , const tCIDXML::EPrintFmts eFormat) const
+                        , const tCIDXML::EPrintFmts eFormat
+                        , const tCIDXML::EPrintOpts eOpts) const
 {
     const tCIDLib::TCard4 c4RealInd = (eFormat == tCIDXML::EPrintFmts::Pretty) ? c4Indent : 0;
     strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4)
@@ -643,44 +643,83 @@ TXMLTreeElement::PrintTo(       TTextOutStream&     strmTarget
             const TXMLTreeAttr* pxtattrCur = m_pcolAttrs->pobjAt(c4Index);
             strmTarget << L" " << pxtattrCur->strQName() << L"=\"";
 
-            if (bEscape)
-            {
-                facCIDXML().EscapeFor
-                (
-                    pxtattrCur->strValue(), strmTarget, tCIDXML::EEscTypes::Attribute
-                );
-            }
-             else
-            {
-                strmTarget << pxtattrCur->strValue();
-            }
+            if (tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::Escape))
+                facCIDXML().EscapeFor(pxtattrCur->strValue(), strmTarget, tCIDXML::EEscTypes::Attribute);
+            else
+                 strmTarget << pxtattrCur->strValue();
 
             strmTarget << L"\"";
         }
     }
 
     c4Count = c4ChildCount();
-    if (c4Count)
+    if (c4Count == 0)
+    {
+        // Empty so just cap it off
+        strmTarget << L"/>";
+        if (eFormat == tCIDXML::EPrintFmts::Pretty)
+            strmTarget << kCIDLib::NewLn;
+    }
+     else if ((c4Count == 1) && (m_pcolChildren->pobjAt(0)->eType() == tCIDXML::ENodeTypes::Text))
+    {
+
+        const TXMLTreeText* pxtnodeText = static_cast<const TXMLTreeText*>(m_pcolChildren->pobjAt(0));
+
+        const tCIDLib::TCh* pszStart = nullptr;
+        const tCIDLib::TCh* pszEnd = nullptr;
+        if (tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::StripLTSpace))
+        {
+            tCIDLib::IgnoreRet(pxtnodeText->strText().bFindTextBody(pszStart, pszEnd));
+        }
+         else
+        {
+            pszStart = pxtnodeText->strText().pszBuffer();
+            pszEnd = pxtnodeText->strText().pszEnd();
+        }
+        const tCIDLib::TCard4 c4Count = pszEnd - pszStart;
+
+        // If wrapping is not disabled and we aren't in flat mode, and length is > 64, then wrap
+        const tCIDLib::TBoolean bWrap
+        (
+            (c4Count > 64)
+            && !tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::NoWrap)
+            && (eFormat != tCIDXML::EPrintFmts::Flat)
+        );
+
+        strmTarget << L">";
+        if (bWrap)
+            strmTarget << kCIDLib::NewLn;
+
+        if (c4Count)
+        {
+            if (tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::Escape))
+                facCIDXML().EscapeFor(pszStart, c4Count, strmTarget, tCIDXML::EEscTypes::ElemText);
+            else
+                strmTarget.WriteChars(pszStart, c4Count);
+        }
+
+        if (bWrap)
+        {
+            strmTarget << kCIDLib::NewLn;
+            strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4);
+        }
+
+        strmTarget << L"</" << m_strQName << L">";
+        if (eFormat == tCIDXML::EPrintFmts::Pretty)
+            strmTarget << kCIDLib::NewLn;
+    }
+     else if (c4Count)
     {
         strmTarget << L">";
         if (eFormat == tCIDXML::EPrintFmts::Pretty)
             strmTarget << kCIDLib::NewLn;
 
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-            m_pcolChildren->pobjAt(c4Index)->PrintTo(strmTarget, c4Indent + 1, bEscape, eFormat);
-
-        if (eFormat == tCIDXML::EPrintFmts::Pretty)
-            strmTarget << kCIDLib::NewLn;
+            m_pcolChildren->pobjAt(c4Index)->PrintTo(strmTarget, c4Indent + 1, eFormat, eOpts);
 
         strmTarget  << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4)
                     << L"</" << m_strQName << L">";
 
-        if (eFormat == tCIDXML::EPrintFmts::Pretty)
-            strmTarget << kCIDLib::NewLn;
-    }
-     else
-    {
-        strmTarget << L"/>";
         if (eFormat == tCIDXML::EPrintFmts::Pretty)
             strmTarget << kCIDLib::NewLn;
     }
@@ -1096,7 +1135,7 @@ TXMLTreeElement::xtnodeChildAtAsPI(const tCIDLib::TCard4 c4Index) const
     }
 
     // Its ok, so do the cast and return
-    return *reinterpret_cast<const TXMLTreePI*>(pxtnodeRet);
+    return *static_cast<const TXMLTreePI*>(pxtnodeRet);
 }
 
 const TXMLTreeText&
@@ -1135,7 +1174,7 @@ TXMLTreeElement::xtnodeChildAtAsText(const tCIDLib::TCard4 c4Index) const
     }
 
     // Its ok, so do the cast and return
-    return *reinterpret_cast<const TXMLTreeText*>(pxtnodeRet);
+    return *static_cast<const TXMLTreeText*>(pxtnodeRet);
 }
 
 
@@ -1541,8 +1580,8 @@ TXMLTreePI::~TXMLTreePI()
 tCIDLib::TVoid
 TXMLTreePI::PrintTo(        TTextOutStream&     strmTarget
                     , const tCIDLib::TCard4     c4Indent
-                    , const tCIDLib::TBoolean
-                    , const tCIDXML::EPrintFmts eFormat) const
+                    , const tCIDXML::EPrintFmts eFormat
+                    , const tCIDXML::EPrintOpts) const
 {
     // <TBD> We should be honoring the escape flag here?
 
@@ -1613,35 +1652,39 @@ TXMLTreeText::~TXMLTreeText()
 tCIDLib::TVoid
 TXMLTreeText::PrintTo(          TTextOutStream&     strmTarget
                         , const tCIDLib::TCard4     c4Indent
-                        , const tCIDLib::TBoolean   bEscape
-                        , const tCIDXML::EPrintFmts eFormat) const
+                        , const tCIDXML::EPrintFmts eFormat
+                        , const tCIDXML::EPrintOpts eOpts) const
 {
     if (!m_bIsIgnorable)
     {
-        // If in flat mode, never show the space
-        tCIDLib::TBoolean bShow = kCIDLib::False;
-        if (eFormat != tCIDXML::EPrintFmts::Flat)
+        //
+        //  If in flat mode or we are ignoring lead/trailing space, then find the body text
+        //  inside any leading/trailing bits. Else take the whole thing.
+        //
+        const tCIDLib::TCh* pszStart = nullptr;
+        const tCIDLib::TCh* pszEnd = nullptr;
+        tCIDLib::TBoolean bRes = kCIDLib::False;
+        if ((eFormat == tCIDXML::EPrintFmts::Flat) || tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::StripLTSpace))
         {
-            const tCIDLib::TCard4 c4Count = m_strText.c4Length();
-            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
-            {
-                if (!TRawStr::bIsSpace(m_strText[c4Index]))
-                {
-                    bShow = kCIDLib::True;
-                    break;
-                }
-            }
+            // If it doesn't find any non-space text, then nothing to do
+            if (!m_strText.bFindTextBody(pszStart, pszEnd))
+                return;
+        }
+         else
+        {
+            pszStart = m_strText.pszBuffer();
+            pszEnd = m_strText.pszEnd();
         }
 
-        // Escape the text if asked to, else just show it as is
-        if (bShow)
+        const tCIDLib::TCard4 c4Count = pszEnd - pszStart;
+        if (c4Count)
         {
             const tCIDLib::TCard4 c4RealInd = (eFormat == tCIDXML::EPrintFmts::Pretty) ? c4Indent : 0;
             strmTarget << TTextOutStream::RepChars(kCIDLib::chSpace, c4RealInd * 4);
-            if (bEscape)
-                facCIDXML().EscapeFor(m_strText, strmTarget, tCIDXML::EEscTypes::ElemText);
+            if (tCIDLib::bAllBitsOn(eOpts, tCIDXML::EPrintOpts::Escape))
+                facCIDXML().EscapeFor(pszStart, c4Count, strmTarget, tCIDXML::EEscTypes::ElemText);
             else
-                strmTarget << m_strText;
+                strmTarget.WriteChars(pszStart, c4Count);
         }
     }
 }
@@ -1689,32 +1732,18 @@ const TString& TXMLTreeText::strText() const
 // ---------------------------------------------------------------------------
 //  TXMLTreeText: Hidden constructors
 // ---------------------------------------------------------------------------
-TXMLTreeText::TXMLTreeText( const   tCIDLib::TCh* const pszText
+TXMLTreeText::TXMLTreeText( const   TStringView&        strvText
                             , const tCIDLib::TBoolean   bIsCDATA
                             , const tCIDLib::TBoolean   bIsIgnorable) :
 
     TXMLTreeNode(tCIDXML::ENodeTypes::Text)
     , m_bIsCDATA(bIsCDATA)
     , m_bIsIgnorable(bIsIgnorable)
-    , m_strText(1024UL)
+    , m_strText()
 {
-    m_strText = pszText;
-}
-
-
-TXMLTreeText::TXMLTreeText( const   TString&            strText
-                            , const tCIDLib::TBoolean   bIsCDATA
-                            , const tCIDLib::TBoolean   bIsIgnorable) :
-
-    TXMLTreeNode(tCIDXML::ENodeTypes::Text)
-    , m_bIsCDATA(bIsCDATA)
-    , m_bIsIgnorable(bIsIgnorable)
-    , m_strText
-      (
-        (strText.c4Length() < 1024) ? 1024UL : strText.c4Length()
-      )
-{
-    m_strText = strText;
+    // If CDATA gotta take it as is
+    if (bIsCDATA && !bIsIgnorable)
+        m_strText = strvText;
 }
 
 
@@ -1722,13 +1751,15 @@ TXMLTreeText::TXMLTreeText( const   TString&            strText
 //  TXMLTreeText: Protected methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TXMLTreeText::Set(  const   TString&            strText
+TXMLTreeText::Set(  const   TStringView&        strvText
                     , const tCIDLib::TBoolean   bIsCDATA
                     , const tCIDLib::TBoolean   bIsIgnorable)
 {
     m_bIsCDATA = bIsCDATA;
     m_bIsIgnorable = bIsIgnorable;
-    m_strText = strText;
+
+    if (bIsCDATA && !bIsIgnorable)
+        m_strText = strvText;
 }
 
 
@@ -1861,8 +1892,8 @@ TXMLTreeElement& TXMLTreeDocument::xtnodeRoot()
 tCIDLib::TVoid
 TXMLTreeDocument::PrintTo(          TTextOutStream&     strmTarget
                             , const tCIDLib::TCard4
-                            , const tCIDLib::TBoolean   bEscape
-                            , const tCIDXML::EPrintFmts eFormat) const
+                            , const tCIDXML::EPrintFmts eFormat
+                            , const tCIDXML::EPrintOpts eOpts) const
 {
     //
     //  Iterate our children and print each one of them. Everything here is
@@ -1873,7 +1904,7 @@ TXMLTreeDocument::PrintTo(          TTextOutStream&     strmTarget
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ChildCount; c4Index++)
     {
         const TXMLTreeNode& xtnodeCur = *m_pcolChildren->pobjAt(c4Index);
-        xtnodeCur.PrintTo(strmTarget, 0, bEscape, eFormat);
+        xtnodeCur.PrintTo(strmTarget, 0, eFormat, eOpts);
 
         strmTarget.Flush();
     }
@@ -1903,7 +1934,7 @@ tCIDLib::TVoid TXMLTreeDocument::AddChild(TXMLTreeNode* const pxtnodeToAdopt)
 
 tCIDLib::TVoid TXMLTreeDocument::FormatTo(TTextOutStream& strmDest) const
 {
-    PrintTo(strmDest, 0, kCIDLib::True);
+    PrintTo(strmDest, 0, tCIDXML::EPrintFmts::Pretty, tCIDXML::EPrintOpts::Escape);
 }
 
 

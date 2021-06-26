@@ -599,6 +599,15 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
             return kCIDLib::True;
         }
 
+        TCursor cursThis() const
+        {
+            return TCursor(this);
+        }
+
+        TNCCursor cursThis()
+        {
+            return TNCCursor(this);
+        }
 
         tCIDLib::TVoid DiscardBottom()
         {

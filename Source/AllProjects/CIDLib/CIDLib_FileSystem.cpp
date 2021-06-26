@@ -105,8 +105,7 @@ FindFiles(  const   TString&                    strWildCard
     //  We found some, so iterate the bag of child directories and
     //  recurse for each one.
     //
-    TFindBuf::TNCCursor cursChildren = fndbTarget.cursChildrenNC();
-    for (; cursChildren; ++cursChildren)
+    for (auto cursChildren = fndbTarget.cursChildrenNC(); cursChildren; ++cursChildren)
     {
         //  If this one is a directory, then search it.
         TFindBuf& fndbCur = *cursChildren;
@@ -150,15 +149,13 @@ static tCIDLib::TVoid FindDirs( const   TString&            strWildCard
     //  We found some, so iterate the bag of child directories and
     //  recurse for each one.
     //
-    TFindBuf::TNCCursor cursChildren = fndbTarget.cursChildrenNC();
-    for (; cursChildren; ++cursChildren)
+    for (auto cursChildren = fndbTarget.cursChildrenNC(); cursChildren; ++cursChildren)
         FindDirs(strWildCard, *cursChildren, c4Matches);
 }
 
 
 //  A recursive helper for the RemovePath() method.
-static tCIDLib::TVoid
-FSTreeDelete(const TString& strStartDir, const tCIDLib::ETreeDelModes eMode)
+static tCIDLib::TVoid FSTreeDelete(const TString& strStartDir, const tCIDLib::ETreeDelModes eMode)
 {
     TDirIter diterCur;
     TFindBuf fndbCur;
@@ -690,6 +687,8 @@ TFileSys::c4SearchDir(  const   TString&                    strPath
                         ,       TCollection<TFindBuf>&      colTarget
                         , const tCIDLib::EDirSearchFlags    eFlags)
 {
+    colTarget.RemoveAll();
+
     TPathStr    pathToSearch(strPath);
     pathToSearch.AddLevel(strWildCard);
     return c4SearchDir(pathToSearch, colTarget, eFlags);
@@ -700,6 +699,8 @@ TFileSys::c4SearchDir(  const   TString&                    strPath
                         ,       TCollection<TFindBuf>&      colTarget
                         , const tCIDLib::EDirSearchFlags    eFlags)
 {
+    colTarget.RemoveAll();
+
     tCIDLib::TCard4 c4Matches = 0;
     TFindBuf        fndBuf;
     TDirIter        iterSearch;

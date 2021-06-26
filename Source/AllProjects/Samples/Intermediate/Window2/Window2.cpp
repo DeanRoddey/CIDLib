@@ -82,8 +82,16 @@ class TClientWnd : public TWindow
         }
 
         TClientWnd(const TClientWnd&) = delete;
+        TClientWnd(TClientWnd&&) = delete;
 
         ~TClientWnd() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TClientWnd& operator=(const TClientWnd&) = delete;
+        TClientWnd& operator=(TClientWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -155,12 +163,13 @@ class TClientWnd : public TWindow
             &&  (eClickType == tCIDCtrls::EMouseClicks::Down))
             {
                 // Find one that includes the click point
-                TVector<TClickPnt>::TCursor cursPoints(&m_colPoints);
-                for (; cursPoints; ++cursPoints)
-                {
-                    if (cursPoints->m_areaTest.bContainsPoint(pntAt))
-                        break;
-                }
+                TPntList::TCursor cursPoints = tCIDColAlgo::cursFindByKey
+                (
+                    m_colPoints, pntAt, [](const TClickPnt& cpntTest, const TPoint& pntTest)
+                    {
+                        return cpntTest.m_areaTest.bContainsPoint(pntTest);
+                    }
+                );
 
                 TGraphWndDev gdevDraw(*this);
                 if (cursPoints.bIsValid())
@@ -200,8 +209,8 @@ class TClientWnd : public TWindow
         // -------------------------------------------------------------------
 
         // A small class to store click points and the hit testing areas for them
-        static const tCIDLib::TCard4 c4Radius = 8;
-        static const tCIDLib::TCard4 c4Diameter = c4Radius * 2;
+        static constexpr tCIDLib::TCard4 c4Radius = 8;
+        static constexpr tCIDLib::TCard4 c4Diameter = c4Radius * 2;
         class TClickPnt
         {
             public :
@@ -213,13 +222,17 @@ class TClientWnd : public TWindow
                     m_areaTest.Inflate(1);
                 }
                 TClickPnt(const TClickPnt&) = default;
+                TClickPnt(TClickPnt&&) = default;
+                TClickPnt& operator=(const TClickPnt&) = default;
+                TClickPnt& operator=(TClickPnt&&) = default;
 
                 TArea   m_areaTest;
                 TPoint  m_pntAt;
         };
+        using TPntList = TVector<TClickPnt>;
 
-        const TRGBClr       m_rgbCircle;
-        TVector<TClickPnt>  m_colPoints;
+        const TRGBClr   m_rgbCircle;
+        TPntList        m_colPoints;
 
 
         // -------------------------------------------------------------------
@@ -241,7 +254,14 @@ class TTestFrameWnd : public TFrameWnd
         // -------------------------------------------------------------------
         TTestFrameWnd() = default;
         TTestFrameWnd(const TTestFrameWnd&) = delete;
+        TTestFrameWnd(TTestFrameWnd&&) = delete;
         ~TTestFrameWnd() = default;
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TTestFrameWnd& operator=(const TTestFrameWnd&) = delete;
+        TTestFrameWnd& operator=(TTestFrameWnd&&) = delete;
 
 
     protected :
@@ -250,7 +270,7 @@ class TTestFrameWnd : public TFrameWnd
         // -------------------------------------------------------------------
 
         // We have to handle this to create our client window
-        tCIDLib::TBoolean bCreated() override
+        tCIDLib::TBoolean bCreated() final
         {
             // Call our parent first
             TParent::bCreated();
@@ -276,7 +296,8 @@ class TTestFrameWnd : public TFrameWnd
         //  Private data members
         //
         //  m_pwndClient
-        //      Our custom client window that we keep sized to fit our client area
+        //      Our custom client window that we keep sized to fit our client area. We
+        //      don't own it. This is just a typed pointer for convenience.
         // -------------------------------------------------------------------
         TClientWnd* m_pwndClient;
 

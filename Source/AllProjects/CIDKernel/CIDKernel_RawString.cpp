@@ -843,6 +843,97 @@ static tCIDLib::TInt4 i4TextToCard8( const  tCIDLib::TCh* const pszSrcText
 // ---------------------------------------------------------------------------
 //  TRawStr Methods
 // ---------------------------------------------------------------------------
+
+//
+//  Finds the body of the text, i.e. the part inside any leading and trailing
+//  text. If there is any, it returns true and sets c4Start to the first non-
+//  space character and c4End to the index of the first trailing space. If it
+//  returns false, the caller shouldn't do anything.
+//
+//  If the caller has the length, he should pass it since we can be more
+//  efficient. Else, set it to c4MaxCard and we'll find the end ourself.
+//
+tCIDLib::TBoolean TRawStr::bFindTextBody(const  tCIDLib::TCh* const pszSrc
+                                        , COP   tCIDLib::TCard4&    c4Start
+                                        , COP   tCIDLib::TCard4&    c4End
+                                        , const tCIDLib::TCard4     c4Length)
+{
+    c4Start = kCIDLib::c4MaxCard;
+    c4End = kCIDLib::c4MaxCard;
+
+    if (*pszSrc == kCIDLib::chNull)
+        return kCIDLib::False;
+
+    //
+    //  Do a pincer to find the start/stop points. For the start, it's the same in both
+    //  cases, we just search forward.
+    //
+    const tCIDLib::TCh* pszStart = pszSrc;
+    while (*pszStart && bIsSpace(*pszStart))
+        pszStart++;
+
+    // If we hit the end, then we are done. There's no leading or trailing text
+    if (*pszStart == kCIDLib::chNull)
+    {
+        c4Start = 0;
+        c4End = pszStart - pszSrc;
+        return kCIDLib::True;
+    }
+
+    // Now find the end
+    const tCIDLib::TCh* pszEnd = nullptr;
+    if (c4Length != kCIDLib::c4MaxCard)
+    {
+        // We get get to the end efficiently, so just work backwards
+        pszEnd = pszSrc + (c4Length - 1);
+        while (*pszEnd && bIsSpace(*pszEnd))
+            pszEnd--;
+
+        // Move back up to get past the char we stopped on
+        pszEnd++;
+    }
+     else
+    {
+        //
+        //  We can't get the end efficiently, so we just continue forward, remembering
+        //  the last space after a non-space.
+        //
+        pszEnd = pszStart;
+        const tCIDLib::TCh* pszNext = pszEnd;
+        while (*pszNext)
+        {
+            // Find the next space or end
+            while (*pszNext && !bIsSpace(*pszNext))
+                pszNext++;
+
+            // Remember this as the potential end
+            pszEnd = pszNext;
+
+            // If not at the end, then move end up to the next non-space
+            if (*pszNext)
+            {
+                while (*pszNext && bIsSpace(*pszNext))
+                    pszNext++;
+            }
+        }
+    }
+
+    // It shouldn't be possible, but if the pointers inverted do nothing
+    if (pszStart < pszEnd)
+    {
+        c4Start = pszStart - pszSrc;
+        c4End = pszEnd - pszSrc;
+        return kCIDLib::True;
+    }
+    return kCIDLib::False;
+}
+
+
+//
+//  A fundamental formatting function which formats the value string into the buffer
+//  string, within a field of a given width, justified and filled. Various other
+//  formatting operations can use this.
+//
 tCIDLib::TBoolean
 TRawStr::bFormatStr(const   tCIDLib::TCh* const pszVal
                     ,       tCIDLib::TCh* const pszBuf
@@ -2085,7 +2176,7 @@ TRawStr::eCompareStrNI( const   tCIDLib::TSCh* const    pszStr1
 //
 tCIDLib::TFloat8
 TRawStr::f8AsBinary(const   tCIDLib::TCh* const pszToConvert
-                    ,       tCIDLib::TBoolean&  bValid) noexcept
+                    , COP   tCIDLib::TBoolean&  bValid) noexcept
 {
     if (!pszToConvert)
     {
@@ -2242,7 +2333,7 @@ TRawStr::hshHashStr(const   tCIDLib::TCh* const pszSrc
 
 tCIDLib::TInt4
 TRawStr::i4AsBinary(const   tCIDLib::TCh* const pszToConvert
-                    ,       tCIDLib::TBoolean&  bValid
+                    , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
     if (!pszToConvert)
@@ -2272,7 +2363,7 @@ TRawStr::i4AsBinary(const   tCIDLib::TCh* const pszToConvert
 
 tCIDLib::TInt8
 TRawStr::i8AsBinary(const   tCIDLib::TCh* const pszToConvert
-                    ,       tCIDLib::TBoolean&  bValid
+                    , COP   tCIDLib::TBoolean&  bValid
                     , const tCIDLib::ERadices   eRadix) noexcept
 {
     if (!pszToConvert)

@@ -736,6 +736,12 @@ class CIDLIBEXP TString :
             , const tCIDLib::TBoolean       bStripWS = kCIDLib::True
         )   const noexcept;
 
+        [[nodiscard]] tCIDLib::TBoolean bFindTextBody
+        (
+            const   tCIDLib::TCh*&          pszStart
+            , const tCIDLib::TCh*&          pszEnd
+        )   const;
+
         [[nodiscard]] tCIDLib::TBoolean bFindTokenList
         (
             COP     TString&                strToFill
@@ -978,6 +984,12 @@ class CIDLIBEXP TString :
             , const tCIDLib::TCard4         c4Start
             , const tCIDLib::TCard4         c4Len = kCIDLib::c4MaxCard
         )   const;
+
+        tCIDLib::TVoid CopyWithoutSpace(const   TStringView&        strvSrc
+                                        , const tCIDLib::TBoolean   bAppend = kCIDLib::False)
+        {
+            m_strbData.CopyWithoutSpace(strvSrc, bAppend);
+        }
 
         tCIDLib::TVoid Cut
         (
@@ -1561,6 +1573,12 @@ class CIDLIBEXP TString :
                 }
 
                 tCIDLib::TVoid Clear() noexcept;
+
+                tCIDLib::TVoid CopyWithoutSpace
+                (
+                    const   TStringView&        strvSrc
+                    , const tCIDLib::TBoolean   bAppend
+                );
 
                 tCIDLib::TVoid DecEnd
                 (

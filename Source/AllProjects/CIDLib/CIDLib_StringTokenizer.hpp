@@ -84,6 +84,13 @@ class CIDLIBEXP TStringTokenizer : public TObject
             ,       TString&                strAccum
         );
 
+        static tCIDLib::TVoid SplitOnChar
+        (
+            const   TStringView&            strvText
+            ,       TCollection<TString>&   colToFill
+            , const tCIDLib::TCh            chSplitChar
+        );
+
 
         // -------------------------------------------------------------------
         //  Constuctors and Destructor
@@ -92,14 +99,8 @@ class CIDLIBEXP TStringTokenizer : public TObject
 
         TStringTokenizer
         (
-            const   TStringView             strToTokenize
-            , const TStringView&            strWhitespace
-        );
-
-        TStringTokenizer
-        (
             const   TStringView             strvToTokenize
-            , const tCIDLib::TCh* const     pszWhitespace
+            , const TStringView&            strvWhitespace
         );
 
         TStringTokenizer(const TStringTokenizer&) = delete;

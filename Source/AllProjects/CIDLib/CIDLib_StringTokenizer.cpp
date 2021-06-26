@@ -483,6 +483,26 @@ TStringTokenizer::BuildQuotedCommaList( const   tCIDLib::TStrCollect&   colValue
 }
 
 
+//
+//  Splits the passed text into a sequence of sub-strings,separated by the passed split
+//  character.
+//
+tCIDLib::TVoid TStringTokenizer::SplitOnChar(const  TStringView&            strvText
+                                            ,       tCIDLib::TStrCollect&   colToFill
+                                            , const tCIDLib::TCh            chSplitChar)
+{
+    tCIDLib::TCh achSplit[1];
+    achSplit[0] = chSplitChar;
+    TStringTokenizer stokSplit(strvText, TStringView(achSplit, 1));
+
+    colToFill.RemoveAll();
+    TString strToken;
+    while (stokSplit.bGetNextToken(strToken))
+    {
+        colToFill.objAdd(strToken);
+    }
+}
+
 
 // ---------------------------------------------------------------------------
 //  TStringTokenizer: Constructors and Destructor
@@ -505,17 +525,6 @@ TStringTokenizer::TStringTokenizer( const   TStringView     strvToTokenize
     , m_c4CurToken(0)
     , m_c4SourceLen(0)
     , m_strWhitespace(strvWhitespace)
-    , m_strvSrc(strvToTokenize)
-{
-    Reset();
-}
-
-TStringTokenizer::TStringTokenizer( const   TStringView         strvToTokenize
-                                    , const tCIDLib::TCh* const pszWhitespace) :
-    m_c4CurOffset(0)
-    , m_c4CurToken(0)
-    , m_c4SourceLen(0)
-    , m_strWhitespace(pszWhitespace)
     , m_strvSrc(strvToTokenize)
 {
     Reset();

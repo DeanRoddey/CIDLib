@@ -465,7 +465,7 @@ tCIDLib::TVoid TLogSrvLogger::SpoolLocal(TCIDLogSrvClientProxy& orbcToUse)
     pathSearch.Append(L"_*.LocalLog");
 
     //
-    //  Create a bag to hold the files we find. Make it a sorted by, sorted
+    //  Create a bag to hold the files we find. Make it a sorted bag, sorted
     //  by last modify time, ascending. If there are more than a few, we'll
     //  delete our way up through the list till we get to the lastest ones,
     //  then spool them out from oldest to most recent.
@@ -500,8 +500,7 @@ tCIDLib::TVoid TLogSrvLogger::SpoolLocal(TCIDLogSrvClientProxy& orbcToUse)
         //  the last three.
         //
         tCIDLib::TCard4 c4Count = colFiles.c4ElemCount();
-        TSortedBag<TFindBuf>::TCursor cursFiles(&colFiles);
-        for (; cursFiles; ++cursFiles)
+        for (auto cursFiles = colFiles.cursThis(); cursFiles; ++cursFiles)
         {
             const TString& strName = cursFiles->pathFileName();
             if (c4Count > 3)

@@ -33,6 +33,14 @@
 
 namespace TRawStr
 {
+    KRNLEXPORT tCIDLib::TBoolean bFindTextBody
+    (
+        const   tCIDLib::TCh* const     pszSrc
+        , COP   tCIDLib::TCard4&        c4Start
+        , COP   tCIDLib::TCard4&        c4End
+        , const tCIDLib::TCard4         c4Length = kCIDLib::c4MaxCard
+    );
+
     KRNLEXPORT tCIDLib::TBoolean bFormatStr
     (
         const   tCIDLib::TCh* const     pszVal
@@ -341,7 +349,7 @@ namespace TRawStr
     KRNLEXPORT [[nodiscard]] tCIDLib::TFloat8 f8AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
     )   noexcept;
 
     KRNLEXPORT tCIDLib::TVoid FillString
@@ -360,14 +368,14 @@ namespace TRawStr
     KRNLEXPORT [[nodiscard]] tCIDLib::TInt4 i4AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 
     KRNLEXPORT [[nodiscard]] tCIDLib::TInt8 i8AsBinary
     (
         const   tCIDLib::TCh* const     pszToConvert
-        ,       tCIDLib::TBoolean&      bValid
+        , COP   tCIDLib::TBoolean&      bValid
         , const tCIDLib::ERadices       eRadix = tCIDLib::ERadices::Auto
     )   noexcept;
 

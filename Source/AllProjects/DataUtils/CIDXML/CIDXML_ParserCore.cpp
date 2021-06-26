@@ -164,13 +164,6 @@ TXMLParserCore::ParseRootEntity(        tCIDXML::TEntitySrcRef& esrRoot
     // Do a reset to clear up any previous data
     Reset();
 
-    //
-    //  And now lets reset our own data structures to get them ready for
-    //  the next round. Note that the entity manager is flushed at the end
-    //  because we have to insure that opened sources get closed.
-    //
-    m_c4ErrorCount = 0;
-
     // Insure that the entity manager gets flushed when we get out of here
     TXMLEMStackJan janEM(&m_xemThis);
 
@@ -388,6 +381,12 @@ tCIDLib::TVoid TXMLParserCore::Reset()
 
     // Flush the entity manager
     m_xemThis.Reset();
+
+    // Reset any of our flags
+    m_bInException = kCIDLib::False;
+    m_bStandalone = kCIDLib::False;
+    m_c4ErrorCount = 0;
+    m_eLocation = tCIDXML::ELocations::BeforeContent;
 }
 
 
@@ -809,13 +808,7 @@ tCIDLib::TVoid TXMLParserCore::ParseCDATA()
     &&  bInfoWanted(tCIDXML::EParseFlags::Chars)
     &&  !m_strChars.bIsEmpty())
     {
-        m_pmxevDocEvents->DocCharacters
-        (
-            m_strChars
-            , kCIDLib::True
-            , kCIDLib::False
-            , m_eLocation
-        );
+        m_pmxevDocEvents->DocCharacters(m_strChars, kCIDLib::True, kCIDLib::False, m_eLocation);
     }
 }
 
@@ -1555,13 +1548,7 @@ tCIDLib::TVoid TXMLParserCore::ParsePostContent()
             if (m_pmxevDocEvents && bInfoWanted(tCIDXML::EParseFlags::SpaceAC))
             {
                 m_xemThis.GetSpaces(m_strChars);
-                m_pmxevDocEvents->DocCharacters
-                (
-                    m_strChars
-                    , kCIDLib::False
-                    , kCIDLib::True
-                    , m_eLocation
-                );
+                m_pmxevDocEvents->DocCharacters(m_strChars, kCIDLib::False, kCIDLib::True, m_eLocation);
             }
              else
             {

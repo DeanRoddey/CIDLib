@@ -43,7 +43,7 @@
 RTTIDecls(TTest_String1,TTestFWTest)
 RTTIDecls(TTest_String2,TTestFWTest)
 RTTIDecls(TTest_String3,TTestFWTest)
-RTTIDecls(TTest_StringCat,TTestFWTest)
+RTTIDecls(TTest_StringCopyCat,TTestFWTest)
 RTTIDecls(TTest_StringMove,TTestFWTest)
 RTTIDecls(TTest_StringTokens,TTestFWTest)
 RTTIDecls(TTest_StringTokenRep,TTestFWTest)
@@ -848,23 +848,23 @@ TTest_String3::eRunTest(TTextStringOutStream&   strmOut
 
 
 // ---------------------------------------------------------------------------
-//  CLASS: TTest_StringCat
+//  CLASS: TTest_StringCopyCat
 // PREFIX: tfwt
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TTest_StringCat: Constructor and Destructor
+//  TTest_StringCopyCat: Constructor and Destructor
 // ---------------------------------------------------------------------------
-TTest_StringCat::TTest_StringCat() :
+TTest_StringCopyCat::TTest_StringCopyCat() :
 
     TTestFWTest
     (
-        L"String Cat", L"Tests concatenation helper", 2
+        L"String Copy/Cat", L"Tests copy/concatenation tests", 2
     )
 {
 }
 
-TTest_StringCat::~TTest_StringCat()
+TTest_StringCopyCat::~TTest_StringCopyCat()
 {
 }
 
@@ -873,103 +873,163 @@ TTest_StringCat::~TTest_StringCat()
 //  TTest_StringCat: Public, inherited methods
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
-TTest_StringCat::eRunTest(TTextStringOutStream&   strmOut
-                        , tCIDLib::TBoolean&    bWarning)
+TTest_StringCopyCat::eRunTest(  TTextStringOutStream&   strmOut
+                                , tCIDLib::TBoolean&    bWarning)
 {
     tTestFWLib::ETestRes eRes = tTestFWLib::ETestRes::Success;
 
-    const TString strSrc1(L"ABC");
-    const TString strSrc2(L"DEF");
-    const TString strSrc3(L"GHI");
-    const TString strSrc4(L"JKL");
-
-    const tCIDLib::TCh* const pszSrc1(L"abc");
-    const tCIDLib::TCh* const pszSrc2(L"def");
-
-    const TString strTest1(TString::strConcat(strSrc1, strSrc2));
-    if (strTest1 != L"ABCDEF")
+    // Basic tests of concatenation
     {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"2 String cat helper failed\n";
+        const TString strSrc1(L"ABC");
+        const TString strSrc2(L"DEF");
+        const TString strSrc3(L"GHI");
+        const TString strSrc4(L"JKL");
+
+        const tCIDLib::TCh* const pszSrc1(L"abc");
+        const tCIDLib::TCh* const pszSrc2(L"def");
+
+        const TString strTest1(TString::strConcat(strSrc1, strSrc2));
+        if (strTest1 != L"ABCDEF")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"2 String cat helper failed\n";
+        }
+
+        const TString strTest2(TString::strConcat(strSrc1, strSrc2, strSrc3));
+        if (strTest2 != L"ABCDEFGHI")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"3 String cat helper failed\n";
+        }
+
+        const TString strTest3(TString::strConcat(strSrc1, strSrc2, strSrc3, strSrc4));
+        if (strTest3 != L"ABCDEFGHIJKL")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"4 String cat helper failed\n";
+        }
+
+        const TString strTest4(TString::strConcat(strSrc1, kCIDLib::chDollarSign));
+        if (strTest4 != L"ABC$")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"String/TCh cat helper failed\n";
+        }
+
+        const TString strTest5(TString::strConcat(strSrc1, kCIDLib::chPeriod, strSrc2));
+        if (strTest5 != L"ABC.DEF")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"TString/TCh/TString cat helper failed\n";
+        }
+
+        const TString strTest6(TString::strConcat(strSrc1, pszSrc2));
+        if (strTest6 != L"ABCdef")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"String/TCh* cat helper failed\n";
+        }
+
+        const TString strTest7(TString::strConcat(pszSrc1, strSrc2));
+        if (strTest7 != L"abcDEF")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"TCh*/String cat helper failed\n";
+        }
+
+        const TString strTest8(TString::strConcat(pszSrc1, pszSrc2));
+        if (strTest8 != L"abcdef")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"TCh*/TCh* cat helper failed\n";
+        }
+
+        const TString strTest9(TString::strConcat(pszSrc1, kCIDLib::chAmpersand, pszSrc2));
+        if (strTest9 != L"abc&def")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"TCh*/TCh/TCh* cat helper failed\n";
+        }
+
+        // Should handle empty strings
+        const TString strTest20(TString::strConcat(L"", pszSrc1));
+        if (strTest20 != L"abc")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Empty/TCh* cat helper failed\n";
+        }
+
+        const TString strTest21(TString::strConcat(pszSrc2, L""));
+        if (strTest21 != L"def")
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"TCh*/Empty cat helper failed\n";
+        }
+
+        const TString strTest22(TString::strConcat(TString::strEmpty(), TString::strEmpty()));
+        if (!strTest22.bIsEmpty())
+        {
+            eRes = tTestFWLib::ETestRes::Failed;
+            strmOut << TFWCurLn << L"Empty/Empty cat helper failed\n";
+        }
     }
 
-    const TString strTest2(TString::strConcat(strSrc1, strSrc2, strSrc3));
-    if (strTest2 != L"ABCDEFGHI")
+    // Test the copy without space method
     {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"3 String cat helper failed\n";
-    }
+        struct TTest
+        {
+            const tCIDLib::TCh* pszTar;
+            const tCIDLib::TCh* pszSrc;
+            tCIDLib::TBoolean   bAppend;
+            const tCIDLib::TCh* pszExpected;
+        };
 
-    const TString strTest3(TString::strConcat(strSrc1, strSrc2, strSrc3, strSrc4));
-    if (strTest3 != L"ABCDEFGHIJKL")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"4 String cat helper failed\n";
-    }
+        const TTest aTests[] =
+        {
+              { L""             , L"1234"           , kCIDLib::False    , L"1234" }
+            , { L""             , L" 1234 "         , kCIDLib::False    , L"1234" }
+            , { L""             , L"  1234 456 "    , kCIDLib::True     , L"1234 456" }
+            , { L""             , L"   456"         , kCIDLib::True     , L"456" }
+            , { L""             , L"123    "        , kCIDLib::True     , L"123" }
 
-    const TString strTest4(TString::strConcat(strSrc1, kCIDLib::chDollarSign));
-    if (strTest4 != L"ABC$")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"String/TCh cat helper failed\n";
-    }
+            , { L"123"          , L"   456    "     , kCIDLib::True     , L"123456" }
+            , { L"123"          , L"   456    "     , kCIDLib::False    , L"456" }
+            , { L"  123  "      , L"   456    "     , kCIDLib::True     , L"  123  456" }
 
-    const TString strTest5(TString::strConcat(strSrc1, kCIDLib::chPeriod, strSrc2));
-    if (strTest5 != L"ABC.DEF")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TString/TCh/TString cat helper failed\n";
-    }
+            , { L"  123  "      , nullptr           , kCIDLib::True     , L"  123  " }
+            , { L"  123  "      , nullptr           , kCIDLib::True     , L"  123  " }
 
-    const TString strTest6(TString::strConcat(strSrc1, pszSrc2));
-    if (strTest6 != L"ABCdef")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"String/TCh* cat helper failed\n";
-    }
+            , { L" 1 2 3 4 "    , L" 5 6 7 "        , kCIDLib::True     , L" 1 2 3 4 5 6 7" }
+            , { L" 1 2 3 4 "    , L" 5 6 7 "        , kCIDLib::False    , L"5 6 7" }
+        };
+        const tCIDLib::TCard4 c4Count = tCIDLib::c4ArrayElems(aTests);
 
-    const TString strTest7(TString::strConcat(pszSrc1, strSrc2));
-    if (strTest7 != L"abcDEF")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TCh*/String cat helper failed\n";
-    }
+        TString strSrc;
+        TString strTar;
+        for (const TTest& testCur : aTests)
+        {
+            // We test it with a string object source and a raw string source
+            strTar = testCur.pszTar;
+            strTar.CopyWithoutSpace(testCur.pszSrc, testCur.bAppend);
+            if (strTar != testCur.pszExpected)
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"Copy WithoutSpace test failed (raw). Got='"
+                        << strTar << L"' but expected '" << testCur.pszExpected
+                        << L"'\n";
+            }
 
-    const TString strTest8(TString::strConcat(pszSrc1, pszSrc2));
-    if (strTest8 != L"abcdef")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TCh*/TCh* cat helper failed\n";
-    }
-
-    const TString strTest9(TString::strConcat(pszSrc1, kCIDLib::chAmpersand, pszSrc2));
-    if (strTest9 != L"abc&def")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TCh*/TCh/TCh* cat helper failed\n";
-    }
-
-
-    // Should handle empty strings
-    const TString strTest20(TString::strConcat(L"", pszSrc1));
-    if (strTest20 != L"abc")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"Empty/TCh* cat helper failed\n";
-    }
-
-    const TString strTest21(TString::strConcat(pszSrc2, L""));
-    if (strTest21 != L"def")
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"TCh*/Empty cat helper failed\n";
-    }
-
-    const TString strTest22(TString::strConcat(TString::strEmpty(), TString::strEmpty()));
-    if (!strTest22.bIsEmpty())
-    {
-        eRes = tTestFWLib::ETestRes::Failed;
-        strmOut << TFWCurLn << L"Empty/Empty cat helper failed\n";
+            strTar = testCur.pszTar;
+            strSrc = testCur.pszSrc;
+            strTar.CopyWithoutSpace(strSrc, testCur.bAppend);
+            if (strTar != testCur.pszExpected)
+            {
+                eRes = tTestFWLib::ETestRes::Failed;
+                strmOut << TFWCurLn << L"Copy WithoutSpace test failed (object). Got='"
+                        << strTar << L"' but expected '" << testCur.pszExpected
+                        << L"'\n";
+            }
+        }
     }
 
     return eRes;

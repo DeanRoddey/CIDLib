@@ -219,19 +219,6 @@ namespace tCIDXML
 
 
     // -----------------------------------------------------------------------
-    //  Usec by the PrintTo() method of the tree classes.
-    // -----------------------------------------------------------------------
-    enum class EPrintFmts
-    {
-        Unknown
-        , Pretty
-        , Flat
-
-        , Count
-    };
-
-
-    // -----------------------------------------------------------------------
     //  Used in the facility class' EscapeFor() to indicate what rules should
     //  apply in the escapement processing.
     // -----------------------------------------------------------------------
@@ -362,7 +349,6 @@ namespace tCIDXML
         , MarkupMask        = 0x0008800
     };
 
-
     // -----------------------------------------------------------------------
     //  This value is used to indicate where in the XML source something is.
     //  Note that these are set to the mask values of EParseFlags, to make
@@ -391,7 +377,35 @@ namespace tCIDXML
         , IgnoreDTD         = 0x0000004
         , IgnoreBadChars    = 0x0000008
 
-        , All                = 0x000000F
+        , All               = 0x000001F
+    };
+
+
+    // -----------------------------------------------------------------------
+    //  Used by the PrintTo() method of the tree classes.
+    // -----------------------------------------------------------------------
+    enum class EPrintFmts  : tCIDLib::TCard4
+    {
+        Unknown
+        , Pretty
+        , Flat
+
+        , Count
+    };
+
+
+    // -----------------------------------------------------------------------
+    //  Used by the PrintTo() method of the tree classes, when doing pretty printing,
+    //  to indicate options for printing.
+    // -----------------------------------------------------------------------
+    enum class EPrintOpts : tCIDLib::TCard4
+    {
+        None                = 0x0000
+        , NoWrap            = 0x0001
+        , StripLTSpace      = 0x0002
+        , Escape            = 0x0004
+
+        , AllBits           = 0x0007
     };
 
 
@@ -488,6 +502,7 @@ EnumStreamMacros(tCIDXML::ENodeTypes)
 
 BmpEnumTricks(tCIDXML::EParseFlags)
 BmpEnumTricks(tCIDXML::EParseOpts)
+BmpEnumTricks(tCIDXML::EPrintOpts)
 BmpEnumTricks(tCIDXML::EPERefOpts)
 
 #endif

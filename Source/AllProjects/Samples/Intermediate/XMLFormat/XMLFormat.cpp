@@ -19,14 +19,20 @@
 //  two things. It will take a directory of XML files and spit out another
 //  directory of the same files pretty printed. And, it will go the other
 //  way taking a directory of XML files and printing them back out with
-//  all non-significant white space removed.
+//  all white space removed.
 //
 //  They are output in the same encoding as they were originally in.
 //
 //  You can ask for validation, else it won't do any. If you do ask for
-//  validation, they have to have DTDs.
+//  validation, they have to have DTDs that are accessible via the system
+//  id. If it does have a DTD but you want to ingore it, use the /IgnoreDTD
+//  option.
 //
-//  If will not overwrite unless you provide the /Overwrite option
+//  If the /Ovewrite option is provided, it will overwrite target files that
+//  already exist. If you want to be sure you only get new content, then
+//  you must clean out the target directory first.
+//
+//  It will operate recursively if you provide the /Recurse option.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -57,8 +63,7 @@ CIDLib_MainModule(TThread(L"XMLFormatThread", eXMLFormatThread))
 //  Local data
 //
 //  conOut
-//      The parsed XML output can go to this, or to an output file. Otherwise this
-//      is used for program output, usage msg, error msg.
+//      Just for outputting usage info, errors, etc...
 // ----------------------------------------------------------------------------
 TOutConsole conOut;
 
@@ -67,108 +72,200 @@ TOutConsole conOut;
 //  Local helper functions
 // ----------------------------------------------------------------------------
 
-// Just shows a usage banner if we get bad parms
+// Just shows a usage banner if we get bad parms or no parms
 static tCIDLib::TVoid ShowUsage()
 {
-    conOut  << L"Usage: XMLFormat /InSpec=xxx /OutDir=xxx /Fmt=[Pretty|Flat] [options]\n"
+    conOut  << L"\nUsage: XMLFormat /SrcDir=xxx /OutDir=xxx /SpecList=xxx /Fmt=[Pretty|Flat] [options]\n"
                L"       Options:\n"
-               L"          /Overwrite\n\n"
-               L"       InSpec is the path and wildcard spec to search for, e.g.\n"
-               L"       X:\\Files\\*.xml\n\n"
-               L"       It will not overwrite any target files unless you give the \n"
-               L"       /Overwrite option\n\n"
+               L"          /SpecList=*.xxx;*.yyy;\n"
+               L"          /Overwrite\n"
+               L"          /Nowrap\n"
+               L"          /StripLTSpace\n"
+               L"          /Recurse\n\n"
+               L"       SrcDir is the path to search\n\n"
+               L"       SpecList is one or more wild card files to search for in the\n"
+               L"       source directory. If spaces are involved, quote the parameter.\n\n"
+               L"       It will not overwrite any target files unless you give\n"
+               L"       the /Overwrite option. It will not clean the target directory.\n\n"
+               L"       If /Recurse is not given, it just does the target directory\n\n"
+               L"       StripLTSpace will strip any leading/trailing white space off of\n"
+               L"       element text in Pretty mode\n\n"
+               L"       NoWrap will force the start/end elements around text content to be\n"
+               L"       on the same line in Pretty mode, otherwise it will indent longer text\n"
+               L"       values inside vertically aligned start/end elements.\n"
             << kCIDLib::NewEndLn;
 }
 
 
 //
-//  This is called for each file.
+//  This is a potentially recursive call to process the source files and spit them
+//  out to the target directorty. We process all files at the pathCur level. Then,
+//  if bRecurse is true, we search for all sub-dirs at that level and recurse into
+//  those.
 //
-static tCIDLib::TBoolean bProcess(          TXMLTreeParser&     xtprsToUse
-                                    , const TPathStr&           pathFile
+static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
+                                    , const TPathStr&           pathCur
+                                    , const tCIDLib::TStrList&  colSpecList
                                     , const TString&            strOutDir
                                     , const tCIDXML::EParseOpts eOpts
                                     , const tCIDXML::EPrintFmts eFmt
-                                    , const tCIDLib::TBoolean   bOverwrite)
+                                    , const tCIDXML::EPrintOpts ePrintOpts
+                                    , const tCIDLib::TBoolean   bOverwrite
+                                    , const tCIDLib::TBoolean   bRecurse)
 {
-    // Build up our output path. We have to get the file.ext off the file and add to the out path
-    TString strFilePart;
-    if (!pathFile.bQueryNameExt(strFilePart))
+    // If the target path doesn't exist, try to create it
+    if (!TFileSys::bExists(strOutDir, tCIDLib::EDirSearchFlags::NormalDirs))
     {
-        conOut  << L"Couldn't get the file.ext from the input file:\n     "
-                << pathFile << kCIDLib::DNewLn;
-        return kCIDLib::False;
-    }
-    TPathStr pathOut(strOutDir);
-    pathOut.AddLevel(strFilePart);
-
-    // If overwrite is fals, see if it exists
-    if (!bOverwrite && TFileSys::bExists(pathOut))
-    {
-        conOut  << L"Output file already exists:\n    "
-                << pathOut << kCIDLib::DNewLn;
-        return kCIDLib::False;
-    }
-
-    try
-    {
-        //
-        //  Do the XML parse using the tree parser. Tell the tree to store all
-        //  XML content. Often you will just want to store elements and character
-        //  data if the purpose is to process the contents for your own purposes.
-        //  here we are writing it back out so we want it all.
-        //
-        if (xtprsToUse.bParseRootEntity(pathFile, eOpts, tCIDXML::EParseFlags::All))
+        try
         {
-            // Get the original encoding out of the header
-            const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
-            const TString strEncoding = xtprsToUse.xtdocThis().xtnodeDecl().strEncoding();
-
-            //
-            //  Try to create an encoder for that. This has to work since we were able to
-            //  to parse thei file with this encoding.
-            //
-            TTextConverter* ptcvtOut = facCIDEncode().ptcvtMake(strEncoding);
-
-            // Try to create the output stream. It adopts the converter
-            TTextFileOutStream strmOut
-            (
-                pathOut
-                , tCIDLib::ECreateActs::CreateAlways
-                , tCIDLib::EFilePerms::Default
-                , tCIDLib::EFileFlags::SequentialScan
-                , tCIDLib::EAccessModes::Excl_Write
-                , ptcvtOut
-            );
-
-            //  It worked, so format it back out to the output passed output stream.
-            xtprsToUse.xtdocThis().PrintTo(strmOut, 0, kCIDLib::False, eFmt);
+            TFileSys::MakePath(strOutDir);
         }
-         else
+
+        catch(const TError& errToCatch)
         {
-            // XML errors occurred, display the first one
-            const TXMLTreeParser::TErrInfo& errFirst = xtprsToUse.erriFirst();
-            conOut.FormatF
-            (
-                L"\nThe parse failed\n    %(1)\n    (%(2).%(3)) %(4)\n"
-                , errFirst.strText()
-                , errFirst.c4Line()
-                , errFirst.c4Column()
-                , errFirst.strSystemId()
-            );
+            conOut  << L"Could not create output path: '" << pathCur
+                    << L"'. Error=\n" << errToCatch.strErrText()
+                    << kCIDLib::DNewLn;
             return kCIDLib::False;
         }
     }
 
-    catch(TError& errToCatch)
+    // Keep an overall return status for our level and below
+    tCIDLib::TBoolean bResult = kCIDLib::True;
+
+    // Search for any files at this level and process those. We have to do it for each wild card spec
+    tCIDLib::TFFindList colFiles;
+    for (auto cursWCs = colSpecList.cursThis(); cursWCs; ++cursWCs)
     {
-        conOut.FormatF
-        (
-            L"A CIDLib runtime error occured during parsing.\n    Error: %(1)\n\n"
-            , errToCatch.strErrText()
-        );
+        TPathStr pathSpec(pathCur);
+        pathSpec.AddLevel(*cursWCs);
+        if (TFileSys::c4SearchDir(pathSpec, colFiles, tCIDLib::EDirSearchFlags::NormalFiles))
+        {
+            // We found some files, so let's process them
+            for (tCIDLib::TFFindList::TCursor cursFl = colFiles.cursThis(); cursFl; ++cursFl)
+            {
+                // Build up our output path. We have to get the file.ext off the src and add to the out path
+                TString strFilePart;
+                if (!cursFl->pathFileName().bQueryNameExt(strFilePart))
+                {
+                    conOut  << L"Couldn't get the file.ext from the input file:\n     "
+                            << cursFl->pathFileName() << kCIDLib::DNewLn;
+                    bResult = kCIDLib::False;
+                    continue;
+                }
+                TPathStr pathOut(strOutDir);
+                pathOut.AddLevel(strFilePart);
+
+                // If overwrite is false, see if it exists
+                if (!bOverwrite && TFileSys::bExists(pathOut))
+                {
+                    conOut  << L"Output file already exists, not overwriting:\n    "
+                            << pathOut << kCIDLib::DNewLn;
+                    bResult = kCIDLib::False;
+                    continue;
+                }
+
+                try
+                {
+                    //
+                    //  Do the XML parse using the tree parser. Tell the tree to store all
+                    //  XML content. Often you will just want to store elements and character
+                    //  data if the purpose is to process the contents for your own purposes.
+                    //  here we are writing it back out so we want it all.
+                    //
+                    if (xtprsToUse.bParseRootEntity(cursFl->pathFileName(), eOpts, tCIDXML::EParseFlags::All))
+                    {
+                        // Get the original encoding out of the header
+                        const TXMLTreeElement& xtnodeRoot = xtprsToUse.xtdocThis().xtnodeRoot();
+                        const TString strEncoding = xtprsToUse.xtdocThis().xtnodeDecl().strEncoding();
+
+                        //
+                        //  Try to create the output stream. Give it a converter for the original
+                        //  encoding. That encoding has to be supported since we parsed the file
+                        //  with that encoding. It adopts the converter.
+                        //
+                        TTextFileOutStream strmOut
+                        (
+                            pathOut
+                            , tCIDLib::ECreateActs::CreateAlways
+                            , tCIDLib::EFilePerms::Default
+                            , tCIDLib::EFileFlags::SequentialScan
+                            , tCIDLib::EAccessModes::Excl_Write
+                            , facCIDEncode().ptcvtMake(strEncoding)
+                        );
+
+                        //  It worked, so format it back out to the output passed output stream.
+                        xtprsToUse.xtdocThis().PrintTo(strmOut, 0, eFmt, ePrintOpts);
+                    }
+                    else
+                    {
+                        // XML errors occurred, display the first one
+                        const TXMLTreeParser::TErrInfo& errFirst = xtprsToUse.erriFirst();
+                        conOut.FormatF
+                        (
+                            L"\nThe parse failed\n    %(1)\n    (%(2).%(3)) %(4)\n"
+                            , errFirst.strText()
+                            , errFirst.c4Line()
+                            , errFirst.c4Column()
+                            , errFirst.strSystemId()
+                        );
+                        bResult = kCIDLib::False;
+                    }
+                }
+
+                catch(TError& errToCatch)
+                {
+                    conOut.FormatF
+                    (
+                        L"A CIDLib runtime error occured during parsing.\n    Error: %(1)\n\n"
+                        , errToCatch.strErrText()
+                    );
+                    bResult = kCIDLib::False;
+                }
+            }
+        }
     }
-    return kCIDLib::True;
+
+
+    // If recursing, we now need to search for sub-dirs and do those
+    if (bRecurse)
+    {
+        TPathStr pathSpec = pathCur;
+        pathSpec.AddLevel(kCIDLib::pszAllDirsSpec);
+        colFiles.RemoveAll();
+        if (TFileSys::c4SearchDir(pathSpec, colFiles, tCIDLib::EDirSearchFlags::NormalDirs))
+        {
+            TString strFilePart;
+            for (tCIDLib::TFFindList::TCursor cursFl = colFiles.cursThis(); cursFl; ++cursFl)
+            {
+                // Build up the new target path for this level
+                TPathStr pathOut(strOutDir);
+                if (!cursFl->pathFileName().bQueryNameExt(strFilePart))
+                {
+                    conOut  << L"Couldn't get the file.ext from the source path:\n     "
+                            << cursFl->pathFileName() << kCIDLib::DNewLn;
+                    bResult = kCIDLib::False;
+                }
+                 else
+                {
+                    pathOut.AddLevel(strFilePart);
+                    bResult &= bProcess
+                    (
+                        xtprsToUse
+                        , cursFl->pathFileName()
+                        , colSpecList
+                        , pathOut
+                        , eOpts
+                        , eFmt
+                        , ePrintOpts
+                        , bOverwrite
+                        , bRecurse
+                    );
+                }
+            }
+        }
+    }
+    return bResult;
 }
 
 
@@ -183,10 +280,13 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
     // Parse our parameters, some are defaulted
     tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
     tCIDLib::TBoolean   bOvewrite = kCIDLib::False;
+    tCIDLib::TBoolean   bRecurse = kCIDLib::False;
+    tCIDLib::TStrList   colSpecList;
     tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
+    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::Escape;
     tCIDXML::EPrintFmts eFmt = tCIDXML::EPrintFmts::Unknown;
-    TString             strInSpecParm;
-    TString             strOutDirParm;
+    TString             strInPath;
+    TString             strOutDir;
     TString             strEncoding;
     {
         TCmdLine cmdlLoad;
@@ -194,25 +294,38 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
         // Remove consumed parms so we can check for unknown ones at the end
         cmdlLoad.bRemoveConsumed(kCIDLib::True);
 
-        // The input and output and xlat type are required
-        TString strFmtType;
-        if (!cmdlLoad.bFindOptionVal(L"InSpec", strInSpecParm)
-        ||  !cmdlLoad.bFindOptionVal(L"OutDir", strOutDirParm)
-        ||  !cmdlLoad.bFindOptionVal(L"Fmt", strFmtType))
+        // These are all required
         {
-            ShowUsage();
-            return tCIDLib::EExitCodes::BadParameters;
-        }
+            TString strFmtType;
+            TString strSpecList;
+            if (!cmdlLoad.bFindOptionVal(L"SrcDir", strInPath)
+            ||  !cmdlLoad.bFindOptionVal(L"SpecList", strSpecList)
+            ||  !cmdlLoad.bFindOptionVal(L"OutDir", strOutDir)
+            ||  !cmdlLoad.bFindOptionVal(L"Fmt", strFmtType))
+            {
+                ShowUsage();
+                return tCIDLib::EExitCodes::BadParameters;
+            }
 
-        if (strFmtType.bCompareI(L"Pretty"))
-            eFmt = tCIDXML::EPrintFmts::Pretty;
-        else if (strFmtType.bCompareI(L"Flat"))
-            eFmt = tCIDXML::EPrintFmts::Flat;
-        else
-        {
-            conOut  << L"'" << strFmtType << L"' is not a known output type"
-                    << kCIDLib::EndLn;
-            return tCIDLib::EExitCodes::BadParameters;
+            // Validate the format type before it goes out of scope
+            if (strFmtType.bCompareI(L"Pretty"))
+                eFmt = tCIDXML::EPrintFmts::Pretty;
+            else if (strFmtType.bCompareI(L"Flat"))
+                eFmt = tCIDXML::EPrintFmts::Flat;
+            else
+            {
+                conOut  << L"'" << strFmtType << L"' is not a known output type"
+                        << kCIDLib::EndLn;
+                return tCIDLib::EExitCodes::BadParameters;
+            }
+
+            // Break out the spec list
+            TStringTokenizer::SplitOnChar(strSpecList, colSpecList, kCIDLib::chSemiColon);
+            if (colSpecList.bIsEmpty())
+            {
+                conOut  << L"The wild card spec list was not valid" << kCIDLib::EndLn;
+                return tCIDLib::EExitCodes::BadParameters;
+            }
         }
 
         //
@@ -225,8 +338,16 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
             eOptsToUse |= tCIDXML::EParseOpts::IgnoreDTD;
         if (cmdlLoad.bFindOption(L"Validate"))
             eOptsToUse |= tCIDXML::EParseOpts::Validate;
+
+        if (cmdlLoad.bFindOption(L"NoWrap"))
+            ePrintOpts |= tCIDXML::EPrintOpts::NoWrap;
+        if (cmdlLoad.bFindOption(L"StripLTSpace"))
+            ePrintOpts |= tCIDXML::EPrintOpts::StripLTSpace;
+
         if (cmdlLoad.bFindOption(L"Overwrite"))
             bOvewrite = kCIDLib::True;
+        if (cmdlLoad.bFindOption(L"Recurse"))
+            bRecurse = kCIDLib::True;
 
         // If any left, they are unknown ones
         if (!cmdlLoad.bIsEmpty())
@@ -236,29 +357,36 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
         }
     }
 
-    tCIDLib::TBoolean bRet = kCIDLib::True;
+    //
+    //  If the source and target are the same, refuse to do it. We need to get
+    //  fully qualified, canonical versions of the directories to be sure.
+    //
 
-    // Find all the files that match the input spec
-    tCIDLib::TFFindList colFiles;
-    TFileSys::c4SearchDir(strInSpecParm, colFiles, tCIDLib::EDirSearchFlags::AllFiles);
-    if (colFiles.bIsEmpty())
-    {
-        conOut << L"No files match the input spec" << kCIDLib::DNewLn;
-    }
-     else
-    {
-        // Loop through the files and call the processing method for each one
-        for (tCIDLib::TFFindList::TCursor cursFl = colFiles.cursThis(); cursFl; ++cursFl)
-        {
-            TXMLTreeParser xtprsToUse;
-            bRet &= bProcess
-            (
-                xtprsToUse, cursFl->pathFileName(), strOutDirParm, eOptsToUse, eFmt, bOvewrite
-            );
-        }
-    }
+
+    // Tell the parser to ignore lead/trailing white space in text nodes
+    TXMLTreeParser xtprsToUse;
+
+    // And now kick off the process, which may be recursive
+    const tCIDLib::TBoolean bResult = bProcess
+    (
+        xtprsToUse
+        , strInPath
+        , colSpecList
+        , strOutDir
+        , eOptsToUse
+        , eFmt
+        , ePrintOpts
+        , bOvewrite
+        , bRecurse
+    );
+
+    if (!bResult)
+        conOut << L"\n[ERROR] One or more files could not be processed\n\n";
 
     // Make sure all the output gets spit out
     conOut.Flush();
-    return tCIDLib::EExitCodes::Normal;
+
+    if (bResult)
+        return tCIDLib::EExitCodes::Normal;
+    return  tCIDLib::EExitCodes::Unknown;
 }

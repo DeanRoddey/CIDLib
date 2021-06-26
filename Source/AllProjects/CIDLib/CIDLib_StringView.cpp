@@ -65,6 +65,35 @@ tCIDLib::TBoolean TStringView::bContainsSubStr( const   tCIDLib::TCh* const pszT
     return m_pstrObj->bContainsSubStr(pszToFind, bCaseSensitive);
 }
 
+
+//
+//  Returns pointers to the text inside any leading/trailing text. If none, then returns False,
+//  else returns true and sets the pointers.
+//
+tCIDLib::TBoolean TStringView::bFindTextBody(const  tCIDLib::TCh*&  pszStart
+                                            , const tCIDLib::TCh*&  pszEnd) const
+{
+    tCIDLib::TCard4 c4Start;
+    tCIDLib::TCard4 c4End;
+    const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody
+    (
+        pszBuffer(), c4Start, c4End, bHaveLength() ? c4Length() : kCIDLib::c4MaxCard
+    );
+
+    if (bRes)
+    {
+        pszStart = pszBufferAt(c4Start);
+        pszEnd = pszBufferAt(c4End);
+    }
+     else
+    {
+        pszStart = nullptr;
+        pszEnd = nullptr;
+    }
+    return bRes;
+}
+
+
 tCIDLib::TBoolean
 TStringView::bFirstOccurrence(  const   tCIDLib::TCh            chToFind
                                 , COP   tCIDLib::TCard4&        c4Pos
@@ -165,7 +194,8 @@ const TString* TStringView::pstrObj() const
 
 const tCIDLib::TCh* TStringView::pszBufferAt(const tCIDLib::TCard4 c4At) const
 {
-    if (c4At >= c4Length())
+    // We allow it to be on the end, which would result in an empty string
+    if (c4At > c4Length())
     {
         facCIDLib().ThrowErr
         (

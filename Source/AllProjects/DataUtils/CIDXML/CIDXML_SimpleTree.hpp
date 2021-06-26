@@ -212,8 +212,8 @@ class CIDXMLEXP TXMLTreeNode : public TObject, public MFormattable
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const = 0;
 
 
@@ -294,8 +294,8 @@ class CIDXMLEXP TXMLTreeComment : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -376,8 +376,8 @@ class CIDXMLEXP TXMLTreeDecl : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -478,8 +478,8 @@ class CIDXMLEXP TXMLTreeDTD : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -569,8 +569,8 @@ class CIDXMLEXP TXMLTreeElement : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -976,8 +976,8 @@ class CIDXMLEXP TXMLTreePI : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -1066,8 +1066,8 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const final;
 
 
@@ -1098,14 +1098,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         // -------------------------------------------------------------------
         TXMLTreeText
         (
-            const   tCIDLib::TCh* const     pszText
-            , const tCIDLib::TBoolean       bIsCDATA
-            , const tCIDLib::TBoolean       bIsIgnorable
-        );
-
-        TXMLTreeText
-        (
-            const   TString&                strText
+            const   TStringView&            strvText
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
         );
@@ -1116,7 +1109,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         // -------------------------------------------------------------------
         tCIDLib::TVoid Set
         (
-            const   TString&                strText
+            const   TStringView&            strvText
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
         );
@@ -1179,8 +1172,8 @@ class CIDXMLEXP TXMLTreeDocument : public TObject, public MFormattable
         (
                     TTextOutStream&         strmTarget
             , const tCIDLib::TCard4         c4IndentLevel
-            , const tCIDLib::TBoolean       bEscape = kCIDLib::False
             , const tCIDXML::EPrintFmts     eFormat = tCIDXML::EPrintFmts::Pretty
+            , const tCIDXML::EPrintOpts     eOpts = tCIDXML::EPrintOpts::None
         )   const;
 
         tCIDLib::TVoid Reset();

@@ -95,7 +95,7 @@ tCIDLib::TVoid TCIDLibTestApp::LoadTests()
     AddTest(new TTest_StringTokens);
     AddTest(new TTest_StringTokenRep);
     AddTest(new TTest_StringMove);
-    AddTest(new TTest_StringCat);
+    AddTest(new TTest_StringCopyCat);
 
     // General tests of basic classes, non all that inter-related
     AddTest(new TTest_CoordCtor);
