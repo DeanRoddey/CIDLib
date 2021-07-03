@@ -28,7 +28,7 @@
 //  id. If it does have a DTD but you want to ingore it, use the /IgnoreDTD
 //  option.
 //
-//  If the /Ovewrite option is provided, it will overwrite target files that
+//  If the /Overwrite option is provided, it will overwrite target files that
 //  already exist. If you want to be sure you only get new content, then
 //  you must clean out the target directory first.
 //
@@ -62,10 +62,12 @@ CIDLib_MainModule(TThread(L"XMLFormatThread", eXMLFormatThread))
 // ----------------------------------------------------------------------------
 //  Local data
 //
-//  conOut
-//      Just for outputting usage info, errors, etc...
+//  strOut
+//      We want to support redirection, so we have to get our output stream dynamically.
+//      So we use a non-adopting smart pointer to hold a text output stream which we'll
+//      set first thing.
 // ----------------------------------------------------------------------------
-TOutConsole conOut;
+TMngPtr<TTextOutStream> mptrOut;
 
 
 // ----------------------------------------------------------------------------
@@ -75,24 +77,26 @@ TOutConsole conOut;
 // Just shows a usage banner if we get bad parms or no parms
 static tCIDLib::TVoid ShowUsage()
 {
-    conOut  << L"\nUsage: XMLFormat /SrcDir=xxx /OutDir=xxx /SpecList=xxx /Fmt=[Pretty|Flat] [options]\n"
-               L"       Options:\n"
-               L"          /SpecList=*.xxx;*.yyy;\n"
-               L"          /Overwrite\n"
-               L"          /Nowrap\n"
-               L"          /StripLTSpace\n"
-               L"          /Recurse\n\n"
-               L"       SrcDir is the path to search\n\n"
-               L"       SpecList is one or more wild card files to search for in the\n"
-               L"       source directory. If spaces are involved, quote the parameter.\n\n"
-               L"       It will not overwrite any target files unless you give\n"
-               L"       the /Overwrite option. It will not clean the target directory.\n\n"
-               L"       If /Recurse is not given, it just does the target directory\n\n"
-               L"       StripLTSpace will strip any leading/trailing white space off of\n"
-               L"       element text in Pretty mode\n\n"
-               L"       NoWrap will force the start/end elements around text content to be\n"
-               L"       on the same line in Pretty mode, otherwise it will indent longer text\n"
-               L"       values inside vertically aligned start/end elements.\n"
+    *mptrOut << L"\nUsage: XMLFormat /SrcDir=xxx /OutDir=xxx /SpecList=xxx /Fmt=[Pretty|Flat] [options]\n"
+                L"       Options:\n"
+                L"          /SpecList=*.xxx;*.yyy;\n"
+                L"          /Overwrite\n"
+                L"          /Nowrap\n"
+                L"          /StripLTSpace\n"
+                L"         /EscapeNL\n"
+                L"          /Recurse\n\n"
+                L"       SrcDir is the path to search\n\n"
+                L"       SpecList is one or more wild card files to search for in the\n"
+                L"       source directory. If spaces are involved, quote the parameter.\n\n"
+                L"       It will not overwrite any target files unless you give\n"
+                L"       the /Overwrite option. It will not clean the target directory.\n\n"
+                L"       If /Recurse is not given, it just does the target directory\n\n"
+                L"       StripLTSpace will strip any leading/trailing white space off of\n"
+                L"       element text in Pretty mode\n\n"
+                L"       EscapeNL will render new lines as character references in Pretty mode\n\n"
+                L"       NoWrap will force the start/end elements around text content to be\n"
+                L"       on the same line in Pretty mode, otherwise it will indent longer text\n"
+                L"       values inside vertically aligned start/end elements.\n"
             << kCIDLib::NewEndLn;
 }
 
@@ -123,9 +127,9 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
 
         catch(const TError& errToCatch)
         {
-            conOut  << L"Could not create output path: '" << pathCur
-                    << L"'. Error=\n" << errToCatch.strErrText()
-                    << kCIDLib::DNewLn;
+            *mptrOut    << L"Could not create output path: '" << pathCur
+                        << L"'. Error=\n" << errToCatch.strErrText()
+                        << kCIDLib::DNewLn;
             return kCIDLib::False;
         }
     }
@@ -148,8 +152,8 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
                 TString strFilePart;
                 if (!cursFl->pathFileName().bQueryNameExt(strFilePart))
                 {
-                    conOut  << L"Couldn't get the file.ext from the input file:\n     "
-                            << cursFl->pathFileName() << kCIDLib::DNewLn;
+                    *mptrOut    << L"Couldn't get the file.ext from the input file:\n     "
+                                << cursFl->pathFileName() << kCIDLib::DNewLn;
                     bResult = kCIDLib::False;
                     continue;
                 }
@@ -159,8 +163,8 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
                 // If overwrite is false, see if it exists
                 if (!bOverwrite && TFileSys::bExists(pathOut))
                 {
-                    conOut  << L"Output file already exists, not overwriting:\n    "
-                            << pathOut << kCIDLib::DNewLn;
+                    *mptrOut    << L"Output file already exists, not overwriting:\n    "
+                                << pathOut << kCIDLib::DNewLn;
                     bResult = kCIDLib::False;
                     continue;
                 }
@@ -201,7 +205,7 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
                     {
                         // XML errors occurred, display the first one
                         const TXMLTreeParser::TErrInfo& errFirst = xtprsToUse.erriFirst();
-                        conOut.FormatF
+                        mptrOut->FormatF
                         (
                             L"\nThe parse failed\n    %(1)\n    (%(2).%(3)) %(4)\n"
                             , errFirst.strText()
@@ -215,7 +219,7 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
 
                 catch(TError& errToCatch)
                 {
-                    conOut.FormatF
+                    mptrOut->FormatF
                     (
                         L"A CIDLib runtime error occured during parsing.\n    Error: %(1)\n\n"
                         , errToCatch.strErrText()
@@ -242,8 +246,8 @@ static tCIDLib::TBoolean bProcess(  CIOP    TXMLTreeParser&     xtprsToUse
                 TPathStr pathOut(strOutDir);
                 if (!cursFl->pathFileName().bQueryNameExt(strFilePart))
                 {
-                    conOut  << L"Couldn't get the file.ext from the source path:\n     "
-                            << cursFl->pathFileName() << kCIDLib::DNewLn;
+                    *mptrOut    << L"Couldn't get the file.ext from the source path:\n     "
+                                << cursFl->pathFileName() << kCIDLib::DNewLn;
                     bResult = kCIDLib::False;
                 }
                  else
@@ -277,13 +281,16 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
     // We have to let our calling thread go first
     thrThis.Sync();
 
+    // Get our default output stream
+    mptrOut.SetPointer(&TSysInfo::strmOut());
+
     // Parse our parameters, some are defaulted
     tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
     tCIDLib::TBoolean   bOvewrite = kCIDLib::False;
     tCIDLib::TBoolean   bRecurse = kCIDLib::False;
     tCIDLib::TStrList   colSpecList;
     tCIDXML::EParseOpts eOptsToUse = tCIDXML::EParseOpts::None;
-    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::Escape;
+    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::None;
     tCIDXML::EPrintFmts eFmt = tCIDXML::EPrintFmts::Unknown;
     TString             strInPath;
     TString             strOutDir;
@@ -314,8 +321,8 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
                 eFmt = tCIDXML::EPrintFmts::Flat;
             else
             {
-                conOut  << L"'" << strFmtType << L"' is not a known output type"
-                        << kCIDLib::EndLn;
+                *mptrOut    << L"'" << strFmtType << L"' is not a known output type"
+                            << kCIDLib::EndLn;
                 return tCIDLib::EExitCodes::BadParameters;
             }
 
@@ -323,7 +330,7 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
             TStringTokenizer::SplitOnChar(strSpecList, colSpecList, kCIDLib::chSemiColon);
             if (colSpecList.bIsEmpty())
             {
-                conOut  << L"The wild card spec list was not valid" << kCIDLib::EndLn;
+                *mptrOut << L"The wild card spec list was not valid" << kCIDLib::EndLn;
                 return tCIDLib::EExitCodes::BadParameters;
             }
         }
@@ -343,6 +350,8 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
             ePrintOpts |= tCIDXML::EPrintOpts::NoWrap;
         if (cmdlLoad.bFindOption(L"StripLTSpace"))
             ePrintOpts |= tCIDXML::EPrintOpts::StripLTSpace;
+        if (cmdlLoad.bFindOption(L"EscapeNL"))
+            ePrintOpts |= tCIDXML::EPrintOpts::EscapeNL;
 
         if (cmdlLoad.bFindOption(L"Overwrite"))
             bOvewrite = kCIDLib::True;
@@ -381,10 +390,10 @@ tCIDLib::EExitCodes eXMLFormatThread(TThread& thrThis, tCIDLib::TVoid* pData)
     );
 
     if (!bResult)
-        conOut << L"\n[ERROR] One or more files could not be processed\n\n";
+        *mptrOut << L"\n[ERROR] One or more files could not be processed\n\n";
 
     // Make sure all the output gets spit out
-    conOut.Flush();
+    mptrOut->Flush();
 
     if (bResult)
         return tCIDLib::EExitCodes::Normal;

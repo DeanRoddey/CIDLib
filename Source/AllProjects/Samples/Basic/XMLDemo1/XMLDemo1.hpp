@@ -78,9 +78,16 @@ class TFacXMLDemo1 :
         TFacXMLDemo1();
 
         TFacXMLDemo1(const TFacXMLDemo1&) = delete;
+        TFacXMLDemo1(TFacXMLDemo1&&) = delete;
 
         ~TFacXMLDemo1();
 
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TFacXMLDemo1& operator=(const TFacXMLDemo1&) = delete;
+        TFacXMLDemo1& operator=(TFacXMLDemo1&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -104,37 +111,38 @@ class TFacXMLDemo1 :
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
             , const tCIDXML::ELocations     eLocation
-        )   override;
+            , const tCIDLib::TBoolean       bAllSpaces
+        )   final;
 
         tCIDLib::TVoid DocComment
         (
             const   TString&                strCommentText
             , const tCIDXML::ELocations     eLocation
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DocPI
         (
             const   TString&                strTarget
             , const TString&                strValue
             , const tCIDXML::ELocations     eLocation
-        )   override;
+        )   final;
 
         tCIDLib::TVoid EndDocument
         (
             const   TXMLEntitySrc&          xsrcOfRoot
-        )   override;
+        )   final;
 
         tCIDLib::TVoid EndTag
         (
             const   TXMLElemDecl&           xdeclElem
-        )   override;
+        )   final;
 
         tCIDLib::TVoid ResetDocument() override;
 
         tCIDLib::TVoid StartDocument
         (
             const   TXMLEntitySrc&          xsrcOfRoot
-        )   override;
+        )   final;
 
         tCIDLib::TVoid StartTag
         (
@@ -143,14 +151,14 @@ class TFacXMLDemo1 :
             , const tCIDLib::TBoolean       bEmpty
             , const TVector<TXMLAttr>&      colAttrList
             , const tCIDLib::TCard4         c4AttrListSize
-        )   override;
+        )   final;
 
         tCIDLib::TVoid XMLDecl
         (
             const   TString&                strVersion
             , const TString&                strEncoding
             , const TString&                strStandalone
-        )   override;
+        )   final;
 
 
 
@@ -165,9 +173,9 @@ class TFacXMLDemo1 :
             , const tCIDLib::TCard4         c4CurColumn
             , const tCIDLib::TCard4         c4CurLine
             , const TString&                strSystemId
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid ResetErrors() override;
+        tCIDLib::TVoid ResetErrors() final;
 
 
         // -------------------------------------------------------------------
@@ -177,77 +185,77 @@ class TFacXMLDemo1 :
         (
             const   TDTDAttrDef&            xadAttr
             , const tCIDLib::TBoolean       bIgnored
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DocType
         (
             const   TDTDElemDecl&           xdeclRoot
             , const TString&                strPublicId
             , const TString&                strSystemId
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DocTypeComment
         (
             const   TString&                strCommentText
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DocTypePI
         (
             const   TString&                strTarget
             , const TString&                strValue
             , const tCIDXML::ELocations     eLocation
-        )   override;
+        )   final;
 
         tCIDLib::TVoid DocTypeWS
         (
             const   TString&                strChars
-        )   override;
+        )   final;
 
         tCIDLib::TVoid ElementDecl
         (
             const   TDTDElemDecl&           xdeclElement
             , const tCIDLib::TBoolean       bIgnored
-        )   override;
+        )   final;
 
         tCIDLib::TVoid EndAttList
         (
             const   TDTDElemDecl&           xdeclParentElement
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid EndDocType() override;
+        tCIDLib::TVoid EndDocType() final;
 
-        tCIDLib::TVoid EndExtSubset() override;
+        tCIDLib::TVoid EndExtSubset() final;
 
-        tCIDLib::TVoid EndIntSubset() override;
+        tCIDLib::TVoid EndIntSubset() final;
 
         tCIDLib::TVoid EntityDecl
         (
             const   TDTDEntityDecl&         xdeclEntity
             , const tCIDLib::TBoolean       bIgnored
-        )   override;
+        )   final;
 
         tCIDLib::TVoid NotationDecl
         (
             const   TDTDNotationDecl&       xdeclNotation
             , const tCIDLib::TBoolean       bIgnored
-        )   override;
+        )   final;
 
         tCIDLib::TVoid ResetDocType() override;
 
         tCIDLib::TVoid StartAttList
         (
             const   TDTDElemDecl&           xdeclParentElement
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid StartExtSubset() override;
+        tCIDLib::TVoid StartExtSubset() final;
 
-        tCIDLib::TVoid StartIntSubset() override;
+        tCIDLib::TVoid StartIntSubset() final;
 
         tCIDLib::TVoid TextDecl
         (
             const   TString&                strVersion
             , const TString&                strEncoding
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -256,14 +264,14 @@ class TFacXMLDemo1 :
         tCIDLib::TVoid EndEntity
         (
             const   TXMLEntityDecl&         xdeclEnding
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid ResetEntities() override;
+        tCIDLib::TVoid ResetEntities() final;
 
         tCIDLib::TVoid StartEntity
         (
             const   TXMLEntityDecl&         xdeclStarting
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -276,9 +284,9 @@ class TFacXMLDemo1 :
             , const TString&                strEntityName
             , const TString&                strParentId
             , const tCIDXML::EResolveTypes  eResType
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid ResetResolver() override;
+        tCIDLib::TVoid ResetResolver() final;
 
 
     private :

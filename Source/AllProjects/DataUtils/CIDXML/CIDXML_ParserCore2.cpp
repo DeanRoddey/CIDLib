@@ -1156,6 +1156,7 @@ tCIDLib::TVoid TXMLParserCore::PassContentChars(TString& strChars)
             , kCIDLib::False
             , (eMask == tCIDXML::EParseFlags::IgnorableSpace)
             , m_eLocation
+            , bAllSpaces
         );
     }
     strChars.Clear();

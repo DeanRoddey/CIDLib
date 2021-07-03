@@ -49,7 +49,8 @@ tCIDLib::TVoid
 TFacXMLDemo1::DocCharacters(const   TString&            strChars
                             , const tCIDLib::TBoolean   bIsCDATA
                             , const tCIDLib::TBoolean   bIsIgnorable
-                            , const tCIDXML::ELocations eLocation)
+                            , const tCIDXML::ELocations eLocation
+                            , const tCIDLib::TBoolean   bAllSpaces)
 {
     // If no display mode, then nothing to do
     if (m_eDisplayMode == EDisplayModes::None)

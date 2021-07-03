@@ -1079,11 +1079,25 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
             const   TString&                strToAppend
         );
 
-        tCIDLib::TBoolean bIsCDATA() const;
+        tCIDLib::TBoolean bAllSpace() const
+        {
+            return m_bAllSpaces;
+        }
 
-        tCIDLib::TBoolean bIsIgnorable() const;
+        tCIDLib::TBoolean bIsCDATA() const
+        {
+            return m_bIsCDATA;
+        }
 
-        const TString& strText() const;
+        tCIDLib::TBoolean bIsIgnorable() const
+        {
+            return m_bIsIgnorable;
+        }
+
+        const TString& strText() const
+        {
+            return m_strText;
+        }
 
 
     protected :
@@ -1101,6 +1115,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
             const   TStringView&            strvText
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
+            , const tCIDLib::TBoolean       bAllSpaces
         );
 
 
@@ -1112,6 +1127,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
             const   TStringView&            strvText
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
+            , const tCIDLib::TBoolean       bAllSpaces
         );
 
 
@@ -1120,6 +1136,10 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         // -------------------------------------------------------------------
         //  Private data members
         //
+        //  m_bAllSpaces
+        //      The parser has this info and provides it. We store it away since we
+        //      may make use of it during printing.
+        //
         //  m_bIsCDATA
         //  m_bIsIgnorable
         //      These indicate some attributes of the text node.
@@ -1127,6 +1147,7 @@ class CIDXMLEXP TXMLTreeText : public TXMLTreeNode
         //  m_strText
         //      This is the text of the text node.
         // -------------------------------------------------------------------
+        tCIDLib::TBoolean   m_bAllSpaces;
         tCIDLib::TBoolean   m_bIsCDATA;
         tCIDLib::TBoolean   m_bIsIgnorable;
         TString             m_strText;

@@ -16,8 +16,8 @@
 // DESCRIPTION:
 //
 //  This sample program is step up from Window1. This one creates a custom window,
-//  and sets it as the client area of the main frame window. It uses the area changed
-//  callback to keep the custom window sized to fit.
+//  and sets it as the client area of the main frame window. The frame window will
+//  keep it sized appropriately to fill the client area.
 //
 //  The custom window watches for clicks and draws a circle wherever you click,
 //  so demonstrating the basics of how user input is handled and some simple
@@ -43,6 +43,9 @@
 //      Destroyed() in the parent window and destroy the window, then call the parent's
 //      Destroyed(). That way it doesn't see that window anymore and won't try to
 //      destroy it again.
+//
+//  2)  As with most of these samples, it's not complex enough to justify having a
+//      facility object, so we just start it up on a local function.
 //
 // LOG:
 //
@@ -116,7 +119,12 @@ class TClientWnd : public TWindow
                 , kCIDCtrls::widFirstCtrl
             );
 
-            // Set our bgn color to make it clear that we are there
+            //
+            //  Set our bgn color to make it clear that we are there. Note that, in
+            //  theory, we could get drawn before this is set, but in practice it
+            //  never happens. But, most of the time for such setup you should override
+            //  bCreated().
+            //
             SetBgnColor(facCIDGraphDev().rgbCornflowerBlue);
         }
 
@@ -133,9 +141,9 @@ class TClientWnd : public TWindow
         //  suppress that for this simple program, though you might for something that
         //  is more actively updating, to avoid flicker.
         //
-        tCIDLib::TBoolean
-        bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate) override
+        tCIDLib::TBoolean bPaint(TGraphDrawDev& gdevToUse, const TArea& areaUpdate) final
         {
+            // For variety, we use for each to process the points here
             m_colPoints.bForEach
             (
                 [&gdevToUse, &areaUpdate](const TClickPnt& cpntCur)
@@ -157,12 +165,16 @@ class TClientWnd : public TWindow
                                 , const tCIDCtrls::EMouseClicks eClickType
                                 , const TPoint&                 pntAt
                                 , const tCIDLib::TBoolean
-                                , const tCIDLib::TBoolean       ) override
+                                , const tCIDLib::TBoolean       ) final
         {
             if ((eButton == tCIDCtrls::EMouseButts::Left)
             &&  (eClickType == tCIDCtrls::EMouseClicks::Down))
             {
-                // Find one that includes the click point
+                //
+                //  Find one that includes the click point, using an algorithm this time. This
+                //  one takes a key to look for, pntAt in this case. which is passed to the
+                //  callback along with each element to check.
+                //
                 TPntList::TCursor cursPoints = tCIDColAlgo::cursFindByKey
                 (
                     m_colPoints, pntAt, [](const TClickPnt& cpntTest, const TPoint& pntTest)
@@ -231,6 +243,10 @@ class TClientWnd : public TWindow
         };
         using TPntList = TVector<TClickPnt>;
 
+
+        // -------------------------------------------------------------------
+        //  Private class members
+        // -------------------------------------------------------------------
         const TRGBClr   m_rgbCircle;
         TPntList        m_colPoints;
 

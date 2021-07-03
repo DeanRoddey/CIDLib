@@ -74,6 +74,7 @@ class TCIDAIBTParser :  public MXMLDocEvents
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
             , const tCIDXML::ELocations     eLocation
+            , const tCIDLib::TBoolean       bAllSpaces
         )   override;
 
         tCIDXML::TEntitySrcRef esrResolve

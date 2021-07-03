@@ -1255,7 +1255,7 @@ TMEngXMLTreeParserInfo::bInvokeMethod(          TCIDMacroEngine&    meOwner
                 mecvTarget.strmTarget(meOwner)
                 , 4
                 , tCIDXML::EPrintFmts::Pretty
-                , tCIDXML::EPrintOpts::Escape
+                , tCIDXML::EPrintOpts::None
             );
         }
 

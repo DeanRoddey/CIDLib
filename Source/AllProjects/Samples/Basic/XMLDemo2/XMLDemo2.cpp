@@ -150,7 +150,7 @@ tCIDLib::EExitCodes eXMLDemo2Thread(TThread& thrThis, tCIDLib::TVoid* pData)
 
     // Parse our parameters, some are defaulted
     tCIDLib::TBoolean   bParmsOK = kCIDLib::True;
-    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::Escape;
+    tCIDXML::EPrintOpts ePrintOpts = tCIDXML::EPrintOpts::None;
     tCIDXML::EParseOpts eParseOpts = tCIDXML::EParseOpts::None;
     TString             strInFileParm;
     TString             strOutFileParm;

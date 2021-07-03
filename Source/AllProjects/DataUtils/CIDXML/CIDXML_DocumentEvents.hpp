@@ -86,6 +86,7 @@ class CIDXMLEXP MXMLDocEvents
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
             , const tCIDXML::ELocations     eLocation
+            , const tCIDLib::TBoolean       bAllSpaces
         );
 
         virtual tCIDLib::TVoid DocComment

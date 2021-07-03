@@ -131,10 +131,11 @@ TCIDAIBTParser::pbtnodeParse(const TMemBuf& mbufSrc, const tCIDLib::TCard4 c4Byt
 //  TCIDAIBTParser: Protected, virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TVoid
-TCIDAIBTParser::DocCharacters(  const   TString&            strChars
-                                , const tCIDLib::TBoolean   bIsCDATA
-                                , const tCIDLib::TBoolean   bIsIgnorable
-                                , const tCIDXML::ELocations eLocation)
+TCIDAIBTParser::DocCharacters(  const   TString&
+                                , const tCIDLib::TBoolean
+                                , const tCIDLib::TBoolean
+                                , const tCIDXML::ELocations
+                                , const tCIDLib::TBoolean   )
 {
 }
 

@@ -41,7 +41,8 @@ tCIDLib::TVoid
 MXMLDocEvents::DocCharacters(const  TString&
                             , const tCIDLib::TBoolean
                             , const tCIDLib::TBoolean
-                            , const tCIDXML::ELocations)
+                            , const tCIDXML::ELocations
+                            , const tCIDLib::TBoolean)
 {
 }
 

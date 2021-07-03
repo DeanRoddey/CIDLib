@@ -671,7 +671,8 @@ tCIDLib::TVoid
 TXMLTreeParser::DocCharacters(  const   TString&            strChars
                                 , const tCIDLib::TBoolean   bIsCDATA
                                 , const tCIDLib::TBoolean   bIsIgnorable
-                                , const tCIDXML::ELocations )
+                                , const tCIDXML::ELocations
+                                , const tCIDLib::TBoolean   bAllSpaces)
 {
     // <TBD> Should we be using the location parameter?
 
@@ -706,14 +707,14 @@ TXMLTreeParser::DocCharacters(  const   TString&            strChars
         if (m_c4TextPoolInd == m_colTextPool.c4ElemCount())
         {
             // We are full so create a new one and add it to the list
-            pxtnodeText = new TXMLTreeText(strChars, bIsCDATA, bIsIgnorable);
+            pxtnodeText = new TXMLTreeText(strChars, bIsCDATA, bIsIgnorable, bAllSpaces);
             m_colTextPool.Add(pxtnodeText);
         }
          else
         {
             // Get the next available one from the pool and update it
             pxtnodeText = m_colTextPool[m_c4TextPoolInd];
-            pxtnodeText->Set(strChars, bIsCDATA, bIsIgnorable);
+            pxtnodeText->Set(strChars, bIsCDATA, bIsIgnorable, bAllSpaces);
         }
 
         // Bump the pool index and add this one to the tree

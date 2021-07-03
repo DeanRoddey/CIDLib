@@ -251,6 +251,7 @@ class CIDXMLEXP TXMLTreeParser :
             , const tCIDLib::TBoolean       bIsCDATA
             , const tCIDLib::TBoolean       bIsIgnorable
             , const tCIDXML::ELocations     eLocation
+            , const tCIDLib::TBoolean       bAllSpaces
         )   final;
 
         tCIDLib::TVoid DocComment

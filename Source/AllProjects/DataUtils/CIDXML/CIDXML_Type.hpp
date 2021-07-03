@@ -403,7 +403,7 @@ namespace tCIDXML
         None                = 0x0000
         , NoWrap            = 0x0001
         , StripLTSpace      = 0x0002
-        , Escape            = 0x0004
+        , EscapeNL          = 0x0004
 
         , AllBits           = 0x0007
     };

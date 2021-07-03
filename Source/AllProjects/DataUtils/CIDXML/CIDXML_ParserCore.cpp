@@ -808,7 +808,10 @@ tCIDLib::TVoid TXMLParserCore::ParseCDATA()
     &&  bInfoWanted(tCIDXML::EParseFlags::Chars)
     &&  !m_strChars.bIsEmpty())
     {
-        m_pmxevDocEvents->DocCharacters(m_strChars, kCIDLib::True, kCIDLib::False, m_eLocation);
+        m_pmxevDocEvents->DocCharacters
+        (
+            m_strChars, kCIDLib::True, kCIDLib::False, m_eLocation, kCIDLib::False
+        );
     }
 }
 
@@ -1457,6 +1460,7 @@ tCIDLib::TVoid TXMLParserCore::ParsePreContent()
                     , kCIDLib::False
                     , kCIDLib::True
                     , m_eLocation
+                    , kCIDLib::True
                 );
             }
              else
@@ -1548,7 +1552,10 @@ tCIDLib::TVoid TXMLParserCore::ParsePostContent()
             if (m_pmxevDocEvents && bInfoWanted(tCIDXML::EParseFlags::SpaceAC))
             {
                 m_xemThis.GetSpaces(m_strChars);
-                m_pmxevDocEvents->DocCharacters(m_strChars, kCIDLib::False, kCIDLib::True, m_eLocation);
+                m_pmxevDocEvents->DocCharacters
+                (
+                    m_strChars, kCIDLib::False, kCIDLib::True, m_eLocation, kCIDLib::True
+                );
             }
              else
             {

@@ -124,6 +124,7 @@ tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TTextOutStream&     strmOut
                         , const tCIDXML::EEscTypes  eType
+                        , const TStringView&        strvOtherChars
                         , const tCIDLib::TBoolean   bSkipLTSpace)
 {
     //
@@ -153,7 +154,7 @@ TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
             c4Count = strvInText.c4Length();
     }
 
-    EscapeFor(pszStart, c4Count, strmOut, eType);
+    EscapeFor(pszStart, c4Count, strmOut, eType, strvOtherChars);
 }
 
 
@@ -162,12 +163,14 @@ tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszStart
                         , const tCIDLib::TCard4     c4Count
                         ,       TTextOutStream&     strmOut
-                        , const tCIDXML::EEscTypes  eType)
+                        , const tCIDXML::EEscTypes  eType
+                        , const TStringView&        strvOtherChars)
 {
     const tCIDLib::TCh* pszCur = pszStart;
     const tCIDLib::TCh* pszEnd = (c4Count == kCIDLib::c4MaxCard) ? nullptr : pszStart + c4Count;
 
     // Loop at worst till we hit the null (or break out below at the end)
+    TString strCharRef;
     while (*pszCur)
     {
         const tCIDLib::TCh chCur = *pszCur++;
@@ -197,6 +200,17 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh* const pszStart
                 break;
         };
 
+        if (!pszEsc)
+        {
+            if (strvOtherChars.bContainsChar(chCur))
+            {
+                strCharRef = L"&#x";
+                strCharRef.AppendFormatted(static_cast<tCIDLib::TCard4>(chCur), tCIDLib::ERadices::Hex);
+                strCharRef.Append(kCIDLib::chSemiColon);
+                pszEsc = strCharRef.pszBuffer();
+            }
+        }
+
         // If we got an escape, write that out, else write out the character
         if (pszEsc)
             strmOut.WriteChars(pszEsc, c4EscLen);
@@ -214,6 +228,7 @@ tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
                         ,       TString&            strOutText
                         , const tCIDXML::EEscTypes  eType
+                        , const TStringView&        strvOtherChars
                         , const tCIDLib::TBoolean   bSkipLTSpace)
 {
     //
@@ -222,16 +237,18 @@ TFacCIDXML::EscapeFor(  const   TStringView&        strvInText
     //
     TTextStringOutStream strmOut(&strOutText);
     strmOut.Reset();
-    EscapeFor(strvInText, strmOut, eType, bSkipLTSpace);
+    EscapeFor(strvInText, strmOut, eType, strvOtherChars, bSkipLTSpace);
 }
 
 
 tCIDLib::TVoid
 TFacCIDXML::EscapeFor(  const   tCIDLib::TCh        chInText
                         ,       TTextOutStream&     strmOut
-                        , const tCIDXML::EEscTypes  eType)
+                        , const tCIDXML::EEscTypes  eType
+                        , const TStringView&        strvOtherChars)
 {
     const tCIDLib::TCh* pszEsc = nullptr;
+    TString strCharRef;
     switch(eType)
     {
         case tCIDXML::EEscTypes::Attribute :
@@ -265,6 +282,17 @@ TFacCIDXML::EscapeFor(  const   tCIDLib::TCh        chInText
         }
     };
 
+    if (!pszEsc)
+    {
+        if (strvOtherChars.bContainsChar(chInText))
+        {
+            strCharRef = L"&#x";
+            strCharRef.AppendFormatted(static_cast<tCIDLib::TCard4>(chInText), tCIDLib::ERadices::Hex);
+            strCharRef.Append(kCIDLib::chSemiColon);
+            pszEsc = strCharRef.pszBuffer();
+        }
+    }
+
     if (pszEsc)
         strmOut << pszEsc;
     else
@@ -287,7 +315,7 @@ TFacCIDXML::FormatAttr(          TTextOutStream&    strmOut
     if (bSpaceBefore)
         strmOut << L' ';
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue, strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
+    EscapeFor(strvValue, strmOut, tCIDXML::EEscTypes::Attribute, TString::strEmpty(), kCIDLib::False);
     strmOut << L"\"";
 }
 
@@ -305,7 +333,7 @@ TFacCIDXML::FormatAttrNL(       TTextOutStream&     strmOut
     if (bSpaceBefore)
         strmOut << L' ';
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, TString::strEmpty(), kCIDLib::False);
     strmOut << L"\"";
 
     // And the put out a new line
@@ -323,7 +351,7 @@ TFacCIDXML::NLFormatAttr(       TTextOutStream&     strmOut
     strmOut << kCIDLib::NewLn;
 
     strmOut << strvName << L"=\"";
-    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, kCIDLib::False);
+    EscapeFor(strvValue.pszBuffer(), strmOut, tCIDXML::EEscTypes::Attribute, TString::strEmpty(), kCIDLib::False);
     strmOut << L"\"";
 
     if (bSpaceAfter)
@@ -341,7 +369,7 @@ TFacCIDXML::FormatTextElem(         TTextOutStream&     strmOut
                             , const TStringView&        strvElemText)
 {
     strmOut << L'<' << strvElemName << L'>';
-    EscapeFor(strvElemText, strmOut, tCIDXML::EEscTypes::ElemText, kCIDLib::False);
+    EscapeFor(strvElemText, strmOut, tCIDXML::EEscTypes::ElemText, TString::strEmpty(), kCIDLib::False);
     strmOut << L"</" << strvElemName << L'>';
 }
 
