@@ -59,7 +59,7 @@ Let me know if you have any questions or issues with the build instructions.
 
 **The CQC Automation Platform**
 
-CIDLib underlies an even larger project of mine called CQC - The Charmed Quark Controller, which is a very powerful home automation platform. CQC is not open source, it is a proprietary product, though you might find it interesting as well. And seeing what CQC can do will perhaps give you a feeling for the power of CIDLib.
+CIDLib underlies an even larger project of mine called CQC - The Charmed Quark Controller, which is a very powerful home automation platform. CQC is also now open source. Even if you don't use it, you might find it interesting as well. And seeing what CQC can do will perhaps give you a feeling for the power of CIDLib.
 
 https://www.charmedquark.com
 
