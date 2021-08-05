@@ -1,11 +1,11 @@
 //
-// FILE NAME: CIDAudStream_WaveInStream.hpp
+// FILE NAME: CIDAudStream_WaveOutStream.hpp
 //
 // AUTHOR: Dean Roddey
 //
-// CREATED: 09/11/2017
+// CREATED: 08/01/2021
 //
-// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2021
 //
 //  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
 //  the author (Dean Roddey.) It is licensed under the MIT Open Source
@@ -15,12 +15,12 @@
 //
 // DESCRIPTION:
 //
-//  This is a derivative of our base audio source stream, which handles the common
-//  scenario of input via a standard WAV style input source. Usually this will be
-//  a standard system audio input.
+//  This is a derivative of our base audio target stream, which handles the common
+//  scenario of output via a standard WAV style output source. Usually this will be
+//  a standard system audio output.
 //
 //  This guy has per-platform implementation files to handle the platform specific
-//  stuff. On Windows we use a standard WAVE input.
+//  stuff. On Windows we use a standard WAVE output.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -34,53 +34,43 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 // Forward reference our internal per-platform structure
-struct TCIDWaveInStreamInfo;
+struct TCIDWaveOutStreamInfo;
 
 
 // ---------------------------------------------------------------------------
-//   CLASS: TCIDWaveInStream
+//   CLASS: TCIDWaveOutStream
 //  PREFIX: strm
 // ---------------------------------------------------------------------------
-class CIDAUDSTREAMEXP TCIDWaveInStream : public TCIDAudioSrcStream
+class CIDAUDSTREAMEXP TCIDWaveOutStream : public TCIDAudioTarStream
 {
     public :
         // -------------------------------------------------------------------
-        //  Public, static methods
-        // -------------------------------------------------------------------
-        static tCIDLib::TBoolean bEnumWaveInDevs
-        (
-                    TCIDAudioStreamList&    colToFill
-            , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::True
-        );
-
-
-        // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TCIDWaveInStream();
+        TCIDWaveOutStream();
 
-        TCIDWaveInStream(const TCIDWaveInStream&) = delete;
-        TCIDWaveInStream(TCIDWaveInStream&&) = delete;
+        TCIDWaveOutStream(const TCIDWaveOutStream&) = delete;
+        TCIDWaveOutStream(TCIDWaveOutStream&&) = delete;
 
-        virtual ~TCIDWaveInStream();
+        virtual ~TCIDWaveOutStream();
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCIDWaveInStream& operator=(const TCIDWaveInStream&) = delete;
-        TCIDWaveInStream& operator=(TCIDWaveInStream&&) = delete;
+        TCIDWaveOutStream& operator=(const TCIDWaveOutStream&) = delete;
+        TCIDWaveOutStream& operator=(TCIDWaveOutStream&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bReadBytes
+        tCIDLib::TBoolean bWriteBytes
         (
-                    tCIDLib::TCard1* const  pc1ToFill
-            , const tCIDLib::TCard4         c4MaxBytes
-            , COP   tCIDLib::TCard4&        c4BytesRead
+            const   tCIDLib::TCard1* const  pc1Src
+            , const tCIDLib::TCard4         c4SrcBytes
             , const tCIDLib::TCard4         c4WaitMSs
+            , COP   tCIDLib::TCard4&        c4BytesWritten
         )   final;
 
         tCIDLib::TVoid FlushBufs() final;
@@ -117,13 +107,13 @@ class CIDAUDSTREAMEXP TCIDWaveInStream : public TCIDAudioSrcStream
         //      need to deal with.
         // -------------------------------------------------------------------
         TMutex                  m_mtxSync;
-        TCIDWaveInStreamInfo*   m_pInfo;
+        TCIDWaveOutStreamInfo*     m_pInfo;
 
 
         // -------------------------------------------------------------------
         //  Magic macros
         // -------------------------------------------------------------------
-        RTTIDefs(TCIDWaveInStream,TCIDAudioSrcStream)
+        RTTIDefs(TCIDWaveOutStream,TCIDAudioTarStream)
 };
 
 #pragma CIDLIB_POPPACK

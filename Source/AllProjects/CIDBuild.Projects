@@ -1031,6 +1031,7 @@ PROJECT=CIDMacroEng [WIN32_*]
         CIDSock
         CIDNet
         CIDXML
+        CIDZLib
     END DEPENDENTS
 
 END PROJECT
@@ -1674,6 +1675,20 @@ END PROJECT
 ; ----------------------------------------------------------------------------
 ;  Basic Sample programs to demonstrate various aspects of CIDLib
 ; ----------------------------------------------------------------------------
+PROJECT=AudioStreams1
+    SETTINGS
+        DIRECTORY   = Samples\Basic\AudioStreams1
+        SAMPLE      = Yes
+    END SETTINGS
+
+    DEPENDENTS
+        CIDLib
+        CIDAudStream
+    END DEPENDENTS
+
+END PROJECT
+
+
 PROJECT=Beeper
     SETTINGS
         DIRECTORY   = Samples\Basic\Beeper

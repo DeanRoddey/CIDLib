@@ -35,6 +35,10 @@ ERRORS=
     errcStrm_OpenDefWavIn           7002    Could not open the default WAVEIn device. Error=%(1)
     errcStrm_InitWAVEBuf            7003    Could not initialize WAVEIn buffer. Error=%(1)
     errcStrm_AddWAVEBuf             7004    Could not add WAVEIn buffer. Error=%(1)
+    errcStrm_BadSampleRate          7005    %(1) is not a supported sample rate
+    errcStrm_BadBytesPerSample      7006    %(1) is not a supported bytes per sample
+    errcStrm_BadChannels            7007    %(1) is not a supported audio channel count
+    errcStrm_EnumDevices            7008    Failed to enumerated audio stream devices
 
 END ERRORS
 

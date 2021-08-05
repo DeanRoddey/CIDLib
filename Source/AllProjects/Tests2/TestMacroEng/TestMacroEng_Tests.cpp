@@ -383,6 +383,7 @@ TTest_CMLRuntime::eRunTest( TTextStringOutStream&   strmOut
       , { L"MEng.User.Tests.TestEPParms1", L"1" }
       , { L"MEng.User.Tests.TestEPParms2", L"1 2.3 -4 C 'Eat Me' ValP2" }
       , { L"MEng.User.Tests.TestJSONParser", L"" }
+      , { L"MEng.User.Tests.TestZLib", L"" }
     };
     const tCIDLib::TCard4 c4TestCnt = tCIDLib::c4ArrayElems(aTests);
 

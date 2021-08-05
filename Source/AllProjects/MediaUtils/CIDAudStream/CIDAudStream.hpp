@@ -57,8 +57,11 @@
 #include    "CIDAudStream_ErrorIds.hpp"
 #include    "CIDAudStream_Type.hpp"
 #include    "CIDAudStream_Shared.hpp"
+#include    "CIDAudStream_AudioFmt.hpp"
 #include    "CIDAudStream_SrcStream.hpp"
+#include    "CIDAudStream_TarStream.hpp"
 #include    "CIDAudStream_WaveInStream.hpp"
+#include    "CIDAudStream_WaveOutStream.hpp"
 #include    "CIDAudStream_ThisFacility.hpp"
 
 

@@ -257,7 +257,7 @@ TMEngUSBHIDInfo::TMEngUSBHIDInfo(TCIDMacroEngine& meOwner) :
     , m_c4ErrOpenFailed(kCIDLib::c4MaxCard)
     , m_c4ErrReadFailed(kCIDLib::c4MaxCard)
     , m_c4ErrWriteFailed(kCIDLib::c4MaxCard)
-    , m_pmeciErrors(0)
+    , m_pmeciErrors(nullptr)
 {
 }
 

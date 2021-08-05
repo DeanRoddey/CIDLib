@@ -1,11 +1,11 @@
 //
-// FILE NAME: CIDAudStream_WaveInStream_Win32.cpp
+// FILE NAME: CIDAudStream_WaveOutStream_Win32.cpp
 //
 // AUTHOR: Dean Roddey
 //
-// CREATED: 04/01/2019
+// CREATED: 08/01/2021
 //
-// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2021
 //
 //  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
 //  the author (Dean Roddey.) It is licensed under the MIT Open Source
@@ -15,7 +15,7 @@
 //
 // DESCRIPTION:
 //
-//  This file provides the Win32 specific implementation of the Wave audio input
+//  This file provides the Win32 specific implementation of the Wave audio output
 //  stream class.
 //
 // CAVEATS/GOTCHAS:
@@ -38,14 +38,12 @@
 #pragma warning(pop)
 
 #include    "CIDKernel_InternalHelpers_.hpp"
-#include    "CIDKernel_RegistryWin32.hpp"
 
 
 // ---------------------------------------------------------------------------
 //  Force some system libraries to be linked in
 // ---------------------------------------------------------------------------
 #pragma comment(lib, "Winmm.lib")
-#pragma comment(lib, "Ole32.lib")
 
 
 // ---------------------------------------------------------------------------
@@ -53,7 +51,7 @@
 // ---------------------------------------------------------------------------
 namespace
 {
-    namespace CIDAudStream_WaveInStream_Win32
+    namespace CIDAudStream_WaveOutStream_Win32
     {
         //
         //  Constants related to our most common audio format, which is 16K at 16 bits
@@ -83,18 +81,18 @@ namespace
 //  Our internal structure that we use to track any OS specific resources, so as not
 //  to expose them.
 // ---------------------------------------------------------------------------
-struct TCIDWaveInStreamInfo
+struct TCIDWaveOutStreamInfo
 {
-    HWAVEIN             hWAVEIn;
+    HWAVEIN             hWAVEOut;
     HANDLE              hNotEvent;
 
-    // Info about which buffer we are working on, it's size, where we are in it
+    // Info about which buffer we are working on, the bytes in it, where we are in it
     tCIDLib::TCard4     c4BufAvail;
     tCIDLib::TCard4     c4BufIndex;
     tCIDLib::TCard4     c4NextBufInd;
 
     // We keep a set of buffers available
-    WAVEHDR             hdrWAVEs[CIDAudStream_WaveInStream_Win32::c4BufCount];
+    WAVEHDR             hdrWAVEs[CIDAudStream_WaveOutStream_Win32::c4BufCount];
 
     //
     //  An overflow buffer that we copy any data to that we can't return
@@ -108,111 +106,7 @@ struct TCIDWaveInStreamInfo
 
 
 // ---------------------------------------------------------------------------
-//  TCIDWaveInStream: Public, static methods
-// ---------------------------------------------------------------------------
-tCIDLib::TBoolean
-TCIDWaveInStream::bEnumWaveInDevs(          TCIDAudioStreamList&    colToFill
-                                    , const tCIDLib::TBoolean       bThrowIfNot)
-{
-    colToFill.RemoveAll();
-
-    //
-    //  Get the  number of devices available. There's no specific error return. If we
-    //  get zero, so we have to just see if there's a last error.
-    //
-    const UINT uCnt =  waveInGetNumDevs();
-    if (uCnt == 0)
-    {
-        const DWORD dwErr = ::GetLastError();
-        if (dwErr)
-        {
-            TKrnlError::SetLastHostError(dwErr);
-            if (bThrowIfNot)
-            {
-                facCIDAudStream().ThrowKrnlErr
-                (
-                    CID_FILE
-                    , CID_LINE
-                    , kAudStrErrs::errcStrm_EnumDevices
-                    , TKrnlError::kerrLast()
-                    , tCIDLib::ESeverities::Failed
-                    , tCIDLib::EErrClasses::NotFound
-                );
-            }
-            return kCIDLib::False;
-        }
-
-        // Not an error, just no devices
-        return kCIDLib::True;
-    }
-
-    // Assume generally they'll all be gotten successfully
-    colToFill.CheckExpansion(uCnt);
-
-    // Try to open the key where full names are found
-    tCIDKernel::TWRegHandle hkeyNames = TKrnlWin32Registry::hkeyOpenSubKey
-    (
-        tCIDKernel::ERootKeys::LocalMachine
-        , L"System\\CurrentControlSet\\Control\\"
-        , L"MediaCategories"
-        , tCIDKernel::ERegAccFlags::StdOwned
-    );
-
-    //
-    //  Iterate through them and get their info. We have to look them up in the registry
-    //  to get around a shortcoming in the name length that can be reported. If not in the
-    //  registry, we assume the iterated name is the full one.
-    //
-    tCIDLib::TZStr512 szName;
-    TString strName;
-    TString strId;
-    WAVEINCAPS2 wicCur;
-    for (UINT uIndex = 0; uIndex < uCnt; uIndex++)
-    {
-        MMRESULT res = ::waveInGetDevCaps(uIndex, reinterpret_cast<WAVEINCAPS*>(&wicCur), sizeof(WAVEINCAPS2));
-        if (res != MMSYSERR_NOERROR)
-            continue;
-
-        constexpr tCIDLib::TCard4 c4BufSz = 127;
-        tCIDLib::TCh achBuf[c4BufSz + 1];
-        if (!::StringFromGUID2(wicCur.ProductGuid, achBuf, c4BufSz))
-            continue;
-        strId = achBuf;
-
-        if (TKrnlWin32Registry::bQueryStrValue(hkeyNames, achBuf, szName, 512))
-        {
-            strName = szName;
-        }
-         else
-        {
-            strName = wicCur.szPname;
-        }
-        colToFill.objPlace(strName, strId);
-    }
-
-    // Close the registery key if we opened it
-    if (hkeyNames != nullptr)
-        ::TKrnlWin32Registry::bCloseKey(hkeyNames);
-
-    // If none of them worked, treat that as an error
-    if (colToFill.bIsEmpty() && bThrowIfNot)
-    {
-        facCIDAudStream().ThrowErr
-        (
-            CID_FILE
-            , CID_LINE
-            , kAudStrErrs::errcStrm_EnumDevices
-            , tCIDLib::ESeverities::Failed
-            , tCIDLib::EErrClasses::NotFound
-        );
-    }
-
-    return kCIDLib::True;
-}
-
-
-// ---------------------------------------------------------------------------
-//  TCIDWaveInStream: Public, virtual methods
+//  TCIDWaveOutStream: Public, virtual methods
 // ---------------------------------------------------------------------------
 
 //
@@ -220,10 +114,10 @@ TCIDWaveInStream::bEnumWaveInDevs(          TCIDAudioStreamList&    colToFill
 //  available in the short time that we wait for data to show up.
 //
 tCIDLib::TBoolean
-TCIDWaveInStream::bReadBytes(          tCIDLib::TCard1* const  pc1ToFill
-                            , const tCIDLib::TCard4         c4MaxBytes
-                            , COP   tCIDLib::TCard4&        c4BytesRead
-                            , const tCIDLib::TCard4         c4WaitMSs)
+TCIDWaveOutStream::bWriteBytes(const   tCIDLib::TCard1* const  pc1Src
+                            , const tCIDLib::TCard4         c4SrcBytes
+                            , const tCIDLib::TCard4         c4WaitMSs
+                            , COP   tCIDLib::TCard4&        c4BytesWritten)
 {
     if (!m_pInfo)
         ThrowNotReady();
@@ -231,9 +125,9 @@ TCIDWaveInStream::bReadBytes(          tCIDLib::TCard1* const  pc1ToFill
     // Lock while we do this
     TLocker lockrSync(&m_mtxSync);
 
+/*
     //
-    //  If we have some left over data from last time, return it first. It's even
-    //  possible we still cannot return it all, so be careful of that.
+    //  If we have some left over data from last time, push it into the
     //
     if (m_pInfo->c4BufAvail)
     {
@@ -281,7 +175,7 @@ TCIDWaveInStream::bReadBytes(          tCIDLib::TCard1* const  pc1ToFill
         //
         WAVEHDR& hdrCur = m_pInfo->hdrWAVEs[m_pInfo->c4NextBufInd];
         m_pInfo->c4NextBufInd++;
-        if (m_pInfo->c4NextBufInd == CIDAudStream_WaveInStream_Win32::c4BufCount)
+        if (m_pInfo->c4NextBufInd == CIDAudStream_WaveOutStream_Win32::c4BufCount)
             m_pInfo->c4NextBufInd = 0;
 
         // Calc how much room left
@@ -318,6 +212,7 @@ TCIDWaveInStream::bReadBytes(          tCIDLib::TCard1* const  pc1ToFill
         // And give this one back
         ::waveInAddBuffer(m_pInfo->hWAVEIn, &hdrCur, sizeof(WAVEHDR));
     }
+*/
 
     return kCIDLib::True;
 }
@@ -328,12 +223,14 @@ TCIDWaveInStream::bReadBytes(          tCIDLib::TCard1* const  pc1ToFill
 //  queued up data  before it starts again, else that will show up before the new info
 //  it really cares about.
 //
-tCIDLib::TVoid TCIDWaveInStream::FlushBufs()
+tCIDLib::TVoid TCIDWaveOutStream::FlushBufs()
 {
     if (!m_pInfo)
         ThrowNotReady();
 
     TLocker lockrSync(&m_mtxSync);
+
+/*
 
     // Just move through the buffers until we find one not ready
     while (kCIDLib::True)
@@ -348,9 +245,11 @@ tCIDLib::TVoid TCIDWaveInStream::FlushBufs()
 
         // And move forward, wrapping if needed
         m_pInfo->c4NextBufInd++;
-        if (m_pInfo->c4NextBufInd == CIDAudStream_WaveInStream_Win32::c4BufCount)
+        if (m_pInfo->c4NextBufInd == CIDAudStream_WaveOutStream_Win32::c4BufCount)
             m_pInfo->c4NextBufInd = 0;
     }
+
+*/
 
     // Make sure the overflow buffer is seen as empty as well
     m_pInfo->c4BufAvail = 0;
@@ -362,7 +261,7 @@ tCIDLib::TVoid TCIDWaveInStream::FlushBufs()
 //  This method must be called to set us up. We create our round buffers and get all
 //  of the waveIn stuff set up. We set up our internal structure for tracking state.
 //
-tCIDLib::TVoid TCIDWaveInStream::Initialize()
+tCIDLib::TVoid TCIDWaveOutStream::Initialize()
 {
     if (m_pInfo)
     {
@@ -378,14 +277,15 @@ tCIDLib::TVoid TCIDWaveInStream::Initialize()
 
     try
     {
-        m_pInfo = new TCIDWaveInStreamInfo;
-        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TCIDWaveInStreamInfo));
+        m_pInfo = new TCIDWaveOutStreamInfo;
+        TRawMem::SetMemBuf(m_pInfo, kCIDLib::c1MinCard, sizeof(TCIDWaveOutStreamInfo));
 
+/*
         //
         //  Allocate our overflow buffer. It's the same size as one of our regular
         //  buffers.
         //
-        m_pInfo->pac1Over = new tCIDLib::TCard1[CIDAudStream_WaveInStream_Win32::c4BufBytes];
+        m_pInfo->pac1Over = new tCIDLib::TCard1[CIDAudStream_WaveOutStream_Win32::c4BufBytes];
 
         // Create the event we'll register, an auto-reset one
         m_pInfo->hNotEvent = ::CreateEvent(0, 0, 0, 0);
@@ -395,11 +295,11 @@ tCIDLib::TVoid TCIDWaveInStream::Initialize()
         {
             WAVE_FORMAT_PCM
             , 1
-            , CIDAudStream_WaveInStream_Win32::c4SampleRate
-            , CIDAudStream_WaveInStream_Win32::c4SampleRate
-              * CIDAudStream_WaveInStream_Win32::c4SampleBytes
-            , CIDAudStream_WaveInStream_Win32::c4SampleBytes
-            , CIDAudStream_WaveInStream_Win32::c4SampleBytes * 8
+            , CIDAudStream_WaveOutStream_Win32::c4SampleRate
+            , CIDAudStream_WaveOutStream_Win32::c4SampleRate
+              * CIDAudStream_WaveOutStream_Win32::c4SampleBytes
+            , CIDAudStream_WaveOutStream_Win32::c4SampleBytes
+            , CIDAudStream_WaveOutStream_Win32::c4SampleBytes * 8
             , 0
         };
         MMRESULT mRes = ::waveInOpen
@@ -426,16 +326,16 @@ tCIDLib::TVoid TCIDWaveInStream::Initialize()
         }
 
         // Set up the buffers
-        for (tCIDLib::TCard4 c4Index = 0; c4Index < CIDAudStream_WaveInStream_Win32::c4BufCount; c4Index++)
+        for (tCIDLib::TCard4 c4Index = 0; c4Index < CIDAudStream_WaveOutStream_Win32::c4BufCount; c4Index++)
         {
             WAVEHDR& hdrCur = m_pInfo->hdrWAVEs[c4Index];
 
             hdrCur.lpData = (LPSTR)new tCIDLib::TCard1
             [
-                CIDAudStream_WaveInStream_Win32::c4BufBytes
+                CIDAudStream_WaveOutStream_Win32::c4BufBytes
             ];
             hdrCur.dwFlags = 0;
-            hdrCur.dwBufferLength = CIDAudStream_WaveInStream_Win32::c4BufBytes;
+            hdrCur.dwBufferLength = CIDAudStream_WaveOutStream_Win32::c4BufBytes;
 
             mRes = ::waveInPrepareHeader(m_pInfo->hWAVEIn, &hdrCur, sizeof(WAVEHDR));
             if (mRes != MMSYSERR_NOERROR)
@@ -463,13 +363,12 @@ tCIDLib::TVoid TCIDWaveInStream::Initialize()
                     , TInteger(mRes, tCIDLib::ERadices::Hex)
                 );
             }
+
         }
 
         // Now start processing
-        waveInStart(m_pInfo->hWAVEIn);
-
-        // Set our parent class' stream state to ready
-        eState(tCIDAudStream::EStrmStates::Ready);
+        waveOutStart(m_pInfo->hWAVEIn);
+*/
     }
 
     catch(TError& errToCatch)
@@ -494,7 +393,7 @@ tCIDLib::TVoid TCIDWaveInStream::Initialize()
 
 // Returns the sample format for for this stream.
 tCIDLib::TVoid
-TCIDWaveInStream::QueryFormat( COP     tCIDLib::TCard4&    c4Channels
+TCIDWaveOutStream::QueryFormat( COP    tCIDLib::TCard4&    c4Channels
                             , COP   tCIDLib::TCard4&    c4SamplesPerSec
                             , COP   tCIDLib::TCard4&    c4BytesPerSample) const
 {
@@ -503,9 +402,9 @@ TCIDWaveInStream::QueryFormat( COP     tCIDLib::TCard4&    c4Channels
         ThrowNotReady();
 
     TLocker lockrSync(&m_mtxSync);
-    c4Channels = CIDAudStream_WaveInStream_Win32::c4Channels;
-    c4SamplesPerSec = CIDAudStream_WaveInStream_Win32::c4SampleRate;
-    c4BytesPerSample = CIDAudStream_WaveInStream_Win32::c4SampleBytes;
+    c4Channels = CIDAudStream_WaveOutStream_Win32::c4Channels;
+    c4SamplesPerSec = CIDAudStream_WaveOutStream_Win32::c4SampleRate;
+    c4BytesPerSample = CIDAudStream_WaveOutStream_Win32::c4SampleBytes;
 }
 
 
@@ -513,10 +412,11 @@ TCIDWaveInStream::QueryFormat( COP     tCIDLib::TCard4&    c4Channels
 //  This will clean up our resources. We have to make sure we leave ourself in a
 //  state where multiple calls to this method will not do anything wrong.
 //
-tCIDLib::TVoid TCIDWaveInStream::Terminate()
+tCIDLib::TVoid TCIDWaveOutStream::Terminate()
 {
     TLocker lockrSync(&m_mtxSync);
 
+/*
     if (m_pInfo)
     {
         // Most of this could have only gotten set up if we opened the wave device
@@ -527,7 +427,7 @@ tCIDLib::TVoid TCIDWaveInStream::Terminate()
 
             // Unprep our buffers and release them
             for (tCIDLib::TCard4 c4Index = 0;
-                            c4Index < CIDAudStream_WaveInStream_Win32::c4BufCount; c4Index++)
+                            c4Index < CIDAudStream_WaveOutStream_Win32::c4BufCount; c4Index++)
             {
                 WAVEHDR& hdrCur = m_pInfo->hdrWAVEs[c4Index];
 
@@ -554,5 +454,6 @@ tCIDLib::TVoid TCIDWaveInStream::Terminate()
         delete m_pInfo;
         m_pInfo = nullptr;
     }
+*/
 }
 

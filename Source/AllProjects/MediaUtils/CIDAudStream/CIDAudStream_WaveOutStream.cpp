@@ -1,11 +1,11 @@
 //
-// FILE NAME: CIDAudStream_WaveInStream.cpp
+// FILE NAME: CIDAudStream_WaveOutStream.cpp
 //
 // AUTHOR: Dean Roddey
 //
-// CREATED: 03/03/2017
+// CREATED: 08/01/2021
 //
-// COPYRIGHT: Charmed Quark Systems, Ltd @ 2019
+// COPYRIGHT: Charmed Quark Systems, Ltd @ 2021
 //
 //  This software is copyrighted by 'Charmed Quark Systems, Ltd' and
 //  the author (Dean Roddey.) It is licensed under the MIT Open Source
@@ -15,7 +15,8 @@
 //
 // DESCRIPTION:
 //
-//  This file implements a standard input stream that works over Windows audio inputs.
+//  This file implements a standard output stream that works over Windows audio
+//  WAVE outputs.
 //
 // CAVEATS/GOTCHAS:
 //
@@ -34,25 +35,25 @@
 // ---------------------------------------------------------------------------
 //  Magic macros
 // ---------------------------------------------------------------------------
-RTTIDecls(TCIDWaveInStream,TCIDAudioSrcStream)
+RTTIDecls(TCIDWaveOutStream,TCIDAudioTarStream)
 
 
 
 // ---------------------------------------------------------------------------
-//   CLASS: TCIDWaveInStream
+//   CLASS: TCIDWaveOutStream
 //  PREFIX: sprecev
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
-//  TCIDWaveInStream: Constructors and Destructor
+//  TCIDWaveOutStream: Constructors and Destructor
 // ---------------------------------------------------------------------------
-TCIDWaveInStream::TCIDWaveInStream() :
+TCIDWaveOutStream::TCIDWaveOutStream() :
 
     m_pInfo(nullptr)
 {
 }
 
-TCIDWaveInStream::~TCIDWaveInStream()
+TCIDWaveOutStream::~TCIDWaveOutStream()
 {
     try
     {
@@ -69,9 +70,9 @@ TCIDWaveInStream::~TCIDWaveInStream()
 
 
 // ---------------------------------------------------------------------------
-//  TCIDWaveInStream: Private, non-virtual methods
+//  TCIDWaveOutStream: Private, non-virtual methods
 // ---------------------------------------------------------------------------
-tCIDLib::TVoid TCIDWaveInStream::ThrowNotReady() const
+tCIDLib::TVoid TCIDWaveOutStream::ThrowNotReady() const
 {
     facCIDAudStream().ThrowErr
     (

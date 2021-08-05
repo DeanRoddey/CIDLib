@@ -1,0 +1,85 @@
+Class=[Final]
+    ClassPath MEng.User.Tests.TestZLib;
+    ParentClass MEng.Object;
+EndClass;
+
+Imports=
+    MEng.User.Tests.TestHelpers;
+    MEng.System.Runtime.ConsoleOutStream;
+    MEng.System.Runtime.ZLib;
+EndImports;
+
+Literals=
+    // Not a byte boundary to test for correct padding and such
+    Card4   kBufSz(507);
+EndLiterals;
+
+Members=
+    TestHelpers         m_Helper;
+    ConsoleOutStream    m_Output;
+    ZLib                m_Comp;
+    Int4                m_RetVal;
+EndMembers;
+
+
+Methods=[Public,Final]
+
+    Constructor() :
+        m_RetVal(0);
+    Begin
+    EndConstructor;
+
+    // Tests a path to see if it has the expected component values
+    Method Start() Returns Int4
+    Begin
+        Locals=
+            MemBuf  OrgBuf;
+            MemBuf  OutBuf;
+            MemBuf  TestBuf;
+            Card4   CompBytes;
+            Card4   TestBytes;
+            Card4   Index;
+        EndLocals;
+
+        // Put test data into the original buffer
+        Index := 0;
+        While (Index < kBufSz)
+            OrgBuf.PutCard1At(Index, TypeCast(MEng.Card1, Index));
+            Index++;
+        EndWhile;
+
+        // Compress it into the output buffer and ecompress back to test buffer
+        Try
+            CompBytes := m_Comp.Compress(OrgBuf, OutBuf, kBufSz);
+            TestBytes := m_Comp.Decompress(OutBuf, TestBuf, CompBytes);
+        EndTry;
+
+        Catch
+            m_Helper.PrintErr("Exception curing compression round trip", m_Output, $CurLine);
+            m_RetVal := -1;
+        EndCatch;
+
+        // Test bytes should equal original
+        If (m_RetVal != -1)
+            If (TestBytes != kBufSz)
+                m_Helper.PrintErr("Round trip resulted in different byte count", m_Output, $CurLine);
+                m_RetVal := -1;
+            EndIf;
+        EndIf;
+
+        // And the original and test buffers should be the same
+        Index := 0;
+        While (Index < kBufSz)
+            If (OrgBuf.GetCard1At(Index) != TestBuf.GetCard1At(Index))
+                m_Helper.PrintErr("Round trip compression failed", m_Output, $CurLine);
+                m_RetVal := -1;
+                Break;
+            EndIf;
+            Index++;
+        EndWhile;
+
+        m_Output.Flush();
+        Return m_RetVal;
+    EndMethod;
+
+EndMethods;

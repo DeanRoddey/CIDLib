@@ -23,9 +23,8 @@
 //  lockable interface. It is tolerant of the lockable object being null, so that
 //  we can support optional locking.
 //
-//  In the CIDLib_Mutex.hpp file it defines an incredibly common implementation
-//  that uses a mutex.
-//
+//  TMutex implements the lockable interface. Various other things may implement
+//  lockable, but generally will just delegate to a mutex member.
 //
 //  Because locking is so often just an internal detail and not part of the actual
 //  data of the containing class, and therefore often has to be done from
@@ -236,8 +235,8 @@ class CIDLIBEXP TLocker
         //      This indicates whether we currently have it locked or not.
         //
         //  m_pmlockTar
-        //      This is a pointer to the target mutex we will release upon
-        //      destruction. It may be zero. We are designed to be tolerant
+        //      This is a pointer to the target lockable we will release upon
+        //      destruction. It may be null. We are designed to be tolerant
         //      of this so that optional scope based locking can be done. See
         //      the file notes above.
         // -------------------------------------------------------------------

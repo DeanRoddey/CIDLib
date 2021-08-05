@@ -19,6 +19,11 @@
 //  interface that should suit most purposes. Where something more is required then one
 //  of these can be encapsulated. We assume that the data is PCM of some sort.
 //
+//  We also define a simple class that is used to return information about the available
+//  streams (of whatever type are being queried.) It includes a platform specific encoded
+//  identifier in text form. Each platform can use that however needed to get back to the
+//  indicated stream.
+//
 // CAVEATS/GOTCHAS:
 //
 // LOG:
@@ -31,8 +36,96 @@
 #pragma CIDLIB_PACK(CIDLIBPACK)
 
 // ---------------------------------------------------------------------------
+//   CLASS: TCIDAudioStreamInfo
+//  PREFIX: asinfo
+// ---------------------------------------------------------------------------
+class CIDAUDSTREAMEXP TCIDAudioStreamInfo : public TObject, public MStreamable
+{
+    public :
+        // -------------------------------------------------------------------
+        //  Constructors and Destructor
+        // -------------------------------------------------------------------
+        TCIDAudioStreamInfo() = default;
+
+        TCIDAudioStreamInfo
+        (
+            const   TString&                strName
+            , const TString&                strId
+        );
+
+        TCIDAudioStreamInfo(const TCIDAudioStreamInfo&) = default;
+        TCIDAudioStreamInfo(TCIDAudioStreamInfo&&) = default;
+
+        ~TCIDAudioStreamInfo() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDAudioStreamInfo& operator=(const TCIDAudioStreamInfo&) = default;
+        TCIDAudioStreamInfo& operator=(TCIDAudioStreamInfo&&) = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public, non-virtual methods
+        // -------------------------------------------------------------------
+        const TString& strId() const
+        {
+            return m_strId;
+        }
+
+        const TString& strName() const
+        {
+            return m_strName;
+        }
+
+        tCIDLib::TVoid Set
+        (
+            const   TString&                strName
+            , const TString&                strId
+        );
+
+
+    protected :
+        // -------------------------------------------------------------------
+        //  Protected, inherited methods
+        // -------------------------------------------------------------------
+        tCIDLib::TVoid StreamFrom
+        (
+                    TBinInStream&           strmToReadFrom
+        )   final;
+
+        tCIDLib::TVoid StreamTo
+        (
+                    TBinOutStream&          strmToWriteTo
+        )   const final;
+
+
+    private :
+        // -------------------------------------------------------------------
+        //  Private data members
+        //
+        //  m_strId
+        //      A platform specific id to let us find the stream again.
+        //
+        //  m_strName
+        //      The human readable name for the stream.
+        // -------------------------------------------------------------------
+        TString             m_strId;
+        TString             m_strName;
+
+
+        // -------------------------------------------------------------------
+        //  Magic macros
+        // -------------------------------------------------------------------
+        RTTIDefs(TCIDAudioStreamInfo, TObject)
+};
+using TCIDAudioStreamList = TVector<TCIDAudioStreamInfo>;
+
+
+// ---------------------------------------------------------------------------
 //   CLASS: TCIDAudioSrcStream
-//  PREFIX: cass
+//  PREFIX: strm
 // ---------------------------------------------------------------------------
 class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
 {
@@ -45,7 +138,7 @@ class CIDAUDSTREAMEXP TCIDAudioSrcStream : public TObject
         TCIDAudioSrcStream(const TCIDAudioSrcStream&) = delete;
         TCIDAudioSrcStream(TCIDAudioSrcStream&&) = delete;
 
-        virtual ~TCIDAudioSrcStream();
+        ~TCIDAudioSrcStream();
 
 
         // -------------------------------------------------------------------

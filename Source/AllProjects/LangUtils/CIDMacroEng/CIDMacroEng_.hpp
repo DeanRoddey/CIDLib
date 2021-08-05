@@ -69,6 +69,7 @@
 #include    "CIDMacroEng_SockClasses_.hpp"
 #include    "CIDMacroEng_RandomClasses_.hpp"
 #include    "CIDMacroEng_XMLClasses_.hpp"
+#include    "CIDMacroEng_ZLib_.hpp"
 
 
 // ---------------------------------------------------------------------------

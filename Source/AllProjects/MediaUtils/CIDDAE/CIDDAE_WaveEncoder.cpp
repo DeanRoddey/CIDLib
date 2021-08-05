@@ -400,7 +400,7 @@ tCIDLib::TVoid TCIDDAEWaveEnc::EndEncodeImpl()
             , kDAEErrs::errcEnc_WriteErr
             , tCIDLib::ESeverities::Failed
             , tCIDLib::EErrClasses::NotAllWritten
-            , TCardinal(sizeof(Hdr) + 8)
+            , TCardinal64(sizeof(Hdr) + 8ULL)
         );
     }
 
@@ -448,7 +448,7 @@ TCIDDAEWaveEnc::StartEncodeImpl(const   TString&        strTargetFile
     //  Write out empty bytes for the header plus room for the data chunk
     //  id/size that we'll have to write after it.
     //
-    tCIDMedia::TWaveHdr Hdr = {0};
+    tCIDMedia::TWaveHdr Hdr = {};
     const tCIDLib::TCard4 c4Count = sizeof(Hdr) + 8;
     if (m_flTarget.c4WriteBuffer(&Hdr, c4Count) != c4Count)
     {

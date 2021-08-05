@@ -16,7 +16,9 @@
 // DESCRIPTION:
 //
 //  This is the header file for the CIDComm_ThisFacility.cpp file. This
-//  file implements the facility class for this facility.
+//  file implements the facility class for this facility. Some of the things
+//  we do here need to be synchronized from the outside, so we implement the
+//  lockable mixin.
 //
 // CAVEATS/GOTCHAS:
 //

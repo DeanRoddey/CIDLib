@@ -220,6 +220,8 @@ TMEngRTClassLoader::pmeciLoadClass(         TCIDMacroEngine&    meTarget
         pmeciRet = new TMEngXMLTreeAnchorInfo(meTarget);
     else if (strClassPath == TMEngXMLTreeParserInfo::strPath())
         pmeciRet = new TMEngXMLTreeParserInfo(meTarget);
+    else if (strClassPath == TMEngZLibInfo::strPath())
+        pmeciRet = new TMEngZLibInfo(meTarget);
 
     return pmeciRet;
 }

@@ -310,7 +310,7 @@ tCIDLib::TVoid TCIDSpReco::Initialize(TCIDAudioSrcStream* const pstrmToAdopt)
         if (pstrmToAdopt)
             m_pInfo->pstrmSrc = janSteam.pobjOrphan();
         else
-            m_pInfo->pstrmSrc = new TWaveInSrcStream();
+            m_pInfo->pstrmSrc = new TCIDWaveInStream();
 
         // Initialize the source stream
         m_pInfo->pstrmSrc->Initialize();
