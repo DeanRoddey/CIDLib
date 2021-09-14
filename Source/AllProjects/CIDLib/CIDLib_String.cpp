@@ -4187,7 +4187,7 @@ TString::ToZStr(        tCIDLib::TCh* const pszTarget
     pszTarget[0] = kCIDLib::chNull;
 
     // If no chars in this string, then we are done
-    if (!m_strbData.bIsEmpty())
+    if (m_strbData.bIsEmpty())
         return;
 
     // If start index is at end of string, then we are done
@@ -4446,7 +4446,18 @@ TString::TStrBuf& TString::TStrBuf::operator=(const TStrBuf& strbSrc)
         }
          else if (bSmallSrc && !bSmallTar)
         {
-            // He is small and we are not. we won't bother moving to small mode. Our buffer is big enough
+            //
+            //  He is small and we are not. If our buffer is big enough, just copy it over. Else drop
+            //  our buffer and use the small buffer.
+            //
+            if (m_c4BufSz < strbSrc.m_c4CurEnd)
+            {
+                delete [] m_pszBuffer;
+                m_pszBuffer = nullptr;
+                m_pszBuffer = m_szSmallBuf;
+                m_c4BufSz = c4SmallBufSz;
+            }
+
             m_c4CurEnd = strbSrc.m_c4CurEnd;
             TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
         }
