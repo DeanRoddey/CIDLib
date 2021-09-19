@@ -82,7 +82,7 @@ IF NOT "%5" == "" GOTO SHOW_USAGE
 REM ---------------------------------------------------------------------------
 REM Set this appropriately for the version to build
 REM ---------------------------------------------------------------------------
-SET CID_VERSION=6.0.3
+SET CID_VERSION=6.0.4
 SET CID_VERSIONUL=%CID_VERSION:.=_%
 
 
