@@ -383,6 +383,9 @@ template <class TElem> tCIDLib::TVoid TXMLNameIDPool<TElem>::RemoveAll()
     m_c4IterBucket = c4Modulus;
     m_pIter = nullptr;
 
+    // Reset the current id index
+    m_c4IdIndex = 0;
+
     // Bump the sequence id to invalidate cursors
     m_c4SeqId++;
 }
