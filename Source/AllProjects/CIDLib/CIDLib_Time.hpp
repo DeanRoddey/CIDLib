@@ -71,6 +71,8 @@ class CIDLIBEXP TTime :
 
         static tCIDLib::TCard8 c8Millis();
 
+        static tCIDLib::TCard8 c8HPTimerUS();
+
         static tCIDLib::TVoid CalcRiseSetTimes
         (
             const   TTime&                  tmOn

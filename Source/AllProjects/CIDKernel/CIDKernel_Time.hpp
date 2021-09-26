@@ -271,5 +271,3 @@ class KRNLEXPORT TKrnlTimeStamp
 };
 
 #pragma CIDLIB_POPPACK
-
-

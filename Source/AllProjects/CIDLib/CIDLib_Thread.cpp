@@ -972,6 +972,23 @@ tCIDLib::TVoid TThread::Sleep(const tCIDLib::TCard4 c4MilliSecs)
 }
 
 
+// An uncondition higher performance sleep, to allow for sub-millisecond sleeping
+tCIDLib::TVoid TThread::HPSleep(const tCIDLib::TCard4 c4MicroSecs)
+{
+    if (!TKrnlHPTimer::bHighResDelay(c4MicroSecs))
+    {
+        facCIDLib().ThrowErr
+        (
+            CID_FILE
+            , CID_LINE
+            , kCIDErrs::errcPrc_HPSleep
+            , tCIDLib::ESeverities::Failed
+            , tCIDLib::EErrClasses::CantDo
+        );
+    }
+}
+
+
 tCIDLib::TThreadId TThread::tidCaller()
 {
     return TKrnlThread::tidCaller();

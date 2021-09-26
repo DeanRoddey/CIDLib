@@ -550,6 +550,7 @@ MESSAGES=
     midInit_SigHandler             17013    Signal handling
     midInit_FileSys                17014    File System
     midInit_RemMedia               17015    Removable media
+    midInit_HPTimer                17016    High performance timers
 
     ; Messages used by TKrnlPathStr
     midPath_UnknownPart            20000    Unknown path part enum value

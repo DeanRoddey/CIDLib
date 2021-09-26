@@ -303,6 +303,7 @@ TCIDKrnlModule::TCIDKrnlModule() :
         ,   { &TCIDKrnlModule::bInitTermAudio       , kKrnlMsgs::midInit_Audio }
         ,   { &TCIDKrnlModule::bInitTermIP          , kKrnlMsgs::midInit_IP }
         ,   { &TCIDKrnlModule::bInitTermTime        , kKrnlMsgs::midInit_Time }
+        ,   { &TCIDKrnlModule::bInitTermHPTimer     , kKrnlMsgs::midInit_HPTimer }
         ,   { &TCIDKrnlModule::bInitTermSysInfo     , kKrnlMsgs::midInit_SysInfo }
         ,   { &TCIDKrnlModule::bInitTermEnvironment , kKrnlMsgs::midInit_Environment }
         ,   { &TCIDKrnlModule::bInitTermFileSys     , kKrnlMsgs::midInit_FileSys }

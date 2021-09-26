@@ -278,6 +278,11 @@ class CIDLIBEXP TThread : public TObject, public MFormattable
             const   tCIDLib::TCard4         c4MilliSecs
         );
 
+        static tCIDLib::TVoid HPSleep
+        (
+            const   tCIDLib::TCard4         c4MicroSecs
+        );
+
         static tCIDLib::TThreadId tidCaller();
 
 

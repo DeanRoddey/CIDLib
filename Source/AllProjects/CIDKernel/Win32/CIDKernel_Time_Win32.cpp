@@ -38,21 +38,6 @@
 
 
 // ---------------------------------------------------------------------------
-//  Local data
-// ---------------------------------------------------------------------------
-namespace
-{
-    namespace CIDKernel_Time_Win32
-    {
-        tCIDLib::TBoolean   bHighResAvail = kCIDLib::False;
-        tCIDLib::TCard4     c4MinUSecs;
-        tCIDLib::TInt8      i8TicksPerUSec;
-    }
-}
-
-
-
-// ---------------------------------------------------------------------------
 //  TCIDKrnlModule: Private, non-virtual methods
 // ---------------------------------------------------------------------------
 tCIDLib::TBoolean TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eState)
@@ -94,27 +79,6 @@ tCIDLib::TBoolean TCIDKrnlModule::bInitTermTime(const tCIDLib::EInitTerm eState)
             FlTime.dwLowDateTime, FlTime.dwHighDateTime
         );
         #endif
-
-        // See if highe perf timers are available
-        LARGE_INTEGER Freq;
-        if (::QueryPerformanceFrequency(&Freq))
-        {
-            // Make sure we actually have counter support also
-            LARGE_INTEGER TestTicks;
-            if (::QueryPerformanceCounter(&TestTicks))
-            {
-                //
-                //  We allow sleeps for microsecond intervals, so calculate
-                //  the ticks per microsecond.
-                //
-                CIDKernel_Time_Win32::i8TicksPerUSec = Freq.QuadPart / 1000000;
-                CIDKernel_Time_Win32::bHighResAvail = kCIDLib::True;
-            }
-        }
-         else
-        {
-            CIDKernel_Time_Win32::bHighResAvail = kCIDLib::False;
-        }
     }
     return kCIDLib::True;
 }
@@ -132,61 +96,6 @@ const tCIDLib::TEncodedTime TKrnlTimeStamp::enctNTPOfs  = 116444738208988800;
 // ---------------------------------------------------------------------------
 //  TKrnlTimeStamp: Public, static methods
 // ---------------------------------------------------------------------------
-
-//
-//  Indicates whether high resolution timers are available on this machine.
-//  If not, then the high res delay methods below will not have any better
-//  than system time slice granularity necessarily.
-//
-tCIDLib::TBoolean TKrnlTimeStamp::bHighResTimerAvailable()
-{
-    return CIDKernel_Time_Win32::bHighResAvail;
-}
-
-
-tCIDLib::TBoolean
-TKrnlTimeStamp::bHighResDelay(const tCIDLib::TCard4 c4MicroSecs)
-{
-    // If no support, then just sleep for millis
-    if (!CIDKernel_Time_Win32::bHighResAvail)
-    {
-        if (c4MicroSecs < 1000)
-            ::Sleep(1);
-        else
-            Sleep(c4MicroSecs / 1000);
-    }
-     else
-    {
-        // Calculate the ticks we'll need to wait for
-        const tCIDLib::TInt8 i8TicksToWait
-        (
-            c4MicroSecs * CIDKernel_Time_Win32::i8TicksPerUSec
-        );
-
-        // Get the current timer
-        LARGE_INTEGER CurTicks;
-        if (!::QueryPerformanceCounter(&CurTicks))
-        {
-            TKrnlError::SetLastHostError(::GetLastError());
-            return kCIDLib::False;
-        }
-
-        // Calculate the end ticks
-        const tCIDLib::TInt8 i8EndTicks = CurTicks.QuadPart + i8TicksToWait;
-
-        // Now loop until it its the required value
-        do
-        {
-            if (!::QueryPerformanceCounter(&CurTicks))
-            {
-                TKrnlError::SetLastHostError(::GetLastError());
-                return kCIDLib::False;
-            }
-        }   while (CurTicks.QuadPart < i8EndTicks);
-    }
-    return kCIDLib::True;
-}
-
 
 // Return the daylist savings time state
 tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(COP tCIDLib::TBoolean& bDSTState)
@@ -212,7 +121,6 @@ tCIDLib::TBoolean TKrnlTimeStamp::bIsDST(COP tCIDLib::TBoolean& bDSTState)
     }
     return kCIDLib::True;
 }
-
 
 
 // Return the time zone offset

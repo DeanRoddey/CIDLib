@@ -62,6 +62,7 @@
 #include    "CIDKernel_String.hpp"
 #include    "CIDKernel_Module.hpp"
 #include    "CIDKernel_ConCharSet.hpp"
+#include    "CIDKernel_HiPerfTimer.hpp"
 
 
 // ---------------------------------------------------------------------------
@@ -242,6 +243,11 @@ class KRNLEXPORT TCIDKrnlModule : public TKrnlModule
         );
 
         tCIDLib::TBoolean bInitTermFileSys
+        (
+            const   tCIDLib::EInitTerm      eState
+        );
+
+        tCIDLib::TBoolean bInitTermHPTimer
         (
             const   tCIDLib::EInitTerm      eState
         );

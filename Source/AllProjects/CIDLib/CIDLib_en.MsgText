@@ -414,6 +414,7 @@ ERRORS=
     errcPrc_SetSingleInstInfo   2473    Error while settings single process instance information
     errcPrc_StillRunning        2474    Thread '%(1)' is still running at destruction, trying to stop it...
     errcPrc_CantStop            2475    Thread '%(1)' could not be stopped. Fatal error, restarting process!
+    errcPrc_HPSleep             2476    The high performance sleep call failed
 
     ; Pub/sub errors
     errcPubSub_IdNotFound       2901    No %(1) found with id %(2)

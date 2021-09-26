@@ -324,6 +324,13 @@ tCIDLib::TCard8 TTime::c8Millis()
 }
 
 
+// This returns the higher performance timer, which is micro seconds
+tCIDLib::TCard8 TTime::c8HPTimerUS()
+{
+    return TKrnlHPTimer::c8GetTicks();
+}
+
+
 // Just a passthrough to the kernel level
 tCIDLib::TVoid
 TTime::CurNTPTime(  COP     tCIDLib::TCard4&    c4Secs
