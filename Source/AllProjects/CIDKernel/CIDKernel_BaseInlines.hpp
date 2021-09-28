@@ -186,7 +186,8 @@ namespace tCIDLib
 
     // -----------------------------------------------------------------------
     //  These are just simple templates to return the smaller or larger of two
-    //  quantities (with 'quantity' meaning anything with a < and > operator.)
+    //  quantities (with 'quantity' meaning anything with a < and > operator)
+    //  or clamping between a min and max.
     // -----------------------------------------------------------------------
     template <typename T> constexpr T MaxVal(const T& v1, const T& v2) noexcept
     {
@@ -198,12 +199,21 @@ namespace tCIDLib
         return (v1 < v2) ? v1 : v2;
     }
 
+    template <typename T> constexpr T Clamp(const T& vMin, const T& vMax, const T& vTest) noexcept
+    {
+        if (vTest < vMin)
+            return vMin;
+        if (vTest > vMax)
+            return vMax;
+        return vTest;
+    }
+
 
     // ---------------------------------------------------------------------------
     //  Calculate the size of an array
     // ---------------------------------------------------------------------------
     template <typename T, int size>
-    constexpr tCIDLib::TCard4 c4ArrayElems(T(&)[size]) noexcept {return size;}
+    constexpr tCIDLib::TCard4 c4ArrayElems(T(&)[size]) noexcept { return size; }
 
 
     // ---------------------------------------------------------------------------

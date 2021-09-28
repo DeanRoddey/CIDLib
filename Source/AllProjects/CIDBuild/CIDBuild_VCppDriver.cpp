@@ -98,6 +98,10 @@ tCIDLib::TBoolean TVCppDriver::bBuild(const TProjectInfo& projiTarget)
         throw tCIDBuild::EErrors::Internal;
     }
 
+    // Compile any shader files
+    if (!bCompileShaders())
+        return kCIDLib::False;
+
     //
     //  Lets do our Cpp compilations. We just run through each of the Cpp
     //  files, which our parent class has has already set up, and ask if
@@ -717,6 +721,68 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
 
     // REturn true if we built something
     return !listToBuild.bEmpty();
+}
+
+
+// Builds any defined shader files, which for now are assumed to be for Vulkan
+tCIDLib::TBoolean TVCppDriver::bCompileShaders()
+{
+    TBldStr strTmp;
+
+    // Loop through all of the shader files and invoke glslc for each
+    TList<TBldStr>::TCursor cursShaders(&m_pprojiTarget->listShaders());
+    if (!cursShaders.bResetIter())
+        return kCIDLib::True;
+
+    constexpr tCIDLib::TCard4 c4MaxArgs = 8;
+    const tCIDLib::TCh* apszArgs[c4MaxArgs] = { nullptr };
+    do
+    {
+        // Build up the path to the source and destination files
+        TBldStr strSrc = m_pprojiTarget->strProjectDir();
+        strSrc.AppendPathComp(cursShaders->pszBuffer());
+
+        TBldStr strDest = m_pprojiTarget->strOutDir();
+        strDest.AppendPathComp(m_pprojiTarget->strProjectName().pszBuffer());
+
+        tCIDLib::TCard4 c4NameOfs = 0, c4ExtOfs = 0;
+        TUtils::FindPathParts(strSrc, c4NameOfs, c4ExtOfs);
+        if (c4ExtOfs != kCIDBuild::c4NotFound)
+        {
+            strDest.Append(&strSrc.pszBuffer()[c4ExtOfs]);
+        }
+
+        tCIDLib::TCard4 c4ArgCnt = 0;
+        apszArgs[c4ArgCnt++] = L"glslc.exe";
+        apszArgs[c4ArgCnt++] = strSrc.pszBuffer();
+        apszArgs[c4ArgCnt++] = L"-o";
+        apszArgs[c4ArgCnt++] = strDest.pszBuffer();
+
+        if (c4ArgCnt > c4MaxArgs)
+            throw tCIDBuild::EErrors::IndexError;
+
+        if (facCIDBuild.bVerbose()    )
+        {
+            stdOut << L"    ";
+            for (tCIDLib::TCard4 c4Index = 0; c4Index < c4ArgCnt; c4Index++)
+            {
+                stdOut << apszArgs[c4Index] << L" ";
+            }
+            stdOut << kCIDBuild::EndLn;
+        }
+
+        tCIDLib::TCard4 c4ErrCode = 0;
+        if (!TUtils::bExec(apszArgs, c4ArgCnt, c4ErrCode, kCIDBuild::c4ExecFlag_None))
+        {
+            stdOut  << L"Could not compile shader file: "
+                    << strSrc
+                    << kCIDBuild::EndLn;
+            return kCIDLib::False;
+        }
+
+    }   while (cursShaders.bNext());
+
+    return kCIDLib::True;
 }
 
 

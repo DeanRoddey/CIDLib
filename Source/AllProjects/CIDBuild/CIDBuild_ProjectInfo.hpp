@@ -50,7 +50,17 @@ class TProjFileCopy
             const   TBldStr&                strOutPath
         );
 
+        TProjFileCopy(const TProjFileCopy&) = delete;
+        TProjFileCopy(TProjFileCopy&&) = delete;
+
         ~TProjFileCopy();
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TProjFileCopy& operator=(const TProjFileCopy&) = delete;
+        TProjFileCopy& operator=(TProjFileCopy&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -185,19 +195,21 @@ class TProjectInfo
 
         const TList<TFindInfo>& listCpps() const;
 
-        const TList<TBldStr>& listCustomCmds() const;
+        const tCIDBuild::TStrList& listCustomCmds() const;
 
         const TList<TBldStr>& listDeps() const;
 
         const TList<TProjFileCopy>& listFileCopies() const;
 
-        const TList<TBldStr>& listExtLibs() const;
+        const tCIDBuild::TStrList& listExtLibs() const;
 
         const TList<TFindInfo>& listHpps() const;
 
         const TList<TIDLInfo>& listIDLFiles() const;
 
-        const TList<TBldStr>& listIncludePaths() const;
+        const tCIDBuild::TStrList& listIncludePaths() const;
+
+        const tCIDBuild::TStrList& listShaders() const;
 
         tCIDLib::TVoid LoadFileLists();
 
@@ -307,6 +319,11 @@ class TProjectInfo
         );
 
         tCIDLib::TVoid ParseSettings
+        (
+                    TLineSpooler&           lsplSource
+        );
+
+        tCIDLib::TVoid ParseShaders
         (
                     TLineSpooler&           lsplSource
         );
@@ -523,6 +540,7 @@ class TProjectInfo
         tCIDBuild::TKVPList         m_listOptions;
         tCIDBuild::TStrList         m_listPlatformsExcl;
         tCIDBuild::TStrList         m_listPlatformsIncl;
+        tCIDBuild::TStrList         m_listShaders;
         tCIDBuild::TStrList         m_listTmp1;
         tCIDBuild::TStrList         m_listTmp2;
         TBldStr                     m_strCopyOutDir;

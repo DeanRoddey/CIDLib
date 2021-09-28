@@ -44,6 +44,7 @@ class TVCppDriver : public TToolsDriver
         TVCppDriver();
 
         TVCppDriver(const TVCppDriver&) = delete;
+        TVCppDriver(TVCppDriver&&) = delete;
 
         ~TVCppDriver();
 
@@ -52,6 +53,7 @@ class TVCppDriver : public TToolsDriver
         //  Public operators
         // -------------------------------------------------------------------
         TVCppDriver& operator=(const TVCppDriver&) = delete;
+        TVCppDriver& operator=(TVCppDriver&&) = delete;
 
 
     protected :
@@ -86,6 +88,8 @@ class TVCppDriver : public TToolsDriver
         );
 
         tCIDLib::TBoolean bCompileCpps();
+
+        tCIDLib::TBoolean bCompileShaders();
 
         tCIDLib::TBoolean bLibsNewer
         (

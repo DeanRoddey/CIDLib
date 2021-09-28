@@ -439,6 +439,11 @@ const  tCIDBuild::TStrList& TProjectInfo::listIncludePaths() const
     return m_listIncludePaths;
 }
 
+const  tCIDBuild::TStrList& TProjectInfo::listShaders() const
+{
+    return m_listShaders;
+}
+
 
 tCIDLib::TVoid TProjectInfo::LoadFileLists()
 {
@@ -600,6 +605,10 @@ tCIDLib::TVoid TProjectInfo::ParseContent(TLineSpooler& lsplSource)
             strReadBuf.Cut(7);
             strReadBuf.StripWhitespace();
             ParseOptions(strReadBuf, lsplSource);
+        }
+         else if (strReadBuf == L"SHADERS")
+        {
+            ParseShaders(lsplSource);
         }
          else
         {
@@ -1332,5 +1341,31 @@ tCIDLib::TVoid TProjectInfo::ParseSettings(TLineSpooler& lsplSource)
                 << L" failed to define a project name"
                 << kCIDBuild::EndLn;
         throw tCIDBuild::EErrors::FileFormat;
+    }
+}
+
+
+// Parses any shade files from the SHADERS= block, which has already been see
+tCIDLib::TVoid TProjectInfo::ParseShaders(TLineSpooler& lsplSource)
+{
+    static const TBldStr strEndBlock(L"END SHADERS");
+
+    TBldStr strReadBuf;
+    while (kCIDLib::True)
+    {
+        // Get the next line. If end of file, that's an error here
+        if (!lsplSource.bReadLine(strReadBuf))
+        {
+            stdOut  << L"(Line " << lsplSource.c4CurLine()
+                    << L") Expected shader file name or END SHADERS"
+                    << kCIDBuild::EndLn;
+            throw tCIDBuild::EErrors::UnexpectedEOF;
+        }
+
+        if (strReadBuf == strEndBlock)
+            break;
+
+        // Store it as a shader file
+        m_listShaders.Add(new TBldStr(strReadBuf));
     }
 }

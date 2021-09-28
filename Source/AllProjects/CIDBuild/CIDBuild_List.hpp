@@ -62,6 +62,7 @@ template <typename T> class TList
         }
 
         TList(const TList&) = delete;
+        TList(TList&&) = delete;
 
         ~TList()
         {
@@ -73,6 +74,7 @@ template <typename T> class TList
         //  Public operators
         // -------------------------------------------------------------------
         TList& operator=(const TList&) = delete;
+        TList& operator=(TList&&) = delete;
 
 
         // -------------------------------------------------------------------
