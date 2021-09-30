@@ -34,3 +34,7 @@ Tmp.Txt
 *.sln
 *.exe
 *.dll
+
+
+# We have some special cases we have to force
+!Source/Depends/**
