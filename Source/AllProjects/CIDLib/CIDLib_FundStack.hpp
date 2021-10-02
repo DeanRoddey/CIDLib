@@ -129,6 +129,7 @@ template <typename T> class TFundStack : public TFundColBase, public MDuplicable
 
             // Oh well, lets check the actual content
             const T* const ptSrc = fcolToCompare.m_ptElements;
+            CIDAssert3(ptSrc != nullptr);
             for (tCIDLib::TCard4 c4Index = 0; c4Index < m_c4Top; c4Index++)
             {
                 if (m_ptElements[c4Index] != ptSrc[c4Index])

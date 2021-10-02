@@ -1,8 +1,9 @@
 # Ignore the prod/release output directories
 /Output
 
-# Don't do the .vscode directory, this is per-platform
+# Ignore Visual Studio (and Code) stuff
 /.vscode
+.vs/
 
 # Ignore any thumbs files
 Thumbs.db

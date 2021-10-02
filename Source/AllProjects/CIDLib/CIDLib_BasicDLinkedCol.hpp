@@ -588,6 +588,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the last node
             TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert3(pnodeLast != nullptr);
 
             // Get a copy of the stored object and delete the node
             objToFill = pnodeLast->objData();
@@ -717,6 +718,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the first node and return a ref to the data
             TNode* pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert3(pnodeFirst != nullptr);
             return pnodeFirst->objData();
         }
 
@@ -730,6 +732,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the first node and return a ref to the data
             TNode* pnodeFirst = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert3(pnodeFirst != nullptr);
             return pnodeFirst->objData();
         }
 
@@ -743,6 +746,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the last node and return a ref to the data
             TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert3(pnodeLast != nullptr);
             return pnodeLast->objData();
         }
 
@@ -756,6 +760,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the last node amd return a ref to the data
             TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert3(pnodeLast != nullptr);
             return pnodeLast->objData();
         }
 
@@ -769,6 +774,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the first node
             TNode* pnodeHead = static_cast<TNode*>(m_llstCol.pnodeHead());
+            CIDAssert3(pnodeHead != nullptr);
 
             // Get a copy of the stored object
             TElem objRet = pnodeHead->objData();
@@ -792,6 +798,7 @@ template <typename TElem> class TBasicDLinkedCol : public TCollection<TElem>
 
             // Get a pointer to the last node
             TNode* pnodeLast = static_cast<TNode*>(m_llstCol.pnodeTail());
+            CIDAssert3(pnodeLast != nullptr);
 
             // Get a copy of the stored object
             TElem objRet = pnodeLast->objData();

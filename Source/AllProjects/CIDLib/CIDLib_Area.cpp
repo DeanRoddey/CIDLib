@@ -140,10 +140,10 @@ tCIDLib::TVoid TArea::operator-=(const TArea& areaToSub)
         return;
 
     // To much simplify things, get both our right/bottom positions
-    tCIDLib::TInt4  i4ThisRight    = i4Right() ;
-    tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
-    tCIDLib::TInt4  i4TestRight    = areaToSub.i4Right();
-    tCIDLib::TInt4  i4TestBottom   = areaToSub.i4Bottom();
+    const tCIDLib::TInt4  i4ThisRight    = i4Right() ;
+    const tCIDLib::TInt4  i4ThisBottom   = i4Bottom();
+    const tCIDLib::TInt4  i4TestRight    = areaToSub.i4Right();
+    const tCIDLib::TInt4  i4TestBottom   = areaToSub.i4Bottom();
 
     //
     //  If his origin is is past our LR or his LR is before our origin,
@@ -1347,6 +1347,8 @@ tCIDLib::TVoid
 TArea::ToPointArray(        tCIDLib::THostPoint* const  aptlTarget
                     , const tCIDLib::ERectlTypes        eInclusive) const
 {
+    CIDAssert3(aptlTarget != nullptr);
+
     tCIDLib::TInt4 i4R = i4Right();
     tCIDLib::TInt4 i4B = i4Bottom();
 

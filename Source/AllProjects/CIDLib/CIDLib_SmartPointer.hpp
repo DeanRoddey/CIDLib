@@ -856,8 +856,11 @@ template <typename T> class TCntPtr
             TCntPtrData<T>* pcdTmp = m_pcdRef;
             m_pcdRef = new TCntPtrDataDefDel<T>(pobjNew, kCIDLib::True);
 
-            //  If no more refs of either type left, then clean up the pointer data
-            if (!pcdTmp->bReleaseStrongRef())
+            //
+            //  If no more refs of either type left, then clean up the pointer data. Just in
+            //  case it's been moved, check for null.
+            //
+            if (pcdTmp && !pcdTmp->bReleaseStrongRef())
                 delete pcdTmp;
         }
 
@@ -875,11 +878,8 @@ template <typename T> class TCntPtr
             //  If no more refs of either type left, then clean up the pointer data. Just in
             //  case it's been moved, check for null.
             //
-            if (pcdTmp)
-            {
-                if (!pcdTmp->bReleaseStrongRef())
-                    delete pcdTmp;
-            }
+            if (pcdTmp && !pcdTmp->bReleaseStrongRef())
+                delete pcdTmp;
         }
 
 

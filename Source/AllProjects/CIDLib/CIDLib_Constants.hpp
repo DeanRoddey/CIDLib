@@ -190,6 +190,9 @@ namespace tCIDLib
 
     #define CIDAssert2X(msg,tok1)  tCIDLib::ThrowAssert(msg, CID_FILE, CID_LINE, tok1);
 
+    #define CIDAssert3(test) \
+    if (!(test)) { tCIDLib::ThrowAssert(L## #test, CID_FILE, CID_LINE); }
+
     // Never actually returns, this is for code analysis reasons
     inline tCIDLib::TBoolean
     bAssertTest(const   tCIDLib::TBoolean       bResult
@@ -227,6 +230,7 @@ namespace tCIDLib
     #define CIDAssertX(test,msg,tok1) {}
     #define CIDAssert2(msg) {}
     #define CIDAssert2X(msg,tok1) {}
+    #define CIDAssert3(msg) {}
 
     #define bCIDAssert(test,msg) kCIDLib::True
     #define bCIDAssertX(test,msg,tok1) kCIDLib::True

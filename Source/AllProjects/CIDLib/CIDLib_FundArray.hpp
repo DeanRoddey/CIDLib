@@ -338,7 +338,7 @@ class TFundArray : public TFundColBase, public MDuplicable
 
         tCIDLib::TVoid RotateDown(const tCIDLib::TCard4 c4Count)
         {
-            tCIDLib::TCard4  c4Actual = c4Count % m_c4ElemCount;
+            const tCIDLib::TCard4  c4Actual = c4Count % m_c4ElemCount;
 
             if (!c4Actual || (m_c4ElemCount == 1))
                 return;
@@ -357,7 +357,7 @@ class TFundArray : public TFundColBase, public MDuplicable
 
         tCIDLib::TVoid RotateUp(const tCIDLib::TCard4 c4Count)
         {
-            tCIDLib::TCard4  c4Actual = c4Count % m_c4ElemCount;
+            const tCIDLib::TCard4  c4Actual = c4Count % m_c4ElemCount;
 
             if (!c4Actual || (m_c4ElemCount == 1))
                 return;

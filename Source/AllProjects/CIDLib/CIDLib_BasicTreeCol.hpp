@@ -789,6 +789,7 @@ template <typename TElem> class TTreeNodeNT : public TBasicTreeNode<TElem>
                     , const tCIDLib::TBoolean               bCaseSensitive
                     , const tCIDLib::TBoolean               bSorted)
         {
+            CIDAssert3(pnodeAdd != nullptr);
             TBasicTreeNode<TElem>* pnodeCur  = m_pnodeRoot;
             TBasicTreeNode<TElem>* pnodePrev = nullptr;
             tCIDLib::TBoolean      bDup      = kCIDLib::False;
@@ -1840,11 +1841,13 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             // Find the node and make sure it's a scope, casting it to the right type
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strScopePath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind != nullptr);
             TBasicTreeHelpers::CheckNodeType
             (
                 pnodeToFind, tCIDLib::ETreeNodes::NonTerminal, CID_FILE, CID_LINE
             );
             TNodeNT* pnodeTarget = static_cast<TNodeNT*>(pnodeToFind);
+            CIDAssert3(pnodeTarget != nullptr);
 
             return pnodeTarget->c4SerialNum();
         }
@@ -1952,6 +1955,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             // Get a cursor for this collection. If empty, then do nothing
             TColCursor<TKeyValuePair>* pcursPairs = colPairs.pcursNew();
+            CIDAssert3(pcursPairs != nullptr);
             TJanitor<TColCursor<TKeyValuePair> > janCurs(pcursPairs);
             if (!pcursPairs->bReset())
                 return nullptr;
@@ -2045,6 +2049,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             // Find the node that we are to add under and check the type
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind != nullptr);
             TBasicTreeHelpers::CheckNodeType
             (
                 pnodeToFind, tCIDLib::ETreeNodes::NonTerminal, CID_FILE, CID_LINE
@@ -2055,10 +2060,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             m_c4TCount++;
 
             // And now add it to the target node
-            return pnodeTarget->objAddTerminal
-            (
-                objToAdd, strToAdd, strDescription, m_bCasePath, m_bSorted
-            );
+            return pnodeTarget->objAddTerminal(objToAdd, strToAdd, strDescription, m_bCasePath, m_bSorted);
         }
 
         TElem&
@@ -2075,11 +2077,13 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             // Find the node that we are to add under and check the type
             TNode* pnodeAt = cursAt.pnodeCur();
+            CIDAssert3(pnodeAt != nullptr);
             TBasicTreeHelpers::CheckNodeType
             (
                 pnodeAt, tCIDLib::ETreeNodes::NonTerminal, CID_FILE, CID_LINE
             );
             TNodeNT* pnodeTarget = static_cast<TNodeNT*>(pnodeAt);
+            CIDAssert3(pnodeTarget != nullptr);
 
             // Bump our terminal element count
             m_c4TCount++;
@@ -2101,6 +2105,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeAt != nullptr);
             return pnodeAt->objData();
         }
 
@@ -2114,6 +2119,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             const TNode* pnodeAt = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeAt != nullptr);
             return pnodeAt->objData();
         }
 
@@ -2126,12 +2132,10 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind != nullptr);
 
             // Has to be a terminal in this case
-            TBasicTreeHelpers::CheckNodeType
-            (
-                pnodeToFind, tCIDLib::ETreeNodes::Terminal, CID_FILE, CID_LINE
-            );
+            TBasicTreeHelpers::CheckNodeType(pnodeToFind, tCIDLib::ETreeNodes::Terminal, CID_FILE, CID_LINE);
 
             // Give back the name/descr info
             strNameToFill = pnodeToFind->strName();
@@ -2209,6 +2213,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind != nullptr);
             strNameToFill = pnodeToFind->strName();
             strDescToFill = pnodeToFind->strDescription();
         }
@@ -2239,10 +2244,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             m_c4NTCount++;
 
             // And now add it to the target node
-            return pnodeTarget->pnodeAddNonTerminal
-            (
-                strToAdd, strDescription, m_bCasePath, m_bSorted
-            );
+            return pnodeTarget->pnodeAddNonTerminal(strToAdd, strDescription, m_bCasePath, m_bSorted);
         }
 
         TNodeNT*
@@ -2258,20 +2260,19 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             // Find the node that we are to add under and check the type
             TNode* pnodeAt = cursAt.pnodeCur();
+            CIDAssert3(pnodeAt != nullptr);
             TBasicTreeHelpers::CheckNodeType
             (
                 pnodeAt, tCIDLib::ETreeNodes::NonTerminal, CID_FILE, CID_LINE
             );
             TNodeNT* pnodeTarget = static_cast<TNodeNT*>(pnodeAt);
+            CIDAssert3(pnodeTarget != nullptr);
 
             // Bump our terminal element count
             m_c4NTCount++;
 
             // And now add it to the target node
-            return pnodeTarget->pnodeAddNonTerminal
-            (
-                strToAdd, strDescription, m_bCasePath, m_bSorted
-            );
+            return pnodeTarget->pnodeAddNonTerminal(strToAdd, strDescription, m_bCasePath, m_bSorted);
         }
 
 
@@ -2299,6 +2300,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind);
             TBasicTreeHelpers::CheckNodeType
             (
                 pnodeToFind, tCIDLib::ETreeNodes::Terminal, CID_FILE, CID_LINE
@@ -2356,6 +2358,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
 
             tCIDLib::TCard4 c4Dummy;
             TNode* pnodeToFind = pnodeFindNode(strPath, c4Dummy, kCIDLib::True);
+            CIDAssert3(pnodeToFind);
             pnodeToFind->strDescription(strDescription);
         }
 
@@ -2457,6 +2460,8 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
                                     , const TNodeNT* const      pnodeCur
                                     , const tCIDLib::TCard4     c4Level)
         {
+            CIDAssert3(pnodeCur != nullptr);
+
             // First space us over
             strmTarget << TTextOutStream::Spaces(c4Level * 4);
 
@@ -2525,6 +2530,9 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             //  through its siblings.
             //
             pnodeCurParent = pnodeStart->pnodeParent();
+
+            // This can be null on return
+            CIDLib_Suppress(26429)
             TNode* pnodeCur = nullptr;
             constexpr tCIDLib::TBoolean bDone = kCIDLib::False;
             while (!bDone)
@@ -2591,6 +2599,7 @@ template <typename TElem> class TBasicTreeCol : public TCollection<TElem>
             TStringTokenizer stokName(&strToFind, strSepChars);
 
             TNodeNT*    pnodeCurParent = m_pnodeRoot;
+            CIDAssert3(pnodeCurParent != nullptr);
             TNode*      pnodeTmp = nullptr;
             TString     strCur;
             while (stokName.bGetNextToken(strCur))

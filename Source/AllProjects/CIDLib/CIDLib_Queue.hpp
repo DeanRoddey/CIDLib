@@ -742,7 +742,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
-            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            const tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
                 lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
             );
@@ -773,7 +773,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
-            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            const tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
                 lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
             );
@@ -782,6 +782,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             {
                 // Get the head node
                 TNode* pnodeHead = static_cast<TNode*>(m_llstQueue.pnodeHead());
+                CIDAssert3(pnodeHead != nullptr);
 
                 // Get the object out of it and then flush the node
                 objToFill = tCIDLib::ForceMove(pnodeHead->objData());
@@ -859,7 +860,7 @@ template <typename TElem> class TQueue : public TCollection<TElem>
             TLocker lockrQueue(this);
 
             // Call a helper to wait for something to show up
-            tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
+            const tCIDLib::TBoolean bGotOne = TCollectionBase::bWaitForData
             (
                 lockrQueue, *this, c4Millis, m_twlWaiters, bThrowIfTimeout
             );
