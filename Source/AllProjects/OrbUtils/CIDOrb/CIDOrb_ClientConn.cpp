@@ -279,8 +279,8 @@ TOrbClientConnImpl::eSpoolThread(TThread& thrThis, tCIDLib::TVoid*)
     // Let our caller go
     thrThis.Sync();
 
-    tCIDLib::TBoolean       bDone = kCIDLib::False;
-    tCIDSock::ESockEvs   eEvents;
+    tCIDLib::TBoolean   bDone = kCIDLib::False;
+    tCIDSock::ESockEvs  eEvents = tCIDSock::ESockEvs::None;
     while(!bDone)
     {
         try

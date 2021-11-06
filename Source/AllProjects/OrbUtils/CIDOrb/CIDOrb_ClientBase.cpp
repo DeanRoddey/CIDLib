@@ -669,7 +669,7 @@ TCmdQItem* TOrbClientBase::pcqiGetCmdItem(const TOrbId& oidToSet)
     //  add a new one.
     //
     const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colCmdCache.c4ElemCount();
-    tCIDLib::TCard4 c4Index;
+    tCIDLib::TCard4 c4Index = 0;
     TCmdQItem* pcqiCur = nullptr;
     for (c4Index = 0; c4Index < c4Count; c4Index++)
     {
@@ -1539,7 +1539,7 @@ TSrvTarget* TOrbClientBase::psrvtAddSrvRef()
         //  removing them from the wait list. They do that themselves.
         //
         const tCIDLib::TCard4 c4Count = CIDOrb_ClientBase::m_pState->colConnWaitList.c4ElemCount();
-        TOrbCConnWait* poccwCur;
+        TOrbCConnWait* poccwCur = nullptr;
         for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
         {
             poccwCur = CIDOrb_ClientBase::m_pState->colConnWaitList.pobjAt(c4Index);

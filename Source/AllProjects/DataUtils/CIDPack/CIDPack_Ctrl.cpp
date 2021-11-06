@@ -62,13 +62,6 @@ namespace
 // ---------------------------------------------------------------------------
 //  TCIDPackFlHdr: Constructors and Destructor.
 // ---------------------------------------------------------------------------
-TCIDPackFlHdr::TCIDPackFlHdr() :
-
-    m_c4CompBytes(0)
-    , m_c4OrgBytes(0)
-{
-}
-
 TCIDPackFlHdr::TCIDPackFlHdr(const  tCIDLib::TCard4     c4CompBytes
                             , const tCIDLib::TCard4     c4OrgBytes
                             , const TMD5Hash&           mhashOrg
@@ -79,35 +72,6 @@ TCIDPackFlHdr::TCIDPackFlHdr(const  tCIDLib::TCard4     c4CompBytes
     , m_mhashOrg(mhashOrg)
     , m_strRelPath(strRelPath)
 {
-}
-
-TCIDPackFlHdr::TCIDPackFlHdr(const TCIDPackFlHdr& pkhdrSrc) :
-
-    m_c4CompBytes(pkhdrSrc.m_c4CompBytes)
-    , m_c4OrgBytes(pkhdrSrc.m_c4OrgBytes)
-    , m_mhashOrg(pkhdrSrc.m_mhashOrg)
-    , m_strRelPath(pkhdrSrc.m_strRelPath)
-{
-}
-
-TCIDPackFlHdr::~TCIDPackFlHdr()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TCIDPackFlHdr: Public operators
-// ---------------------------------------------------------------------------
-TCIDPackFlHdr& TCIDPackFlHdr::operator=(const TCIDPackFlHdr& pkfhdrSrc)
-{
-    if (this != &pkfhdrSrc)
-    {
-        m_c4CompBytes   = pkfhdrSrc.m_c4CompBytes;
-        m_c4OrgBytes    = pkfhdrSrc.m_c4OrgBytes;
-        m_mhashOrg      = pkfhdrSrc.m_mhashOrg;
-        m_strRelPath    = pkfhdrSrc.m_strRelPath;
-    }
-    return *this;
 }
 
 
@@ -137,7 +101,6 @@ const TString& TCIDPackFlHdr::strRelPath() const
 {
     return m_strRelPath;
 }
-
 
 
 // ---------------------------------------------------------------------------
@@ -235,61 +198,15 @@ tCIDLib::TVoid TCIDPackFlHdr::StreamTo(TBinOutStream& strmToWriteTo) const
 // ---------------------------------------------------------------------------
 //  TCIDPackHdr: Constructors and Destructor.
 // ---------------------------------------------------------------------------
-TCIDPackHdr::TCIDPackHdr() :
-
-    m_c4FileCount(0)
-    , m_c4User(0)
-    , m_c8User(0)
-    , m_c8Version(0)
-    , m_enctStamp(0)
-{
-}
-
 TCIDPackHdr::TCIDPackHdr(const  tCIDLib::TCard4         c4FileCount
                         , const tCIDLib::TCard8         c8Version
                         , const tCIDLib::TEncodedTime   enctStamp) :
 
     m_c4FileCount(c4FileCount)
-    , m_c4User(0)
     , m_c8Version(c8Version)
-    , m_c8User(0)
     , m_enctStamp(enctStamp)
 {
 }
-
-TCIDPackHdr::TCIDPackHdr(const TCIDPackHdr& pkhdrSrc) :
-
-    m_c4FileCount(pkhdrSrc.m_c4FileCount)
-    , m_c4User(pkhdrSrc.m_c4User)
-    , m_c8User(pkhdrSrc.m_c8User)
-    , m_c8Version(pkhdrSrc.m_c8Version)
-    , m_enctStamp(pkhdrSrc.m_enctStamp)
-    , m_strUser(pkhdrSrc.m_strUser)
-{
-}
-
-TCIDPackHdr::~TCIDPackHdr()
-{
-}
-
-
-// ---------------------------------------------------------------------------
-//  TCIDPackHdr: Public operators
-// ---------------------------------------------------------------------------
-TCIDPackHdr& TCIDPackHdr::operator=(const TCIDPackHdr& pkhdrSrc)
-{
-    if (this != &pkhdrSrc)
-    {
-        m_c4FileCount   = pkhdrSrc.m_c4FileCount;
-        m_c4User        = pkhdrSrc.m_c4User;
-        m_c8User        = pkhdrSrc.m_c8User;
-        m_c8Version     = pkhdrSrc.m_c8Version;
-        m_enctStamp     = pkhdrSrc.m_enctStamp;
-        m_strUser       = pkhdrSrc.m_strUser;
-    }
-    return *this;
-}
-
 
 // ---------------------------------------------------------------------------
 //  TCIDPackHdr: Public, non-virtual methods
@@ -313,7 +230,6 @@ tCIDLib::TCard4 TCIDPackHdr::c4User(const tCIDLib::TCard4 c4ToSet)
     m_c4User = c4ToSet;
     return m_c4User;
 }
-
 
 
 // Get/set the 64 cardinal user value

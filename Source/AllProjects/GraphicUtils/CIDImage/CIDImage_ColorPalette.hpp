@@ -198,12 +198,12 @@ class CIDIMGEXP TClrPalette :
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToFormat
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToFormat
-        )   const;
+        )   const final;
 
 
     private :

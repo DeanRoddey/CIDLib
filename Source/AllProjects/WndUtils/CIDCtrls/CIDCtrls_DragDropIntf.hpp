@@ -49,6 +49,7 @@ class CIDCTRLSEXP MDragAndDrop
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         MDragAndDrop(const MDragAndDrop&) = delete;
+        MDragAndDrop(MDragAndDrop&&) = delete;
 
         virtual ~MDragAndDrop();
 
@@ -57,6 +58,7 @@ class CIDCTRLSEXP MDragAndDrop
         //  Public operators
         // -------------------------------------------------------------------
         MDragAndDrop& operator=(const MDragAndDrop&) = delete;
+        MDragAndDrop& operator=(MDragAndDrop&&) = delete;
 
 
         // -------------------------------------------------------------------

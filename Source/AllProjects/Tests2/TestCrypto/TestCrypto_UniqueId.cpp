@@ -65,8 +65,8 @@ TTest_UniqueId1::~TTest_UniqueId1()
 //  TTest_UniqueId1: Public, inherited methods
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
-TTest_UniqueId1::eRunTest(TTextStringOutStream&  strmOut
-                    , tCIDLib::TBoolean&    bWarning)
+TTest_UniqueId1::eRunTest(  TTextStringOutStream&   strmOut
+                            , tCIDLib::TBoolean&    bWarning)
 {
     //
     //  Create an id, get it into a binary message hash object, then

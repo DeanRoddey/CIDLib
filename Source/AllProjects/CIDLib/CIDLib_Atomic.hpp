@@ -61,7 +61,7 @@ namespace TAtomic
 
     template <typename T> T* pExchangePtr(T** ppToFill, T* const pNew)
     {
-        return reinterpret_cast<T*>
+        return static_cast<T*>
         (
             TRawMem::pExchangeRawPtr
             (
@@ -74,7 +74,7 @@ namespace TAtomic
                                                 , T* const  pNew
                                                 , T* const  pCompare)
     {
-        return reinterpret_cast<T*>
+        return static_cast<T*>
         (
             TRawMem::pCompareAndExchangeRawPtr
             (

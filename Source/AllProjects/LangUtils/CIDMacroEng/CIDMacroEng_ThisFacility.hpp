@@ -68,6 +68,7 @@ class CIDMACROENGEXP TFacCIDMacroEng : public TFacility
         TFacCIDMacroEng();
 
         TFacCIDMacroEng(const TFacCIDMacroEng&) = delete;
+        TFacCIDMacroEng(TFacCIDMacroEng&&) = delete;
 
         ~TFacCIDMacroEng();
 
@@ -76,6 +77,7 @@ class CIDMACROENGEXP TFacCIDMacroEng : public TFacility
         //  Public operators
         // -------------------------------------------------------------------
         TFacCIDMacroEng& operator=(const TFacCIDMacroEng&) = delete;
+        TFacCIDMacroEng& operator=(TFacCIDMacroEng&&) = delete;
 
 
         // -------------------------------------------------------------------

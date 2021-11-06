@@ -4249,18 +4249,15 @@ TString::TStrBuf::TStrBuf(const tCIDLib::TCard4 c4InitSz) :
     m_c4BufSz(c4InitSz)
     , m_c4CurEnd(0)
 {
+    m_szSmallBuf[0] = kCIDLib::chNull;
+
     if (m_c4BufSz < c4SmallBufSz)
         m_c4BufSz = c4SmallBufSz;
 
     if (m_c4BufSz > c4SmallBufSz)
-    {
         m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
-        m_szSmallBuf[0] = kCIDLib::chNull;
-    }
     else
-    {
         m_pszBuffer = m_szSmallBuf;
-    }
     m_pszBuffer[0] = kCIDLib::chNull;
 }
 
@@ -4268,7 +4265,8 @@ TString::TStrBuf::TStrBuf(const tCIDLib::TCard4 c4InitSz) :
 // Construct from an existing string, optionally allocating extra chars for subsequent use
 TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszSrc
                             , const tCIDLib::TCard4     c4SrcLen
-                            , const tCIDLib::TCard4     c4ExtraChars)
+                            , const tCIDLib::TCard4     c4ExtraChars) :
+    m_szSmallBuf(L"")
 {
     if (pszSrc)
     {
@@ -4284,7 +4282,6 @@ TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszSrc
         m_c4BufSz = c4NewSz;
         m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
         TRawMem::CopyMemBuf(m_pszBuffer, pszSrc, m_c4CurEnd * kCIDLib::c4CharBytes);
-        m_szSmallBuf[0] = kCIDLib::chNull;
     }
      else
     {
@@ -4299,7 +4296,9 @@ TString::TStrBuf::TStrBuf(  const   tCIDLib::TCh* const pszSrc
 
 // Construct from an existing string, which we may be asked to adopt
 TString::TStrBuf::TStrBuf(          tCIDLib::TCh* const     pszToAdopt
-                            , const tCIDLib::EAdoptOpts     eAdopt)
+                            , const tCIDLib::EAdoptOpts     eAdopt) :
+
+    m_szSmallBuf(L"")
 {
     if (!pszToAdopt)
     {
@@ -4328,8 +4327,6 @@ TString::TStrBuf::TStrBuf(          tCIDLib::TCh* const     pszToAdopt
                 m_pszBuffer = pszToAdopt;
             else
                 m_pszBuffer = TRawStr::pszReplicate(pszToAdopt);
-
-            m_szSmallBuf[0] = kCIDLib::chNull;
         }
     }
 }
@@ -4338,8 +4335,9 @@ TString::TStrBuf::TStrBuf(const TStrBuf& strbSrc) :
 
     m_c4BufSz(strbSrc.m_c4BufSz)
     , m_c4CurEnd(strbSrc.m_c4CurEnd)
-    , m_pszBuffer(nullptr)
+    , m_szSmallBuf(L"")
 {
+    m_szSmallBuf[0] = kCIDLib::chNull;
     if (strbSrc.m_pszBuffer == strbSrc.m_szSmallBuf)
     {
         CIDAssert(strbSrc.m_c4CurEnd <= c4SmallBufSz, L"Small buffer string is too big");
@@ -4363,8 +4361,6 @@ TString::TStrBuf::TStrBuf(const TStrBuf& strbSrc) :
         m_pszBuffer = new tCIDLib::TCh[m_c4BufSz + 1];
         TRawMem::CopyMemBuf(m_pszBuffer, strbSrc.m_pszBuffer, m_c4CurEnd * kCIDLib::c4CharBytes);
         m_pszBuffer[m_c4CurEnd] = kCIDLib::chNull;
-
-        m_szSmallBuf[0] = kCIDLib::chNull;
     }
 }
 
@@ -4373,6 +4369,7 @@ TString::TStrBuf::TStrBuf(TStrBuf&& strbSrc) :
 
     m_c4BufSz(c4SmallBufSz)
     , m_pszBuffer(m_szSmallBuf)
+    , m_szSmallBuf(L"")
 {
     *this = tCIDLib::ForceMove(strbSrc);
 }
@@ -4381,6 +4378,7 @@ TString::TStrBuf::TStrBuf(const TKrnlString& kstrSrc) :
 
     m_c4BufSz(kstrSrc.c4Length())
     , m_c4CurEnd(kstrSrc.c4Length())
+    , m_szSmallBuf(L"")
 {
     // If it will fit in the small string do that, else allocate
     if (m_c4BufSz <= c4SmallBufSz)
@@ -4399,7 +4397,9 @@ TString::TStrBuf::TStrBuf(const TKrnlString& kstrSrc) :
 }
 
 // We just steal his buffer
-TString::TStrBuf::TStrBuf(TKrnlString&& kstrSrc)
+TString::TStrBuf::TStrBuf(TKrnlString&& kstrSrc) :
+
+    m_szSmallBuf(L"")
 {
     m_pszBuffer = kstrSrc.pszOrphanBuffer(m_c4BufSz, m_c4CurEnd);
 }
@@ -4728,7 +4728,8 @@ tCIDLib::TVoid TString::TStrBuf::CopyWithoutSpace(  const   TStringView&        
         Clear();
 
     // Find the start and end indicies
-    tCIDLib::TCard4 c4Start, c4End;
+    tCIDLib::TCard4 c4Start = 0;
+    tCIDLib::TCard4 c4End = 0;
     const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody
     (
         strvSrc.pszBuffer(), c4Start, c4End, strvSrc.bHaveLength() ? strvSrc.c4Length() : kCIDLib::c4MaxCard

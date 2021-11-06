@@ -167,12 +167,12 @@ template <typename T> class TFundQueue : public TFundColBase, public MDuplicable
         // --------------------------------------------------------------------
         //  Public, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::TBoolean bIsEmpty() const override
+        tCIDLib::TBoolean bIsEmpty() const final
         {
             return (m_c4Head == m_c4Tail);
         }
 
-        tCIDLib::TCard4 c4ElemCount() const override
+        tCIDLib::TCard4 c4ElemCount() const final
         {
             if (m_c4Head == m_c4Tail)
                 return 0;
@@ -189,7 +189,7 @@ template <typename T> class TFundQueue : public TFundColBase, public MDuplicable
             }
         }
 
-        tCIDLib::TVoid RemoveAll()
+        tCIDLib::TVoid RemoveAll() final
         {
             // Point the head and tail back at the zero'th position
             m_c4Head = 0;

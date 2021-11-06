@@ -118,7 +118,7 @@ class TMEngRTClassLoader : public MMEngExtClassLoader
         (
                     TCIDMacroEngine&        meTarget
             , const TString&                strClassPath
-        );
+        )   final;
 };
 
 

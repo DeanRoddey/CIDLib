@@ -56,6 +56,7 @@ class TColThread : public TThread
         );
 
         TColThread(const TColThread&) = delete;
+        TColThread(TColThread&&) = delete;
 
         ~TColThread();
 
@@ -64,13 +65,14 @@ class TColThread : public TThread
         //  Public operators
         // -------------------------------------------------------------------
         TColThread& operator=(const TColThread&) = delete;
+        TColThread& operator=(TColThread&&) = delete;
 
 
     protected   :
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::EExitCodes eProcess();
+        tCIDLib::EExitCodes eProcess() final;
 
 
     private :

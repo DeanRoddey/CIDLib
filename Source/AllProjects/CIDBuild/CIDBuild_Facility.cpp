@@ -1012,6 +1012,12 @@ TFacCIDBuild::ParseParms(   const   tCIDLib::TCard4        c4Args
                     m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Level2;
                     m_eAction = tCIDBuild::EActions::Build;
                 }
+                 else if (!TRawStr::iCompIStr(pszActVal, L"AnalyzeTmp"))
+                {
+                    // It's a build but with the code analysis level set
+                    m_eCodeAnalysis = tCIDBuild::EAnalysisLevels::Temp;
+                    m_eAction = tCIDBuild::EActions::Build;
+                }
                  else if (!TRawStr::iCompIStr(pszActVal, L"Build"))
                 {
                     m_eAction = tCIDBuild::EActions::Build;

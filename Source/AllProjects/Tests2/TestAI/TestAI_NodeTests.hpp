@@ -48,7 +48,7 @@ class TTest_BTInverterTest1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -82,7 +82,7 @@ class TTest_BTVarTest1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :

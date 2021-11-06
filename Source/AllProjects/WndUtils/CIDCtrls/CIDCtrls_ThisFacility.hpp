@@ -88,7 +88,17 @@ class CIDCTRLSEXP TFacCIDCtrls : public TGUIFacility
         // -------------------------------------------------------------------
         TFacCIDCtrls();
 
+        TFacCIDCtrls(const TFacCIDCtrls&) = delete;
+        TFacCIDCtrls(TFacCIDCtrls&&) = delete;
+
         ~TFacCIDCtrls();
+
+
+        // -------------------------------------------------------------------
+        //  Public methods
+        // -------------------------------------------------------------------
+        TFacCIDCtrls& operator=(const TFacCIDCtrls&) = delete;
+        TFacCIDCtrls& operator=(TFacCIDCtrls&&) = delete;
 
 
         // -------------------------------------------------------------------

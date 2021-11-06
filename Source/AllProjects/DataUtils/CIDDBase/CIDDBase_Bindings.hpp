@@ -57,6 +57,7 @@ class CIDDBASEEXP TDBBinding : public TObject
         //  Constructors and Destructor
         // -------------------------------------------------------------------
         TDBBinding(const TDBBinding&) = delete;
+        TDBBinding(TDBBinding&&) = delete;
 
         ~TDBBinding();
 
@@ -65,6 +66,7 @@ class CIDDBASEEXP TDBBinding : public TObject
         //  Public operators
         // -------------------------------------------------------------------
         tCIDLib::TVoid operator=(const TDBBinding&) = delete;
+        tCIDLib::TVoid operator=(TDBBinding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -189,6 +191,7 @@ class CIDDBASEEXP TDBBoolBinding : public TDBBinding
         );
 
         TDBBoolBinding(const TDBBoolBinding&) = delete;
+        TDBBoolBinding(TDBBoolBinding&&) = delete;
 
         ~TDBBoolBinding();
 
@@ -197,6 +200,7 @@ class CIDDBASEEXP TDBBoolBinding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBBoolBinding& operator=(const TDBBoolBinding&) = delete;
+        TDBBoolBinding& operator=(TDBBoolBinding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -206,9 +210,9 @@ class CIDDBASEEXP TDBBoolBinding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -253,6 +257,7 @@ class CIDDBASEEXP TDBCard1Binding : public TDBBinding
         );
 
         TDBCard1Binding(const TDBCard1Binding&) = delete;
+        TDBCard1Binding(TDBCard1Binding&&) = delete;
 
         ~TDBCard1Binding();
 
@@ -261,6 +266,7 @@ class CIDDBASEEXP TDBCard1Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBCard1Binding& operator=(const TDBCard1Binding&) = delete;
+        TDBCard1Binding& operator=(TDBCard1Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -270,9 +276,9 @@ class CIDDBASEEXP TDBCard1Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -316,6 +322,7 @@ class CIDDBASEEXP TDBCard2Binding : public TDBBinding
         );
 
         TDBCard2Binding(const TDBCard2Binding&) = delete;
+        TDBCard2Binding(TDBCard2Binding&&) = delete;
 
         ~TDBCard2Binding();
 
@@ -324,6 +331,7 @@ class CIDDBASEEXP TDBCard2Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBCard2Binding& operator=(const TDBCard2Binding&) = delete;
+        TDBCard2Binding& operator=(TDBCard2Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -333,9 +341,9 @@ class CIDDBASEEXP TDBCard2Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -380,6 +388,7 @@ class CIDDBASEEXP TDBCard4Binding : public TDBBinding
         );
 
         TDBCard4Binding(const TDBCard4Binding&) = delete;
+        TDBCard4Binding(TDBCard4Binding&&) = delete;
 
         ~TDBCard4Binding();
 
@@ -388,6 +397,7 @@ class CIDDBASEEXP TDBCard4Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBCard4Binding& operator=(const TDBCard4Binding&) = delete;
+        TDBCard4Binding& operator=(TDBCard4Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -397,9 +407,9 @@ class CIDDBASEEXP TDBCard4Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -444,6 +454,7 @@ class CIDDBASEEXP TDBCard8Binding : public TDBBinding
         );
 
         TDBCard8Binding(const TDBCard8Binding&) = delete;
+        TDBCard8Binding(TDBCard8Binding&&) = delete;
 
         ~TDBCard8Binding();
 
@@ -452,6 +463,7 @@ class CIDDBASEEXP TDBCard8Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBCard8Binding& operator=(const TDBCard8Binding&) = delete;
+        TDBCard8Binding& operator=(TDBCard8Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -469,7 +481,7 @@ class CIDDBASEEXP TDBCard8Binding : public TDBBinding
         // -------------------------------------------------------------------
         tCIDLib::TCard8 c8Value() const;
 
-        tCIDLib::TVoid PostFetch();
+        tCIDLib::TVoid PostFetch() final;
 
 
     private :
@@ -516,6 +528,7 @@ class CIDDBASEEXP TDBDateBinding : public TDBBinding
         );
 
         TDBDateBinding(const TDBDateBinding&) = delete;
+        TDBDateBinding(TDBDateBinding&&) = delete;
 
         ~TDBDateBinding();
 
@@ -524,6 +537,7 @@ class CIDDBASEEXP TDBDateBinding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBDateBinding& operator=(const TDBDateBinding&) = delete;
+        TDBDateBinding& operator=(TDBDateBinding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -533,9 +547,9 @@ class CIDDBASEEXP TDBDateBinding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -591,6 +605,7 @@ class CIDDBASEEXP TDBInt1Binding : public TDBBinding
         );
 
         TDBInt1Binding(const TDBInt1Binding&) = delete;
+        TDBInt1Binding(TDBInt1Binding&&) = delete;
 
         ~TDBInt1Binding();
 
@@ -599,6 +614,7 @@ class CIDDBASEEXP TDBInt1Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBInt1Binding& operator=(const TDBInt1Binding&) = delete;
+        TDBInt1Binding& operator=(TDBInt1Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -608,9 +624,9 @@ class CIDDBASEEXP TDBInt1Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -654,6 +670,7 @@ class CIDDBASEEXP TDBInt2Binding : public TDBBinding
         );
 
         TDBInt2Binding(const TDBInt2Binding&) = delete;
+        TDBInt2Binding(TDBInt2Binding&&) = delete;
 
         ~TDBInt2Binding();
 
@@ -662,6 +679,7 @@ class CIDDBASEEXP TDBInt2Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBInt2Binding& operator=(const TDBInt2Binding&) = delete;
+        TDBInt2Binding& operator=(TDBInt2Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -671,9 +689,9 @@ class CIDDBASEEXP TDBInt2Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -718,6 +736,7 @@ class CIDDBASEEXP TDBInt4Binding : public TDBBinding
         );
 
         TDBInt4Binding(const TDBInt4Binding&) = delete;
+        TDBInt4Binding(TDBInt4Binding&&) = delete;
 
         ~TDBInt4Binding();
 
@@ -726,6 +745,7 @@ class CIDDBASEEXP TDBInt4Binding : public TDBBinding
         //  Unimplemented
         // -------------------------------------------------------------------
         TDBInt4Binding& operator=(const TDBInt4Binding&) = delete;
+        TDBInt4Binding& operator=(TDBInt4Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -735,9 +755,9 @@ class CIDDBASEEXP TDBInt4Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -782,6 +802,7 @@ class CIDDBASEEXP TDBInt8Binding : public TDBBinding
         );
 
         TDBInt8Binding(const TDBInt8Binding&) = delete;
+        TDBInt8Binding(TDBInt8Binding&&) = delete;
 
         ~TDBInt8Binding();
 
@@ -790,6 +811,7 @@ class CIDDBASEEXP TDBInt8Binding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBInt8Binding& operator=(const TDBInt8Binding&) = delete;
+        TDBInt8Binding& operator=(TDBInt8Binding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -799,9 +821,9 @@ class CIDDBASEEXP TDBInt8Binding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -848,6 +870,7 @@ class CIDDBASEEXP TDBStrBinding : public TDBBinding
         );
 
         TDBStrBinding(const TDBStrBinding&) = delete;
+        TDBStrBinding(TDBStrBinding&&) = delete;
 
         ~TDBStrBinding();
 
@@ -856,6 +879,7 @@ class CIDDBASEEXP TDBStrBinding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBStrBinding& operator=(const TDBStrBinding&) = delete;
+        TDBStrBinding& operator=(TDBStrBinding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -865,9 +889,9 @@ class CIDDBASEEXP TDBStrBinding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------
@@ -944,6 +968,7 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         );
 
         TDBTimeBinding(const TDBTimeBinding&) = delete;
+        TDBTimeBinding(TDBTimeBinding&&) = delete;
 
         ~TDBTimeBinding();
 
@@ -952,6 +977,7 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         //  Public operators
         // -------------------------------------------------------------------
         TDBTimeBinding& operator=(const TDBTimeBinding&) = delete;
+        TDBTimeBinding& operator=(TDBTimeBinding&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -961,9 +987,9 @@ class CIDDBASEEXP TDBTimeBinding : public TDBBinding
         (
                     TDBStatement&           dbstmtSrc
             , const tCIDLib::TCard2         c2ParmInd
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid PostFetch() override;
+        tCIDLib::TVoid PostFetch() final;
 
 
         // -------------------------------------------------------------------

@@ -46,7 +46,7 @@ class CIDPACKEXP TCIDPackFlHdr : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
         // -------------------------------------------------------------------
-        TCIDPackFlHdr();
+        TCIDPackFlHdr() = default;
 
         TCIDPackFlHdr
         (
@@ -56,21 +56,17 @@ class CIDPACKEXP TCIDPackFlHdr : public TObject, public MStreamable
             , const TString&                strRelPath
         );
 
-        TCIDPackFlHdr
-        (
-            const   TCIDPackFlHdr&            pkfhdrSrc
-        );
+        TCIDPackFlHdr(const TCIDPackFlHdr&) = default;
+        TCIDPackFlHdr(TCIDPackFlHdr&&) = default;
 
-        ~TCIDPackFlHdr();
+        ~TCIDPackFlHdr() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCIDPackFlHdr& operator=
-        (
-            const   TCIDPackFlHdr&            pkfhdrSrc
-        );
+        TCIDPackFlHdr& operator=(const TCIDPackFlHdr&) = default;
+        TCIDPackFlHdr& operator=(TCIDPackFlHdr&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -92,12 +88,12 @@ class CIDPACKEXP TCIDPackFlHdr : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -118,8 +114,8 @@ class CIDPACKEXP TCIDPackFlHdr : public TObject, public MStreamable
         //      The relative path of this file, relative to the original top
         //      level directory.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4     m_c4CompBytes;
-        tCIDLib::TCard4     m_c4OrgBytes;
+        tCIDLib::TCard4     m_c4CompBytes = 0;
+        tCIDLib::TCard4     m_c4OrgBytes = 0;
         TMD5Hash            m_mhashOrg;
         TString             m_strRelPath;
 
@@ -141,7 +137,7 @@ class CIDPACKEXP TCIDPackHdr : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
         // -------------------------------------------------------------------
-        TCIDPackHdr();
+        TCIDPackHdr() = default;
 
         TCIDPackHdr
         (
@@ -150,21 +146,17 @@ class CIDPACKEXP TCIDPackHdr : public TObject, public MStreamable
             , const tCIDLib::TEncodedTime   enctStamp
         );
 
-        TCIDPackHdr
-        (
-            const   TCIDPackHdr&            pkhdrSrc
-        );
+        TCIDPackHdr(const TCIDPackHdr&) = default;
+        TCIDPackHdr(TCIDPackHdr&&) = default;
 
-        ~TCIDPackHdr();
+        ~TCIDPackHdr() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TCIDPackHdr& operator=
-        (
-            const   TCIDPackHdr&            pkhdrSrc
-        );
+        TCIDPackHdr& operator=(const  TCIDPackHdr&) = default;
+        TCIDPackHdr& operator=(TCIDPackHdr&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -205,12 +197,12 @@ class CIDPACKEXP TCIDPackHdr : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -242,11 +234,11 @@ class CIDPACKEXP TCIDPackHdr : public TObject, public MStreamable
         //      Some open ended info that can be stored in the file for the use of
         //      client code. It's not compressed, so it shouldn't be really big.
         // -------------------------------------------------------------------
-        tCIDLib::TCard4         m_c4FileCount;
-        tCIDLib::TCard4         m_c4User;
-        tCIDLib::TCard8         m_c8User;
-        tCIDLib::TCard8         m_c8Version;
-        tCIDLib::TEncodedTime   m_enctStamp;
+        tCIDLib::TCard4         m_c4FileCount = 0;
+        tCIDLib::TCard4         m_c4User = 0;
+        tCIDLib::TCard8         m_c8User = 0;
+        tCIDLib::TCard8         m_c8Version = 0;
+        tCIDLib::TEncodedTime   m_enctStamp = 0;
         TString                 m_strUser;
 
 

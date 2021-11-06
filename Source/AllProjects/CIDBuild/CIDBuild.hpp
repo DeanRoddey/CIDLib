@@ -128,6 +128,7 @@ namespace tCIDBuild
         None
         , Level1
         , Level2
+        , Temp
     };
 
 

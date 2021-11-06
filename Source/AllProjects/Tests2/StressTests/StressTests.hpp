@@ -62,7 +62,7 @@ class TTest_ObjStore1: public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -104,7 +104,7 @@ class TTest_ObjStore2: public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -144,7 +144,7 @@ class TTest_ObjStore3: public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -205,7 +205,7 @@ class TTest_ObjStore4: public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -262,6 +262,7 @@ class TStressTestsApp : public TTestFWApp
         TStressTestsApp();
 
         TStressTestsApp(const TStressTestsApp&) = delete;
+        TStressTestsApp(TStressTestsApp&&) = delete;
 
         ~TStressTestsApp();
 
@@ -272,21 +273,21 @@ class TStressTestsApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

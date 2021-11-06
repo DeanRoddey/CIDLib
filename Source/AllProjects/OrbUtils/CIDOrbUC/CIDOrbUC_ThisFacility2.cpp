@@ -422,7 +422,7 @@ tCIDLib::TBoolean TFacCIDOrbUC::bBindAll(tCIDOrbUC::TNSrvProxy& orbcNS)
 //  rebind objects that need to be rebound, and does them.
 //
 tCIDLib::TBoolean
-TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS, tCIDLib::TBoolean& bChanges)
+TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS, COP tCIDLib::TBoolean& bChanges)
 {
     // Assume no changes until proven otherwise
     bChanges = kCIDLib::False;
@@ -542,18 +542,17 @@ TFacCIDOrbUC::bDoBindingPass(tCIDOrbUC::TNSrvProxy& orbcNS, tCIDLib::TBoolean& b
 //  renewal. It renews them if so.
 //
 tCIDLib::TBoolean
-TFacCIDOrbUC::bDoLeaseRenewal(  tCIDOrbUC::TNSrvProxy&  orbcNS
-                                , tCIDLib::TBoolean&    bChanges)
+TFacCIDOrbUC::bDoLeaseRenewal(tCIDOrbUC::TNSrvProxy&  orbcNS, COP tCIDLib::TBoolean& bChanges)
 {
     // Assume no changes until proven otherwise
     bChanges = kCIDLib::False;
 
-    tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
-
     // Remember any paths that need a renewal
-    tCIDLib::TStrList           colToDo;
-    tCIDLib::TCardList          fcolOrgInd;
+    tCIDLib::TStrList  colToDo;
+    tCIDLib::TCardList fcolOrgInd;
     const tCIDLib::TEncodedTime enctNow = TTime::enctNow();
+
+    tCIDLib::TCard4 c4Count = m_colList.c4ElemCount();
     for (tCIDLib::TCard4 c4Index = 0; c4Index < c4Count; c4Index++)
     {
         TNSRebindInfo& nsrbiCur = m_colList[c4Index];

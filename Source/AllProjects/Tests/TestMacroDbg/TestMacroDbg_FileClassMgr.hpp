@@ -53,7 +53,17 @@ class TMacroDbgClassMgr : public TMEngFixedBaseClassMgr
 
         );
 
+        TMacroDbgClassMgr(const TMacroDbgClassMgr&) = delete;
+        TMacroDbgClassMgr(TMacroDbgClassMgr&&) = delete;
+
         ~TMacroDbgClassMgr();
+
+
+        // -------------------------------------------------------------------
+        //  Public methods
+        // -------------------------------------------------------------------
+        TMacroDbgClassMgr& operator=(const TMacroDbgClassMgr&) = delete;
+        TMacroDbgClassMgr& operator=(TMacroDbgClassMgr&&) = delete;
 
 
     protected :
@@ -64,17 +74,10 @@ class TMacroDbgClassMgr : public TMEngFixedBaseClassMgr
         (
                     TString&                strToFill
             , const tCIDMacroEng::EResModes    eMode
-        );
+        )   final;
 
 
     private :
-        // -------------------------------------------------------------------
-        //  Unimplemented
-        // -------------------------------------------------------------------
-        TMacroDbgClassMgr(const TMacroDbgClassMgr&);
-        tCIDLib::TVoid operator=(const TMacroDbgClassMgr&);
-
-
         // -------------------------------------------------------------------
         //  Private data members
         //

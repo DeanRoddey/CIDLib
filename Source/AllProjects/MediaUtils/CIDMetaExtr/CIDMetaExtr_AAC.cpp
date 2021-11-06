@@ -86,10 +86,6 @@ TCIDMetaExtrAAC::TCIDMetaExtrAAC() :
 {
 }
 
-TCIDMetaExtrAAC::~TCIDMetaExtrAAC()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TCIDMetaExtrAAC: Public, inherited methods

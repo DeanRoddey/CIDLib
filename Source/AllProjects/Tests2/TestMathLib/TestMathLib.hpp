@@ -58,7 +58,7 @@ class TTest_Basic : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -92,7 +92,7 @@ class TTest_Ctor : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -125,7 +125,7 @@ class TTest_Geo : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -159,7 +159,7 @@ class TTest_GraphData : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -193,7 +193,7 @@ class TTest_Range : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -222,6 +222,7 @@ class TMathLibTestApp : public TTestFWApp
         TMathLibTestApp();
 
         TMathLibTestApp(const TMathLibTestApp&) = delete;
+        TMathLibTestApp(TMathLibTestApp&&) = delete;
 
         ~TMathLibTestApp();
 
@@ -232,21 +233,21 @@ class TMathLibTestApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

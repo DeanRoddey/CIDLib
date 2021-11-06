@@ -50,44 +50,14 @@ RTTIDecls(TTextSym,TObject)
 // ----------------------------------------------------------------------------
 //  TTextSym: Constructors and Destructor
 // ----------------------------------------------------------------------------
-TTextSym::TTextSym() :
-
-    m_eType(tCIDResEd::EMsgTypes::Message)
-    , m_strSym()
-{
-}
-
-TTextSym::TTextSym(const TTextSym& tsymToCopy) :
-
-    m_eType(tsymToCopy.m_eType)
-    , m_strSym(tsymToCopy.m_strSym)
-    , m_strRealSym(tsymToCopy.m_strRealSym)
-{
-}
-
 TTextSym::TTextSym(const TString& strSym, const tCIDResEd::EMsgTypes eType)
 {
     Set(strSym, eType);
 }
 
-TTextSym::~TTextSym()
-{
-}
-
 // ----------------------------------------------------------------------------
 //  TTextSym: Public operators
 // ----------------------------------------------------------------------------
-TTextSym& TTextSym::operator=(const TTextSym& tsymToAssign)
-{
-    if (this != &tsymToAssign)
-    {
-        m_eType      = tsymToAssign.m_eType;
-        m_strSym     = tsymToAssign.m_strSym;
-        m_strRealSym = tsymToAssign.m_strRealSym;
-    }
-    return *this;
-}
-
 tCIDLib::TBoolean TTextSym::operator==(const TTextSym& tsymToComp) const
 {
     return (m_eType == tsymToComp.m_eType)

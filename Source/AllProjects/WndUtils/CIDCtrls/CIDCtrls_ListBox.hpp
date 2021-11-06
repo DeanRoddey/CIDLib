@@ -94,6 +94,7 @@ class CIDCTRLSEXP TListBox : public TListWnd
         TListBox();
 
         TListBox(const TListBox&) = delete;
+        TListBox(TListBox&&) = delete;
 
         ~TListBox();
 
@@ -102,68 +103,69 @@ class CIDCTRLSEXP TListBox : public TListWnd
         //  Public oeprators
         // -------------------------------------------------------------------
         TListBox& operator=(const TListBox&) = delete;
+        TListBox& operator=(TListBox&&) = delete;
 
 
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TBoolean bIsMultiSel() const override;
+        tCIDLib::TBoolean bIsMultiSel() const final;
 
         tCIDLib::TBoolean bSelectByText
         (
             const   TString&                strToSel
             ,       tCIDLib::TCard4&        c4FoundAt
             , const tCIDLib::TBoolean       bForceEvent = kCIDLib::False
-        )   override;
+        )   final;
 
-        tCIDLib::TCard4 c4CurItem() const override;
+        tCIDLib::TCard4 c4CurItem() const final;
 
         tCIDLib::TCard4 c4FindByText
         (
             const   TString&                strToFind
-        )   const override;
+        )   const final;
 
         tCIDLib::TCard4 c4IndexToId
         (
             const   tCIDLib::TCard4         c4Index
-        )   const override;
+        )   const final;
 
-        tCIDLib::TCard4 c4ItemCount() const;
+        tCIDLib::TCard4 c4ItemCount() const final;
 
         tCIDLib::TCard4 c4StartsWith
         (
             const   TString&                strToFind
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid InitFromDesc
         (
             const   TWindow&                wndParent
             , const TDlgItem&               dlgiSrc
             , const tCIDCtrls::EWndThemes   eTheme
-        )   override;
+        )   final;
 
         tCIDLib::TVoid QueryHints
         (
                     tCIDLib::TStrCollect&   colToFill
-        )   const override;
+        )   const final;
 
         tCIDLib::TVoid RemoveAll
         (
             const   tCIDLib::TBoolean       bNoEvent = kCIDLib::False
-        )   override;
+        )   final;
 
         tCIDLib::TVoid RemoveAt
         (
             const   tCIDLib::TCard4         c4ToSel
             , const tCIDLib::TBoolean       bSelectAnother = kCIDLib::True
-        )  override;
+        )  final;
 
         tCIDLib::TVoid SelectByIndex
         (
             const   tCIDLib::TCard4         c4ToSel
             , const tCIDLib::TBoolean       bForceEvent = kCIDLib::False
             , const tCIDLib::TBoolean       bThrowIfNot = kCIDLib::False
-        )   override;
+        )   final;
 
 
         // -------------------------------------------------------------------
@@ -270,7 +272,7 @@ class CIDCTRLSEXP TListBox : public TListWnd
             , const tCIDLib::TBoolean       bCtrl
             , const tCIDLib::TBoolean       bShift
             , const TWindow* const          pwndChild = nullptr
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bNotReflect
         (
@@ -279,7 +281,7 @@ class CIDCTRLSEXP TListBox : public TListWnd
             , const tCIDCtrls::TWParam      wParam
             , const tCIDCtrls::TLParam      lParam
             ,       tCIDCtrls::TMsgResult&  mresRet
-        )   override;
+        )   final;
 
 
     private :

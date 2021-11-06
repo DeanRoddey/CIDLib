@@ -43,7 +43,7 @@ class CIDIMGEXP THSVClr :
         // -------------------------------------------------------------------
         //  Constructors and Destructor.
         // -------------------------------------------------------------------
-        THSVClr();
+        THSVClr() = default;
 
         THSVClr
         (
@@ -57,21 +57,17 @@ class CIDIMGEXP THSVClr :
             , const tCIDLib::TFloat4        f4Value
         );
 
-        THSVClr
-        (
-            const   THSVClr&                hsvToCopy
-        );
+        THSVClr(const THSVClr&) = default;
+        THSVClr(THSVClr&&) = default;
 
-        ~THSVClr();
+        ~THSVClr() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        THSVClr& operator=
-        (
-            const   THSVClr&                hsvToAssign
-        );
+        THSVClr& operator=(const THSVClr&) = default;
+        THSVClr& operator=(THSVClr&&) = default;
 
         THSVClr& operator=
         (
@@ -171,17 +167,17 @@ class CIDIMGEXP THSVClr :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private         :
@@ -193,9 +189,9 @@ class CIDIMGEXP THSVClr :
         //  m_f4Value
         //      These are the color components
         // -------------------------------------------------------------------
-        tCIDLib::TFloat4    m_f4Hue;
-        tCIDLib::TFloat4    m_f4Saturation;
-        tCIDLib::TFloat4    m_f4Value;
+        tCIDLib::TFloat4    m_f4Hue = 0.0F;
+        tCIDLib::TFloat4    m_f4Saturation = 0.0F;
+        tCIDLib::TFloat4    m_f4Value = 0.0F;
 
 
         // -------------------------------------------------------------------

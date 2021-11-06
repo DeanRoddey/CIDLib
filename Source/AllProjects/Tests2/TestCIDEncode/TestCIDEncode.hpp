@@ -54,6 +54,7 @@ class TTest_ByName : public TTestFWTest
         TTest_ByName();
 
         TTest_ByName(const TTest_ByName&) = delete;
+        TTest_ByName(TTest_ByName&&) = delete;
 
         ~TTest_ByName();
 

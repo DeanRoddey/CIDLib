@@ -141,12 +141,12 @@ class CIDIMGEXP TBitmapImage : public TCIDImage
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :

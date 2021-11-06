@@ -47,7 +47,7 @@ class CIDIMGEXP TFRGBClr :
         // -------------------------------------------------------------------
         // Constructors and Destructor
         // -------------------------------------------------------------------
-        TFRGBClr();
+        TFRGBClr() = default;
 
         TFRGBClr
         (
@@ -57,21 +57,17 @@ class CIDIMGEXP TFRGBClr :
             , const tCIDLib::TFloat8&       f8Alpha = 0.0
         );
 
-        TFRGBClr
-        (
-            const   TFRGBClr&               frgbToCopy
-        );
+        TFRGBClr(const TFRGBClr&) = default;
+        TFRGBClr(TFRGBClr&&) = default;
 
-        ~TFRGBClr();
+        ~TFRGBClr() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TFRGBClr& operator=
-        (
-            const   TFRGBClr&               frgbToAssign
-        );
+        TFRGBClr& operator=(const TFRGBClr&) = default;
+        TFRGBClr& operator=(TFRGBClr&&) = default;
 
         friend TFRGBClr CIDIMGEXP operator+
         (
@@ -283,17 +279,17 @@ class CIDIMGEXP TFRGBClr :
         tCIDLib::TVoid FormatTo
         (
                     TTextOutStream&         strmToWriteTo
-        )   const;
+        )   const final;
 
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private             :
@@ -310,10 +306,10 @@ class CIDIMGEXP TFRGBClr :
         //      The alpha component is a measure of transparency, which 0.0
         //      be totally opaque and 1.0 being totally transparent.
         // -------------------------------------------------------------------
-        tCIDLib::TFloat8        m_f8Red;
-        tCIDLib::TFloat8        m_f8Green;
-        tCIDLib::TFloat8        m_f8Blue;
-        tCIDLib::TFloat8        m_f8Alpha;
+        tCIDLib::TFloat8        m_f8Red = 0.0;
+        tCIDLib::TFloat8        m_f8Green = 0.0;
+        tCIDLib::TFloat8        m_f8Blue = 0.0;
+        tCIDLib::TFloat8        m_f8Alpha = 0.0;
 
 
         // -------------------------------------------------------------------

@@ -3533,8 +3533,8 @@ TGraphDrawDev::hrgnSetClipArea( const   tCIDGraphDev::EClipModes    eMode
     (
         areaToSet.i4X()
         , areaToSet.i4Y()
-        , areaToSet.i4Right() + 2
-        , areaToSet.i4Bottom() + 2
+        , areaToSet.i4Right() + 1
+        , areaToSet.i4Bottom() + 1
         , c4Rounding
         , c4Rounding
     );

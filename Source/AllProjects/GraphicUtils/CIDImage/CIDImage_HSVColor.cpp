@@ -58,14 +58,6 @@ THSVClr& THSVClr::Nul_THSVClr() noexcept
 // ---------------------------------------------------------------------------
 //  THSVClr: Constructors and Destructor
 // ---------------------------------------------------------------------------
-THSVClr::THSVClr() :
-
-    m_f4Hue(0)
-    , m_f4Saturation(0)
-    , m_f4Value(0)
-{
-}
-
 THSVClr::THSVClr(const TRGBClr& rgbSrc)
 {
     FromRGB(rgbSrc);
@@ -80,52 +72,27 @@ THSVClr::THSVClr(const  tCIDLib::TFloat4    f4HueInit
     f4Value(f4ValueInit);
 }
 
-THSVClr::THSVClr(const THSVClr& hsvSrc) :
-
-    m_f4Hue(hsvSrc.m_f4Hue)
-    , m_f4Saturation(hsvSrc.m_f4Saturation)
-    , m_f4Value(hsvSrc.m_f4Value)
-{
-}
-
-THSVClr::~THSVClr()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  THSVClr: Public operators
 // ---------------------------------------------------------------------------
-THSVClr& THSVClr::operator=(const THSVClr& hsvToAssign)
+THSVClr& THSVClr::operator=(const TRGBClr& rgbSrc)
 {
-    if (this == &hsvToAssign)
-        return *this;
-
-    m_f4Hue         = hsvToAssign.m_f4Hue;
-    m_f4Saturation  = hsvToAssign.m_f4Saturation;
-    m_f4Value       = hsvToAssign.m_f4Value;
-
-    return *this;
-}
-
-THSVClr& THSVClr::operator=(const TRGBClr& rgbToAssign)
-{
-    FromRGB(rgbToAssign);
+    FromRGB(rgbSrc);
     return *this;
 }
 
 tCIDLib::TBoolean THSVClr::operator==(const THSVClr& hsvToTest) const
 {
-    if (this == &hsvToTest)
-        return kCIDLib::True;
-
-    if ((hsvToTest.m_f4Hue != m_f4Hue)
-    ||  (hsvToTest.m_f4Saturation != m_f4Saturation)
-    ||  (hsvToTest.m_f4Value != m_f4Value))
+    if (this != &hsvToTest)
     {
-        return kCIDLib::False;
+        if ((hsvToTest.m_f4Hue != m_f4Hue)
+        ||  (hsvToTest.m_f4Saturation != m_f4Saturation)
+        ||  (hsvToTest.m_f4Value != m_f4Value))
+        {
+            return kCIDLib::False;
+        }
     }
-
     return kCIDLib::True;
 }
 

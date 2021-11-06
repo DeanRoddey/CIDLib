@@ -60,7 +60,7 @@ class CDropTarget : public IDropTarget
         // -------------------------------------------------------------------
         // IUnknown implementation
         // -------------------------------------------------------------------
-        HRESULT __stdcall QueryInterface (REFIID iid, void ** ppvObject)
+        HRESULT __stdcall QueryInterface (REFIID iid, void ** ppvObject) final
         {
             HRESULT hRes = S_OK;
 
@@ -85,12 +85,12 @@ class CDropTarget : public IDropTarget
             return hRes;
         }
 
-        ULONG __stdcall AddRef(void)
+        ULONG __stdcall AddRef(void) final
         {
             return ++m_scntRef;
         }
 
-        ULONG __stdcall Release(void)
+        ULONG __stdcall Release(void) final
         {
             CIDAssert(m_scntRef.c4Value() > 0, L"DragDrop COM object ref count underflow");
 
@@ -108,16 +108,16 @@ class CDropTarget : public IDropTarget
         HRESULT __stdcall DragEnter
         (
             IDataObject * pDataObject, DWORD grfKeyState, POINTL pt, DWORD * pdwEffect
-        );
+        )   final;
 
-        HRESULT __stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD * pdwEffect);
+        HRESULT __stdcall DragOver(DWORD grfKeyState, POINTL pt, DWORD * pdwEffect)  final;
 
-        HRESULT __stdcall DragLeave(void);
+        HRESULT __stdcall DragLeave(void)  final;
 
         HRESULT __stdcall Drop
         (
             IDataObject * pDataObject, DWORD grfKeyState, POINTL pt, DWORD * pdwEffect
-        );
+        )   final;
 
 
     private:

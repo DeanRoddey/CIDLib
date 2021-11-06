@@ -61,7 +61,7 @@ class TTest_ORBBasic : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -98,7 +98,7 @@ class TTest_ORBLoopback : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -131,6 +131,7 @@ class TORBTestApp : public TTestFWApp
         TORBTestApp();
 
         TORBTestApp(const TORBTestApp&) = delete;
+        TORBTestApp(TORBTestApp&&) = delete;
 
         ~TORBTestApp();
 

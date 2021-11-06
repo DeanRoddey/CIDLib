@@ -152,7 +152,7 @@ TCfgServerClient::AddObject(const   TString&        strKey
 
 tCIDLib::TBoolean
 TCfgServerClient::bAddOrUpdate( const   TString&            strKey
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 , const MStreamable&        strmblToAdd
                                 , const tCIDLib::TCard4     c4Reserve)
 {
@@ -176,17 +176,13 @@ TCfgServerClient::bAddOrUpdate( const   TString&            strKey
         }
          else
         {
-            bRet = orbcProxy().bAddOrUpdate
-            (
-                strKey, c4Version, m_strmOut.c4CurPos(), m_mbufIO, c4Reserve
-            );
+            bRet = orbcProxy().bAddOrUpdate(strKey, c4Version, m_strmOut.c4CurPos(), m_mbufIO, c4Reserve);
         }
     }
 
     catch(TError& errToCatch)
     {
         CheckLostProxy(errToCatch);
-
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
@@ -289,7 +285,7 @@ TCfgServerClient::bFindNameUnder(const  TString&            strName
 tCIDLib::TBoolean
 TCfgServerClient::bReadObject(  const   TString&            strKey
                                 ,       MStreamable&        strmblToFill
-                                ,       tCIDLib::TCard4&    c4Version)
+                                , CIOP  tCIDLib::TCard4&    c4Version)
 {
     tCIDLib::TBoolean bNewData = kCIDLib::False;
     try
@@ -447,12 +443,12 @@ tCIDLib::TVoid TCfgServerClient::DropProxy()
     try
     {
         delete m_porbcProxy;
-        m_porbcProxy = 0;
+        m_porbcProxy = nullptr;
     }
 
     catch(TError& errToCatch)
     {
-        m_porbcProxy = 0;
+        m_porbcProxy = nullptr;
         errToCatch.AddStackLevel(CID_FILE, CID_LINE);
         throw;
     }
@@ -462,7 +458,7 @@ tCIDLib::TVoid TCfgServerClient::DropProxy()
 tCIDLib::ELoadRes
 TCfgServerClient::eReadObject(  const   TString&            strKey
                                 ,       MStreamable&        strmblToFill
-                                ,       tCIDLib::TCard4&    c4Version
+                                , CIOP  tCIDLib::TCard4&    c4Version
                                 , const tCIDLib::TBoolean   bThrowIfNot)
 {
     tCIDLib::ELoadRes eRes = tCIDLib::ELoadRes::NotFound;
@@ -548,7 +544,7 @@ tCIDLib::TVoid TCfgServerClient::CheckLostProxy(const TError& errToCheck)
     if (m_porbcProxy && m_porbcProxy->bCheckForLostConnection(errToCheck))
     {
         delete m_porbcProxy;
-        m_porbcProxy = 0;
+        m_porbcProxy = nullptr;
     }
 }
 

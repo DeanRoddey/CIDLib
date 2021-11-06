@@ -76,7 +76,7 @@ class TTest_HTTPAuthParse : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -121,7 +121,7 @@ class TTest_HTTPGET : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -168,7 +168,7 @@ class TTest_EndPoints : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -216,7 +216,7 @@ class TTest_JSON1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -249,7 +249,7 @@ class TTest_JSON2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -282,7 +282,7 @@ class TTest_JSON3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -315,7 +315,7 @@ class TTest_JSON4 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -348,7 +348,7 @@ class TTest_JSON5 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -381,7 +381,7 @@ class TTest_MPMIMEDecode1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -415,7 +415,7 @@ class TTest_URLParse : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -488,7 +488,7 @@ class TTest_URLBuild : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -516,6 +516,7 @@ class TNetTestApp : public TTestFWApp
         TNetTestApp();
 
         TNetTestApp(const TNetTestApp&) = delete;
+        TNetTestApp(TNetTestApp&&) = delete;
 
         ~TNetTestApp();
 
@@ -526,21 +527,21 @@ class TNetTestApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

@@ -58,7 +58,7 @@ class TTest_Attr : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -106,6 +106,7 @@ class TXMLTestApp : public TTestFWApp
         TXMLTestApp();
 
         TXMLTestApp(const TXMLTestApp&) = delete;
+        TXMLTestApp(TXMLTestApp&&) = delete;
 
         ~TXMLTestApp();
 
@@ -116,21 +117,21 @@ class TXMLTestApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

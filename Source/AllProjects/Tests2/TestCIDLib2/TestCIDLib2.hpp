@@ -1722,7 +1722,7 @@ class TTest_ObjArrayMoveSem : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -3073,7 +3073,7 @@ class TTest_WeakPtr3 : public TTestFWTest
 // PREFIX: tfwapp
 //
 //  This is our implementation of the test framework's test program framework.
-//  We just create a derivative and final some methods.
+//  We just create a derivative and override some methods.
 // ---------------------------------------------------------------------------
 class TCIDLibTestApp : public TTestFWApp
 {
@@ -3084,6 +3084,7 @@ class TCIDLibTestApp : public TTestFWApp
         TCIDLibTestApp();
 
         TCIDLibTestApp(const TCIDLibTestApp&) = delete;
+        TCIDLibTestApp(TCIDLibTestApp&&) = delete;
 
         ~TCIDLibTestApp();
 

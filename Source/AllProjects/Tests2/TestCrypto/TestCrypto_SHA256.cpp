@@ -64,7 +64,7 @@ TTest_SHA256_1::~TTest_SHA256_1()
 //  TTest_SHA256_1: Public, inherited methods
 // ---------------------------------------------------------------------------
 tTestFWLib::ETestRes
-TTest_SHA256_1::eRunTest( TTextStringOutStream&   strmOut
+TTest_SHA256_1::eRunTest(TTextStringOutStream&  strmOut
                         , tCIDLib::TBoolean&    bWarning)
 {
     //

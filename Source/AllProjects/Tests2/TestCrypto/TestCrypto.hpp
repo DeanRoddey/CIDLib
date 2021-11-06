@@ -133,7 +133,7 @@ class TTest_MD51 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -167,7 +167,7 @@ class TTest_SHA1_1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -201,7 +201,7 @@ class TTest_SHA256_1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -235,7 +235,7 @@ class TTest_HMACSHA256 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -269,7 +269,7 @@ class TTest_UniqueId1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -303,7 +303,7 @@ class TTest_AES1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -336,7 +336,7 @@ class TTest_AES2 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -369,7 +369,7 @@ class TTest_AES3 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -423,7 +423,7 @@ class TTest_Blowfish1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -469,7 +469,7 @@ class TTest_XOR1 : public TTest_BaseCrypto
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -503,7 +503,7 @@ class TTest_SChan1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -531,6 +531,7 @@ class TCryptoTestApp : public TTestFWApp
         TCryptoTestApp();
 
         TCryptoTestApp(const TCryptoTestApp&) = delete;
+        TCryptoTestApp(TCryptoTestApp&&) = delete;
 
         ~TCryptoTestApp();
 
@@ -541,21 +542,21 @@ class TCryptoTestApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

@@ -57,7 +57,7 @@ class TTest_Basic1 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -90,7 +90,7 @@ class TTest_Basic2 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -123,7 +123,7 @@ class TTest_Basic3 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -157,7 +157,7 @@ class TTest_Basic4 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -191,7 +191,7 @@ class TTest_Basic5 : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -229,6 +229,7 @@ class TObjStTestApp : public TTestFWApp
         TObjStTestApp();
 
         TObjStTestApp(const TObjStTestApp&) = delete;
+        TObjStTestApp(TObjStTestApp&&) = delete;
 
         ~TObjStTestApp();
 

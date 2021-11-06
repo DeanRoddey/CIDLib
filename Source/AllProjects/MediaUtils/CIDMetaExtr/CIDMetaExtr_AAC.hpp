@@ -41,7 +41,17 @@ class CIDMETAEXTREXP TCIDMetaExtrAAC : public TCIDMetaExtractor
         // -------------------------------------------------------------------
         TCIDMetaExtrAAC();
 
-        ~TCIDMetaExtrAAC();
+        TCIDMetaExtrAAC(const TCIDMetaExtrAAC&) = default;
+        TCIDMetaExtrAAC(TCIDMetaExtrAAC&&) = default;
+
+        ~TCIDMetaExtrAAC() = default;
+
+
+        // -------------------------------------------------------------------
+        //  Public operators
+        // -------------------------------------------------------------------
+        TCIDMetaExtrAAC& operator=(const TCIDMetaExtrAAC&) = default;
+        TCIDMetaExtrAAC& operator=(TCIDMetaExtrAAC&&) = default;
 
 
         // -------------------------------------------------------------------
@@ -64,21 +74,21 @@ class CIDMETAEXTREXP TCIDMetaExtrAAC : public TCIDMetaExtractor
             , const tCIDLib::TBoolean       bWantArt
             ,       TMemBuf&                mbufArt
             ,       tCIDLib::TCard4&        c4ArtSize
-        );
+        )   final;
 
         tCIDLib::TBoolean bExtractImage
         (
             const   TString&                strFilePath
             ,       TMemBuf&                mbufArt
             ,       tCIDLib::TCard4&        c4ArtSize
-        );
+        )   final;
 
         tCIDLib::TBoolean bProbe
         (
             const   TString&                strFilePath
-        );
+        )   final;
 
-        const TString& strTypeName() const;
+        const TString& strTypeName() const final;
 
 
     private :

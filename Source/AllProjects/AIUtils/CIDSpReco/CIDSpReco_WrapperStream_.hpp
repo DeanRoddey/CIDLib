@@ -88,11 +88,11 @@ class TSpWrapperStream : public IStream
         // -------------------------------------------------------------------
         //  Public, inherited methods
         // -------------------------------------------------------------------
-        STDMETHODIMP_(ULONG) AddRef();
+        STDMETHODIMP_(ULONG) AddRef() final;
 
-        STDMETHODIMP Clone(IStream**);
+        STDMETHODIMP Clone(IStream**) final;
 
-        STDMETHODIMP Commit(DWORD);
+        STDMETHODIMP Commit(DWORD) final;
 
         STDMETHODIMP CopyTo
         (
@@ -100,42 +100,42 @@ class TSpWrapperStream : public IStream
             , ULARGE_INTEGER
             , ULARGE_INTEGER *
             , ULARGE_INTEGER *
-        );
+        )   final;
 
-        STDMETHODIMP LockRegion(ULARGE_INTEGER, ULARGE_INTEGER, DWORD);
+        STDMETHODIMP LockRegion(ULARGE_INTEGER, ULARGE_INTEGER, DWORD) final;
 
-        STDMETHODIMP QueryInterface(REFIID riid, void **ppv);
+        STDMETHODIMP QueryInterface(REFIID riid, void **ppv) final;
 
         STDMETHODIMP Read
         (
             void *pBuffer
             , ULONG cbBuffer
             , ULONG *pcbRead
-        );
+        )   final;
 
-        STDMETHODIMP_(ULONG) Release();
+        STDMETHODIMP_(ULONG) Release() final;
 
-        STDMETHODIMP Revert();
+        STDMETHODIMP Revert() final;
 
         STDMETHODIMP Seek
         (
             LARGE_INTEGER
             , DWORD
             , ULARGE_INTEGER *
-        );
+        )   final;
 
-        STDMETHODIMP SetSize(ULARGE_INTEGER);
+        STDMETHODIMP SetSize(ULARGE_INTEGER) final;
 
-        STDMETHODIMP Stat(STATSTG*, DWORD);
+        STDMETHODIMP Stat(STATSTG*, DWORD) final;
 
-        STDMETHODIMP UnlockRegion(ULARGE_INTEGER, ULARGE_INTEGER, DWORD);
+        STDMETHODIMP UnlockRegion(ULARGE_INTEGER, ULARGE_INTEGER, DWORD) final;
 
         STDMETHODIMP Write
         (
             const void *pv
             , ULONG cb
             , ULONG *pcbWritten
-        );
+        )   final;
 
 
         // -------------------------------------------------------------------

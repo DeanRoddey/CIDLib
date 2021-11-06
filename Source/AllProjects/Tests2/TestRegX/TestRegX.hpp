@@ -57,7 +57,7 @@ class TTest_Match : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -90,7 +90,7 @@ class TTest_Parse : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -123,7 +123,7 @@ class TTest_RepAll : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -156,7 +156,7 @@ class TTest_CpMv : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -189,7 +189,7 @@ class TTest_Misc : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -216,6 +216,7 @@ class TRegXTestApp : public TTestFWApp
         TRegXTestApp();
 
         TRegXTestApp(const TRegXTestApp&) = delete;
+        TRegXTestApp(TRegXTestApp&&) = delete;
 
         ~TRegXTestApp();
 

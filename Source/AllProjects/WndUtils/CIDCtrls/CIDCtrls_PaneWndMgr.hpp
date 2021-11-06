@@ -288,7 +288,7 @@ class CIDCTRLSEXP TPaneLayout2Horz : public TPaneLayout
             , const TArea&                  areaNew
             , const TArea&                  areaOld
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bCheckOnDiv
         (
@@ -297,7 +297,7 @@ class CIDCTRLSEXP TPaneLayout2Horz : public TPaneLayout
             ,       tCIDLib::TCard4&        c4First
             ,       tCIDLib::TCard4&        c4Sec
             ,       tCIDLib::TBoolean&      bHorz
-        )   const override;
+        )   const final;
 
         tCIDLib::TBoolean bDragAdjust
         (
@@ -306,18 +306,18 @@ class CIDCTRLSEXP TPaneLayout2Horz : public TPaneLayout
             , const tCIDLib::TCard4         c4Sec
             , const TPoint&                 pntAt
             , const TArea&                  areaAvail
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bVertDrag() const override;
+        tCIDLib::TBoolean bVertDrag() const final;
 
-        tCIDLib::TCard4 c4PaneCount() const override;
+        tCIDLib::TCard4 c4PaneCount() const final;
 
         tCIDLib::TVoid InitPanes
         (
                     tCIDCtrls::TPaneList&   colPanes
             , const TArea&                  areaAvail
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 };
 
 
@@ -356,7 +356,7 @@ class CIDCTRLSEXP TPaneLayout2Vert : public TPaneLayout
             , const TArea&                  areaNew
             , const TArea&                  areaOld
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bCheckOnDiv
         (
@@ -365,7 +365,7 @@ class CIDCTRLSEXP TPaneLayout2Vert : public TPaneLayout
             ,       tCIDLib::TCard4&        c4First
             ,       tCIDLib::TCard4&        c4Sec
             ,       tCIDLib::TBoolean&      bHorz
-        )   const override;
+        )   const final;
 
         tCIDLib::TBoolean bDragAdjust
         (
@@ -374,18 +374,18 @@ class CIDCTRLSEXP TPaneLayout2Vert : public TPaneLayout
             , const tCIDLib::TCard4         c4Sec
             , const TPoint&                 pntAt
             , const TArea&                  areaAvail
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bVertDrag() const override;
+        tCIDLib::TBoolean bVertDrag() const final;
 
-        tCIDLib::TCard4 c4PaneCount() const override;
+        tCIDLib::TCard4 c4PaneCount() const final;
 
         tCIDLib::TVoid InitPanes
         (
                     tCIDCtrls::TPaneList&   colPanes
             , const TArea&                  areaAvail
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 };
 
 
@@ -424,7 +424,7 @@ class CIDCTRLSEXP TPaneLayout3Vert : public TPaneLayout
             , const TArea&                  areaNew
             , const TArea&                  areaOld
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bCheckOnDiv
         (
@@ -433,7 +433,7 @@ class CIDCTRLSEXP TPaneLayout3Vert : public TPaneLayout
             ,       tCIDLib::TCard4&        c4First
             ,       tCIDLib::TCard4&        c4Sec
             ,       tCIDLib::TBoolean&      bHorz
-        )   const override;
+        )   const final;
 
         tCIDLib::TBoolean bDragAdjust
         (
@@ -442,18 +442,18 @@ class CIDCTRLSEXP TPaneLayout3Vert : public TPaneLayout
             , const tCIDLib::TCard4         c4Sec
             , const TPoint&                 pntAt
             , const TArea&                  areaAvail
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bVertDrag() const override;
+        tCIDLib::TBoolean bVertDrag() const final;
 
-        tCIDLib::TCard4 c4PaneCount() const override;
+        tCIDLib::TCard4 c4PaneCount() const final;
 
         tCIDLib::TVoid InitPanes
         (
                     tCIDCtrls::TPaneList&   colPanes
             , const TArea&                  areaAvail
             , const tCIDLib::TBoolean       bEmphDir
-        )   override;
+        )   final;
 };
 
 
@@ -545,7 +545,7 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
             , const tCIDLib::TBoolean       bOrgChanged
             , const tCIDLib::TBoolean       bSizeChanged
             , const tCIDLib::TBoolean       bStateChanged
-        )  override;
+        )  final;
 
         tCIDLib::TBoolean bClick
         (
@@ -554,25 +554,25 @@ class CIDCTRLSEXP TPaneWndCont : public TWindow
             , const TPoint&                 pntAt
             , const tCIDLib::TBoolean       bCtrlShift
             , const tCIDLib::TBoolean       bShift
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bEraseBgn
         (
                     TGraphDrawDev&          gdevToUse
-        );
+        )   final;
 
         tCIDLib::TBoolean bMouseMove
         (
             const   TPoint&                 pntAt
             , const tCIDLib::TBoolean       bCtrlShift
             , const tCIDLib::TBoolean       bShift
-        )   override;
+        )   final;
 
         tCIDLib::TBoolean bPaint
         (
                     TGraphDrawDev&          gdevToUse
             , const TArea&                  areaUpdate
-        )   override;
+        )   final;
 
 
     private :

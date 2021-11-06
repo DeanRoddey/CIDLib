@@ -64,11 +64,11 @@ class TCppGenerator : public TCodeGenerator
             , const TString&                strOptName
             , const TString&                strExpKeyword
             , const tCIDLib::TBoolean       bPrivHeader
-        );
+        )   final;
 
-        tCIDLib::TVoid BeginCodeGen();
+        tCIDLib::TVoid BeginCodeGen() final;
 
-        tCIDLib::TVoid BeginConstants();
+        tCIDLib::TVoid BeginConstants() final;
 
         tCIDLib::TVoid BeginGlobals
         (
@@ -77,15 +77,15 @@ class TCppGenerator : public TCodeGenerator
             , const TString&                strGlobalsName
             , const TString&                strExpKeyword
             , const tCIDLib::TBoolean       bPrivHeader
-        );
+        )   final;
 
         tCIDLib::TVoid BeginIntf
         (
             const   TString&                strInterfaceName
             , const TString&                strInterfaceId
-        );
+        )   final;
 
-        tCIDLib::TVoid BeginMethods();
+        tCIDLib::TVoid BeginMethods() final;
 
         tCIDLib::TVoid BeginServerIntf
         (
@@ -96,25 +96,25 @@ class TCppGenerator : public TCodeGenerator
             , const TString&                strExpKeyword
             , const tCIDIDL::TParmList&     colCtorParams
             , const tCIDLib::TBoolean       bPrivHeader
-        );
+        )   final;
 
-        tCIDLib::TVoid BeginTypes();
+        tCIDLib::TVoid BeginTypes() final;
 
-        tCIDLib::TVoid EndClientIntf();
+        tCIDLib::TVoid EndClientIntf() final;
 
-        tCIDLib::TVoid EndCodeGen();
+        tCIDLib::TVoid EndCodeGen() final;
 
-        tCIDLib::TVoid EndConstants();
+        tCIDLib::TVoid EndConstants() final;
 
-        tCIDLib::TVoid EndGlobals();
+        tCIDLib::TVoid EndGlobals() final;
 
-        tCIDLib::TVoid EndIntf();
+        tCIDLib::TVoid EndIntf() final;
 
-        tCIDLib::TVoid EndMethods();
+        tCIDLib::TVoid EndMethods() final;
 
-        tCIDLib::TVoid EndServerIntf();
+        tCIDLib::TVoid EndServerIntf() final;
 
-        tCIDLib::TVoid EndTypes();
+        tCIDLib::TVoid EndTypes() final;
 
         tCIDLib::TVoid GenConstant
         (
@@ -122,13 +122,13 @@ class TCppGenerator : public TCodeGenerator
             , const tCIDIDL::ETypes         Type
             , const TString&                strValue
             , const TString&                strDocs
-        );
+        )   final;
 
         tCIDLib::TVoid GenEnum
         (
             const   TString&                strDocs
             ,       TCGenEnumInfo&          einfoToGen
-        );
+        )   final;
 
         tCIDLib::TVoid GenMethod
         (
@@ -139,7 +139,7 @@ class TCppGenerator : public TCodeGenerator
             , const tCIDLib::TCard4         c4Timeout
             , const tCIDLib::TBoolean       bInBaseClass
             , const tCIDLib::TCard4         c4MethIndex
-        );
+        )   final;
 
 
     private :

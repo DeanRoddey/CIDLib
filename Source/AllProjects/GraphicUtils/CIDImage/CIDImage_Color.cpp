@@ -67,45 +67,10 @@ TFRGBClr::TFRGBClr( const   tCIDLib::TFloat8&   f8Red
 {
 }
 
-TFRGBClr::TFRGBClr(const TFRGBClr& frgbToCopy) :
-
-    m_f8Red(frgbToCopy.m_f8Red)
-    , m_f8Green(frgbToCopy.m_f8Green)
-    , m_f8Blue(frgbToCopy.m_f8Blue)
-    , m_f8Alpha(frgbToCopy.m_f8Alpha)
-{
-}
-
-TFRGBClr::TFRGBClr() :
-
-    m_f8Red(0.0)
-    , m_f8Green(0.0)
-    , m_f8Blue(0.0)
-    , m_f8Alpha(0.0)
-{
-}
-
-TFRGBClr::~TFRGBClr()
-{
-}
-
 
 // ---------------------------------------------------------------------------
 //  TFRGBClr: Public operators
 // ---------------------------------------------------------------------------
-TFRGBClr& TFRGBClr::operator=(const TFRGBClr& frgbToAssign)
-{
-    if (this == &frgbToAssign)
-        return *this;
-
-    m_f8Red     = frgbToAssign.m_f8Red;
-    m_f8Green   = frgbToAssign.m_f8Green;
-    m_f8Blue    = frgbToAssign.m_f8Blue;
-    m_f8Alpha   = frgbToAssign.m_f8Alpha;
-
-    return *this;
-}
-
 tCIDLib::TVoid TFRGBClr::operator+=(const tCIDLib::TFloat8& f8Inc)
 {
     m_f8Red += f8Inc;

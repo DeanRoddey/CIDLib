@@ -56,6 +56,8 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
         // --------------------------------------------------------------------
         // Public Destructor
         // --------------------------------------------------------------------
+        TLoopbackImpl() = delete;
+
         TLoopbackImpl(  tCIDLib::TBoolean* const    pbInitCalled
                         , tCIDLib::TBoolean* const  pbTermCalled) :
 
@@ -66,14 +68,16 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
         {
         }
 
-        ~TLoopbackImpl()
-        {
-        }
+        TLoopbackImpl(const TLoopbackImpl&) = delete;
+        TLoopbackImpl(TLoopbackImpl&&) = delete;
+
+        ~TLoopbackImpl() = default;
+
 
         // --------------------------------------------------------------------
         // Public, inherited methods
         // --------------------------------------------------------------------
-        tCIDLib::TCard4 c4BumpIt(const tCIDLib::TCard4 c4Input)
+        tCIDLib::TCard4 c4BumpIt(const tCIDLib::TCard4 c4Input) final
         {
             return c4Input + 1;
         }
@@ -83,9 +87,9 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
             const   TBag<TArea>&            colIn
             ,       TBag<TPoint>&           colOut
             ,       TString&                strFailReason
-        );
+        )   final;
 
-        tCIDLib::TBoolean bPollData(tCIDLib::TCard4& c4SerialNum, TArea& areaRet)
+        tCIDLib::TBoolean bPollData(tCIDLib::TCard4& c4SerialNum, TArea& areaRet) final
         {
             //
             //  If the serial number is different from ours, then update the
@@ -119,16 +123,15 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
             , const tCIDLib::TBoolean       bIn
             ,       tCIDLib::TBoolean&      bOut
             ,       TString&                strFailReason
-        );
+        )   final;
 
         tCIDLib::TBoolean bVectorParamTest
         (
                     TVector<TString>&       colInOut
             ,       TString&                strFailReason
-        );
+        )   final;
 
-        tCIDLib::TVoid
-        BulkTest(tCIDLib::TCard4& c4BufSz_mbufOut, THeapBuf& mbufOut)
+        tCIDLib::TVoid BulkTest(tCIDLib::TCard4& c4BufSz_mbufOut, THeapBuf& mbufOut) final
         {
             for (tCIDLib::TCard4 c4Index = 0; c4Index < c4BufSz_mbufOut; c4Index++)
                 mbufOut.PutCard1(tCIDLib::TCard1(mbufOut[c4Index]) ^ 0xFF, c4Index);
@@ -139,7 +142,7 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
             //
         }
 
-        tCIDLib::TVoid ExceptTest()
+        tCIDLib::TVoid ExceptTest() final
         {
             // Just throw a known exception back to the client
             facCIDOrb().ThrowErr
@@ -152,7 +155,7 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
             );
         }
 
-        tCIDLib::TVoid ExceptTest(const tCIDLib::TCard4 c4Dummy)
+        tCIDLib::TVoid ExceptTest(const tCIDLib::TCard4 c4Dummy) final
         {
             // Just throw a known exception back to the client
             facCIDOrb().ThrowErr
@@ -165,7 +168,7 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
             );
         }
 
-        tCIDLib::TVoid SetData(const TArea& areaToSet)
+        tCIDLib::TVoid SetData(const TArea& areaToSet) final
         {
             // Store the new and bump the serial number
             m_areaData = areaToSet;
@@ -177,14 +180,14 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
         // -------------------------------------------------------------------
         //  Protected, inherited methods
         // -------------------------------------------------------------------
-        tCIDLib::TVoid Initialize()
+        tCIDLib::TVoid Initialize() final
         {
             // Call our parent and then mark that we were initialized correctly
             TParent::Initialize();
             *m_pbInitCalled = kCIDLib::True;
         }
 
-        tCIDLib::TVoid Terminate()
+        tCIDLib::TVoid Terminate() final
         {
             // Call our parent and then mark that we were initialized correctly
             TParent::Terminate();
@@ -193,13 +196,6 @@ class TLoopbackImpl : public TTestOrbIntfServerBase
 
 
     private :
-        // --------------------------------------------------------------------
-        // Unimplemented ctors and operators
-        // --------------------------------------------------------------------
-        TLoopbackImpl(const TLoopbackImpl&);
-        tCIDLib::TVoid operator=(const TLoopbackImpl&);
-
-
         // --------------------------------------------------------------------
         //  Private data members
         //
@@ -361,10 +357,7 @@ TLoopbackImpl::bVectorParamTest(TVector<TString>&   colInOut
 // ---------------------------------------------------------------------------
 TTest_ORBLoopback::TTest_ORBLoopback() :
 
-    TTestFWTest
-    (
-        L"ORB Loopback", L"Single process client/server test", 4
-    )
+    TTestFWTest(L"ORB Loopback", L"Single process client/server test", 4)
 {
 }
 

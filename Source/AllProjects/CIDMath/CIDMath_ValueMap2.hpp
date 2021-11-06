@@ -82,13 +82,13 @@ class CIDMATHEXP TLogMap : public TValueMap
         tCIDLib::TCard4 c4MapIndex
         (
             const   tCIDLib::TCard4         c4Index1
-        )   const;
+        )   const override;
 
         tCIDLib::TVoid SetNewRanges
         (
             const   tCIDLib::TCard4         c4MaxIndex1
             , const tCIDLib::TCard4         c4MaxIndex2
-        );
+        )   override;
 
 
     protected   :

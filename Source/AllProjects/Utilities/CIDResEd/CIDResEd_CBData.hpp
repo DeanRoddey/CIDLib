@@ -46,7 +46,17 @@ class TResEdCBItems : public TObject, public MStreamable
             const   tCIDResEd::TDlgItemRefList& colItems
         );
 
+        TResEdCBItems(const TResEdCBItems&) = delete;
+        TResEdCBItems(TResEdCBItems&&) = delete;
+
         ~TResEdCBItems();
+
+
+        // -------------------------------------------------------------------
+        //  Public methods
+        // -------------------------------------------------------------------
+        TResEdCBItems& operator=(const TResEdCBItems&) = delete;
+        TResEdCBItems& operator=(TResEdCBItems&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -62,12 +72,12 @@ class TResEdCBItems : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :

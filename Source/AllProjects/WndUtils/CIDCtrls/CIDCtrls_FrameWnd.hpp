@@ -241,7 +241,7 @@ class CIDCTRLSEXP TFrameWnd : public TWindow
             , const tCIDLib::TBoolean       bStateChanged
         )  override;
 
-        tCIDLib::TBoolean bCreated();
+        tCIDLib::TBoolean bCreated() override;
 
         tCIDLib::TVoid Destroyed() override;
 

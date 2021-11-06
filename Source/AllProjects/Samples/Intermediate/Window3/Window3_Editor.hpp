@@ -103,7 +103,7 @@ class TWindow3Ed : public TCtrlWnd
         tCIDLib::TVoid
         TWindow3Ed::InitFromDesc(   const   TWindow&                wndParent
                                     , const TDlgItem&               dlgiSrc
-                                    , const tCIDCtrls::EWndThemes   eTheme)
+                                    , const tCIDCtrls::EWndThemes   eTheme) final
         {
 
             TWindow::CreateWnd

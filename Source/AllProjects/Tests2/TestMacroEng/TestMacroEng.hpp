@@ -57,7 +57,7 @@ class TTest_PathValidation : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -92,7 +92,7 @@ class TTest_NumConstProbe : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -126,7 +126,7 @@ class TTest_CMLRuntime : public TTestFWTest
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     private :
@@ -179,6 +179,7 @@ class TMacroEngTestApp : public TTestFWApp
         TMacroEngTestApp();
 
         TMacroEngTestApp(const TMacroEngTestApp&) = delete;
+        TMacroEngTestApp(TMacroEngTestApp&&) = delete;
 
         ~TMacroEngTestApp();
 

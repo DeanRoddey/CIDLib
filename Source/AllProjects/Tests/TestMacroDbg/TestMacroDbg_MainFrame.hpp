@@ -42,7 +42,17 @@ class TMEngDbgFrameWnd : public TFrameWnd
         // -------------------------------------------------------------------
         TMEngDbgFrameWnd();
 
+        TMEngDbgFrameWnd(const TMEngDbgFrameWnd&) = delete;
+        TMEngDbgFrameWnd(TMEngDbgFrameWnd&&) = delete;
+
         ~TMEngDbgFrameWnd();
+
+
+        // -------------------------------------------------------------------
+        //  Public methods
+        // -------------------------------------------------------------------
+        TMEngDbgFrameWnd& operator=(const TMEngDbgFrameWnd&) = delete;
+        TMEngDbgFrameWnd& operator=(TMEngDbgFrameWnd&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -51,7 +61,7 @@ class TMEngDbgFrameWnd : public TFrameWnd
         tCIDLib::TBoolean bProcessAccel
         (
             const   tCIDLib::TVoid* const   pMsgData
-        )   const override;
+        )   const final;
 
 
         // -------------------------------------------------------------------
@@ -74,20 +84,20 @@ class TMEngDbgFrameWnd : public TFrameWnd
             , const tCIDLib::TBoolean       bOrgChanged
             , const tCIDLib::TBoolean       bSizeChanged
             , const tCIDLib::TBoolean       bStateChanged
-        )   override;
+        )   final;
 
-        tCIDLib::TBoolean bAllowShutdown() override;
+        tCIDLib::TBoolean bAllowShutdown() final;
 
-        tCIDLib::TBoolean bCreated() override;
+        tCIDLib::TBoolean bCreated() final;
 
-        tCIDLib::TVoid Destroyed() override;
+        tCIDLib::TVoid Destroyed() final;
 
         tCIDLib::TVoid MenuCommand
         (
             const   tCIDLib::TResId         ridItem
             , const tCIDLib::TBoolean       bChecked
             , const tCIDLib::TBoolean       bEnabled
-        );
+        )   final;
 
 
     private :

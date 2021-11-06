@@ -72,7 +72,7 @@ class CIDRTPEXP TFileWaveIO : public TCIDRTPIOSrc
                     TMemBuf&                mbufToFill
             , COP   tCIDLib::TCard4&        c4AtSample
             , COP   tCIDLib::TCard4&        c4AtMillisec
-        )   override;
+        )   final;
 
         tCIDLib::TVoid Initialize
         (
@@ -83,9 +83,9 @@ class CIDRTPEXP TFileWaveIO : public TCIDRTPIOSrc
             , COP   tCIDLib::TCard4&        c4SampleBytes
             , COP   tCIDLib::TCard4&        c4TotalMSs
             , COP   tCIDLib::TCard4&        c4TotalBytes
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate();
+        tCIDLib::TVoid Terminate() final;
 
 
 

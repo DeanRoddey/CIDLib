@@ -73,8 +73,8 @@ tCIDLib::TBoolean TStringView::bContainsSubStr( const   tCIDLib::TCh* const pszT
 tCIDLib::TBoolean TStringView::bFindTextBody(const  tCIDLib::TCh*&  pszStart
                                             , const tCIDLib::TCh*&  pszEnd) const
 {
-    tCIDLib::TCard4 c4Start;
-    tCIDLib::TCard4 c4End;
+    tCIDLib::TCard4 c4Start = 0;
+    tCIDLib::TCard4 c4End = 0;
     const tCIDLib::TBoolean bRes = TRawStr::bFindTextBody
     (
         pszBuffer(), c4Start, c4End, bHaveLength() ? c4Length() : kCIDLib::c4MaxCard
@@ -147,7 +147,7 @@ tCIDLib::TBoolean TStringView::bStartsWith( const   TString&            strToFin
 }
 
 
-tCIDLib::TVoid TStringView::CopyOutSubStr(          TString&            strTarget
+tCIDLib::TVoid TStringView::CopyOutSubStr(  COP     TString&            strTarget
                                             , const tCIDLib::TCard4     c4Start
                                             , const tCIDLib::TCard4     c4Len) const
 {

@@ -50,6 +50,7 @@ class TCIDAITestApp : public TTestFWApp
         TCIDAITestApp();
 
         TCIDAITestApp(const TCIDAITestApp&) = delete;
+        TCIDAITestApp(TCIDAITestApp&&) = delete;
 
         ~TCIDAITestApp();
 
@@ -60,21 +61,21 @@ class TCIDAITestApp : public TTestFWApp
         tCIDLib::TBoolean bInitialize
         (
                     TString&                strErr
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid LoadTests() override;
+        tCIDLib::TVoid LoadTests() final;
 
         tCIDLib::TVoid PostTest
         (
             const   TTestFWTest&            tfwtFinished
-        )   override;
+        )   final;
 
         tCIDLib::TVoid PreTest
         (
             const   TTestFWTest&            tfwtStarting
-        )   override;
+        )   final;
 
-        tCIDLib::TVoid Terminate() override;
+        tCIDLib::TVoid Terminate() final;
 
 
     private :

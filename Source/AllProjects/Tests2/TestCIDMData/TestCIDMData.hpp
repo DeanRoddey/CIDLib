@@ -54,6 +54,7 @@ class TMDataTestApp : public TTestFWApp
         TMDataTestApp();
 
         TMDataTestApp(const TMDataTestApp&) = delete;
+        TMDataTestApp(TMDataTestApp&&) = delete;
 
         ~TMDataTestApp();
 

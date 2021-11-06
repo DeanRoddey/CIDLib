@@ -419,12 +419,9 @@ tCIDLib::TBoolean TSrvTarget::bMakeSocket()
     psockNew->bNagleOn(kCIDLib::False);
 
     // And wait for an acceptance code from the server
-    tCIDLib::TCard4 c4Status;
+    tCIDLib::TCard4 c4Status = 0;
     const tCIDLib::TCard4 c4ToRead = sizeof(c4Status);
-    const tCIDLib::TEncodedTime enctWait
-    (
-        kCIDLib::enctFourSeconds + facCIDOrb().enctTimeoutAdjust()
-    );
+    const tCIDLib::TEncodedTime enctWait(kCIDLib::enctFourSeconds + facCIDOrb().enctTimeoutAdjust());
     if (psockNew->c4ReceiveRawTO(&c4Status, enctWait, c4ToRead) != c4ToRead)
     {
         if (facCIDOrb().bLogWarnings())
@@ -445,8 +442,8 @@ tCIDLib::TBoolean TSrvTarget::bMakeSocket()
     if (c4Status != kCIDOrb::c4Accepted)
     {
         // It wasn't accepted by the server, so translate to an error
-        tCIDLib::EErrClasses eClass;
-        tCIDLib::TMsgId midReason;
+        tCIDLib::EErrClasses eClass = tCIDLib::EErrClasses::Unknown;
+        tCIDLib::TMsgId midReason = kOrbMsgs::midRej_Unknown;
         switch(c4Status)
         {
             case kCIDOrb::c4RejectTooMany :
@@ -455,8 +452,6 @@ tCIDLib::TBoolean TSrvTarget::bMakeSocket()
                 break;
 
             default :
-                eClass = tCIDLib::EErrClasses::Unknown;
-                midReason = kOrbMsgs::midRej_Unknown;
                 break;
         }
 
@@ -855,8 +850,8 @@ TSrvTarget::PollReplies(TThread& thrCaller
     //  NOTE that we mean the FD_READ event, not the event that we block on.
     //  We reset the event object before even calling into here.
     //
-    tCIDLib::TCard4     c4DataBytes;
-    tCIDLib::TCard4     c4SeqId;
+    tCIDLib::TCard4     c4DataBytes = 0;
+    tCIDLib::TCard4     c4SeqId = 0;
     while (kCIDLib::True)
     {
         strmRead.Reset();
@@ -1021,7 +1016,7 @@ tCIDLib::TVoid TSrvTarget::SendQueued(TThread&, TBinMBufOutStream& strmWrite)
         //  list go again so that clients can queue up more items while we are
         //  in here.
         //
-        TCmdQItem* pcqiCur;
+        TCmdQItem* pcqiCur = nullptr;
         {
             TLocker lockrSync(&m_mtxSync);
 

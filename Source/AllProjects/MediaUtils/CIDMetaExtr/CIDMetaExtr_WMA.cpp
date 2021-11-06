@@ -74,7 +74,7 @@ struct TReaderStatusHandler : public IWMStatusCallback
     {
     }
 
-    HRESULT __stdcall QueryInterface(REFIID riid, void **ppv)
+    HRESULT __stdcall QueryInterface(REFIID riid, void **ppv) final
     {
         if ((riid == IID_IUnknown)
         ||  (riid == IID_IWMStatusCallback))
@@ -87,12 +87,12 @@ struct TReaderStatusHandler : public IWMStatusCallback
         return E_NOINTERFACE;
     }
 
-    unsigned long __stdcall AddRef(void)
+    unsigned long __stdcall AddRef(void) final
     {
         return m_c4RefCnt++;
     }
 
-    unsigned long __stdcall Release(void)
+    unsigned long __stdcall Release(void) final
     {
         if (m_c4RefCnt)
         {
@@ -107,7 +107,7 @@ struct TReaderStatusHandler : public IWMStatusCallback
                                 , HRESULT           hRes
                                 , WMT_ATTR_DATATYPE dwType
                                 , BYTE*             pValue
-                                , void*             pvContext)
+                                , void*             pvContext) final
     {
         if (FAILED(hRes))
             m_pmetexOwner->StatusCallback(hRes);

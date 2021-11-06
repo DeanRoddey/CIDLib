@@ -440,6 +440,10 @@ tCIDLib::TBoolean TVCppDriver::bCompileCpps()
             {
                 pstrRules->Append(L"Source\\Cmd\\Win32\\Standard2.ruleset\"");
             }
+             else if (facCIDBuild.eCodeAnalysis() == tCIDBuild::EAnalysisLevels::Temp)
+            {
+                pstrRules->Append(L"Source\\Cmd\\Win32\\Temp.ruleset\"");
+            }
              else
             {
                 stdOut  << L"Unknown code analysis level" << kCIDBuild::EndLn;

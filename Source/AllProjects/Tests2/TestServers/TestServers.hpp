@@ -186,7 +186,7 @@ class TTest_NameSrv : public TTestServersBase
         (
                     TTextStringOutStream&   strmOutput
             ,       tCIDLib::TBoolean&      bWarning
-        );
+        )   final;
 
 
     protected :

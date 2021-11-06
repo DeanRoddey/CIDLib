@@ -169,7 +169,7 @@ class TMEngSHA1HashInfo : public TMEngClassInfo
                     TCIDMacroEngine&        meOwner
             , const TMEngMethodInfo&        methiTarget
             ,       TMEngClassVal&          mecvInstance
-        )   override;
+        )   final;
 
 
     private :
@@ -313,7 +313,7 @@ class TMEngSHA1Info : public TMEngClassInfo
                     TCIDMacroEngine&        meOwner
             , const TMEngMethodInfo&        methiTarget
             ,       TMEngClassVal&          mecvInstance
-        )   ;
+        )   final;
 
 
     private :

@@ -391,7 +391,7 @@ tCIDLib::TVoid TGUIRegion::Set( const   TArea&          areaToSet
     //
     //  Create the region. There is a known stupidity in Windows in which the area
     //  of a rounded rect region is not the same as a non-rounded, so we have to add
-	//	1 to get the right results. It's sort of doubly non-inclusive.
+	//	2 to get the right results. It's sort of doubly non-inclusive.
     //
     tCIDGraphDev::TRegionHandle hrgnTmp = ::CreateRoundRectRgn
     (

@@ -40,12 +40,10 @@ class TTextSym : public TObject, public MStreamable
         // -------------------------------------------------------------------
         //  Constructors and Destructor
         // -------------------------------------------------------------------
-        TTextSym();
+        TTextSym() = default;
 
-        TTextSym
-        (
-            const   TTextSym&               tsymToCopy
-        );
+        TTextSym(const TTextSym&) = default;
+        TTextSym(TTextSym&&) = default;
 
         TTextSym
         (
@@ -53,16 +51,14 @@ class TTextSym : public TObject, public MStreamable
             , const tCIDResEd::EMsgTypes    eType
         );
 
-        ~TTextSym();
+        ~TTextSym() = default;
 
 
         // -------------------------------------------------------------------
         //  Public operators
         // -------------------------------------------------------------------
-        TTextSym& operator=
-        (
-            const   TTextSym&               tsymToAssign
-        );
+        TTextSym& operator=(const TTextSym&) = default;
+        TTextSym& operator=(TTextSym&&) = default;
 
         tCIDLib::TBoolean operator==
         (
@@ -102,12 +98,12 @@ class TTextSym : public TObject, public MStreamable
         tCIDLib::TVoid StreamFrom
         (
                     TBinInStream&           strmToReadFrom
-        );
+        )   final;
 
         tCIDLib::TVoid StreamTo
         (
                     TBinOutStream&          strmToWriteTo
-        )   const;
+        )   const final;
 
 
     private :
@@ -125,7 +121,7 @@ class TTextSym : public TObject, public MStreamable
         //  m_strSym
         //      The symbolic name as read from/written to the resource file.
         // -------------------------------------------------------------------
-        tCIDResEd::EMsgTypes    m_eType;
+        tCIDResEd::EMsgTypes    m_eType = tCIDResEd::EMsgTypes::Message;
         TString                 m_strRealSym;
         TString                 m_strSym;
 

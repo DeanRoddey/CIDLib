@@ -49,7 +49,7 @@ TLogSrvLogger::TLogSrvLogger(const TString& strLocalPath) :
 
     m_bForceLocal(kCIDLib::False)
     , m_enctLast(0)
-    , m_porbcLogger(0)
+    , m_porbcLogger(nullptr)
     , m_strLocalPath(strLocalPath)
     , m_strmBuf(8192)
 {

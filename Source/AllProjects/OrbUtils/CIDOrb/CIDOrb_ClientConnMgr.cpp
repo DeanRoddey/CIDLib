@@ -609,7 +609,7 @@ tCIDLib::TVoid TOrbClientConnMgr::Terminate()
 //  The main thread tells us if this is the first time this is called. If so, we
 //  will log stuff that we won't subsequently if we have to keep trying.
 //
-tCIDLib::TBoolean TOrbClientConnMgr::bMakeListener(tCIDLib::TBoolean& bFirstTime)
+tCIDLib::TBoolean TOrbClientConnMgr::bMakeListener(COP tCIDLib::TBoolean& bFirstTime)
 {
     // Remember the first time flag and then clear it
     tCIDLib::TBoolean bLogMsgs = bFirstTime;

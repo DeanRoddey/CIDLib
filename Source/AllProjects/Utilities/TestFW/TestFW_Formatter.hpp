@@ -94,8 +94,15 @@ class TTFWHTMLFormatter : public TTFWFormatter
         TTFWHTMLFormatter();
 
         TTFWHTMLFormatter(const TTFWHTMLFormatter&) = delete;
+        TTFWHTMLFormatter(TTFWHTMLFormatter&&) = delete;
 
         ~TTFWHTMLFormatter();
+
+        // -------------------------------------------------------------------
+        //  Public oeprators
+        // -------------------------------------------------------------------
+        TTFWHTMLFormatter& operator=(const TTFWHTMLFormatter&) = delete;
+        TTFWHTMLFormatter& operator=(TTFWHTMLFormatter&&) = delete;
 
 
         // -------------------------------------------------------------------
@@ -110,7 +117,7 @@ class TTFWHTMLFormatter : public TTFWFormatter
             , const tTestFW::TStatList&     fcolStats
             , const tTestFW::TGroupList&    colGroupList
             , const tTestFW::TNameList&     colGroupsRun
-        );
+        )   final;
 
 
     private :
